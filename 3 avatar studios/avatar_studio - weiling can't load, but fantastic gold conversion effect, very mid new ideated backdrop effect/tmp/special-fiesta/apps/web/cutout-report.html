@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cut-out chooser — report over the recorded crowd</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 1.5rem;
+        background: #0e1925;
+        color: #f0baa1;
+        font: 14px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+      h1 { font-size: 1.1rem; }
+      #status { padding: 0.75rem; background: #12243a; border-left: 4px solid #1d5b8c; }
+      .card { margin: 1.25rem 0; padding: 0.75rem; background: #12243a; border-left: 4px solid #2a4a3a; }
+      .card--moved { border-left-color: #c6784b; }
+      .card h2 { margin: 0 0 0.25rem; font-size: 0.95rem; }
+      .card p { margin: 0.15rem 0; }
+      .strip { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.6rem; }
+      figure { margin: 0; }
+      figcaption { font-size: 11px; opacity: 0.8; }
+      canvas { image-rendering: pixelated; display: block; }
+      .dump { white-space: pre-wrap; word-break: break-all; background: #060b12; padding: 0.75rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Cut-out chooser — step 2 of the auto-tuning assessment</h1>
+    <p>
+      Every photograph the demo crowd was built from, run through the pipeline that ships, then
+      scored. Orange cards are the ones where the chooser disagrees with
+      <code>DEFAULT_TUNING</code>. The question is whether it moves only where the default does
+      damage. Dev server only.
+    </p>
+    <p id="status" data-testid="cutout-report__status" data-state="running">starting…</p>
+    <div id="out"></div>
+    <script type="module" src="/tools/cutoutReport.ts"></script>
+  </body>
+</html>

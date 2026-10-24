@@ -1,0 +1,241 @@
+# TEST — the `development` stage of the SHIP-HATS pipeline. INERT DRAFT.
+#
+# The webapp E2E template expects this file to hold the static checks: linting, dependency
+# checking and unit/integration tests (docs: tools/gitlab/web-app-tutorial.md,
+# "TEST.gitlab-ci.yml"; snippets/sample-pipeline.md draws them as lint-job,
+# depcheck-job, unit-test-job). The job names below are those three names on purpose — the
+# compliance framework does not key off them, but a team reading both this repo and the
+# template docs should be able to match them one to one.
+#
+# Everything these jobs run already exists in this repo: `npm run typecheck`,
+# `npm run lint`, `npm run standards`, `npm run test:api`, `npm run test:web` are the same
+# commands `npm run verify` chains locally (package.json:44), which means a red pipeline and
+# a red local run have one cause. Nothing here invents a second definition of "green".
+#
+# CONFIRM: `stage: development` for these jobs — the stage list comes from the included
+# template, so a mismatch is a config error, not a job failure.
+
+lint-job:
+  stage: development
+  needs: []
+  tags:
+    - "@@RUNNER_TAG_TOOLING@@"
+  script:
+    - npm ci --no-audit --no-fund
+    # ESLint over the whole workspace set (eslint.config.js is at the root on purpose),
+    # then scripts/check-standards.mjs — the repo's own structural gate: file naming,
+    # the 800-line caps, and the rule that Dockerfile and Dockerfile-prd ship the same bits
+    # (ADR-323), which is also what makes choosing $DOCKERFILE here meaningful.
+    - npm run lint
+    - npm run standards
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH || $CI_COMMIT_TAG'
+
+unit-test-job:
+  stage: development
+  needs: []
+  tags:
+    - "@@RUNNER_TAG_TOOLING@@"
+  script:
+    - npm ci --no-audit --no-fund
+    - npm run typecheck
+    # Per-workspace vitest invocations rather than `npm run test`, because CI needs two
+    # reporters the local command deliberately does not configure: junit XML for GitLab's
+    # test-report tab, and lcov + cobertura for Sonar and `coverage:`. The apps' own
+    # vite.config.ts / vitest.config.ts stay untouched so a developer's `npm test` keeps
+    # its current output — and their coverage thresholds (ADR-080 ratchets) stay in force,
+    # since only reporters are added on the command line.
+    - |
+      cd apps/api
+      npx vitest run --coverage \
+        --coverage.reporter=lcov \
+        --coverage.reporter=cobertura \
+        --reporter=default --reporter=junit --outputFile=test-results/junit.xml
+      cd "$CI_PROJECT_DIR"
+    - |
+      cd apps/web
+      npx vitest run --coverage \
+        --coverage.reporter=lcov \
+        --coverage.reporter=cobertura \
+        --reporter=default --reporter=junit --outputFile=test-results/junit.xml
+      cd "$CI_PROJECT_DIR"
+    # A machine-readable coverage number for the pipeline UI. The summary shape is
+    # { total: { lines: { pct } } }, which the regex below reads.
+    - |
+      for f in apps/api/coverage/coverage-summary.json apps/web/coverage/coverage-summary.json; do
+        node -e 'const s=require(process.argv[1]);console.log("Coverage:",s.total.lines.pct,"%")' "$f"
+      done
+  coverage: '/Coverage:\s+([\d.]+)\s+%/'
+  # Sonar consumes the lcov files (sonar.javascript.lcov.reportPaths=apps/api/coverage/lcov.info,
+  # apps/web/...); cobertura is only there for GitLab's own coverage payload. CONFIRM: if the
+  # v8 provider refuses `cobertura`, drop that flag and the `coverage_report:` block — the
+  # lcov path is the one Sonar needs.
+  artifacts:
+    when: always
+    paths:
+      - apps/api/coverage/
+      - apps/web/coverage/
+    reports:
+      junit:
+        - apps/api/test-results/junit.xml
+        - apps/web/test-results/junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: "apps/*/coverage/coverage-cobertura.xml"
+    expire_in: "1 week"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH || $CI_COMMIT_TAG'
+
+depcheck-job:
+  stage: development
+  needs: []
+  tags:
+    - "@@RUNNER_TAG_TOOLING@@"
+  script:
+    - npm ci --no-audit --no-fund
+    # Missing/extraneous/invalid dependencies against the lockfile. `npm ci` would already
+    # have failed on an uncommitted lockfile, so this catches the subtler case: a package
+    # present in node_modules that no import uses (drift between package.json and code).
+    - npm ls --all > npm-ls.log || true
+    - |
+      if grep -qE "UNMET DEPENDENCY|invalid|extraneous" npm-ls.log; then
+        grep -E "UNMET DEPENDENCY|invalid|extraneous" npm-ls.log
+        echo "npm ls reported a problem — see npm-ls.log" >&2
+        exit 1
+      fi
+    # SCA. When Nexus IQ is in play the framework's ship-nexus-iq-scan job is the gate and
+    # this audit is advisory only; when it is not, this is the dependency scan IM8 asks for,
+    # so it must be able to fail the pipeline.
+    - npm audit --omit=dev --audit-level=high > npm-audit-high.log || true
+    - npm audit --omit=dev --audit-level=critical > npm-audit-critical.log || true
+    - |
+      echo "--- critical (blocking)"; cat npm-audit-critical.log
+      if [ -s npm-audit-critical.log ] && grep -q "critical" npm-audit-critical.log; then
+        echo "critical npm audit finding — see npm-audit-critical.log" >&2
+        exit 1
+      fi
+  artifacts:
+    when: always
+    paths:
+      - npm-ls.log
+      - npm-audit-high.log
+      - npm-audit-critical.log
+    expire_in: "1 week"
+  rules:
+    - if: '$USE_NEXUS_IQ == "true"'
+      allow_failure: true
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH || $CI_COMMIT_TAG'
+
+# Build-time test of the thing the pipeline is shipping: the image itself. The runner has
+# no docker daemon, so the check is structural — the tarball Kaniko produced must contain
+# the layer set the Dockerfile describes, and `.dockerignore` must still be keeping the
+# ~185 MB of test photographs out of the build context, because a context that grows back
+# to 185 MB is a build that slows down for everyone.
+#
+# It sits in `build-and-package` rather than `development` because `needs:` may only reach
+# backwards to an earlier or same stage, and its input is build-job's artefact.
+image-audit-job:
+  stage: build-and-package
+  needs: ["build-job"]
+  tags:
+    - "@@RUNNER_TAG_TOOLING@@"
+  script:
+    - |
+      cd "$CI_PROJECT_DIR/$WORKING_DIR"
+      test -s "$OUTPUT_ARTEFACT" || { echo "build-job produced no artefact" >&2; exit 1; }
+      tar -xf "$OUTPUT_ARTEFACT" manifest.json
+      node -e '
+        const m = require(process.cwd() + "/manifest.json");
+        const layers = m[0].Layers || [];
+        console.log("image:", m[0].Config || "(no config path)");
+        console.log("layers:", layers.length);
+        if (layers.length === 0) { console.error("manifest lists no layers"); process.exit(1); }
+        if (layers.length > 40) { console.error("suspiciously many layers — check .dockerignore"); process.exit(1); }
+      '
+      rm -f manifest.json
+    - du -h "$OUTPUT_ARTEFACT" | awk '{print "artefact size:", $1}'
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH || $CI_COMMIT_TAG'
+
+# A pipeline that fails in the deploy stage because a token was never added is a pipeline
+# that wasted a build. Everything below costs one job's worth of seconds at the very start
+# and checks the agreement between the switches in this file's variables and the credentials
+# GitLab has been given. Masked variables are still readable by a script, which is all
+# `test -n` needs — the check never prints a value.
+config-check-job:
+  stage: planning
+  needs: []
+  tags:
+    - "@@RUNNER_TAG_TOOLING@@"
+  before_script:
+    - "true"
+  script:
+    - |
+      fail=0
+      note() { printf '%s\n' "$1"; }
+      need() {
+        # Indirect expansion rather than `printenv`, so the check behaves the same in bash,
+        # dash and busybox ash, and so an absent variable is an empty string rather than a
+        # non-zero exit inside a script GitLab runs under `set -e`. Only the emptiness of the
+        # value is ever read, and only the name is ever printed.
+        eval "value=\${$1:-}"
+        if [ -z "$value" ]; then
+          note "  MISSING  \$$1 — $2"
+          fail=1
+        else
+          note "  ok       \$$1"
+        fi
+        value=""
+      }
+      need NEXUSREPO_REPO_ID "set in .gitlab-ci.yml; it is a setting, not a secret"
+      note "switches:"
+      [ "${DEPLOY_STRATEGY:-}" = "docker-ssh" ] \
+        || { note "  DEPLOY_STRATEGY=${DEPLOY_STRATEGY:-unset} is not implemented — see DEPLOY.gitlab-ci.yml"; fail=1; }
+      if [ "${USE_SONAR:-}" = "true" ]; then
+        need SONAR_TOKEN "create it in Settings → CI/CD → Variables"
+        need SONAR_PROJECTKEY "set in .gitlab-ci.yml"
+      else
+        note "  USE_SONAR=false — the framework will still scan if the project has Sonar set up"
+      fi
+      if [ "${USE_NEXUS_IQ:-}" = "true" ]; then
+        need NEXUS_IQ_USERNAME "create it in Settings → CI/CD → Variables"
+        need NEXUS_IQ_PASSWORD "create it in Settings → CI/CD → Variables"
+        need NEXUS_IQ_APP_ID "the public id Nexus IQ gave this application"
+      else
+        note "  USE_NEXUS_IQ=false — depcheck-job's npm audit is the dependency gate, so it runs blocking"
+      fi
+      if [ "${USE_FOD:-}" = "true" ]; then
+        need FOD_USERNAME "create it in Settings → CI/CD → Variables"
+        need FOD_PAT "create it in Settings → CI/CD → Variables"
+        need FOD_RELEASE "the Fortify release name, set in .gitlab-ci.yml"
+      else
+        note "  USE_FOD=false — GitLab's native SAST/DAST run instead"
+      fi
+      if [ "${PUSH_IMAGE:-}" = "true" ]; then
+        note "  PUSH_IMAGE=true — image-push-job authenticates with CI_REGISTRY_USER and CI_REGISTRY_PASSWORD, which GitLab defines for every project"
+        need IMAGE_REPOSITORY "otherwise the tag has nowhere to go"
+      fi
+      if [ -z "${NEXUS_NPM_GROUP_REPO:-}" ]; then
+        note "  NEXUS_NPM_GROUP_REPO is blank: npm ci will use the default registry, which a"
+        note "  SHIP-HATS shared runner usually cannot reach. Expect npm errors, not network config."
+      fi
+      if [ -z "${TESTING_HOST:-}" ]; then
+        note "  TESTING_HOST is blank — deploy-testing-job will fail with its own guard, not this one"
+      fi
+      if [ -z "${COSIGN_PASSWORD:-}" ]; then
+        note "  COSIGN_PASSWORD unset: sign-artefact-job (framework) will fail; that is the gate, not a bug"
+      fi
+      # The artefact has to exist where the framework looks for it, and the paths in
+      # BUILD.gitlab-ci.yml are literal, so both assumptions are checked rather than trusted.
+      # Every optional variable is read as ${X:-} so the job still works if someone adds
+      # `set -u`, which is the shell default a developer would reach for locally.
+      [ "${WORKING_DIR:-}" = "." ] \
+        || { note "  WORKING_DIR=${WORKING_DIR:-unset}, but BUILD.gitlab-ci.yml writes artifacts relative to the root"; fail=1; }
+      exit "$fail"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH || $CI_COMMIT_TAG'

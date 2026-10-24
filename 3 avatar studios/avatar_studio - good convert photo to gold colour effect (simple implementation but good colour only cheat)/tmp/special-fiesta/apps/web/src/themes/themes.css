@@ -1,0 +1,11 @@
+/*
+ * ADR-294 — every venue's stylesheets, in one place, so adding a venue is one line here and
+ * nothing in styles/. Order is irrelevant between venues: each defines its own [data-venue]
+ * block, and the default (:root) is Sentosa alone (see sentosa/theme.css), so import order does not decide who wins.
+ */
+@import './sentosa/theme.css';
+@import './sentosa/scene.css';
+@import './tessensohn/theme.css';
+@import './tessensohn/scene.css';
+@import './kallang/theme.css';
+@import './kallang/scene.css';

@@ -1,0 +1,36 @@
+# SHIP-HATS pipeline — INERT (CLAUDE §10.3). Activate with ./activate-shiphats.sh
+# Mirrors local gates: typecheck, unit tests, python pipeline tests, build,
+# container smoke test on port 3000. Scans/signing attach via the SHIP-HATS
+# templates pinned below (literal ref; include: cannot take variables).
+include:
+  - project: "innersource/sgts/ship-hats/ship-hats-templates"
+    ref: "@@SHIPHATS_TEMPLATES_REF@@"
+    file:
+      - "/templates/build-and-push-docker-image.yml"
+
+variables:
+  SHIPHATS_PROJECT: "@@SHIPHATS_PROJECT@@"
+
+stages: [.pre, build, test, static-test, sign, runtime-test, deploy]
+
+build-job:
+  stage: build
+  image: node:22-alpine
+  script:
+    - npm ci --ignore-scripts
+    - npx tsc --noEmit
+    - npm test
+    - npm run build
+
+test-python-job:
+  stage: test
+  image: python:3.12-slim
+  script:
+    - pip install Pillow numpy opencv-python-headless pytest
+    - python -m pytest tests/python -q
+
+deploy-prod-manual-job:
+  stage: deploy
+  when: manual
+  script:
+    - echo "Promote the signed image for @@SHIPHATS_PROJECT@@ (manual gate)"

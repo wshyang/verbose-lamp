@@ -1,0 +1,57 @@
+/*
+ * ADR-294 / ADR-296 — Sentosa's palette and motif roles for the participant theme.
+ *
+ * Every venue-owned colour is defined here under a ROLE name (accent, surface, primary...), not a
+ * beach name, so the stylesheet that uses them reads the same whichever venue is active.
+ * Structural colours (ink, paper, the LED, the console palette) stay in styles/tokens.css.
+ *
+ * `:root` carries these as the default, so the page is right before any script has run;
+ * `[data-venue='sentosa']` is what `useVenue` sets, and what a second venue's file overrides
+ * with higher specificity.
+ *
+ * `--scene-sky` must equal the top row of this venue's panorama (ADR-022, `skyTop` in
+ * scripts/themes/sentosa/scene/pixel-art.mjs): the sky above the scene box has to match it.
+ *
+ * The `--motif-*` roles are the sprites styles/gameboy.css places by CSS. The `?v=` stamps are
+ * written by `npm run motifs`; do not edit them by hand (ADR-067).
+ */
+
+:root,
+:root[data-venue='sentosa'] {
+  --primary-deep: #0a4f8f;
+  --primary: #2f7dd1;
+  --primary-light: #61b3f2;
+  --sky: #8fd3ff;
+  --scene-sky: #5fb8ec;
+  /* ADR-298 — the art's 480 / 270. A strip venue (the default) is sized from this alone. */
+  --scene-aspect: 1.7777778;
+  /* The colour either side of a full-height plate. Sentosa is a full-width strip, so it never
+     shows; it is defined because every venue must (cssContract.ts). */
+  --scene-edge: var(--scene-sky);
+  --surface: #f5e2b8;
+  --surface-deep: #e3c88b;
+  --secondary: #1b998b;
+  --hot: #e8483f;
+  --hot-deep: #a32b24;
+  --hot-pale: #f9e3e0;
+  --accent: #ffc72c;
+  --accent-deep: #e0a800;
+  --landmark: #9fd6c4;
+  /* The row flash on a live list (ADR-095): the accent, at the opacity it always had. */
+  /* ADR-299 — the banner. Sentosa's current look: a sand plate, a red title outlined in ink. */
+  --banner-bg: var(--surface);
+  --banner-bg-deep: var(--surface-deep);
+  --banner-ink: var(--hot);
+  --banner-outline: var(--ink);
+  --banner-border: var(--ink);
+  --live-flash: color-mix(in srgb, var(--accent) 85%, transparent);
+
+  --motif-cloud: url('/themes/sentosa/motifs/cloud.svg?v=f222a466');
+  --motif-bunting: url('/themes/sentosa/motifs/bunting.svg?v=f222a466');
+  --motif-shoreline: url('/themes/sentosa/motifs/wave.svg?v=f222a466');
+  --motif-coin: url('/themes/sentosa/motifs/coin.svg?v=f222a466');
+  --motif-stamp: url('/themes/sentosa/motifs/stamp.svg?v=f222a466');
+  --motif-bullet: url('/themes/sentosa/motifs/volleyball.svg?v=f222a466');
+  --motif-empty: url('/themes/sentosa/motifs/shell.svg?v=f222a466');
+  --motif-loader: url('/themes/sentosa/motifs/starfish.svg?v=f222a466');
+}

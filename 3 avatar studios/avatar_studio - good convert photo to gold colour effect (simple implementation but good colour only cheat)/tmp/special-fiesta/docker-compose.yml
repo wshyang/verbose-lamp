@@ -1,0 +1,70 @@
+# Deployment: the app container, a Postgres server, and the app's own Cloudflare tunnel
+# (ADR-043 for the single-container app, ADR-051 for the database service).
+#
+#   SUPERADMIN_INITIAL_PASSCODE=... TUNNEL_TOKEN=... docker compose up -d --build
+#
+# Without TUNNEL_TOKEN a throwaway trycloudflare URL is printed in `docker compose logs`.
+# The port mapping below is a convenience for LAN access and can be removed when the
+# tunnel is the only intended entrance.
+#
+# **Postgres is the default here, PGlite is not.** A deployed event should run on a server whose
+# backups and connection limits are somebody's job, and `DATABASE_URL` is all it takes to say so.
+# To use a managed database instead — Neon, RDS, Supabase — set DATABASE_URL in the environment and
+# run `docker compose up app`, leaving the db service below unused.
+#
+# There is no migration step. The app provisions an empty database from schema.sql on first boot
+# (ADR-049), so `docker compose up` against a fresh volume is the entire install.
+#
+# **This stack builds the production image, which seeds no demo data** (ADR-175). A deployment is
+# the one place fabricated participants must never appear. To bring the stack up with the demo
+# day loaded instead — for a rehearsal or a sales demo — build the default image:
+#
+#   PSD_DOCKERFILE=Dockerfile docker compose up -d --build
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ${PSD_DOCKERFILE:-Dockerfile-prd}
+    environment:
+      SUPERADMIN_INITIAL_PASSCODE: ${SUPERADMIN_INITIAL_PASSCODE:?required on first boot}
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:-}
+      TUNNEL_DISABLE: ${TUNNEL_DISABLE:-0}
+      PORT: "3000" # both images listen here under compose; the mapping below must match
+      COOKIE_SECURE: ${COOKIE_SECURE:-true} # the tunnel origin is https
+      # `db` is the service name; compose resolves it on the shared network. Override this variable
+      # to point at a managed database and the db service below simply goes unused.
+      DATABASE_URL: ${DATABASE_URL:-postgresql://psd:${POSTGRES_PASSWORD:-psd}@db:5432/psd_active_day}
+    ports:
+      - "3000:3000"
+    volumes:
+      # Still mounted: the tunnel and any future on-disk artefact live here. Photo bytes and the
+      # database itself do not — those are Postgres rows now (ADR-048).
+      - psd-data:/data
+    depends_on:
+      db:
+        # Not merely "started": Postgres accepts connections a moment after the container exists, and
+        # provisioning a schema against a server that is still starting fails in a way that looks
+        # like a bug in the app.
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: psd
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-psd}
+      POSTGRES_DB: psd_active_day
+    volumes:
+      - psd-pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U psd -d psd_active_day"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    # Deliberately NOT published to the host. The app reaches it over the compose network; exposing
+    # a database port on an event laptop is an invitation nobody needs.
+    restart: unless-stopped
+
+volumes:
+  psd-data:
+  psd-pg:

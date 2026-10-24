@@ -1,0 +1,71 @@
+{
+  "name": "psd-active-day",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "PSD Active Day App \u2014 on-the-day event operations for the PSD Active Day agency sports event",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=20.11"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:api": "npm run dev --workspace @psd/api",
+    "dev:web": "npm run dev --workspace @psd/web",
+    "build": "npm run build --workspace @psd/contracts && npm run build --workspace @psd/api && npm run build --workspace @psd/web",
+    "build:web": "npm run build --workspace @psd/web",
+    "typecheck": "tsc -p packages/contracts/tsconfig.json && tsc -p packages/tournament/tsconfig.json && tsc -p apps/api/tsconfig.json && tsc -p apps/web/tsconfig.json && npm run typecheck:e2e",
+    "typecheck:e2e": "tsc -p tsconfig.e2e.json --noEmit",
+    "lint": "eslint .",
+    "standards": "node scripts/check-standards.mjs",
+    "db:setup": "npm run db:setup --workspace @psd/api",
+    "db:export-demo": "npm run db:export-demo --workspace @psd/api",
+    "test": "npm run test:tournament && npm run test:api && npm run test:web",
+    "test:api": "npm run test --workspace @psd/api",
+    "test:web": "npm run test --workspace @psd/web",
+    "test:e2e": "npm run test:e2e:parallel && npm run test:e2e:exclusive",
+    "test:e2e:parallel": "playwright test e2e/acceptance e2e/participant e2e/facilitator e2e/superadmin",
+    "test:e2e:exclusive": "playwright test e2e/exclusive --workers=1",
+    "test:e2e:full-event": "playwright test --config playwright.full-event.config.ts",
+    "test:e2e:dress-rehearsal": "playwright test --config playwright.dress-rehearsal.config.ts",
+    "test:e2e:tessensohn": "playwright test --config playwright.tessensohn.config.ts",
+    "test:e2e:scale": "playwright test --config playwright.scale.config.ts",
+    "test:e2e:load": "playwright test --config playwright.load.config.ts",
+    "load": "tsx e2e/load/cli.ts",
+    "test:e2e:acceptance": "playwright test e2e/acceptance",
+    "test:e2e:participant": "playwright test e2e/participant",
+    "test:e2e:cutout": "PSD_E2E_REAL_MODEL=1 playwright test e2e/participant/cutout-chooser.spec.ts --project=desktop-chrome",
+    "test:e2e:facilitator": "playwright test e2e/facilitator",
+    "test:e2e:superadmin": "playwright test e2e/superadmin",
+    "test:e2e:serial": "PSD_E2E_WORKERS=1 playwright test",
+    "test:e2e:chromium": "PSD_E2E_ENGINES=chromium playwright test",
+    "test:e2e:webkit": "PSD_E2E_ENGINES=webkit playwright test",
+    "test:e2e:all": "PSD_E2E_ENGINES=all playwright test",
+    "test:e2e:unit": "vitest run --config e2e/vitest.config.ts",
+    "e2e:install": "playwright install chromium webkit",
+    "seed:demo": "node scripts/seed-demo.mjs",
+    "demo:record": "node scripts/record-demo-seed.mjs",
+    "stress": "node scripts/stress-test.mjs",
+    "verify": "npm run typecheck && npm run lint && npm run standards && npm run build:web && npm run test",
+    "test:tournament": "npm run test --workspace @psd/tournament"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.36.0",
+    "@playwright/test": "^1.55.1",
+    "@types/node": "^22.18.6",
+    "@vitest/coverage-v8": "^3.2.7",
+    "eslint": "^9.36.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "globals": "^16.4.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.45.0",
+    "vitest": "^3.2.4"
+  },
+  "allowScripts": {
+    "canvas@3.2.3": true
+  }
+}

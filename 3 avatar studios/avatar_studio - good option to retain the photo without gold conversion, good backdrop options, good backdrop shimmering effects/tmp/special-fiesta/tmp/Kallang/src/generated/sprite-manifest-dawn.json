@@ -1,0 +1,4386 @@
+{
+  "sprites": [
+    {
+      "id": "char-blue-celebrate-back",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-blue-celebrate-back.png",
+      "width": 184,
+      "height": 250,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 2203,
+        "y": 423,
+        "w": 178,
+        "h": 244
+      }
+    },
+    {
+      "id": "char-blue-celebrate-front",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-blue-celebrate-front.png",
+      "width": 184,
+      "height": 248,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 2011,
+        "y": 425,
+        "w": 178,
+        "h": 242
+      }
+    },
+    {
+      "id": "char-blue-cheer-back",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-blue-cheer-back.png",
+      "width": 166,
+      "height": 254,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1429,
+        "y": 419,
+        "w": 160,
+        "h": 248
+      }
+    },
+    {
+      "id": "char-blue-cheer-front",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-blue-cheer-front.png",
+      "width": 174,
+      "height": 257,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1233,
+        "y": 417,
+        "w": 168,
+        "h": 251
+      }
+    },
+    {
+      "id": "char-blue-idle-back",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-blue-idle-back.png",
+      "width": 143,
+      "height": 261,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 205,
+        "y": 412,
+        "w": 137,
+        "h": 255
+      }
+    },
+    {
+      "id": "char-blue-idle-front",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-blue-idle-front.png",
+      "width": 142,
+      "height": 256,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 25,
+        "y": 417,
+        "w": 136,
+        "h": 250
+      }
+    },
+    {
+      "id": "char-blue-reach-left",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-blue-reach-left.png",
+      "width": 151,
+      "height": 247,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1835,
+        "y": 425,
+        "w": 145,
+        "h": 241
+      }
+    },
+    {
+      "id": "char-blue-reach-right",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-blue-reach-right.png",
+      "width": 145,
+      "height": 249,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1642,
+        "y": 424,
+        "w": 139,
+        "h": 243
+      }
+    },
+    {
+      "id": "char-blue-run-left",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-blue-run-left.png",
+      "width": 162,
+      "height": 256,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 823,
+        "y": 417,
+        "w": 156,
+        "h": 250
+      }
+    },
+    {
+      "id": "char-blue-run-right",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-blue-run-right.png",
+      "width": 160,
+      "height": 256,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1026,
+        "y": 417,
+        "w": 154,
+        "h": 250
+      }
+    },
+    {
+      "id": "char-blue-side-left",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-blue-side-left.png",
+      "width": 111,
+      "height": 257,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 577,
+        "y": 417,
+        "w": 105,
+        "h": 251
+      }
+    },
+    {
+      "id": "char-blue-side-right",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-blue-side-right.png",
+      "width": 110,
+      "height": 256,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 403,
+        "y": 417,
+        "w": 104,
+        "h": 250
+      }
+    },
+    {
+      "id": "char-green-celebrate-back",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-green-celebrate-back.png",
+      "width": 184,
+      "height": 244,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 2203,
+        "y": 765,
+        "w": 178,
+        "h": 238
+      }
+    },
+    {
+      "id": "char-green-celebrate-front",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-green-celebrate-front.png",
+      "width": 184,
+      "height": 245,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 2011,
+        "y": 765,
+        "w": 178,
+        "h": 239
+      }
+    },
+    {
+      "id": "char-green-cheer-back",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-green-cheer-back.png",
+      "width": 165,
+      "height": 252,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1429,
+        "y": 758,
+        "w": 159,
+        "h": 246
+      }
+    },
+    {
+      "id": "char-green-cheer-front",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-green-cheer-front.png",
+      "width": 174,
+      "height": 254,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1233,
+        "y": 755,
+        "w": 168,
+        "h": 248
+      }
+    },
+    {
+      "id": "char-green-idle-back",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-green-idle-back.png",
+      "width": 144,
+      "height": 257,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 205,
+        "y": 752,
+        "w": 138,
+        "h": 251
+      }
+    },
+    {
+      "id": "char-green-idle-front",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-green-idle-front.png",
+      "width": 143,
+      "height": 254,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 24,
+        "y": 755,
+        "w": 137,
+        "h": 248
+      }
+    },
+    {
+      "id": "char-green-reach-left",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-green-reach-left.png",
+      "width": 149,
+      "height": 244,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1837,
+        "y": 765,
+        "w": 143,
+        "h": 238
+      }
+    },
+    {
+      "id": "char-green-reach-right",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-green-reach-right.png",
+      "width": 146,
+      "height": 251,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1642,
+        "y": 760,
+        "w": 140,
+        "h": 245
+      }
+    },
+    {
+      "id": "char-green-run-left",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-green-run-left.png",
+      "width": 163,
+      "height": 251,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 823,
+        "y": 759,
+        "w": 157,
+        "h": 245
+      }
+    },
+    {
+      "id": "char-green-run-right",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-green-run-right.png",
+      "width": 160,
+      "height": 250,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1026,
+        "y": 759,
+        "w": 154,
+        "h": 244
+      }
+    },
+    {
+      "id": "char-green-side-left",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-green-side-left.png",
+      "width": 110,
+      "height": 250,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 577,
+        "y": 759,
+        "w": 104,
+        "h": 244
+      }
+    },
+    {
+      "id": "char-green-side-right",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-green-side-right.png",
+      "width": 111,
+      "height": 250,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 402,
+        "y": 759,
+        "w": 105,
+        "h": 244
+      }
+    },
+    {
+      "id": "char-orange-celebrate-back",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-orange-celebrate-back.png",
+      "width": 175,
+      "height": 220,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 2207,
+        "y": 1341,
+        "w": 169,
+        "h": 214
+      }
+    },
+    {
+      "id": "char-orange-celebrate-front",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-orange-celebrate-front.png",
+      "width": 176,
+      "height": 220,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 2015,
+        "y": 1341,
+        "w": 170,
+        "h": 214
+      }
+    },
+    {
+      "id": "char-orange-idle-back",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-orange-idle-back.png",
+      "width": 138,
+      "height": 232,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 206,
+        "y": 1329,
+        "w": 132,
+        "h": 226
+      }
+    },
+    {
+      "id": "char-orange-idle-front",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-orange-idle-front.png",
+      "width": 138,
+      "height": 231,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 31,
+        "y": 1330,
+        "w": 132,
+        "h": 225
+      }
+    },
+    {
+      "id": "char-orange-jog-back",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-orange-jog-back.png",
+      "width": 156,
+      "height": 233,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1435,
+        "y": 1329,
+        "w": 150,
+        "h": 227
+      }
+    },
+    {
+      "id": "char-orange-jog-front",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-orange-jog-front.png",
+      "width": 144,
+      "height": 230,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1037,
+        "y": 1332,
+        "w": 138,
+        "h": 224
+      }
+    },
+    {
+      "id": "char-orange-run-right-a",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-orange-run-right-a.png",
+      "width": 124,
+      "height": 230,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 681,
+        "y": 1331,
+        "w": 118,
+        "h": 224
+      }
+    },
+    {
+      "id": "char-orange-run-right-b",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-orange-run-right-b.png",
+      "width": 143,
+      "height": 229,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 839,
+        "y": 1331,
+        "w": 137,
+        "h": 223
+      }
+    },
+    {
+      "id": "char-orange-run-side-left",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-orange-run-side-left.png",
+      "width": 145,
+      "height": 208,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1839,
+        "y": 1341,
+        "w": 139,
+        "h": 202
+      }
+    },
+    {
+      "id": "char-orange-run-side-right",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-orange-run-side-right.png",
+      "width": 132,
+      "height": 222,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1651,
+        "y": 1335,
+        "w": 126,
+        "h": 216
+      }
+    },
+    {
+      "id": "char-orange-side-left",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-orange-side-left.png",
+      "width": 106,
+      "height": 227,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 529,
+        "y": 1334,
+        "w": 100,
+        "h": 221
+      }
+    },
+    {
+      "id": "char-orange-side-right",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-orange-side-right.png",
+      "width": 106,
+      "height": 226,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 379,
+        "y": 1335,
+        "w": 100,
+        "h": 220
+      }
+    },
+    {
+      "id": "char-orange-wave",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-orange-wave.png",
+      "width": 160,
+      "height": 232,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1235,
+        "y": 1329,
+        "w": 154,
+        "h": 226
+      }
+    },
+    {
+      "id": "char-purple-celebrate-back",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-purple-celebrate-back.png",
+      "width": 174,
+      "height": 221,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 2207,
+        "y": 1575,
+        "w": 168,
+        "h": 215
+      }
+    },
+    {
+      "id": "char-purple-celebrate-front",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-purple-celebrate-front.png",
+      "width": 173,
+      "height": 221,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 2016,
+        "y": 1577,
+        "w": 167,
+        "h": 215
+      }
+    },
+    {
+      "id": "char-purple-idle-back",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-purple-idle-back.png",
+      "width": 139,
+      "height": 231,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 206,
+        "y": 1567,
+        "w": 133,
+        "h": 225
+      }
+    },
+    {
+      "id": "char-purple-idle-front",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-purple-idle-front.png",
+      "width": 137,
+      "height": 229,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 30,
+        "y": 1569,
+        "w": 131,
+        "h": 223
+      }
+    },
+    {
+      "id": "char-purple-jog-back",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-purple-jog-back.png",
+      "width": 156,
+      "height": 235,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1435,
+        "y": 1563,
+        "w": 150,
+        "h": 229
+      }
+    },
+    {
+      "id": "char-purple-jog-front",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-purple-jog-front.png",
+      "width": 146,
+      "height": 229,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1036,
+        "y": 1569,
+        "w": 140,
+        "h": 223
+      }
+    },
+    {
+      "id": "char-purple-run-right-a",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-purple-run-right-a.png",
+      "width": 123,
+      "height": 229,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 680,
+        "y": 1569,
+        "w": 117,
+        "h": 223
+      }
+    },
+    {
+      "id": "char-purple-run-right-b",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-purple-run-right-b.png",
+      "width": 143,
+      "height": 229,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 839,
+        "y": 1569,
+        "w": 137,
+        "h": 223
+      }
+    },
+    {
+      "id": "char-purple-run-side-left",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-purple-run-side-left.png",
+      "width": 146,
+      "height": 210,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1839,
+        "y": 1577,
+        "w": 140,
+        "h": 204
+      }
+    },
+    {
+      "id": "char-purple-run-side-right",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-purple-run-side-right.png",
+      "width": 132,
+      "height": 224,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1651,
+        "y": 1569,
+        "w": 126,
+        "h": 218
+      }
+    },
+    {
+      "id": "char-purple-side-left",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-purple-side-left.png",
+      "width": 104,
+      "height": 229,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 529,
+        "y": 1569,
+        "w": 98,
+        "h": 223
+      }
+    },
+    {
+      "id": "char-purple-side-right",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-purple-side-right.png",
+      "width": 105,
+      "height": 229,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 377,
+        "y": 1569,
+        "w": 99,
+        "h": 223
+      }
+    },
+    {
+      "id": "char-purple-wave",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-purple-wave.png",
+      "width": 162,
+      "height": 234,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1235,
+        "y": 1564,
+        "w": 156,
+        "h": 228
+      }
+    },
+    {
+      "id": "char-red-celebrate-back",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-red-celebrate-back.png",
+      "width": 185,
+      "height": 251,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 2203,
+        "y": 56,
+        "w": 179,
+        "h": 245
+      }
+    },
+    {
+      "id": "char-red-celebrate-front",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-red-celebrate-front.png",
+      "width": 184,
+      "height": 250,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 2011,
+        "y": 57,
+        "w": 178,
+        "h": 244
+      }
+    },
+    {
+      "id": "char-red-cheer-back",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-red-cheer-back.png",
+      "width": 166,
+      "height": 257,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1429,
+        "y": 50,
+        "w": 160,
+        "h": 251
+      }
+    },
+    {
+      "id": "char-red-cheer-front",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-red-cheer-front.png",
+      "width": 176,
+      "height": 261,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1231,
+        "y": 46,
+        "w": 170,
+        "h": 255
+      }
+    },
+    {
+      "id": "char-red-idle-back",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-red-idle-back.png",
+      "width": 142,
+      "height": 264,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 205,
+        "y": 43,
+        "w": 136,
+        "h": 258
+      }
+    },
+    {
+      "id": "char-red-idle-front",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-red-idle-front.png",
+      "width": 142,
+      "height": 262,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 25,
+        "y": 45,
+        "w": 136,
+        "h": 256
+      }
+    },
+    {
+      "id": "char-red-reach-left",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-red-reach-left.png",
+      "width": 148,
+      "height": 250,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1837,
+        "y": 57,
+        "w": 142,
+        "h": 244
+      }
+    },
+    {
+      "id": "char-red-reach-right",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-red-reach-right.png",
+      "width": 146,
+      "height": 252,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1642,
+        "y": 57,
+        "w": 140,
+        "h": 246
+      }
+    },
+    {
+      "id": "char-red-run-left",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-red-run-left.png",
+      "width": 161,
+      "height": 261,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 823,
+        "y": 46,
+        "w": 155,
+        "h": 255
+      }
+    },
+    {
+      "id": "char-red-run-right",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-red-run-right.png",
+      "width": 161,
+      "height": 261,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1026,
+        "y": 46,
+        "w": 155,
+        "h": 255
+      }
+    },
+    {
+      "id": "char-red-side-left",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-red-side-left.png",
+      "width": 111,
+      "height": 262,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 577,
+        "y": 45,
+        "w": 105,
+        "h": 256
+      }
+    },
+    {
+      "id": "char-red-side-right",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-red-side-right.png",
+      "width": 110,
+      "height": 262,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 403,
+        "y": 45,
+        "w": 104,
+        "h": 256
+      }
+    },
+    {
+      "id": "char-yellow-celebrate-back",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-yellow-celebrate-back.png",
+      "width": 182,
+      "height": 243,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 2204,
+        "y": 1072,
+        "w": 176,
+        "h": 237
+      }
+    },
+    {
+      "id": "char-yellow-celebrate-front",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-yellow-celebrate-front.png",
+      "width": 182,
+      "height": 240,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 2012,
+        "y": 1075,
+        "w": 176,
+        "h": 234
+      }
+    },
+    {
+      "id": "char-yellow-cheer-back",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-yellow-cheer-back.png",
+      "width": 166,
+      "height": 253,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1429,
+        "y": 1061,
+        "w": 160,
+        "h": 247
+      }
+    },
+    {
+      "id": "char-yellow-cheer-front",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-yellow-cheer-front.png",
+      "width": 173,
+      "height": 254,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1232,
+        "y": 1059,
+        "w": 167,
+        "h": 248
+      }
+    },
+    {
+      "id": "char-yellow-idle-back",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-yellow-idle-back.png",
+      "width": 142,
+      "height": 255,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 206,
+        "y": 1060,
+        "w": 136,
+        "h": 249
+      }
+    },
+    {
+      "id": "char-yellow-idle-front",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-yellow-idle-front.png",
+      "width": 143,
+      "height": 252,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 25,
+        "y": 1062,
+        "w": 137,
+        "h": 246
+      }
+    },
+    {
+      "id": "char-yellow-reach-left",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-yellow-reach-left.png",
+      "width": 150,
+      "height": 243,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1835,
+        "y": 1071,
+        "w": 144,
+        "h": 237
+      }
+    },
+    {
+      "id": "char-yellow-reach-right",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-yellow-reach-right.png",
+      "width": 144,
+      "height": 249,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1643,
+        "y": 1066,
+        "w": 138,
+        "h": 243
+      }
+    },
+    {
+      "id": "char-yellow-run-left",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-yellow-run-left.png",
+      "width": 156,
+      "height": 248,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 825,
+        "y": 1065,
+        "w": 150,
+        "h": 242
+      }
+    },
+    {
+      "id": "char-yellow-run-right",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-yellow-run-right.png",
+      "width": 159,
+      "height": 248,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 1025,
+        "y": 1063,
+        "w": 153,
+        "h": 242
+      }
+    },
+    {
+      "id": "char-yellow-side-left",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-yellow-side-left.png",
+      "width": 111,
+      "height": 249,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 577,
+        "y": 1066,
+        "w": 105,
+        "h": 243
+      }
+    },
+    {
+      "id": "char-yellow-side-right",
+      "class": "characters",
+      "url": "/sprites-dawn/characters/char-yellow-side-right.png",
+      "width": 111,
+      "height": 249,
+      "sourceSheet": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "sourceBox": {
+        "x": 402,
+        "y": 1066,
+        "w": 105,
+        "h": 243
+      }
+    },
+    {
+      "id": "cloud-01",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-01.png",
+      "width": 176,
+      "height": 102,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 104,
+        "y": 75,
+        "w": 170,
+        "h": 96
+      }
+    },
+    {
+      "id": "cloud-02",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-02.png",
+      "width": 238,
+      "height": 136,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 403,
+        "y": 58,
+        "w": 232,
+        "h": 130
+      }
+    },
+    {
+      "id": "cloud-03",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-03.png",
+      "width": 238,
+      "height": 159,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 741,
+        "y": 47,
+        "w": 232,
+        "h": 153
+      }
+    },
+    {
+      "id": "cloud-04",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-04.png",
+      "width": 267,
+      "height": 147,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 1074,
+        "y": 53,
+        "w": 261,
+        "h": 141
+      }
+    },
+    {
+      "id": "cloud-05",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-05.png",
+      "width": 268,
+      "height": 147,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 1417,
+        "y": 53,
+        "w": 262,
+        "h": 141
+      }
+    },
+    {
+      "id": "cloud-06",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-06.png",
+      "width": 400,
+      "height": 194,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 1761,
+        "y": 29,
+        "w": 394,
+        "h": 188
+      }
+    },
+    {
+      "id": "cloud-07",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-07.png",
+      "width": 308,
+      "height": 136,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 2249,
+        "y": 58,
+        "w": 302,
+        "h": 130
+      }
+    },
+    {
+      "id": "cloud-08",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-08.png",
+      "width": 175,
+      "height": 101,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 105,
+        "y": 311,
+        "w": 169,
+        "h": 95
+      }
+    },
+    {
+      "id": "cloud-09",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-09.png",
+      "width": 262,
+      "height": 182,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 391,
+        "y": 265,
+        "w": 256,
+        "h": 176
+      }
+    },
+    {
+      "id": "cloud-10",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-10.png",
+      "width": 256,
+      "height": 170,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 735,
+        "y": 271,
+        "w": 250,
+        "h": 164
+      }
+    },
+    {
+      "id": "cloud-11",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-11.png",
+      "width": 245,
+      "height": 125,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 1085,
+        "y": 293,
+        "w": 239,
+        "h": 119
+      }
+    },
+    {
+      "id": "cloud-12",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-12.png",
+      "width": 274,
+      "height": 159,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 1417,
+        "y": 282,
+        "w": 268,
+        "h": 153
+      }
+    },
+    {
+      "id": "cloud-13",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-13.png",
+      "width": 406,
+      "height": 154,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 1755,
+        "y": 293,
+        "w": 400,
+        "h": 148
+      }
+    },
+    {
+      "id": "cloud-14",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-14.png",
+      "width": 353,
+      "height": 170,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 2226,
+        "y": 271,
+        "w": 347,
+        "h": 164
+      }
+    },
+    {
+      "id": "cloud-15",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-15.png",
+      "width": 250,
+      "height": 158,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 93,
+        "y": 563,
+        "w": 244,
+        "h": 152
+      }
+    },
+    {
+      "id": "cloud-16",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-16.png",
+      "width": 536,
+      "height": 285,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 409,
+        "y": 482,
+        "w": 530,
+        "h": 279
+      }
+    },
+    {
+      "id": "cloud-17",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-17.png",
+      "width": 810,
+      "height": 273,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 1045,
+        "y": 494,
+        "w": 804,
+        "h": 267
+      }
+    },
+    {
+      "id": "cloud-18",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-18.png",
+      "width": 755,
+      "height": 228,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 1922,
+        "y": 523,
+        "w": 749,
+        "h": 222
+      }
+    },
+    {
+      "id": "cloud-19",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-19.png",
+      "width": 910,
+      "height": 303,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 81,
+        "y": 786,
+        "w": 904,
+        "h": 297
+      }
+    },
+    {
+      "id": "cloud-20",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-20.png",
+      "width": 893,
+      "height": 286,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 1073,
+        "y": 809,
+        "w": 887,
+        "h": 280
+      }
+    },
+    {
+      "id": "cloud-21",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-21.png",
+      "width": 782,
+      "height": 130,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 99,
+        "y": 1171,
+        "w": 776,
+        "h": 124
+      }
+    },
+    {
+      "id": "cloud-22",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-22.png",
+      "width": 755,
+      "height": 130,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 959,
+        "y": 1171,
+        "w": 749,
+        "h": 124
+      }
+    },
+    {
+      "id": "cloud-23",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-23.png",
+      "width": 571,
+      "height": 125,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 1785,
+        "y": 1170,
+        "w": 565,
+        "h": 119
+      }
+    },
+    {
+      "id": "cloud-24",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-24.png",
+      "width": 738,
+      "height": 128,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 93,
+        "y": 1356,
+        "w": 732,
+        "h": 122
+      }
+    },
+    {
+      "id": "cloud-25",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-25.png",
+      "width": 570,
+      "height": 102,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 924,
+        "y": 1377,
+        "w": 564,
+        "h": 96
+      }
+    },
+    {
+      "id": "cloud-26",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-26.png",
+      "width": 67,
+      "height": 23,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 1538,
+        "y": 1433,
+        "w": 61,
+        "h": 17
+      }
+    },
+    {
+      "id": "cloud-27",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-27.png",
+      "width": 312,
+      "height": 73,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 1739,
+        "y": 1388,
+        "w": 306,
+        "h": 67
+      }
+    },
+    {
+      "id": "cloud-28",
+      "class": "clouds",
+      "url": "/sprites-dawn/clouds/cloud-28.png",
+      "width": 197,
+      "height": 78,
+      "sourceSheet": "src/images/sprite-sheets/clouds.jpeg",
+      "sourceBox": {
+        "x": 2193,
+        "y": 1383,
+        "w": 191,
+        "h": 72
+      }
+    },
+    {
+      "id": "dragon-boat-blue",
+      "class": "dragon-boats",
+      "url": "/sprites-dawn/dragon-boats/dragon-boat-blue.png",
+      "width": 1149,
+      "height": 188,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 31,
+        "y": 217,
+        "w": 1143,
+        "h": 182
+      }
+    },
+    {
+      "id": "dragon-boat-green",
+      "class": "dragon-boats",
+      "url": "/sprites-dawn/dragon-boats/dragon-boat-green.png",
+      "width": 1148,
+      "height": 189,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 31,
+        "y": 411,
+        "w": 1142,
+        "h": 183
+      }
+    },
+    {
+      "id": "dragon-boat-orange",
+      "class": "dragon-boats",
+      "url": "/sprites-dawn/dragon-boats/dragon-boat-orange.png",
+      "width": 1149,
+      "height": 190,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 31,
+        "y": 800,
+        "w": 1143,
+        "h": 184
+      }
+    },
+    {
+      "id": "dragon-boat-purple",
+      "class": "dragon-boats",
+      "url": "/sprites-dawn/dragon-boats/dragon-boat-purple.png",
+      "width": 1149,
+      "height": 189,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 31,
+        "y": 995,
+        "w": 1143,
+        "h": 183
+      }
+    },
+    {
+      "id": "dragon-boat-red",
+      "class": "dragon-boats",
+      "url": "/sprites-dawn/dragon-boats/dragon-boat-red.png",
+      "width": 1150,
+      "height": 189,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 31,
+        "y": 20,
+        "w": 1144,
+        "h": 183
+      }
+    },
+    {
+      "id": "dragon-boat-yellow",
+      "class": "dragon-boats",
+      "url": "/sprites-dawn/dragon-boats/dragon-boat-yellow.png",
+      "width": 1149,
+      "height": 189,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 31,
+        "y": 606,
+        "w": 1143,
+        "h": 183
+      }
+    },
+    {
+      "id": "paddle-double-01",
+      "class": "kayak-paddles",
+      "url": "/sprites-dawn/kayak-paddles/paddle-double-01.png",
+      "width": 181,
+      "height": 34,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1221,
+        "y": 1255,
+        "w": 175,
+        "h": 28
+      }
+    },
+    {
+      "id": "paddle-double-02",
+      "class": "kayak-paddles",
+      "url": "/sprites-dawn/kayak-paddles/paddle-double-02.png",
+      "width": 180,
+      "height": 34,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1419,
+        "y": 1255,
+        "w": 174,
+        "h": 28
+      }
+    },
+    {
+      "id": "paddle-double-03",
+      "class": "kayak-paddles",
+      "url": "/sprites-dawn/kayak-paddles/paddle-double-03.png",
+      "width": 180,
+      "height": 77,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1622,
+        "y": 1232,
+        "w": 174,
+        "h": 71
+      }
+    },
+    {
+      "id": "paddle-double-04",
+      "class": "kayak-paddles",
+      "url": "/sprites-dawn/kayak-paddles/paddle-double-04.png",
+      "width": 180,
+      "height": 33,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1221,
+        "y": 1363,
+        "w": 174,
+        "h": 27
+      }
+    },
+    {
+      "id": "paddle-double-05",
+      "class": "kayak-paddles",
+      "url": "/sprites-dawn/kayak-paddles/paddle-double-05.png",
+      "width": 175,
+      "height": 88,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1420,
+        "y": 1331,
+        "w": 169,
+        "h": 82
+      }
+    },
+    {
+      "id": "paddle-double-06",
+      "class": "kayak-paddles",
+      "url": "/sprites-dawn/kayak-paddles/paddle-double-06.png",
+      "width": 175,
+      "height": 92,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1624,
+        "y": 1329,
+        "w": 169,
+        "h": 86
+      }
+    },
+    {
+      "id": "paddle-double-07",
+      "class": "kayak-paddles",
+      "url": "/sprites-dawn/kayak-paddles/paddle-double-07.png",
+      "width": 180,
+      "height": 34,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1221,
+        "y": 1484,
+        "w": 174,
+        "h": 28
+      }
+    },
+    {
+      "id": "paddle-double-08",
+      "class": "kayak-paddles",
+      "url": "/sprites-dawn/kayak-paddles/paddle-double-08.png",
+      "width": 176,
+      "height": 92,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1420,
+        "y": 1450,
+        "w": 170,
+        "h": 86
+      }
+    },
+    {
+      "id": "paddle-double-09",
+      "class": "kayak-paddles",
+      "url": "/sprites-dawn/kayak-paddles/paddle-double-09.png",
+      "width": 174,
+      "height": 101,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1625,
+        "y": 1446,
+        "w": 168,
+        "h": 95
+      }
+    },
+    {
+      "id": "paddle-double-10",
+      "class": "kayak-paddles",
+      "url": "/sprites-dawn/kayak-paddles/paddle-double-10.png",
+      "width": 180,
+      "height": 35,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1221,
+        "y": 1587,
+        "w": 174,
+        "h": 29
+      }
+    },
+    {
+      "id": "paddle-double-11",
+      "class": "kayak-paddles",
+      "url": "/sprites-dawn/kayak-paddles/paddle-double-11.png",
+      "width": 174,
+      "height": 90,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1421,
+        "y": 1559,
+        "w": 168,
+        "h": 84
+      }
+    },
+    {
+      "id": "paddle-double-12",
+      "class": "kayak-paddles",
+      "url": "/sprites-dawn/kayak-paddles/paddle-double-12.png",
+      "width": 174,
+      "height": 99,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1625,
+        "y": 1556,
+        "w": 168,
+        "h": 93
+      }
+    },
+    {
+      "id": "kayak-blue-k2-a",
+      "class": "kayaks",
+      "url": "/sprites-dawn/kayaks/kayak-blue-k2-a.png",
+      "width": 540,
+      "height": 131,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1239,
+        "y": 622,
+        "w": 534,
+        "h": 125
+      }
+    },
+    {
+      "id": "kayak-blue-k2-b",
+      "class": "kayaks",
+      "url": "/sprites-dawn/kayaks/kayak-blue-k2-b.png",
+      "width": 558,
+      "height": 129,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1805,
+        "y": 624,
+        "w": 552,
+        "h": 123
+      }
+    },
+    {
+      "id": "kayak-coral-k3",
+      "class": "kayaks",
+      "url": "/sprites-dawn/kayaks/kayak-coral-k3.png",
+      "width": 558,
+      "height": 128,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1805,
+        "y": 1015,
+        "w": 552,
+        "h": 122
+      }
+    },
+    {
+      "id": "kayak-green-k2-a",
+      "class": "kayaks",
+      "url": "/sprites-dawn/kayaks/kayak-green-k2-a.png",
+      "width": 540,
+      "height": 132,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1238,
+        "y": 427,
+        "w": 534,
+        "h": 126
+      }
+    },
+    {
+      "id": "kayak-green-k2-b",
+      "class": "kayaks",
+      "url": "/sprites-dawn/kayaks/kayak-green-k2-b.png",
+      "width": 558,
+      "height": 130,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1805,
+        "y": 429,
+        "w": 552,
+        "h": 124
+      }
+    },
+    {
+      "id": "kayak-orange-k2",
+      "class": "kayaks",
+      "url": "/sprites-dawn/kayaks/kayak-orange-k2.png",
+      "width": 539,
+      "height": 130,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1239,
+        "y": 1013,
+        "w": 533,
+        "h": 124
+      }
+    },
+    {
+      "id": "kayak-purple-k3-a",
+      "class": "kayaks",
+      "url": "/sprites-dawn/kayaks/kayak-purple-k3-a.png",
+      "width": 540,
+      "height": 129,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1239,
+        "y": 819,
+        "w": 534,
+        "h": 123
+      }
+    },
+    {
+      "id": "kayak-purple-k3-b",
+      "class": "kayaks",
+      "url": "/sprites-dawn/kayaks/kayak-purple-k3-b.png",
+      "width": 558,
+      "height": 129,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1805,
+        "y": 819,
+        "w": 552,
+        "h": 123
+      }
+    },
+    {
+      "id": "kayak-red-k1-a",
+      "class": "kayaks",
+      "url": "/sprites-dawn/kayaks/kayak-red-k1-a.png",
+      "width": 526,
+      "height": 126,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1244,
+        "y": 51,
+        "w": 520,
+        "h": 120
+      }
+    },
+    {
+      "id": "kayak-red-k1-b",
+      "class": "kayaks",
+      "url": "/sprites-dawn/kayaks/kayak-red-k1-b.png",
+      "width": 528,
+      "height": 127,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1819,
+        "y": 50,
+        "w": 522,
+        "h": 121
+      }
+    },
+    {
+      "id": "kayak-yellow-k1-a",
+      "class": "kayaks",
+      "url": "/sprites-dawn/kayaks/kayak-yellow-k1-a.png",
+      "width": 537,
+      "height": 128,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1239,
+        "y": 237,
+        "w": 531,
+        "h": 122
+      }
+    },
+    {
+      "id": "kayak-yellow-k1-b",
+      "class": "kayaks",
+      "url": "/sprites-dawn/kayaks/kayak-yellow-k1-b.png",
+      "width": 549,
+      "height": 128,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1809,
+        "y": 237,
+        "w": 543,
+        "h": 122
+      }
+    },
+    {
+      "id": "paddle-dip-01",
+      "class": "paddle-splashes",
+      "url": "/sprites-dawn/paddle-splashes/paddle-dip-01.png",
+      "width": 36,
+      "height": 191,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1849,
+        "y": 1232,
+        "w": 30,
+        "h": 185
+      }
+    },
+    {
+      "id": "paddle-dip-02",
+      "class": "paddle-splashes",
+      "url": "/sprites-dawn/paddle-splashes/paddle-dip-02.png",
+      "width": 36,
+      "height": 190,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1963,
+        "y": 1233,
+        "w": 30,
+        "h": 184
+      }
+    },
+    {
+      "id": "paddle-dip-03",
+      "class": "paddle-splashes",
+      "url": "/sprites-dawn/paddle-splashes/paddle-dip-03.png",
+      "width": 35,
+      "height": 191,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 2030,
+        "y": 1232,
+        "w": 29,
+        "h": 185
+      }
+    },
+    {
+      "id": "paddle-dip-04",
+      "class": "paddle-splashes",
+      "url": "/sprites-dawn/paddle-splashes/paddle-dip-04.png",
+      "width": 36,
+      "height": 190,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 2097,
+        "y": 1233,
+        "w": 30,
+        "h": 184
+      }
+    },
+    {
+      "id": "paddle-dip-05",
+      "class": "paddle-splashes",
+      "url": "/sprites-dawn/paddle-splashes/paddle-dip-05.png",
+      "width": 68,
+      "height": 192,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 2190,
+        "y": 1233,
+        "w": 62,
+        "h": 186
+      }
+    },
+    {
+      "id": "paddle-dip-06",
+      "class": "paddle-splashes",
+      "url": "/sprites-dawn/paddle-splashes/paddle-dip-06.png",
+      "width": 72,
+      "height": 193,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 2281,
+        "y": 1232,
+        "w": 66,
+        "h": 187
+      }
+    },
+    {
+      "id": "paddle-dip-07",
+      "class": "paddle-splashes",
+      "url": "/sprites-dawn/paddle-splashes/paddle-dip-07.png",
+      "width": 36,
+      "height": 191,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1849,
+        "y": 1456,
+        "w": 30,
+        "h": 185
+      }
+    },
+    {
+      "id": "paddle-dip-08",
+      "class": "paddle-splashes",
+      "url": "/sprites-dawn/paddle-splashes/paddle-dip-08.png",
+      "width": 36,
+      "height": 191,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1963,
+        "y": 1456,
+        "w": 30,
+        "h": 185
+      }
+    },
+    {
+      "id": "paddle-dip-09",
+      "class": "paddle-splashes",
+      "url": "/sprites-dawn/paddle-splashes/paddle-dip-09.png",
+      "width": 36,
+      "height": 191,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 2030,
+        "y": 1456,
+        "w": 30,
+        "h": 185
+      }
+    },
+    {
+      "id": "paddle-dip-10",
+      "class": "paddle-splashes",
+      "url": "/sprites-dawn/paddle-splashes/paddle-dip-10.png",
+      "width": 36,
+      "height": 191,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 2097,
+        "y": 1456,
+        "w": 30,
+        "h": 185
+      }
+    },
+    {
+      "id": "paddle-dip-11",
+      "class": "paddle-splashes",
+      "url": "/sprites-dawn/paddle-splashes/paddle-dip-11.png",
+      "width": 82,
+      "height": 193,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 2175,
+        "y": 1456,
+        "w": 76,
+        "h": 187
+      }
+    },
+    {
+      "id": "paddle-dip-12",
+      "class": "paddle-splashes",
+      "url": "/sprites-dawn/paddle-splashes/paddle-dip-12.png",
+      "width": 84,
+      "height": 192,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 2274,
+        "y": 1456,
+        "w": 78,
+        "h": 186
+      }
+    },
+    {
+      "id": "paddle-wood-01",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-01.png",
+      "width": 98,
+      "height": 165,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 13,
+        "y": 1245,
+        "w": 92,
+        "h": 159
+      }
+    },
+    {
+      "id": "paddle-wood-02",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-02.png",
+      "width": 85,
+      "height": 172,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 118,
+        "y": 1242,
+        "w": 79,
+        "h": 166
+      }
+    },
+    {
+      "id": "paddle-wood-03",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-03.png",
+      "width": 73,
+      "height": 177,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 222,
+        "y": 1240,
+        "w": 67,
+        "h": 171
+      }
+    },
+    {
+      "id": "paddle-wood-04",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-04.png",
+      "width": 57,
+      "height": 181,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 326,
+        "y": 1240,
+        "w": 51,
+        "h": 175
+      }
+    },
+    {
+      "id": "paddle-wood-05",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-05.png",
+      "width": 44,
+      "height": 181,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 430,
+        "y": 1241,
+        "w": 38,
+        "h": 175
+      }
+    },
+    {
+      "id": "paddle-wood-06",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-06.png",
+      "width": 36,
+      "height": 182,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 535,
+        "y": 1240,
+        "w": 30,
+        "h": 176
+      }
+    },
+    {
+      "id": "paddle-wood-07",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-07.png",
+      "width": 36,
+      "height": 182,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 635,
+        "y": 1240,
+        "w": 30,
+        "h": 176
+      }
+    },
+    {
+      "id": "paddle-wood-08",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-08.png",
+      "width": 36,
+      "height": 182,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 733,
+        "y": 1240,
+        "w": 30,
+        "h": 176
+      }
+    },
+    {
+      "id": "paddle-wood-09",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-09.png",
+      "width": 36,
+      "height": 182,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 831,
+        "y": 1240,
+        "w": 30,
+        "h": 176
+      }
+    },
+    {
+      "id": "paddle-wood-10",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-10.png",
+      "width": 43,
+      "height": 181,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 928,
+        "y": 1241,
+        "w": 37,
+        "h": 175
+      }
+    },
+    {
+      "id": "paddle-wood-11",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-11.png",
+      "width": 42,
+      "height": 181,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1027,
+        "y": 1241,
+        "w": 36,
+        "h": 175
+      }
+    },
+    {
+      "id": "paddle-wood-12",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-12.png",
+      "width": 37,
+      "height": 182,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1128,
+        "y": 1240,
+        "w": 31,
+        "h": 176
+      }
+    },
+    {
+      "id": "paddle-wood-13",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-13.png",
+      "width": 84,
+      "height": 160,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 27,
+        "y": 1443,
+        "w": 78,
+        "h": 154
+      }
+    },
+    {
+      "id": "paddle-wood-14",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-14.png",
+      "width": 63,
+      "height": 162,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 135,
+        "y": 1439,
+        "w": 57,
+        "h": 156
+      }
+    },
+    {
+      "id": "paddle-wood-15",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-15.png",
+      "width": 48,
+      "height": 162,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 235,
+        "y": 1437,
+        "w": 42,
+        "h": 156
+      }
+    },
+    {
+      "id": "paddle-wood-16",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-16.png",
+      "width": 39,
+      "height": 162,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 335,
+        "y": 1436,
+        "w": 33,
+        "h": 156
+      }
+    },
+    {
+      "id": "paddle-wood-17",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-17.png",
+      "width": 32,
+      "height": 161,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 437,
+        "y": 1437,
+        "w": 26,
+        "h": 155
+      }
+    },
+    {
+      "id": "paddle-wood-18",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-18.png",
+      "width": 23,
+      "height": 162,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 539,
+        "y": 1439,
+        "w": 17,
+        "h": 156
+      }
+    },
+    {
+      "id": "paddle-wood-19",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-19.png",
+      "width": 32,
+      "height": 162,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 633,
+        "y": 1439,
+        "w": 26,
+        "h": 156
+      }
+    },
+    {
+      "id": "paddle-wood-20",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-20.png",
+      "width": 44,
+      "height": 163,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 727,
+        "y": 1439,
+        "w": 38,
+        "h": 157
+      }
+    },
+    {
+      "id": "paddle-wood-21",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-21.png",
+      "width": 56,
+      "height": 163,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 818,
+        "y": 1438,
+        "w": 50,
+        "h": 157
+      }
+    },
+    {
+      "id": "paddle-wood-22",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-22.png",
+      "width": 68,
+      "height": 163,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 907,
+        "y": 1438,
+        "w": 62,
+        "h": 157
+      }
+    },
+    {
+      "id": "paddle-wood-23",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-23.png",
+      "width": 83,
+      "height": 162,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 995,
+        "y": 1445,
+        "w": 77,
+        "h": 156
+      }
+    },
+    {
+      "id": "paddle-wood-24",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-24.png",
+      "width": 91,
+      "height": 157,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1087,
+        "y": 1450,
+        "w": 85,
+        "h": 151
+      }
+    },
+    {
+      "id": "paddle-wood-25",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-25.png",
+      "width": 84,
+      "height": 161,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 26,
+        "y": 1621,
+        "w": 78,
+        "h": 155
+      }
+    },
+    {
+      "id": "paddle-wood-26",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-26.png",
+      "width": 50,
+      "height": 165,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 137,
+        "y": 1616,
+        "w": 44,
+        "h": 159
+      }
+    },
+    {
+      "id": "paddle-wood-27",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-27.png",
+      "width": 34,
+      "height": 164,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 241,
+        "y": 1616,
+        "w": 28,
+        "h": 158
+      }
+    },
+    {
+      "id": "paddle-wood-28",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-28.png",
+      "width": 37,
+      "height": 164,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 338,
+        "y": 1616,
+        "w": 31,
+        "h": 158
+      }
+    },
+    {
+      "id": "paddle-wood-29",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-29.png",
+      "width": 36,
+      "height": 164,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 438,
+        "y": 1616,
+        "w": 30,
+        "h": 158
+      }
+    },
+    {
+      "id": "paddle-wood-30",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-30.png",
+      "width": 36,
+      "height": 164,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 536,
+        "y": 1616,
+        "w": 30,
+        "h": 158
+      }
+    },
+    {
+      "id": "paddle-wood-31",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-31.png",
+      "width": 36,
+      "height": 164,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 635,
+        "y": 1616,
+        "w": 30,
+        "h": 158
+      }
+    },
+    {
+      "id": "paddle-wood-32",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-32.png",
+      "width": 35,
+      "height": 164,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 734,
+        "y": 1616,
+        "w": 29,
+        "h": 158
+      }
+    },
+    {
+      "id": "paddle-wood-33",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-33.png",
+      "width": 48,
+      "height": 167,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 825,
+        "y": 1616,
+        "w": 42,
+        "h": 161
+      }
+    },
+    {
+      "id": "paddle-wood-34",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-34.png",
+      "width": 67,
+      "height": 166,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 910,
+        "y": 1616,
+        "w": 61,
+        "h": 160
+      }
+    },
+    {
+      "id": "paddle-wood-35",
+      "class": "paddles",
+      "url": "/sprites-dawn/paddles/paddle-wood-35.png",
+      "width": 89,
+      "height": 162,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 992,
+        "y": 1624,
+        "w": 83,
+        "h": 156
+      }
+    },
+    {
+      "id": "arch-start-finish-v1",
+      "class": "props",
+      "url": "/sprites-dawn/props/arch-start-finish-v1.png",
+      "width": 674,
+      "height": 330,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 1116,
+        "y": 1171,
+        "w": 668,
+        "h": 324
+      }
+    },
+    {
+      "id": "arch-start-finish-v2",
+      "class": "props",
+      "url": "/sprites-dawn/props/arch-start-finish-v2.png",
+      "width": 424,
+      "height": 227,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 1201,
+        "y": 1002,
+        "w": 418,
+        "h": 221
+      }
+    },
+    {
+      "id": "award-v1-01",
+      "class": "props",
+      "url": "/sprites-dawn/props/award-v1-01.png",
+      "width": 98,
+      "height": 179,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 1847,
+        "y": 1187,
+        "w": 92,
+        "h": 173
+      }
+    },
+    {
+      "id": "award-v1-02",
+      "class": "props",
+      "url": "/sprites-dawn/props/award-v1-02.png",
+      "width": 158,
+      "height": 108,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 1931,
+        "y": 1279,
+        "w": 152,
+        "h": 102
+      }
+    },
+    {
+      "id": "award-v1-03",
+      "class": "props",
+      "url": "/sprites-dawn/props/award-v1-03.png",
+      "width": 283,
+      "height": 224,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 1983,
+        "y": 1163,
+        "w": 277,
+        "h": 218
+      }
+    },
+    {
+      "id": "award-v1-04",
+      "class": "props",
+      "url": "/sprites-dawn/props/award-v1-04.png",
+      "width": 45,
+      "height": 116,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 1834,
+        "y": 1385,
+        "w": 39,
+        "h": 110
+      }
+    },
+    {
+      "id": "award-v1-05",
+      "class": "props",
+      "url": "/sprites-dawn/props/award-v1-05.png",
+      "width": 178,
+      "height": 103,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 1917,
+        "y": 1398,
+        "w": 172,
+        "h": 97
+      }
+    },
+    {
+      "id": "award-v1-06",
+      "class": "props",
+      "url": "/sprites-dawn/props/award-v1-06.png",
+      "width": 178,
+      "height": 103,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 2109,
+        "y": 1398,
+        "w": 172,
+        "h": 97
+      }
+    },
+    {
+      "id": "balloon-arch-v1-a",
+      "class": "props",
+      "url": "/sprites-dawn/props/balloon-arch-v1-a.png",
+      "width": 378,
+      "height": 265,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 1921,
+        "y": 873,
+        "w": 372,
+        "h": 259
+      }
+    },
+    {
+      "id": "balloon-arch-v1-b",
+      "class": "props",
+      "url": "/sprites-dawn/props/balloon-arch-v1-b.png",
+      "width": 376,
+      "height": 265,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 2319,
+        "y": 873,
+        "w": 370,
+        "h": 259
+      }
+    },
+    {
+      "id": "balloon-arch-v2",
+      "class": "props",
+      "url": "/sprites-dawn/props/balloon-arch-v2.png",
+      "width": 302,
+      "height": 225,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 1767,
+        "y": 1404,
+        "w": 296,
+        "h": 219
+      }
+    },
+    {
+      "id": "banner-fds-vertical-teal-v1",
+      "class": "props",
+      "url": "/sprites-dawn/props/banner-fds-vertical-teal-v1.png",
+      "width": 87,
+      "height": 211,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 773,
+        "y": 873,
+        "w": 81,
+        "h": 205
+      }
+    },
+    {
+      "id": "banner-fds-vertical-yellow-v1",
+      "class": "props",
+      "url": "/sprites-dawn/props/banner-fds-vertical-yellow-v1.png",
+      "width": 88,
+      "height": 211,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 895,
+        "y": 873,
+        "w": 82,
+        "h": 205
+      }
+    },
+    {
+      "id": "banner-fds-yellow-v2",
+      "class": "props",
+      "url": "/sprites-dawn/props/banner-fds-yellow-v2.png",
+      "width": 181,
+      "height": 79,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 371,
+        "y": 1268,
+        "w": 175,
+        "h": 73
+      }
+    },
+    {
+      "id": "banner-psd-active-day-blue-v2",
+      "class": "props",
+      "url": "/sprites-dawn/props/banner-psd-active-day-blue-v2.png",
+      "width": 411,
+      "height": 104,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 41,
+        "y": 1002,
+        "w": 405,
+        "h": 98
+      }
+    },
+    {
+      "id": "banner-psd-active-day-green-v1",
+      "class": "props",
+      "url": "/sprites-dawn/props/banner-psd-active-day-green-v1.png",
+      "width": 423,
+      "height": 100,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 49,
+        "y": 981,
+        "w": 417,
+        "h": 94
+      }
+    },
+    {
+      "id": "banner-psd-active-day-red-v1",
+      "class": "props",
+      "url": "/sprites-dawn/props/banner-psd-active-day-red-v1.png",
+      "width": 423,
+      "height": 100,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 49,
+        "y": 873,
+        "w": 417,
+        "h": 94
+      }
+    },
+    {
+      "id": "banner-stand-v2",
+      "class": "props",
+      "url": "/sprites-dawn/props/banner-stand-v2.png",
+      "width": 37,
+      "height": 89,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 304,
+        "y": 1261,
+        "w": 31,
+        "h": 83
+      }
+    },
+    {
+      "id": "bunting-v1-a",
+      "class": "props",
+      "url": "/sprites-dawn/props/bunting-v1-a.png",
+      "width": 416,
+      "height": 67,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 53,
+        "y": 1094,
+        "w": 410,
+        "h": 61
+      }
+    },
+    {
+      "id": "bunting-v1-b",
+      "class": "props",
+      "url": "/sprites-dawn/props/bunting-v1-b.png",
+      "width": 416,
+      "height": 68,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 53,
+        "y": 1157,
+        "w": 410,
+        "h": 62
+      }
+    },
+    {
+      "id": "bunting-v2-a",
+      "class": "props",
+      "url": "/sprites-dawn/props/bunting-v2-a.png",
+      "width": 303,
+      "height": 69,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 42,
+        "y": 1374,
+        "w": 297,
+        "h": 63
+      }
+    },
+    {
+      "id": "bunting-v2-b",
+      "class": "props",
+      "url": "/sprites-dawn/props/bunting-v2-b.png",
+      "width": 303,
+      "height": 72,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 42,
+        "y": 1451,
+        "w": 297,
+        "h": 66
+      }
+    },
+    {
+      "id": "bunting-v2-c",
+      "class": "props",
+      "url": "/sprites-dawn/props/bunting-v2-c.png",
+      "width": 303,
+      "height": 74,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 42,
+        "y": 1531,
+        "w": 297,
+        "h": 68
+      }
+    },
+    {
+      "id": "bunting-wavy-v1-a",
+      "class": "props",
+      "url": "/sprites-dawn/props/bunting-wavy-v1-a.png",
+      "width": 328,
+      "height": 64,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 631,
+        "y": 1095,
+        "w": 322,
+        "h": 58
+      }
+    },
+    {
+      "id": "bunting-wavy-v1-b",
+      "class": "props",
+      "url": "/sprites-dawn/props/bunting-wavy-v1-b.png",
+      "width": 328,
+      "height": 65,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 631,
+        "y": 1157,
+        "w": 322,
+        "h": 59
+      }
+    },
+    {
+      "id": "canopy-green-v2",
+      "class": "props",
+      "url": "/sprites-dawn/props/canopy-green-v2.png",
+      "width": 194,
+      "height": 197,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 1425,
+        "y": 1240,
+        "w": 188,
+        "h": 191
+      }
+    },
+    {
+      "id": "canopy-orange-v2",
+      "class": "props",
+      "url": "/sprites-dawn/props/canopy-orange-v2.png",
+      "width": 194,
+      "height": 196,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 1425,
+        "y": 1443,
+        "w": 188,
+        "h": 190
+      }
+    },
+    {
+      "id": "canopy-purple-v2",
+      "class": "props",
+      "url": "/sprites-dawn/props/canopy-purple-v2.png",
+      "width": 194,
+      "height": 196,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 1207,
+        "y": 1443,
+        "w": 188,
+        "h": 190
+      }
+    },
+    {
+      "id": "canopy-yellow-v2",
+      "class": "props",
+      "url": "/sprites-dawn/props/canopy-yellow-v2.png",
+      "width": 194,
+      "height": 197,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 1207,
+        "y": 1240,
+        "w": 188,
+        "h": 191
+      }
+    },
+    {
+      "id": "clutter-v1-01",
+      "class": "props",
+      "url": "/sprites-dawn/props/clutter-v1-01.png",
+      "width": 187,
+      "height": 284,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 2318,
+        "y": 1197,
+        "w": 181,
+        "h": 278
+      }
+    },
+    {
+      "id": "clutter-v1-02",
+      "class": "props",
+      "url": "/sprites-dawn/props/clutter-v1-02.png",
+      "width": 70,
+      "height": 76,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 2539,
+        "y": 1201,
+        "w": 64,
+        "h": 70
+      }
+    },
+    {
+      "id": "clutter-v1-03",
+      "class": "props",
+      "url": "/sprites-dawn/props/clutter-v1-03.png",
+      "width": 62,
+      "height": 61,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 2543,
+        "y": 1287,
+        "w": 56,
+        "h": 55
+      }
+    },
+    {
+      "id": "clutter-v1-04",
+      "class": "props",
+      "url": "/sprites-dawn/props/clutter-v1-04.png",
+      "width": 77,
+      "height": 60,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 2619,
+        "y": 1289,
+        "w": 71,
+        "h": 54
+      }
+    },
+    {
+      "id": "clutter-v1-05",
+      "class": "props",
+      "url": "/sprites-dawn/props/clutter-v1-05.png",
+      "width": 58,
+      "height": 40,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 2627,
+        "y": 1229,
+        "w": 52,
+        "h": 34
+      }
+    },
+    {
+      "id": "clutter-v1-06",
+      "class": "props",
+      "url": "/sprites-dawn/props/clutter-v1-06.png",
+      "width": 70,
+      "height": 76,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 2316,
+        "y": 1425,
+        "w": 64,
+        "h": 70
+      }
+    },
+    {
+      "id": "clutter-v1-07",
+      "class": "props",
+      "url": "/sprites-dawn/props/clutter-v1-07.png",
+      "width": 71,
+      "height": 76,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 2441,
+        "y": 1425,
+        "w": 65,
+        "h": 70
+      }
+    },
+    {
+      "id": "clutter-v1-08",
+      "class": "props",
+      "url": "/sprites-dawn/props/clutter-v1-08.png",
+      "width": 191,
+      "height": 142,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 2516,
+        "y": 1359,
+        "w": 185,
+        "h": 136
+      }
+    },
+    {
+      "id": "equipment-v2-01",
+      "class": "props",
+      "url": "/sprites-dawn/props/equipment-v2-01.png",
+      "width": 168,
+      "height": 104,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 2135,
+        "y": 1009,
+        "w": 162,
+        "h": 98
+      }
+    },
+    {
+      "id": "equipment-v2-02",
+      "class": "props",
+      "url": "/sprites-dawn/props/equipment-v2-02.png",
+      "width": 168,
+      "height": 104,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 2315,
+        "y": 1009,
+        "w": 162,
+        "h": 98
+      }
+    },
+    {
+      "id": "equipment-v2-03",
+      "class": "props",
+      "url": "/sprites-dawn/props/equipment-v2-03.png",
+      "width": 64,
+      "height": 82,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 2139,
+        "y": 1145,
+        "w": 58,
+        "h": 76
+      }
+    },
+    {
+      "id": "equipment-v2-04",
+      "class": "props",
+      "url": "/sprites-dawn/props/equipment-v2-04.png",
+      "width": 64,
+      "height": 81,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 2227,
+        "y": 1146,
+        "w": 58,
+        "h": 75
+      }
+    },
+    {
+      "id": "equipment-v2-05",
+      "class": "props",
+      "url": "/sprites-dawn/props/equipment-v2-05.png",
+      "width": 168,
+      "height": 104,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 2315,
+        "y": 1125,
+        "w": 162,
+        "h": 98
+      }
+    },
+    {
+      "id": "equipment-v2-06",
+      "class": "props",
+      "url": "/sprites-dawn/props/equipment-v2-06.png",
+      "width": 123,
+      "height": 184,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 2136,
+        "y": 1253,
+        "w": 117,
+        "h": 178
+      }
+    },
+    {
+      "id": "equipment-v2-07",
+      "class": "props",
+      "url": "/sprites-dawn/props/equipment-v2-07.png",
+      "width": 85,
+      "height": 70,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 2283,
+        "y": 1265,
+        "w": 79,
+        "h": 64
+      }
+    },
+    {
+      "id": "equipment-v2-08",
+      "class": "props",
+      "url": "/sprites-dawn/props/equipment-v2-08.png",
+      "width": 47,
+      "height": 46,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 2413,
+        "y": 1273,
+        "w": 41,
+        "h": 40
+      }
+    },
+    {
+      "id": "equipment-v2-09",
+      "class": "props",
+      "url": "/sprites-dawn/props/equipment-v2-09.png",
+      "width": 63,
+      "height": 63,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 2241,
+        "y": 1375,
+        "w": 57,
+        "h": 57
+      }
+    },
+    {
+      "id": "equipment-v2-10",
+      "class": "props",
+      "url": "/sprites-dawn/props/equipment-v2-10.png",
+      "width": 62,
+      "height": 63,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 2242,
+        "y": 1456,
+        "w": 56,
+        "h": 57
+      }
+    },
+    {
+      "id": "equipment-v2-11",
+      "class": "props",
+      "url": "/sprites-dawn/props/equipment-v2-11.png",
+      "width": 63,
+      "height": 63,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 2319,
+        "y": 1456,
+        "w": 57,
+        "h": 57
+      }
+    },
+    {
+      "id": "equipment-v2-12",
+      "class": "props",
+      "url": "/sprites-dawn/props/equipment-v2-12.png",
+      "width": 62,
+      "height": 63,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 2320,
+        "y": 1375,
+        "w": 56,
+        "h": 57
+      }
+    },
+    {
+      "id": "equipment-v2-13",
+      "class": "props",
+      "url": "/sprites-dawn/props/equipment-v2-13.png",
+      "width": 81,
+      "height": 174,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 2402,
+        "y": 1352,
+        "w": 75,
+        "h": 168
+      }
+    },
+    {
+      "id": "equipment-v2-14",
+      "class": "props",
+      "url": "/sprites-dawn/props/equipment-v2-14.png",
+      "width": 23,
+      "height": 75,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 2403,
+        "y": 1452,
+        "w": 17,
+        "h": 69
+      }
+    },
+    {
+      "id": "equipment-v2-15",
+      "class": "props",
+      "url": "/sprites-dawn/props/equipment-v2-15.png",
+      "width": 143,
+      "height": 130,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 2132,
+        "y": 1499,
+        "w": 137,
+        "h": 124
+      }
+    },
+    {
+      "id": "equipment-v2-16",
+      "class": "props",
+      "url": "/sprites-dawn/props/equipment-v2-16.png",
+      "width": 58,
+      "height": 77,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 2289,
+        "y": 1552,
+        "w": 52,
+        "h": 71
+      }
+    },
+    {
+      "id": "equipment-v2-17",
+      "class": "props",
+      "url": "/sprites-dawn/props/equipment-v2-17.png",
+      "width": 59,
+      "height": 76,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 2361,
+        "y": 1552,
+        "w": 53,
+        "h": 70
+      }
+    },
+    {
+      "id": "equipment-v2-18",
+      "class": "props",
+      "url": "/sprites-dawn/props/equipment-v2-18.png",
+      "width": 58,
+      "height": 77,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 2435,
+        "y": 1552,
+        "w": 52,
+        "h": 71
+      }
+    },
+    {
+      "id": "feather-fds-v2",
+      "class": "props",
+      "url": "/sprites-dawn/props/feather-fds-v2.png",
+      "width": 82,
+      "height": 244,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 473,
+        "y": 1385,
+        "w": 76,
+        "h": 238
+      }
+    },
+    {
+      "id": "feather-psd-v2-a",
+      "class": "props",
+      "url": "/sprites-dawn/props/feather-psd-v2-a.png",
+      "width": 83,
+      "height": 245,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 472,
+        "y": 1002,
+        "w": 77,
+        "h": 239
+      }
+    },
+    {
+      "id": "feather-psd-v2-b",
+      "class": "props",
+      "url": "/sprites-dawn/props/feather-psd-v2-b.png",
+      "width": 82,
+      "height": 244,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 367,
+        "y": 1385,
+        "w": 76,
+        "h": 238
+      }
+    },
+    {
+      "id": "flag-fds-v1",
+      "class": "props",
+      "url": "/sprites-dawn/props/flag-fds-v1.png",
+      "width": 98,
+      "height": 210,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 639,
+        "y": 873,
+        "w": 92,
+        "h": 204
+      }
+    },
+    {
+      "id": "flag-pennant-rainbow-v2",
+      "class": "props",
+      "url": "/sprites-dawn/props/flag-pennant-rainbow-v2.png",
+      "width": 88,
+      "height": 119,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 357,
+        "y": 1127,
+        "w": 82,
+        "h": 113
+      }
+    },
+    {
+      "id": "flag-pennant-red-v1",
+      "class": "props",
+      "url": "/sprites-dawn/props/flag-pennant-red-v1.png",
+      "width": 100,
+      "height": 124,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 503,
+        "y": 1102,
+        "w": 94,
+        "h": 118
+      }
+    },
+    {
+      "id": "flag-psd-stripes-v2",
+      "class": "props",
+      "url": "/sprites-dawn/props/flag-psd-stripes-v2.png",
+      "width": 276,
+      "height": 121,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 43,
+        "y": 1126,
+        "w": 270,
+        "h": 115
+      }
+    },
+    {
+      "id": "flag-psd-v1",
+      "class": "props",
+      "url": "/sprites-dawn/props/flag-psd-v1.png",
+      "width": 99,
+      "height": 210,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 503,
+        "y": 873,
+        "w": 93,
+        "h": 204
+      }
+    },
+    {
+      "id": "flag-rainbow-v1",
+      "class": "props",
+      "url": "/sprites-dawn/props/flag-rainbow-v1.png",
+      "width": 125,
+      "height": 141,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 2058,
+        "y": 996,
+        "w": 119,
+        "h": 135
+      }
+    },
+    {
+      "id": "flag-rainbow-v2",
+      "class": "props",
+      "url": "/sprites-dawn/props/flag-rainbow-v2.png",
+      "width": 91,
+      "height": 253,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 1699,
+        "y": 1375,
+        "w": 85,
+        "h": 247
+      }
+    },
+    {
+      "id": "flags-pair-v2",
+      "class": "props",
+      "url": "/sprites-dawn/props/flags-pair-v2.png",
+      "width": 127,
+      "height": 170,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 1958,
+        "y": 1183,
+        "w": 121,
+        "h": 164
+      }
+    },
+    {
+      "id": "pennant-fds-red-v2",
+      "class": "props",
+      "url": "/sprites-dawn/props/pennant-fds-red-v2.png",
+      "width": 232,
+      "height": 88,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 42,
+        "y": 1265,
+        "w": 226,
+        "h": 82
+      }
+    },
+    {
+      "id": "podium-v2",
+      "class": "props",
+      "url": "/sprites-dawn/props/podium-v2.png",
+      "width": 282,
+      "height": 135,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 1745,
+        "y": 1024,
+        "w": 276,
+        "h": 129
+      }
+    },
+    {
+      "id": "tent-blue-v1",
+      "class": "props",
+      "url": "/sprites-dawn/props/tent-blue-v1.png",
+      "width": 228,
+      "height": 266,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 314,
+        "y": 1235,
+        "w": 222,
+        "h": 260
+      }
+    },
+    {
+      "id": "tent-blue-v2",
+      "class": "props",
+      "url": "/sprites-dawn/props/tent-blue-v2.png",
+      "width": 227,
+      "height": 204,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 886,
+        "y": 1001,
+        "w": 221,
+        "h": 198
+      }
+    },
+    {
+      "id": "tent-green-v1",
+      "class": "props",
+      "url": "/sprites-dawn/props/tent-green-v1.png",
+      "width": 228,
+      "height": 266,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 851,
+        "y": 1235,
+        "w": 222,
+        "h": 260
+      }
+    },
+    {
+      "id": "tent-green-v2",
+      "class": "props",
+      "url": "/sprites-dawn/props/tent-green-v2.png",
+      "width": 228,
+      "height": 204,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 886,
+        "y": 1213,
+        "w": 222,
+        "h": 198
+      }
+    },
+    {
+      "id": "tent-orange-v2",
+      "class": "props",
+      "url": "/sprites-dawn/props/tent-orange-v2.png",
+      "width": 229,
+      "height": 204,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 885,
+        "y": 1425,
+        "w": 223,
+        "h": 198
+      }
+    },
+    {
+      "id": "tent-pair-red-blue-v1",
+      "class": "props",
+      "url": "/sprites-dawn/props/tent-pair-red-blue-v1.png",
+      "width": 405,
+      "height": 265,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 1040,
+        "y": 874,
+        "w": 399,
+        "h": 259
+      }
+    },
+    {
+      "id": "tent-pair-yellow-green-v1",
+      "class": "props",
+      "url": "/sprites-dawn/props/tent-pair-yellow-green-v1.png",
+      "width": 406,
+      "height": 265,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 1471,
+        "y": 874,
+        "w": 400,
+        "h": 259
+      }
+    },
+    {
+      "id": "tent-purple-v2",
+      "class": "props",
+      "url": "/sprites-dawn/props/tent-purple-v2.png",
+      "width": 228,
+      "height": 204,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 639,
+        "y": 1425,
+        "w": 222,
+        "h": 198
+      }
+    },
+    {
+      "id": "tent-red-v1",
+      "class": "props",
+      "url": "/sprites-dawn/props/tent-red-v1.png",
+      "width": 228,
+      "height": 266,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 54,
+        "y": 1235,
+        "w": 222,
+        "h": 260
+      }
+    },
+    {
+      "id": "tent-red-v2",
+      "class": "props",
+      "url": "/sprites-dawn/props/tent-red-v2.png",
+      "width": 228,
+      "height": 204,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 639,
+        "y": 1001,
+        "w": 222,
+        "h": 198
+      }
+    },
+    {
+      "id": "tent-yellow-v1",
+      "class": "props",
+      "url": "/sprites-dawn/props/tent-yellow-v1.png",
+      "width": 228,
+      "height": 266,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 575,
+        "y": 1235,
+        "w": 222,
+        "h": 260
+      }
+    },
+    {
+      "id": "tent-yellow-v2",
+      "class": "props",
+      "url": "/sprites-dawn/props/tent-yellow-v2.png",
+      "width": 227,
+      "height": 204,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 639,
+        "y": 1213,
+        "w": 221,
+        "h": 198
+      }
+    },
+    {
+      "id": "trophy-table-v2",
+      "class": "props",
+      "url": "/sprites-dawn/props/trophy-table-v2.png",
+      "width": 227,
+      "height": 142,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 1721,
+        "y": 1209,
+        "w": 221,
+        "h": 136
+      }
+    },
+    {
+      "id": "oar-splash-v1-01",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/oar-splash-v1-01.png",
+      "width": 159,
+      "height": 184,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 1303,
+        "y": 519,
+        "w": 153,
+        "h": 178
+      }
+    },
+    {
+      "id": "oar-splash-v1-02",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/oar-splash-v1-02.png",
+      "width": 185,
+      "height": 192,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 1482,
+        "y": 519,
+        "w": 179,
+        "h": 186
+      }
+    },
+    {
+      "id": "oar-splash-v2-01",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/oar-splash-v2-01.png",
+      "width": 199,
+      "height": 148,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 1408,
+        "y": 525,
+        "w": 193,
+        "h": 142
+      }
+    },
+    {
+      "id": "oar-splash-v2-02",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/oar-splash-v2-02.png",
+      "width": 217,
+      "height": 210,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 893,
+        "y": 594,
+        "w": 211,
+        "h": 204
+      }
+    },
+    {
+      "id": "oar-splash-v2-03",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/oar-splash-v2-03.png",
+      "width": 226,
+      "height": 214,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 1073,
+        "y": 594,
+        "w": 220,
+        "h": 208
+      }
+    },
+    {
+      "id": "oar-splash-v2-04",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/oar-splash-v2-04.png",
+      "width": 226,
+      "height": 211,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 1241,
+        "y": 596,
+        "w": 220,
+        "h": 205
+      }
+    },
+    {
+      "id": "oar-splash-v2-05",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/oar-splash-v2-05.png",
+      "width": 242,
+      "height": 209,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 1525,
+        "y": 592,
+        "w": 236,
+        "h": 203
+      }
+    },
+    {
+      "id": "oar-splash-v2-06",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/oar-splash-v2-06.png",
+      "width": 220,
+      "height": 205,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 1733,
+        "y": 592,
+        "w": 214,
+        "h": 199
+      }
+    },
+    {
+      "id": "ripple-v1-01",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/ripple-v1-01.png",
+      "width": 159,
+      "height": 71,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 1845,
+        "y": 169,
+        "w": 153,
+        "h": 65
+      }
+    },
+    {
+      "id": "ripple-v1-02",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/ripple-v1-02.png",
+      "width": 188,
+      "height": 113,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 2047,
+        "y": 132,
+        "w": 182,
+        "h": 107
+      }
+    },
+    {
+      "id": "ripple-v1-03",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/ripple-v1-03.png",
+      "width": 170,
+      "height": 143,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 2281,
+        "y": 108,
+        "w": 164,
+        "h": 137
+      }
+    },
+    {
+      "id": "ripple-v1-04",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/ripple-v1-04.png",
+      "width": 193,
+      "height": 158,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 2486,
+        "y": 95,
+        "w": 187,
+        "h": 152
+      }
+    },
+    {
+      "id": "ripple-v1-05",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/ripple-v1-05.png",
+      "width": 274,
+      "height": 204,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 1837,
+        "y": 313,
+        "w": 268,
+        "h": 198
+      }
+    },
+    {
+      "id": "ripple-v1-06",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/ripple-v1-06.png",
+      "width": 255,
+      "height": 199,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 2145,
+        "y": 317,
+        "w": 249,
+        "h": 193
+      }
+    },
+    {
+      "id": "ripple-v1-07",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/ripple-v1-07.png",
+      "width": 238,
+      "height": 165,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 2435,
+        "y": 346,
+        "w": 232,
+        "h": 159
+      }
+    },
+    {
+      "id": "ripple-v2-01",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/ripple-v2-01.png",
+      "width": 176,
+      "height": 104,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 2033,
+        "y": 188,
+        "w": 170,
+        "h": 98
+      }
+    },
+    {
+      "id": "ripple-v2-02",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/ripple-v2-02.png",
+      "width": 200,
+      "height": 117,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 2285,
+        "y": 182,
+        "w": 194,
+        "h": 111
+      }
+    },
+    {
+      "id": "ripple-v2-03",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/ripple-v2-03.png",
+      "width": 237,
+      "height": 122,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 2003,
+        "y": 369,
+        "w": 231,
+        "h": 116
+      }
+    },
+    {
+      "id": "ripple-v2-04",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/ripple-v2-04.png",
+      "width": 199,
+      "height": 135,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 2291,
+        "y": 362,
+        "w": 193,
+        "h": 129
+      }
+    },
+    {
+      "id": "ripple-v2-05",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/ripple-v2-05.png",
+      "width": 200,
+      "height": 182,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 2023,
+        "y": 565,
+        "w": 194,
+        "h": 176
+      }
+    },
+    {
+      "id": "ripple-v2-06",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/ripple-v2-06.png",
+      "width": 174,
+      "height": 143,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 2298,
+        "y": 584,
+        "w": 168,
+        "h": 137
+      }
+    },
+    {
+      "id": "splash-01",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/splash-01.png",
+      "width": 112,
+      "height": 46,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1226,
+        "y": 1714,
+        "w": 106,
+        "h": 40
+      }
+    },
+    {
+      "id": "splash-02",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/splash-02.png",
+      "width": 124,
+      "height": 63,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1362,
+        "y": 1699,
+        "w": 118,
+        "h": 57
+      }
+    },
+    {
+      "id": "splash-03",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/splash-03.png",
+      "width": 118,
+      "height": 74,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1512,
+        "y": 1687,
+        "w": 112,
+        "h": 68
+      }
+    },
+    {
+      "id": "splash-04",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/splash-04.png",
+      "width": 166,
+      "height": 83,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1653,
+        "y": 1679,
+        "w": 160,
+        "h": 77
+      }
+    },
+    {
+      "id": "splash-05",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/splash-05.png",
+      "width": 157,
+      "height": 43,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 1839,
+        "y": 1719,
+        "w": 151,
+        "h": 37
+      }
+    },
+    {
+      "id": "splash-06",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/splash-06.png",
+      "width": 158,
+      "height": 89,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 2017,
+        "y": 1673,
+        "w": 152,
+        "h": 83
+      }
+    },
+    {
+      "id": "splash-07",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/splash-07.png",
+      "width": 174,
+      "height": 95,
+      "sourceSheet": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "sourceBox": {
+        "x": 2192,
+        "y": 1667,
+        "w": 168,
+        "h": 89
+      }
+    },
+    {
+      "id": "splash-v1-01",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/splash-v1-01.png",
+      "width": 55,
+      "height": 51,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 1085,
+        "y": 174,
+        "w": 49,
+        "h": 45
+      }
+    },
+    {
+      "id": "splash-v1-02",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/splash-v1-02.png",
+      "width": 102,
+      "height": 69,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 1207,
+        "y": 160,
+        "w": 96,
+        "h": 63
+      }
+    },
+    {
+      "id": "splash-v1-03",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/splash-v1-03.png",
+      "width": 105,
+      "height": 89,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 1393,
+        "y": 146,
+        "w": 99,
+        "h": 83
+      }
+    },
+    {
+      "id": "splash-v1-04",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/splash-v1-04.png",
+      "width": 163,
+      "height": 104,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 1577,
+        "y": 135,
+        "w": 157,
+        "h": 98
+      }
+    },
+    {
+      "id": "splash-v1-05",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/splash-v1-05.png",
+      "width": 62,
+      "height": 52,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 1078,
+        "y": 347,
+        "w": 56,
+        "h": 46
+      }
+    },
+    {
+      "id": "splash-v1-06",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/splash-v1-06.png",
+      "width": 122,
+      "height": 119,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 1199,
+        "y": 288,
+        "w": 116,
+        "h": 113
+      }
+    },
+    {
+      "id": "splash-v1-07",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/splash-v1-07.png",
+      "width": 166,
+      "height": 135,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 1360,
+        "y": 277,
+        "w": 160,
+        "h": 129
+      }
+    },
+    {
+      "id": "splash-v1-08",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/splash-v1-08.png",
+      "width": 195,
+      "height": 154,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 1559,
+        "y": 264,
+        "w": 189,
+        "h": 148
+      }
+    },
+    {
+      "id": "splash-v2-01",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/splash-v2-01.png",
+      "width": 122,
+      "height": 93,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 949,
+        "y": 203,
+        "w": 116,
+        "h": 87
+      }
+    },
+    {
+      "id": "splash-v2-02",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/splash-v2-02.png",
+      "width": 218,
+      "height": 117,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 1177,
+        "y": 182,
+        "w": 212,
+        "h": 111
+      }
+    },
+    {
+      "id": "splash-v2-03",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/splash-v2-03.png",
+      "width": 421,
+      "height": 265,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 1499,
+        "y": 196,
+        "w": 415,
+        "h": 259
+      }
+    },
+    {
+      "id": "splash-v2-04",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/splash-v2-04.png",
+      "width": 170,
+      "height": 159,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 927,
+        "y": 343,
+        "w": 164,
+        "h": 153
+      }
+    },
+    {
+      "id": "splash-v2-05",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/splash-v2-05.png",
+      "width": 248,
+      "height": 163,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 1163,
+        "y": 344,
+        "w": 242,
+        "h": 157
+      }
+    },
+    {
+      "id": "spray-v1-01",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/spray-v1-01.png",
+      "width": 343,
+      "height": 117,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 1834,
+        "y": 609,
+        "w": 337,
+        "h": 111
+      }
+    },
+    {
+      "id": "spray-v1-02",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/spray-v1-02.png",
+      "width": 214,
+      "height": 155,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 2203,
+        "y": 571,
+        "w": 208,
+        "h": 149
+      }
+    },
+    {
+      "id": "spray-v1-03",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/spray-v1-03.png",
+      "width": 288,
+      "height": 166,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 2415,
+        "y": 560,
+        "w": 282,
+        "h": 160
+      }
+    },
+    {
+      "id": "wake-v1-01",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/wake-v1-01.png",
+      "width": 391,
+      "height": 72,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 47,
+        "y": 135,
+        "w": 385,
+        "h": 66
+      }
+    },
+    {
+      "id": "wake-v1-02",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/wake-v1-02.png",
+      "width": 523,
+      "height": 81,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 48,
+        "y": 242,
+        "w": 517,
+        "h": 75
+      }
+    },
+    {
+      "id": "wake-v1-03",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/wake-v1-03.png",
+      "width": 675,
+      "height": 91,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 49,
+        "y": 355,
+        "w": 669,
+        "h": 85
+      }
+    },
+    {
+      "id": "wake-v1-04",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/wake-v1-04.png",
+      "width": 915,
+      "height": 120,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 49,
+        "y": 468,
+        "w": 909,
+        "h": 114
+      }
+    },
+    {
+      "id": "wake-v1-05",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/wake-v1-05.png",
+      "width": 1156,
+      "height": 124,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "sourceBox": {
+        "x": 48,
+        "y": 613,
+        "w": 1150,
+        "h": 118
+      }
+    },
+    {
+      "id": "wake-v2-01",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/wake-v2-01.png",
+      "width": 822,
+      "height": 159,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 51,
+        "y": 112,
+        "w": 816,
+        "h": 153
+      }
+    },
+    {
+      "id": "wake-v2-02",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/wake-v2-02.png",
+      "width": 701,
+      "height": 145,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 64,
+        "y": 300,
+        "w": 695,
+        "h": 139
+      }
+    },
+    {
+      "id": "wake-v2-03",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/wake-v2-03.png",
+      "width": 608,
+      "height": 153,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 49,
+        "y": 472,
+        "w": 602,
+        "h": 147
+      }
+    },
+    {
+      "id": "wake-v2-04",
+      "class": "water-effects",
+      "url": "/sprites-dawn/water-effects/wake-v2-04.png",
+      "width": 428,
+      "height": 138,
+      "sourceSheet": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "sourceBox": {
+        "x": 51,
+        "y": 654,
+        "w": 422,
+        "h": 132
+      }
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "status": "Approved by the owner on 2026-10-09 (ADR-235). scripts/draw-demo-names.mjs draws the nicknames from these pools, once, with a fixed seed. No other code reads this file.",
+  "rule": "A nickname is First_Last: 3 to 20 characters, letters, digits and underscores only, not all digits (the contract's rule). Nicknames are unique across the demo, case-insensitively.",
+  "pools": {
+    "Chinese": {
+      "female": {
+        "first": ["Jasmine", "Caryn", "Clarissa", "Doreen", "Beatrice", "Rachel", "Joanne", "Pamela", "Sharon", "Vanessa", "Jocelyn", "Priscilla", "Evelyn", "Cheryl", "Stephanie", "Mei", "Ting", "Xin", "Ling", "Shu", "Yan", "Hui", "Qian", "Ying", "Lin"],
+        "last": ["Tan", "Lim", "Lee", "Koh", "Ang", "Chan", "Ong", "Ng", "Goh", "Teo", "Chua", "Oei", "Wong", "Sim", "Yeo", "Toh", "Seah", "Chew", "Foo", "Low"]
+      },
+      "male": {
+        "first": ["Marcus", "Dominic", "Nicholas", "Kelvin", "Eugene", "Desmond", "Terence", "Joshua", "Benjamin", "Jonathan", "Daniel", "Ethan", "Kenneth", "Leonard", "Kai", "Jun", "Yong", "Wen", "Ming", "Zhi", "Hao", "Ren", "Jian", "Wei", "Sheng"],
+        "last": ["Tan", "Lim", "Lee", "Koh", "Ang", "Chan", "Ong", "Ng", "Goh", "Teo", "Chua", "Oei", "Wong", "Sim", "Yeo", "Toh", "Seah", "Chew", "Foo", "Low"]
+      }
+    },
+    "Malay": {
+      "female": {
+        "first": ["Aisyah", "Farah", "Aminah", "Zulaikha", "Amira", "Hanis", "Syafiqah", "Nadia", "Dayana", "Raihana", "Suhaila", "Azizah", "Balqis", "Iman", "Najwa", "Fatin", "Liyana", "Hidayah", "Izzah", "Aina"],
+        "last": ["Salleh", "Osman", "Ariff", "Rahman", "Ibrahim", "Hussain", "Yusof", "Ahmad", "Abdullah", "Latiff", "Kassim", "Zainal", "Hamid", "Rashid", "Karim", "Mahmood"]
+      },
+      "male": {
+        "first": ["Hafiz", "Zaki", "Faizal", "Ridhwan", "Irfan", "Amirul", "Danial", "Syafiq", "Haziq", "Azlan", "Hairul", "Shahrul", "Imran", "Khairul", "Rizal", "Fadzil", "Hakim", "Zulkifli", "Adam", "Iskandar"],
+        "last": ["Salleh", "Osman", "Ariff", "Rahman", "Ibrahim", "Hussain", "Yusof", "Ahmad", "Abdullah", "Latiff", "Kassim", "Zainal", "Hamid", "Rashid", "Karim", "Mahmood"]
+      }
+    },
+    "Indian": {
+      "female": {
+        "first": ["Priya", "Kavitha", "Deepa", "Divya", "Meera", "Anjali", "Nisha", "Shalini", "Revathi", "Sangeetha", "Lavanya", "Indira", "Vani", "Geetha", "Uma", "Kamala"],
+        "last": ["Muthu", "Pillai", "Nair", "Menon", "Krishnan", "Naidu", "Rajan", "Selvam", "Govind", "Iyer", "Pandian", "Nathan", "Sivan", "Sundar", "Kannan", "Balan"]
+      },
+      "male": {
+        "first": ["Ganesh", "Arjun", "Ravi", "Suresh", "Vignesh", "Kumar", "Prakash", "Sanjay", "Rajesh", "Kiran", "Dinesh", "Mohan", "Senthil", "Murali", "Vijay", "Karthik"],
+        "last": ["Muthu", "Pillai", "Nair", "Menon", "Krishnan", "Naidu", "Rajan", "Selvam", "Govind", "Iyer", "Pandian", "Nathan", "Sivan", "Sundar", "Kannan", "Balan"]
+      }
+    },
+    "Eurasian": {
+      "female": {
+        "first": ["Rebecca", "Christine", "Natalie", "Tiffany", "Angela", "Melissa", "Gabrielle", "Denise", "Monica", "Celine"],
+        "last": ["DSilva", "DCruz", "Pereira", "Gomes", "Oliveiro", "Rodrigues", "Fernandez", "Rozario", "Sequeira", "Dias"]
+      },
+      "male": {
+        "first": ["Ryan", "Adrian", "Jason", "Gerald", "Lionel", "Gregory", "Russell", "Warren", "Justin", "Clifford"],
+        "last": ["DSilva", "DCruz", "Pereira", "Gomes", "Oliveiro", "Rodrigues", "Fernandez", "Rozario", "Sequeira", "Dias"]
+      }
+    }
+  }
+}

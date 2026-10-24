@@ -1,0 +1,832 @@
+/* Facilitator (S18–S33) and superadmin (S34–S59) surfaces.
+   Spartan by rule: text only, no avatars, no decoration — fds.md §5.5. */
+
+.theme-console {
+  min-height: 100%;
+  background: var(--console-bg);
+  color: var(--console-text);
+  font-family: var(--font-console);
+  font-size: 17px;
+  display: flex;
+  flex-direction: column;
+}
+
+/*
+ * ADR-257 — the light, high-contrast console: the default for staff screens,
+ * with the dark palette above kept behind the header toggle. Only tokens and
+ * the three hard-coded dark fills change; layout, type and tap sizes do not.
+ * Every text token here clears 4.5:1 on its ground (checked in
+ * styles/console-theme test): ink #0b1c2c on white, muted #3d556e on white,
+ * accent-as-text #7a5a00 on white, danger #b3261e, ok #0e7a4a.
+ */
+.theme-console[data-console-theme='light'] {
+  --console-bg: #eef2f6;
+  --console-panel: #ffffff;
+  --console-line: #43586d;
+  --console-text: #0b1c2c;
+  --console-muted: #3d556e;
+  --console-accent: #7a5a00;
+  --console-danger: #b3261e;
+  --console-ok: #0e7a4a;
+}
+
+.theme-console[data-console-theme='light'] .console-input,
+.theme-console[data-console-theme='light'] .console-select {
+  background: #ffffff;
+}
+
+.theme-console[data-console-theme='light'] .console-button {
+  background: #dde6ee;
+}
+
+/*
+ * ADR-291 — the pale fill above out-ranks `.console-button--primary` and `--danger`, so each restates
+ * its own fill here beside its white label; without it the label sat on #dde6ee at about 1.3:1.
+ * `e2e/acceptance/console-button-contrast.spec.ts` reads the computed pair and requires AA.
+ */
+.theme-console[data-console-theme='light'] .console-button--primary,
+.theme-console[data-console-theme='light'] .console-tabs a[aria-current='page'] {
+  background: var(--console-accent);
+  color: #ffffff;
+}
+
+.theme-console[data-console-theme='light'] .console-button--danger {
+  background: var(--console-danger);
+  color: #ffffff;
+}
+
+.theme-console[data-console-theme='light'] .console-button--ghost {
+  background: transparent;
+}
+
+.theme-console[data-console-theme='light'] .console-warning {
+  background: #fff4cc;
+}
+
+/* ADR-047 — the photo wall is a projection surface and stays dark in both themes. */
+.console-wall {
+  color: #eef3f8;
+}
+
+.console-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--console-panel);
+  border-bottom: 2px solid var(--console-line);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.console-bar h1 {
+  font-size: 18px;
+  margin: 0;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.console-bar .console-meta {
+  color: var(--console-muted);
+  font-size: 14px;
+}
+
+.console-main {
+  flex: 1;
+  width: min(1100px, 100%);
+  margin: 0 auto;
+  padding: var(--space-4);
+}
+
+.console-main--wide {
+  width: min(1400px, 100%);
+}
+
+.console-panel {
+  background: var(--console-panel);
+  border: 2px solid var(--console-line);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.console-panel h2 {
+  margin: 0 0 var(--space-3);
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--console-accent);
+}
+
+/*
+ * ADR-307 — the reset's danger zone. Red on purpose and impossible to mistake for
+ * an ordinary panel: a thick danger border and a red ground in both themes, with
+ * the heading and the warning line in the danger colour itself. The one action
+ * this system cannot take back should not share a face with a settings form.
+ */
+.console-panel--danger-zone {
+  border: 3px solid var(--console-danger);
+  background: #33100d;
+}
+
+.theme-console[data-console-theme='light'] .console-panel--danger-zone {
+  background: #fdecea;
+}
+
+.console-panel--danger-zone h2 {
+  color: var(--console-danger);
+}
+
+.console-danger-zone__warning {
+  color: var(--console-danger);
+  font-size: 19px;
+  font-weight: bold;
+}
+
+.console-label {
+  display: block;
+  margin: var(--space-3) 0 var(--space-1);
+  font-size: 14px;
+  color: var(--console-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/*
+ * ADR-319 — a field's label, its (i) and the control. The label and the icon share a row so the
+ * icon reads as part of the label; the field grows with its row like the bare label did.
+ *
+ * ADR-327 — the icon is layout-neutral. It occupies one fixed 22px slot and carries no margins:
+ * the spacing belongs to the label row (or the surrounding console row), never to the trigger, so
+ * adding help cannot push a control sideways or drop it below its neighbours. A field is also a
+ * full-height column with its control pinned to the foot; when two fields share a row and one
+ * label wraps further than the other, their controls still land on the same line.
+ */
+.console-field {
+  flex: 1 1 140px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.console-field__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 var(--space-1);
+}
+
+.console-field__head .console-label {
+  display: inline-block;
+  margin: 0;
+}
+
+.console-field > :not(.console-field__head) {
+  margin-top: auto;
+}
+
+.console-grid--fields .console-field:only-child {
+  height: 100%;
+}
+
+.console-row > .console-field {
+  align-self: stretch;
+}
+
+.console-row > .console-label {
+  margin: 0;
+}
+
+.console-field--check {
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+/* The anchor the tooltip hangs from: one fixed inline slot, centred on the text it sits beside. */
+.console-help-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.console-help {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 2px solid var(--console-muted);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--console-muted);
+  font: italic 700 13px/1 Georgia, 'Times New Roman', serif;
+  cursor: help;
+}
+
+/* A 44px target without a 44px circle: the icon stays small, the finger does not have to be exact. */
+.console-help::after {
+  content: '';
+  position: absolute;
+  inset: -11px;
+}
+
+.console-help:hover,
+.console-help:focus-visible {
+  border-color: var(--console-accent);
+  color: var(--console-accent);
+}
+
+.console-help:focus-visible {
+  outline: 3px solid var(--console-accent);
+  outline-offset: 2px;
+}
+
+.console-tooltip {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  left: 0;
+  z-index: 40;
+  width: max-content;
+  max-width: min(320px, calc(100vw - 32px));
+  padding: var(--space-2) var(--space-3);
+  background: var(--console-panel);
+  color: var(--console-text);
+  border: 2px solid var(--console-accent);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  font-size: 15px;
+  font-weight: normal;
+  line-height: 1.35;
+  letter-spacing: normal;
+  text-transform: none;
+  text-align: left;
+}
+
+/* The display above would otherwise win over the hidden attribute and leave every tooltip open. */
+.console-tooltip[hidden] {
+  display: none;
+}
+
+.console-input,
+.console-select {
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: var(--space-2) var(--space-3);
+  background: #0b1219;
+  color: var(--console-text);
+  border: 2px solid var(--console-line);
+  border-radius: var(--radius);
+}
+
+.console-input:focus,
+.console-select:focus,
+.console-button:focus-visible {
+  outline: 3px solid var(--console-accent);
+  outline-offset: 1px;
+}
+
+.console-button {
+  min-height: var(--tap-min);
+  padding: var(--space-3) var(--space-4);
+  border: 2px solid var(--console-line);
+  border-radius: var(--radius);
+  background: #24384f;
+  color: var(--console-text);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.console-button--primary {
+  background: var(--console-accent);
+  color: #1a1400;
+  border-color: var(--console-accent);
+  font-weight: bold;
+}
+
+.console-button--danger {
+  background: var(--console-danger);
+  color: #2a0a06;
+  border-color: var(--console-danger);
+  font-weight: bold;
+}
+
+.console-button--ghost {
+  background: transparent;
+}
+
+/* Facilitator primary actions: one thumb, wet hands, glare (fds.md §1 design principles). */
+.console-button--huge {
+  width: 100%;
+  min-height: var(--tap-large);
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.console-button[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.console-grid {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.console-row {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/*
+ * ADR-149 — one candidate for admission: several sentences of reasoning and then the
+ * button, stacked rather than in a row, because the reasoning is the point and a row
+ * would set it in a column too narrow to read.
+ */
+.console-row-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--console-line);
+}
+
+.console-row--between {
+  justify-content: space-between;
+}
+
+.console-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.console-table th,
+.console-table td {
+  text-align: left;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--console-line);
+  vertical-align: top;
+}
+
+.console-table th {
+  color: var(--console-muted);
+  text-transform: uppercase;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+.console-table tr[data-voided='true'] td {
+  text-decoration: line-through;
+  color: var(--console-muted);
+}
+
+.console-muted {
+  color: var(--console-muted);
+}
+
+.console-ok {
+  color: var(--console-ok);
+}
+
+.console-danger {
+  color: var(--console-danger);
+}
+
+.console-warning {
+  background: #4a3c10;
+  border: 2px solid var(--console-accent);
+  padding: var(--space-3);
+  border-radius: var(--radius);
+}
+
+.console-status {
+  font-size: 22px;
+  padding: var(--space-3);
+  border: 2px dashed var(--console-line);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.console-status--ok {
+  border-color: var(--console-ok);
+  color: var(--console-ok);
+}
+
+.console-status--warn {
+  border-color: var(--console-accent);
+  color: var(--console-accent);
+}
+
+.console-status--error {
+  border-color: var(--console-danger);
+  color: var(--console-danger);
+}
+
+.console-scanner {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  display: block;
+  border: 2px solid var(--console-line);
+  background: #000;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.console-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.console-tabs a {
+  padding: var(--space-2) var(--space-3);
+  border: 2px solid var(--console-line);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--console-muted);
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.console-tabs a[aria-current='page'] {
+  background: var(--console-accent);
+  color: #1a1400;
+  border-color: var(--console-accent);
+  font-weight: bold;
+}
+
+.console-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 8, 12, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  z-index: 30;
+}
+
+.console-modal-body {
+  background: var(--console-panel);
+  border: 2px solid var(--console-accent);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  width: min(520px, 100%);
+}
+
+.console-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border: 1px solid var(--console-line);
+  border-radius: 999px;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+/* ---- Photo wall (ADR-047) ---- */
+
+/*
+ * A projection surface, not a page: full viewport, no chrome, and dark so a lit hall does not
+ * wash it out. `100dvh` rather than `100vh` because a browser in kiosk or full-screen mode
+ * reports a different usable height than the layout viewport.
+ */
+.console-wall {
+  min-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.console-wall-frame {
+  margin: 0;
+  width: 100%;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+/*
+ * `contain`, never `cover`: cropping somebody's photo on the big screen is the one thing a wall
+ * must not do.
+ */
+.console-wall-image {
+  max-width: 100%;
+  max-height: 82dvh;
+  object-fit: contain;
+}
+
+.console-wall-caption {
+  font-family: var(--font-console);
+  font-size: 28px;
+  color: #eef3f8;
+  text-align: center;
+  padding: 0 var(--space-4);
+}
+
+/* ADR-092 — award feedback: the whole screen flashes green when the server says "landed". */
+.scan-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+  animation: scan-flash-fade 0.9s ease-out forwards;
+}
+
+@keyframes scan-flash-fade {
+  0% {
+    box-shadow:
+      inset 0 0 0 8px var(--console-ok),
+      inset 0 0 64px rgba(61, 220, 151, 0.5);
+  }
+
+  100% {
+    box-shadow:
+      inset 0 0 0 8px rgba(61, 220, 151, 0),
+      inset 0 0 64px rgba(61, 220, 151, 0);
+  }
+}
+
+/* ADR-092 — the armed-tier echo: the loud answer to "what does the next scan pay?" */
+.console-armed {
+  margin: 8px 0 0;
+  font-weight: 700;
+  color: var(--console-ok);
+}
+
+/*
+ * ADR-101 — the PIN-reset combobox. Each suggestion is a full-width row comfortably
+ * taller than --tap-min: this is pressed with a thumb, outdoors, often with the other
+ * hand holding somebody's phone.
+ */
+.console-suggest {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  border: 2px solid var(--console-line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.console-suggest li + li {
+  border-top: 2px solid var(--console-line);
+}
+
+.console-suggest__option {
+  width: 100%;
+  min-height: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--console-panel);
+  color: var(--console-text);
+  border: none;
+  text-align: left;
+  font-size: 20px;
+}
+
+.console-suggest__option:active {
+  background: var(--console-line);
+}
+
+.console-suggest__option:focus-visible {
+  outline: 3px solid var(--console-accent);
+  outline-offset: -3px;
+}
+
+.console-suggest__hint {
+  font-size: 15px;
+  color: var(--console-muted);
+}
+
+/*
+ * ADR-108 — the speed-start buttons: each offered pair is one full-width tap, the planned
+ * one leading in primary colours. Two lines per button — the pairing big, the provenance
+ * small — because a marshal reads these at arm's length between rallies.
+ */
+.console-speed {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: var(--space-3);
+}
+
+.console-speed__button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  min-height: 64px;
+  text-align: left;
+}
+
+.console-speed__pair {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.console-speed__tag {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+/*
+ * ADR-114 — the live scoreboard. Two teams, one on each side, because that is how the
+ * marshal is standing: left of the net and right of it, not top and bottom of a form.
+ */
+.scoreboard {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.scoreboard__side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.scoreboard__team {
+  margin: 0;
+  font-size: 15px;
+  text-align: center;
+  /* A long team name must not push the two sides out of alignment. */
+  overflow-wrap: anywhere;
+}
+
+.scoreboard__score {
+  margin: 0;
+  font-size: 48px;
+  font-weight: bold;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.scoreboard__score--leading {
+  color: var(--console-accent, #1b7f3b);
+}
+
+/*
+ * The strip is the whole control: five numbers centred on the live score, of which only
+ * the two neighbours are pressable. No arrows, because there is nowhere else to go.
+ */
+.scoreboard__strip {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  flex-wrap: nowrap;
+}
+
+.scoreboard__step {
+  min-width: 40px;
+  min-height: var(--tap-large);
+  padding: 0 2px;
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;
+  border: 2px solid currentColor;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.scoreboard__step[disabled] {
+  cursor: default;
+}
+
+/* The unreachable far numbers are context, not controls, so they recede. */
+.scoreboard__step[disabled]:not(.scoreboard__step--current) {
+  opacity: 0.25;
+  border-style: dashed;
+}
+
+.scoreboard__step--current {
+  opacity: 1;
+  font-weight: bold;
+  background: var(--console-accent, #1b7f3b);
+  color: #fff;
+}
+
+/*
+ * ADR-145 — a credential shown once, meant to be read off a laptop and typed or copied.
+ *
+ * Monospaced and wrapping anywhere: a screen link is forty characters of base64url with no
+ * spaces in it, and the one thing it must never do is run off the side of the panel where
+ * the operator cannot see the end of the thing they are about to trust.
+ */
+.console-code {
+  font-family: var(--font-console);
+  font-size: 13px;
+  line-height: 1.5;
+  padding: var(--space-3);
+  margin: var(--space-3) 0;
+  background: var(--console-bg);
+  border: 1px solid var(--console-line);
+  border-radius: var(--radius);
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+/* ADR-279 — the Timetable subtab: one lane per court across the day, and a now-line. */
+.timetable-axis {
+  position: relative;
+  height: 20px;
+  margin-left: 120px;
+  border-bottom: 1px solid var(--console-line);
+}
+
+.timetable-mark {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: var(--console-muted);
+}
+
+.timetable-lane {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  border-bottom: 1px solid var(--console-line);
+}
+
+.timetable-lane[data-enabled='false'] {
+  opacity: 0.5;
+}
+
+.timetable-court {
+  width: 112px;
+  flex: none;
+  font-weight: 600;
+}
+
+.timetable-track {
+  position: relative;
+  flex: 1;
+  height: 32px;
+}
+
+.timetable-block {
+  position: absolute;
+  top: 4px;
+  height: 24px;
+  overflow: hidden;
+  padding: 0 4px;
+  border: 1px solid var(--console-line);
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 22px;
+  white-space: nowrap;
+  background: var(--console-bg);
+}
+
+.timetable-block--live {
+  border-color: var(--console-accent);
+  font-weight: 700;
+}
+
+.timetable-block--done {
+  color: var(--console-muted);
+}
+
+.timetable-block--off {
+  text-decoration: line-through;
+  color: var(--console-muted);
+}
+
+.timetable-now {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--console-accent);
+}

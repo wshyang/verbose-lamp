@@ -1,0 +1,46 @@
+.avatar-studio-frame {
+  background:
+    radial-gradient(circle at 50% 38%, rgba(212, 175, 55, 0.12), transparent 62%),
+    linear-gradient(160deg, #100b16 0%, #050407 100%);
+  border: 1px solid rgba(212, 175, 55, 0.32);
+  box-shadow:
+    inset 0 0 0 1px rgba(248, 226, 155, 0.08),
+    0 22px 60px rgba(0, 0, 0, 0.55);
+}
+
+.avatar-studio-sheen {
+  position: absolute;
+  top: -15%;
+  bottom: -15%;
+  left: -60%;
+  width: 34%;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 246, 220, 0.05) 28%,
+    rgba(255, 246, 220, 0.52) 52%,
+    rgba(248, 226, 155, 0.1) 72%,
+    transparent 100%
+  );
+  mix-blend-mode: screen;
+  transform: skewX(-16deg);
+  animation: avatar-studio-sweep 7.5s ease-in-out infinite;
+}
+
+@keyframes avatar-studio-sweep {
+  0%,
+  66% {
+    transform: translateX(-20%) skewX(-16deg);
+  }
+  100% {
+    transform: translateX(430%) skewX(-16deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avatar-studio-sheen {
+    animation: none;
+    left: 38%;
+  }
+}

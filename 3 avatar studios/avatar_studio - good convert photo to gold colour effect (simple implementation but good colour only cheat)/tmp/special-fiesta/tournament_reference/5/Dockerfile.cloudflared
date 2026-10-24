@@ -1,0 +1,4 @@
+# Contextualised from initial-templates/Dockerfile.cloudflared (GREENFIELD s10.1).
+# Pinned release, no auto-update; TUNNEL_TOKEN is supplied at runtime only.
+FROM cloudflare/cloudflared:2025.7.0
+CMD ["tunnel", "--no-autoupdate", "run"]

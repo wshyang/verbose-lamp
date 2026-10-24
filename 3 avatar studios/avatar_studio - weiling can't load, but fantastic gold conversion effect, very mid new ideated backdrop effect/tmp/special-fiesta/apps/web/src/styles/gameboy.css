@@ -1,0 +1,2265 @@
+/* Participant surfaces (S1–S17, S60): Gameboy/Pokémon styling with Sentosa motifs. */
+
+.theme-gameboy {
+  --panel-border: 4px solid var(--ink);
+  /*
+   * ADR-098 — the shell IS the viewport: exactly full height, never scrolling. The bottom
+   * bar is a flex footer of this frame, so no amount of content can push it off screen —
+   * scrolling happens inside .gb-main only.
+   *
+   * ADR-265 — `100dvh` after the `100%` fallback: on a phone the layout viewport includes
+   * the strip under the collapsing URL bar, so a shell sized by the percentage chain sat
+   * taller than the visible screen and the nav (and the scene strip pinned to the same
+   * bottom) started life partly underneath the browser chrome. The dynamic unit tracks
+   * the visible viewport as the bar comes and goes; the photo wall learned this first
+   * (console.css). Browsers without dvh keep the percentage.
+   */
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  isolation: isolate;
+  /* ADR-256 — flat panorama-top colour at every width, so the sky above the scene
+   * box matches the panorama's top row wherever the box ends. */
+  background: var(--scene-sky);
+}
+
+/* ---------------------------------------------------------------------------
+ * Sentosa backdrop (ADR-022). A 480×270 pixel panorama plus one layer per moving
+ * part, drawn by apps/web/scripts/scene/generate-pixel.mjs and positioned by <SentosaScene>.
+ *
+ * The box keeps the art's 16:9 ratio and is pinned to the bottom of the viewport, so
+ * every sprite anchor stays glued to the panorama at any width; the sky above it is
+ * the flat colour of the panorama's top row. Everything is decoration: fixed, behind
+ * the panels, pointer-events free.
+ * ------------------------------------------------------------------------- */
+
+@keyframes gb-scene-drift {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/*
+ * Two-frame sheets. The layer is exactly one frame wide with the sheet at 200%, so frame A
+ * sits at 0% and frame B at 100%; `steps(2, jump-none)` holds each for half the cycle and
+ * never tweens between them.
+ */
+@keyframes gb-scene-frames {
+  from {
+    background-position-x: 0%;
+  }
+
+  to {
+    background-position-x: 100%;
+  }
+}
+
+@keyframes gb-scene-cross {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-30%);
+  }
+}
+
+@keyframes gb-scene-serve {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(22.5%);
+  }
+}
+
+@keyframes gb-scene-hop {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-14%);
+  }
+}
+
+.gb-scene__layer {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+
+/* A sprite sheet: boxed to one frame and placed by the generated left/top. */
+.gb-scene__frame {
+  position: absolute;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+
+/*
+ * ADR-256 — the backdrop appears at EVERY width; it used to exist only above
+ * 760px, so on a phone (the Android report: a blue-and-yellow blank where the
+ * desktop shows Sentosa) the scene never rendered at all and the shell's old
+ * gradient was all there was. The old rationale — on a handset the panels
+ * cover it anyway — mistook "partly covered" for "invisible": the column's
+ * margins, the gaps between panels and the strip above the nav are exactly
+ * where the room shows, on a handset as on a desktop. The box keeps its 16:9,
+ * full-width, bottom-pinned geometry at every size: cropping it to fill a
+ * portrait screen (cover-style) would cut the Merlion off one side and the
+ * court off the other, which is the glitch the 760px gate was avoiding.
+ */
+.gb-scene {
+  display: block;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: calc(100vw / var(--scene-aspect, 1.7777778));
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/*
+ * ADR-298 — a venue whose art is a full-height PORTRAIT plate instead of a bottom strip says so
+ * by rendering `data-fit="plate"` on its `.gb-scene` (a custom property cannot select, so an
+ * attribute is what CSS matches on), and gives its art's width / height as `--scene-aspect`.
+ *
+ * The plate fills the screen's height at its own aspect ratio, centred, and never crops: on a
+ * handset it is the whole screen, on a wide screen it is a column with the venue's flat edge
+ * colour either side. Strip venues (Sentosa) are untouched by this block.
+ */
+.gb-scene[data-fit='plate'] {
+  top: auto;
+  right: auto;
+  left: 50%;
+  /*
+   * The box always has the art's own shape, because the art is painted into it `100% 100%`: any
+   * other shape is a stretched picture. It is the largest such box that fits the screen, flush
+   * with the bottom. On a screen at least as tall as the art (every phone), the width is the
+   * limit and the box is shorter than the screen; the top of the screen is then the venue's flat
+   * `--scene-edge`, which `.theme-gameboy` paints behind it. On a wide screen the height is the
+   * limit and the edge colour fills either side.
+   */
+  width: min(100vw, calc(100dvh * var(--scene-aspect, 0.5625)));
+  height: calc(min(100vw, calc(100dvh * var(--scene-aspect, 0.5625))) / var(--scene-aspect, 0.5625));
+  transform: translateX(-50%);
+}
+
+.theme-gameboy:has(.gb-scene[data-fit='plate']) {
+  background: var(--scene-edge, var(--scene-sky));
+}
+
+.gb-scene__panorama {
+  background-size: 100% 100%;
+}
+
+/*
+ * ADR-193 — the photoreal layer set, which wants the opposite of everything above.
+ *
+ * `image-rendering: pixelated` is load-bearing for the drawn backdrops: at 480x270 a
+ * smoothed half-pixel is a visible smear, so nearest-neighbour is what keeps the art
+ * crisp at any scale. Applied to a 3840x2160 photograph the same rule aliases every palm
+ * frond and cable into a sawtooth, because there is now genuine sub-pixel detail to
+ * throw away. So the real scene turns smoothing back on. Nothing else about the layer
+ * contract changes, which is the whole point of the variant.
+ */
+.gb-scene--real .gb-scene__layer,
+.gb-scene--real .gb-scene__frame {
+  image-rendering: auto;
+}
+
+/* Repeating strips: two tiles wide, translated by exactly one tile. */
+.gb-scene__drift {
+  width: 200%;
+  background-repeat: repeat-x;
+  background-size: 50% auto;
+}
+
+.gb-scene__clouds {
+  animation: gb-scene-drift 150s linear infinite;
+}
+
+.gb-scene__waves {
+  animation: gb-scene-drift 26s linear infinite;
+}
+
+/*
+ * ADR-195 — the near sea, drifting far slower than the glints on top of it.
+ *
+ * 26s is right for specular sparkle, which genuinely flickers. The water body underneath
+ * moves at a different rate or the two lock together and the whole sea slides sideways
+ * like a conveyor. 110s is slow enough to read as swell rather than travel, and being a
+ * different period from the waves it never beats against them.
+ */
+.gb-scene__water {
+  animation: gb-scene-drift 110s linear infinite;
+}
+
+.gb-scene__foam {
+  background-size: 200% auto;
+  animation: gb-scene-frames 0.85s steps(2, jump-none) infinite;
+}
+
+.gb-scene__gulls {
+  animation:
+    gb-scene-frames 0.45s steps(2, jump-none) infinite,
+    gb-scene-cross 58s linear infinite;
+}
+
+.gb-scene__palm {
+  animation: gb-scene-frames 2.4s steps(2, jump-none) infinite alternate;
+}
+
+/* Four players, each on their own flip period so they never move as one. */
+.gb-scene__player {
+  animation: gb-scene-frames var(--gb-period) steps(2, jump-none) infinite alternate;
+}
+
+.gb-scene__serve {
+  animation: gb-scene-serve 3.4s ease-in-out infinite alternate;
+}
+
+.gb-scene__ball {
+  animation: gb-scene-hop 1.7s cubic-bezier(0.3, 0, 0.7, 1) infinite alternate;
+}
+
+/*
+ * Reduced motion keeps the scene — it is the room the app sits in — and stops every
+ * moving part. What TRAVELS across the scene is hidden rather than frozen (parked mid-air
+ * it reads as broken art); which layers those are is the venue's to say, so the hide rule
+ * lives in that theme's scene.css (ADR-294).
+ */
+@media (prefers-reduced-motion: reduce) {
+  .gb-scene__layer,
+  .gb-scene__frame {
+    animation: none;
+  }
+
+}
+
+/*
+ * ADR-265 — the portrait sky. The scene box above keeps ADR-256's bargain at every
+ * size (full 16:9 art, bottom-pinned, nothing cropped or stretched), which on a tall
+ * portrait phone leaves several hundred pixels of flat --scene-sky between the top of
+ * the art and the top of the screen — exactly where the banner and the first panel
+ * sit, so the top of the app read as empty sky with the backdrop nowhere in sight.
+ * The art itself cannot grow into that space without breaking the bargain, so the
+ * SKY grows instead: below the art's top row the shell paints a deeper-to-matching
+ * gradient (its foot is --scene-sky, the panorama's top row, so the join is
+ * invisible) and drifts the pixel cloud motif across it. The scene strip is
+ * untouched — Merlion, court and players all still stand in it — and what sits
+ * behind the heading is now sky with weather in it rather than a flat fill.
+ * Landscape and desktop keep ADR-256's flat sky exactly; this is portrait-only.
+ */
+@keyframes gb-scene-sky-drift {
+  from {
+    background-position:
+      0 8%,
+      0 26%,
+      0 0;
+  }
+
+  to {
+    background-position:
+      168px 8%,
+      112px 26%,
+      0 0;
+  }
+}
+
+@media (orientation: portrait) {
+  /* ADR-298 — a plate venue draws its own sky; the gradient is for the strip's empty top. */
+  .theme-gameboy:not(:has(.gb-scene[data-fit='plate']))::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    /* Behind the scene strip (also -1, later in tree order) and behind all content. */
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      var(--motif-cloud),
+      var(--motif-cloud),
+      linear-gradient(180deg, var(--primary) 0%, var(--primary-light) 55%, var(--scene-sky) 100%);
+    background-repeat: repeat-x, repeat-x, no-repeat;
+    background-size:
+      168px auto,
+      112px auto,
+      100% 100%;
+    background-position:
+      0 8%,
+      0 26%,
+      0 0;
+    image-rendering: pixelated;
+    animation: gb-scene-sky-drift 110s linear infinite;
+  }
+}
+
+@media (orientation: portrait) and (prefers-reduced-motion: reduce) {
+  .theme-gameboy:not(:has(.gb-scene[data-fit='plate']))::before {
+    animation: none;
+  }
+}
+
+/* A sprite rendered by <PixelMotif>. */
+.gb-motif {
+  display: inline-block;
+  vertical-align: middle;
+  flex: none;
+  image-rendering: pixelated;
+}
+
+.theme-gameboy .gb-main {
+  /* ADR-098 — the one scrolling region of the participant shell. */
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  width: min(560px, 100%);
+  margin: 0 auto;
+  /* The wave garnish on the nav overlaps this box by 12px. */
+  padding: var(--space-3) var(--space-3) calc(var(--space-3) + 12px);
+}
+
+.gb-banner {
+  position: relative;
+  margin: var(--space-3) auto var(--space-2);
+  width: min(560px, calc(100% - 24px));
+  /* ADR-299 — the banner's look is the venue's: Sentosa a sand plate, Tessensohn a blue bar. */
+  background: linear-gradient(180deg, var(--banner-bg) 0%, var(--banner-bg-deep) 100%);
+  border: 4px solid var(--banner-border);
+  border-radius: var(--radius);
+  box-shadow:
+    0 4px 0 var(--ink-soft),
+    inset 0 0 0 2px var(--paper),
+    inset 0 0 0 4px var(--accent);
+  padding: var(--space-3);
+  text-align: center;
+}
+
+/* ADR-192 — only ever on screen while the socket is down, so it may be loud. */
+.gb-stream-health {
+  margin: 0;
+  padding: 0.35rem 0.75rem;
+  background: var(--warn);
+  color: var(--warn-ink);
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
+  text-align: center;
+}
+
+.gb-banner-plate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.gb-banner-text {
+  min-width: 0;
+}
+
+/* The PSD mark is the one sprite that must stay legible, so it gets the extra pixels. */
+.gb-banner-logo {
+  width: 40px;
+  height: 40px;
+}
+
+/* Flags strung over the title plate — the shoreline's counterpart at the top edge (ADR-070).
+   48x12 is exactly 2x the 24x6 tile, so the repeat lands on whole pixels. */
+.gb-banner::before {
+  content: '';
+  display: block;
+  height: 12px;
+  margin: calc(var(--space-2) * -1) calc(var(--space-3) * -1) var(--space-2);
+  background: var(--motif-bunting) repeat-x center top / 48px 12px;
+  image-rendering: pixelated;
+}
+
+/* Shoreline under the title plate. */
+.gb-banner::after {
+  content: '';
+  display: block;
+  height: 10px;
+  margin: var(--space-2) calc(var(--space-3) * -1) calc(var(--space-2) * -1);
+  background: var(--motif-shoreline) repeat-x center bottom / 20px 10px;
+  image-rendering: pixelated;
+}
+
+.gb-banner h1 {
+  font-family: var(--font-pixel);
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0;
+  color: var(--banner-ink);
+  /* Poor-man's pixel outline: four 1px copies, then the drop shadow. */
+  text-shadow:
+    1px 0 0 var(--banner-outline),
+    -1px 0 0 var(--banner-outline),
+    0 1px 0 var(--banner-outline),
+    0 -1px 0 var(--banner-outline),
+    2px 3px 0 var(--ink-soft);
+  letter-spacing: 1px;
+}
+
+/* Subtitle sits in its own bar, like the title plates in docs/screenshot/. */
+.gb-banner p {
+  display: inline-block;
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  margin: var(--space-2) 0 0;
+  padding: 3px 8px;
+  letter-spacing: 1px;
+  color: var(--ink);
+  background: var(--primary-light);
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+}
+
+.gb-panel {
+  background: var(--paper);
+  border: var(--panel-border);
+  border-radius: var(--radius);
+  box-shadow:
+    0 4px 0 var(--ink-soft),
+    inset 0 0 0 2px var(--surface);
+  padding: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.gb-panel h2 {
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  letter-spacing: 1px;
+  margin: 0 0 var(--space-3);
+  color: var(--ink);
+}
+
+.gb-panel h3 {
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  letter-spacing: 1px;
+  margin: 0 0 var(--space-2);
+}
+
+.gb-panel h2 .gb-motif,
+.gb-panel h3 .gb-motif {
+  margin-right: 8px;
+  vertical-align: -6px;
+}
+
+.gb-label {
+  display: block;
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  letter-spacing: 1px;
+  margin: var(--space-3) 0 var(--space-1);
+}
+
+.gb-input,
+.gb-select {
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: var(--space-2) var(--space-3);
+  border: 3px solid var(--ink);
+  border-radius: var(--radius);
+  background: #fff;
+  font-size: 22px;
+}
+
+.gb-input:focus,
+.gb-select:focus,
+.gb-range:focus-visible,
+.gb-button:focus-visible,
+.gb-kebab__toggle:focus-visible,
+.gb-kebab__item:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/*
+ * ADR-232 (F11) — the photo picker is a visually hidden file input, and the label is what is seen. Keyboard focus
+ * lands on the input, so the label shows it, placed right after the input in the row.
+ */
+.gb-file:focus-visible + .gb-button {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ADR-232 (F12) — the studio's controls are at least 44 px tall, the repo's touch target (agenda-tab-plan 32). */
+.gb-studio .gb-button,
+.gb-studio .gb-avatar-option {
+  min-height: 44px;
+}
+
+.gb-pin {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.gb-pin input {
+  flex: 1;
+  text-align: center;
+  font-size: 28px;
+  letter-spacing: 4px;
+}
+
+.gb-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* A long label wrapped over two lines stays centred, not left-set in a centred box. */
+  text-align: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: var(--space-3);
+  border: 4px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--accent);
+  box-shadow: 0 4px 0 var(--accent-deep);
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.gb-button:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--accent-deep);
+}
+
+.gb-button[disabled] {
+  background: #cfcfcf;
+  box-shadow: 0 4px 0 #9a9a9a;
+  color: #6b6b6b;
+  cursor: not-allowed;
+}
+
+/*
+ * ADR-076 — a button that says it is pressed must look pressed.
+ *
+ * Every `gb-button` in the app that carries `aria-pressed` was authored correctly and rendered
+ * identically whether on or off: the gender pair at sign-up, the studio's trait rows, the cut-out
+ * choices. Screen readers were told; eyes were not. The attribute is the selector rather than a
+ * modifier class, so the affordance cannot drift from the state it describes — there is nothing to
+ * remember to add.
+ *
+ * It reads as pushed in rather than recoloured: the bevel inverts and the face drops onto it, which
+ * is what a Gameboy button does and what survives sunlight better than a hue change.
+ */
+.gb-button[aria-pressed='true'] {
+  background: var(--primary-light);
+  box-shadow: inset 0 3px 0 var(--primary-deep);
+  transform: translateY(2px);
+}
+
+.gb-button--secondary {
+  background: var(--primary-light);
+  box-shadow: 0 4px 0 var(--primary-deep);
+}
+
+.gb-button--danger {
+  background: var(--hot);
+  box-shadow: 0 4px 0 var(--hot-deep);
+  color: #fff;
+}
+
+/*
+ * ADR-265 — the phone type scale. The participant theme's pixel type was sized on a
+ * desktop monitor: Press Start 2P at 8–15px and a 20px reading face are legible across
+ * a desk and tiny on a handset, which is why the root page read as a zoomed-out
+ * desktop page and invited a pinch-zoom in the first place. Below 600px the reading
+ * face and every pixel-font step go one notch up; tap targets were already 48px
+ * (--tap-min) and do not move. The bottom nav label deliberately stays 8px — ADR-046:
+ * at 320px six tabs are ~53px each and 9px pixel labels no longer fit.
+ *
+ * ADR-317 — this block MUST stay after every base rule it overrides (a media query adds no
+ * specificity, so an earlier block loses to them), and before `.gb-button--small`, which
+ * keeps its own 9px. It once sat above them all and none of the pixel-type steps applied.
+ */
+@media (max-width: 600px) {
+  .theme-gameboy {
+    font-size: 22px;
+  }
+
+  .gb-banner h1 {
+    font-size: 16px;
+  }
+
+  .gb-banner p {
+    font-size: 10px;
+  }
+
+  .gb-panel h2 {
+    font-size: 12px;
+  }
+
+  .gb-panel h3 {
+    font-size: 10px;
+  }
+
+  .gb-label {
+    font-size: 10px;
+  }
+
+  .gb-button {
+    font-size: 12px;
+  }
+}
+
+.gb-button--small {
+  width: auto;
+  min-height: 40px;
+  font-size: 9px;
+  padding: var(--space-2) var(--space-3);
+}
+
+.gb-row {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.gb-row--between {
+  justify-content: space-between;
+}
+
+.gb-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: var(--space-2);
+}
+
+.gb-avatar-option {
+  border: 4px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: var(--space-1);
+  min-height: var(--tap-min);
+}
+
+.gb-avatar-option[aria-pressed='true'] {
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--hot);
+}
+
+.gb-avatar-option img {
+  /* 64px art at 1:1 — every art cell lands on exactly one CSS pixel. */
+  width: 64px;
+  height: 64px;
+  margin: 0 auto;
+  image-rendering: pixelated;
+  display: block;
+}
+
+.gb-avatar-name {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: 10px;
+  text-align: center;
+}
+
+/* ADR-021 — the avatar studio: preview on top, one row of choices per trait. */
+.gb-studio {
+  border: 4px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.gb-studio__preview {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-2);
+}
+
+.gb-row--wrap {
+  flex-wrap: wrap;
+}
+
+.gb-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-bottom: var(--space-2);
+}
+
+/* A swatch is its own colour: 44px keeps it thumb-sized on a phone in the sun. */
+.gb-swatch {
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: 3px solid var(--ink);
+  border-radius: var(--radius);
+  padding: 0;
+  cursor: pointer;
+}
+
+.gb-swatch[aria-pressed='true'] {
+  box-shadow: 0 0 0 3px var(--hot);
+  transform: scale(1.06);
+}
+
+.gb-avatar {
+  image-rendering: pixelated;
+  border: 3px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+/*
+ * ADR-318 — the spoken number is always above the fold. ADR-266 sized the code by width
+ * alone, so on a short phone the card outgrew the space between banner and nav and the
+ * 4-digit number fell off the bottom. The three essentials share one box that is capped at
+ * the height `.gb-main` has (a size container, scoped to this page by :has), and the code,
+ * the one flexible child, is the largest square that fits what the other two leave. Pure
+ * CSS: ADR-266's no-script-shrink rule stands. A browser without cqh/:has ignores all of
+ * this and keeps ADR-266's layout.
+ */
+.gb-main:has(.gb-qr-essentials) {
+  container-type: size;
+}
+
+.gb-qr-essentials {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  /* The panel's own top border (4px) and padding. */
+  max-height: calc(100cqh - var(--space-3) - 4px);
+}
+
+.gb-qr-essentials > * {
+  flex: none;
+  max-width: 100%;
+}
+
+/* The box's gap spaces its children; a paragraph's own margins would spend code height twice. */
+.gb-qr-essentials > .gb-hint {
+  margin: 0;
+}
+
+.gb-qr-essentials > .gb-qr-slot {
+  /*
+   * The one child that gives way: it wants the code's full size (ADR-266's cap) and shrinks
+   * from there. 120px is the least a code can be and still scan. The code is positioned
+   * inside it because a percentage height only resolves against a flex item once flex layout
+   * has given that item a definite height, which an in-flow child cannot wait for.
+   */
+  flex: 0 1 min(320px, 76vw);
+  min-height: 120px;
+  width: 100%;
+  position: relative;
+}
+
+.gb-qr {
+  display: block;
+  margin: 0 auto;
+  /*
+   * ADR-266 — as large as the column lets it be: this code is scanned across a
+   * counter, in glare, at arm's length, so it takes the width the essentials-first
+   * card gives it rather than the 260px cap from the fit-the-whole-card era.
+   * ADR-318 — it fills the height of `.gb-qr-slot` (which wants min(320px, 76vw) and
+   * shrinks from there) and takes its width from the aspect ratio, so it stays square.
+   * Absolute, so its own size never props the slot open.
+   */
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  aspect-ratio: 1;
+  border: 4px solid var(--ink);
+  background: #fff;
+  padding: var(--space-2);
+  image-rendering: pixelated;
+}
+
+.gb-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.gb-list li {
+  border-bottom: 2px dashed var(--surface-deep);
+  padding: var(--space-2) 0;
+}
+
+.gb-list li:last-child {
+  border-bottom: none;
+}
+
+/*
+ * ADR-091 — the "your team plays soon" banner on the Line-ups tab. The gold ground is the
+ * app's "organisers speaking" voice (ADR-090); the blinking LED is the nav dot's red,
+ * repeated at banner size so the tab's alert and the banner read as one signal.
+ */
+.gb-upsoon {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--accent);
+  color: var(--ink);
+  border: var(--panel-border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 0 var(--ink-soft);
+}
+
+.gb-upsoon__led {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--led);
+  box-shadow: 0 0 0 2px var(--ink);
+  animation: gb-upsoon-blink 1.2s steps(2, start) infinite;
+}
+
+.gb-upsoon__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gb-upsoon__text strong {
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+.gb-upsoon__text span {
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+@keyframes gb-upsoon-blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gb-upsoon__led {
+    animation: none;
+  }
+}
+
+/*
+ * ADR-089 — the viewer's own team in the Line-ups tab. The question the tab answers is
+ * "when are WE up?", so their rows are unmissable: gold left rail, gold tint, plus a
+ * YOUR TEAM badge in the row itself. Colour alone would fail in sunlight.
+ */
+.gb-lineup {
+  display: block;
+}
+
+.gb-lineup--mine {
+  border-left: 6px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  padding-left: var(--space-2);
+  padding-right: var(--space-2);
+}
+
+.gb-badge {
+  display: inline-block;
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  padding: 3px 6px;
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+  background: var(--landmark);
+}
+
+.gb-badge--accent {
+  background: var(--accent);
+}
+
+/* "you" sits next to the cluster name, not against it. */
+.gb-badge--you {
+  margin-left: 8px;
+}
+
+/*
+ * ADR-258 — the kebab: a row's few actions behind one ⋮ button, so a roster or
+ * a chat list is names and pills, not a wall of buttons. The menu opens under
+ * the button, right-aligned to it, and every item keeps the small-button
+ * height so a thumb finds it without looking.
+ *
+ * Restyled after field feedback ("too big and ugly"): the first cut gave the
+ * ⋮ a bordered 40px slab beside an 18px pill and opened a 190px menu behind
+ * a 4px border — a wall of chrome for two rare actions. The tap area stays
+ * thumb-sized, but what is *seen* beside the pill is three quiet dots, and
+ * the menu is only as wide and heavy as its longest word needs.
+ */
+.gb-kebab {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+}
+
+.gb-kebab__toggle {
+  min-width: 36px;
+  min-height: 44px;
+  padding: 0 var(--space-1);
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 17px;
+  line-height: 1;
+}
+
+/* Pressed or open, the dots sit on a soft sand disc — feedback without a box. */
+.gb-kebab__toggle:active,
+.gb-kebab__toggle[aria-expanded='true'] {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+@keyframes gb-kebab-in {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.gb-kebab__menu {
+  position: absolute;
+  top: calc(100% + 2px);
+  right: 0;
+  z-index: 20;
+  min-width: 156px;
+  margin: 0;
+  padding: var(--space-1);
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 0 var(--ink-soft);
+  animation: gb-kebab-in 120ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gb-kebab__menu {
+    animation: none;
+  }
+}
+
+.gb-kebab__item {
+  width: 100%;
+  min-height: 40px;
+  padding: var(--space-2) 10px;
+  border: none;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  text-align: left;
+}
+
+@media (hover: hover) {
+  .gb-kebab__item:hover {
+    background: var(--surface);
+  }
+
+  .gb-kebab__item--danger:hover {
+    background: var(--hot-pale);
+  }
+}
+
+.gb-kebab__item:active {
+  background: var(--surface);
+}
+
+.gb-kebab__item--danger {
+  color: var(--hot-deep);
+}
+
+.gb-badge--rank {
+  background: var(--primary-light);
+}
+
+/* ADR-177 — a cancelled programme item. Grey, not red: it is off, not an error. */
+.gb-badge--off {
+  background: var(--surface-deep);
+}
+
+/*
+ * ADR-177 — the day's programme, in the Ball tab's third segment.
+ *
+ * A two-column row rather than a flowing paragraph: the clock lines up down the left edge, which
+ * is what makes a run sheet scannable at arm's length. The time column is fixed rather than
+ * `auto` so the titles start on the same x whether the row reads "2.30pm – 4.30pm" or just "—".
+ */
+.gb-agenda {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.gb-agenda__item {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border: 2px solid var(--surface-deep);
+  border-radius: var(--radius);
+  background: #fff;
+}
+
+/* The one row the tab exists to answer. Gold border and tint, like the viewer's own team
+   on the Line-ups tab — a subtlety would be erased by sunlight on a beach. */
+.gb-agenda__item--now {
+  border: 3px solid var(--accent);
+  background: var(--surface);
+}
+
+/* Cancelled: still on the page, visibly struck. Hiding it would tell a participant who
+   memorised the item nothing at all. */
+.gb-agenda__item--off .gb-agenda__title {
+  text-decoration: line-through;
+}
+
+.gb-agenda__item--off {
+  opacity: 0.75;
+}
+
+.gb-agenda__when {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.gb-agenda__what {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.gb-agenda__title {
+  font-weight: 700;
+}
+
+.gb-agenda__where {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+/* Quieter than the NOW badge on purpose: "what is next" is the second question, never the first. */
+.gb-agenda__next {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--primary-deep);
+}
+
+.gb-bar {
+  height: 14px;
+  border: 2px solid var(--ink);
+  background: #fff;
+  overflow: hidden;
+}
+
+.gb-bar span {
+  display: block;
+  height: 100%;
+  background: var(--secondary);
+}
+
+.gb-points {
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  color: var(--hot);
+}
+
+.gb-points::before {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 5px;
+  vertical-align: -3px;
+  background: var(--motif-coin) no-repeat center / contain;
+  image-rendering: pixelated;
+}
+
+/* Completed-activity rows are stamped, like the paper card they replace. */
+.gb-list--stamped li,
+.gb-list--ball li {
+  position: relative;
+  padding-left: 30px;
+}
+
+.gb-list--stamped li::before,
+.gb-list--ball li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: calc(var(--space-2) + 2px);
+  width: 22px;
+  height: 22px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  image-rendering: pixelated;
+}
+
+.gb-list--stamped li::before {
+  background-image: var(--motif-stamp);
+}
+
+.gb-list--ball li::before {
+  background-image: var(--motif-bullet);
+}
+
+/*
+ * ADR-239 — the passport tab: one station per row, its chop (or an open slot) on the right.
+ * The chop is ink on paper (ADR-241), so multiply lets the panel's paper show through its gaps.
+ */
+.gb-passport {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.gb-passport li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  border-bottom: 2px dashed var(--surface-deep);
+}
+
+.gb-passport li:last-child {
+  border-bottom: none;
+}
+
+.gb-passport__name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.gb-chop {
+  flex: 0 0 auto;
+  width: 120px;
+  height: auto;
+  overflow: visible;
+  mix-blend-mode: multiply;
+}
+
+/*
+ * ADR-261 — repeat strikes at one station, stacked over its slot. Each
+ * impression is pressed over the last, slightly off it, so a station visited
+ * three times reads as three stamps dropped by the same hand, never as one
+ * stamp photocopied. Multiply blending does the ink-over-ink darkening.
+ */
+.gb-passport__chops {
+  position: relative;
+  flex: 0 0 auto;
+  width: 138px;
+  height: 84px;
+}
+
+.gb-passport__chop {
+  position: absolute;
+  left: 6px;
+  top: 5px;
+}
+
+/* ADR-262 — the folded strikes, counted on a gold pill over the stack's corner. */
+.gb-passport__more {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+.gb-passport__slot {
+  flex: 0 0 auto;
+  width: 120px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  color: var(--ink-soft);
+  border: 2px dashed var(--ink-soft);
+  border-radius: var(--radius);
+}
+
+/* Three friends on the ground under the QR badge. */
+.gb-ground-strip {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--space-4);
+  margin-top: var(--space-3);
+  padding-top: var(--space-2);
+  border-top: 3px dashed var(--surface-deep);
+}
+
+/* Empty lists get a shell on the sand rather than a bare sentence. */
+.theme-gameboy .empty-state {
+  text-align: center;
+  padding: var(--space-3) 0;
+}
+
+.theme-gameboy .empty-state::before {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 40px;
+  margin: 0 auto var(--space-2);
+  background: var(--motif-empty) no-repeat center / contain;
+  image-rendering: pixelated;
+}
+
+.theme-gameboy .loading::after {
+  content: '';
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-left: 6px;
+  vertical-align: -4px;
+  background: var(--motif-loader) no-repeat center / contain;
+  image-rendering: pixelated;
+  animation: gb-spin 3.2s steps(4) infinite;
+}
+
+@keyframes gb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-gameboy .loading::after {
+    animation: none;
+  }
+}
+
+.gb-nav {
+  /*
+   * ADR-098 — not `fixed` any more (and ADR-063's `position: relative` below was silently
+   * overriding `fixed` anyway, which is how tall screens ever managed to push the bar off
+   * the viewport). As the last flex row of a non-scrolling full-height shell, the bar
+   * cannot leave the screen no matter how tall the content is.
+   */
+  position: relative;
+  flex: none;
+  display: grid;
+  /* ADR-046 — six tabs since the Social tab arrived. At 320 px that is ~53 px each, which the
+     26 px icon and 8 px label still fit; a seventh would not, which is why chat and photos
+     share one tab instead of taking two. */
+  grid-template-columns: repeat(6, 1fr);
+  background: var(--surface);
+  border-top: 4px solid var(--ink);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  z-index: 10;
+}
+
+.gb-nav a {
+  min-height: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-decoration: none;
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--ink-soft);
+  border-right: 2px solid var(--surface-deep);
+}
+
+.gb-nav a:last-child {
+  border-right: none;
+}
+
+/* ADR-300 — `is-current` is the alias highlight for tabs whose routes live outside their
+   `to` (Teams on `/team`, Social on `/social/photos`); it must look exactly like the
+   router's own aria-current state. */
+.gb-nav a[aria-current='page'],
+.gb-nav a.is-current {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+.gb-nav .gb-nav-icon {
+  width: 26px;
+  height: 26px;
+  line-height: 1;
+}
+
+.gb-nav a[aria-current='page'] .gb-nav-icon,
+.gb-nav a.is-current .gb-nav-icon {
+  animation: gb-bob 1.6s steps(2) infinite alternate;
+}
+
+/* The sea laps at the bottom bar. */
+.gb-nav::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -11px;
+  height: 12px;
+  background: var(--motif-shoreline) repeat-x left bottom / 24px 12px;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gb-nav a[aria-current='page'] .gb-nav-icon,
+  .gb-nav a.is-current .gb-nav-icon {
+    animation: none;
+  }
+}
+
+.gb-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 84px;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: #fff;
+  border: 3px solid var(--accent);
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  z-index: 20;
+}
+
+.gb-inline-error {
+  color: var(--hot);
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  margin-top: var(--space-2);
+  display: block;
+}
+
+.gb-hint {
+  color: var(--ink-soft);
+  font-size: 18px;
+}
+
+/* ADR-028 — the colour wheel sits in the swatch row as one more swatch. */
+.gb-swatch--wheel {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 0;
+  background:
+    conic-gradient(
+      #e8483f, #ffc72c, #7ede5a, #2fd6c3, #2f7dd1, #7a4bd0, #e04bb4, #e8483f
+    );
+}
+
+.gb-swatch--wheel input {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  padding: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* ADR-031 — the file input hides inside its button; the label is the control. */
+.gb-file {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ADR-036 — choosing the square by hand. */
+.gb-cropper {
+  margin: var(--space-2) 0;
+}
+
+.gb-cropper__surface {
+  position: relative;
+  width: 100%;
+  max-width: 280px;
+  aspect-ratio: 1;
+  margin: var(--space-2) auto;
+  overflow: hidden;
+  border: 3px solid var(--ink);
+  border-radius: var(--radius);
+  touch-action: none;
+  background: var(--ink-soft);
+}
+
+.gb-cropper__photo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+/*
+ * ADR-224 — the photograph with the backdrop behind the person, laid exactly over the raw one. Same box
+ * and same contain-fit as the photograph beneath, so the two line up pixel for pixel.
+ */
+.gb-cropper__photo--backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.gb-cropper__box {
+  position: absolute;
+  box-sizing: border-box;
+  border: 3px solid var(--accent);
+  box-shadow: 0 0 0 9999px rgba(6, 12, 20, 0.55);
+  cursor: move;
+}
+
+.gb-cropper__handle {
+  position: absolute;
+  right: -12px;
+  bottom: -12px;
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: nwse-resize;
+}
+
+/* ADR-232 (F12) — the handle stays 24 px to look like a handle, and its hit area is 44 px. */
+.gb-cropper__handle::after {
+  content: '';
+  position: absolute;
+  inset: -10px;
+}
+
+/*
+ * ADR-233 — the photo dialog's panel is the shared dialog body (ADR-027) and scrolls inside the centred overlay.
+ * The overlay still centres it. Before this, a photo taller than the screen clipped off the top and its bottom
+ * controls sat below the viewport, because nothing bounded the panel.
+ */
+.gb-photo-dialog__panel {
+  max-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* ── Tuning the cut-out (ADR-073) ────────────────────────────────────────── */
+
+.gb-controls {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 3px dashed var(--ink-soft);
+}
+
+.gb-controls__preview {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  margin-bottom: var(--space-2);
+}
+
+/*
+ * (The pressed state for these rows now lives with `.gb-button[aria-pressed='true']` near the button
+ * itself, because it turned out every button that carries the attribute wants it — see ADR-076.)
+ */
+
+.gb-controls__fine {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-2);
+  align-items: center;
+  margin-bottom: var(--space-2);
+}
+
+.gb-controls__fine .gb-label {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+/*
+ * The one control in the app that cannot be a styled label over a hidden input the way the colour
+ * wheel is (`.gb-swatch--wheel`): a range needs a track and a thumb of its own, so the native input
+ * is styled directly. The thumb is a tap target first and a bevel second.
+ */
+.gb-range {
+  width: 100%;
+  min-height: var(--tap-min);
+  margin: 0;
+  background: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.gb-range::-webkit-slider-runnable-track {
+  height: 12px;
+  border: 3px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.gb-range::-moz-range-track {
+  height: 12px;
+  border: 3px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.gb-range::-webkit-slider-thumb {
+  width: 32px;
+  height: 32px;
+  margin-top: -13px;
+  border: 4px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--accent);
+  box-shadow: 0 3px 0 var(--accent-deep);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.gb-range::-moz-range-thumb {
+  width: 32px;
+  height: 32px;
+  border: 4px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--accent);
+  box-shadow: 0 3px 0 var(--accent-deep);
+}
+
+/* ── Selfie viewfinder (ADR-042) ─────────────────────────────────────────── */
+
+.gb-selfie {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Mirrored like every phone's selfie preview; the face box lives inside the same
+   mirrored frame, so its coordinates never need flipping. */
+.gb-selfie__stage {
+  position: relative;
+  overflow: hidden;
+  border: 3px solid var(--ink);
+  border-radius: 6px;
+  background: var(--ink);
+  transform: scaleX(-1);
+}
+
+.gb-selfie__video {
+  display: block;
+  width: 100%;
+  max-height: 60vh;
+  object-fit: cover;
+}
+
+.gb-selfie__face {
+  position: absolute;
+  border: 3px solid var(--accent);
+  border-radius: 8px;
+  box-shadow: 0 0 0 2px rgb(0 0 0 / 35%);
+  pointer-events: none;
+  transition: all 120ms linear;
+}
+
+/* No FaceDetector on this browser (iOS Safari): a fixed oval to line up in instead. */
+.gb-selfie__guide {
+  position: absolute;
+  inset: 12% 22%;
+  border: 3px dashed var(--accent);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* ---- Chat room (ADR-046) ---- */
+
+/* The Social tab's segmented control. Shown only once there are two segments to choose. */
+.gb-segments {
+  display: flex;
+  gap: var(--space-1);
+  margin-bottom: var(--space-2);
+}
+
+.gb-segments a {
+  flex: 1;
+  min-height: var(--tap-min);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 3px solid var(--ink);
+  border-radius: var(--radius);
+  text-decoration: none;
+}
+
+.gb-segments a[aria-current='page'] {
+  background: var(--accent);
+}
+
+.gb-chat-list li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/*
+ * ADR-202 — the face and the name, as one thing on the left of a message's header row.
+ *
+ * `min-width: 0` so that the nickname, not the avatar, is what a narrow phone shrinks: the
+ * flex default of `auto` would let a long name push the cluster badge off the right edge.
+ */
+.gb-chat-author {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+/*
+ * One slot, one width, whatever is in it — a participant's avatar, the staff mark, or nothing
+ * yet. A room whose lines indent differently depending on who is speaking, or on whether a
+ * fetch has landed, reads as broken rather than as varied, and `flex: none` is what stops the
+ * slot collapsing when the name beside it is long.
+ */
+.gb-chat-avatar {
+  display: inline-flex;
+  flex: none;
+  width: 32px;
+  height: 32px;
+}
+
+/*
+ * A facilitator or superadmin. Deliberately not a face and deliberately not empty: the
+ * organisers are in the room, they are just not one of its participants. Solid rather than
+ * outlined so it reads at a glance as a different kind of thing from the avatars above and
+ * below it, in the same colour the STAFF badge at the other end of the row uses.
+ */
+.gb-chat-avatar--staff {
+  background: var(--primary-deep);
+  border: 3px solid var(--ink);
+  border-radius: var(--radius);
+}
+
+/*
+ * Known person, directory not back yet — or never coming back, for somebody it cannot place.
+ * Holds the width and says nothing. It must not look like the staff mark: a face that has not
+ * loaded is not an announcement.
+ */
+.gb-chat-avatar--pending {
+  background: transparent;
+}
+
+/*
+ * `pre-wrap` keeps the line breaks a participant typed, and `anywhere` is the load-bearing
+ * half: without it one 500-character word — a pasted URL — would push the room's layout wider
+ * than a 320 px phone.
+ */
+.gb-chat-body {
+  margin: 0;
+  font-family: var(--font-read);
+  font-size: 18px;
+  color: var(--ink);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/*
+ * ADR-163 — the line between what this reader had already seen and what is new.
+ *
+ * A rule with the words sitting in it, rather than a coloured band: the room's own rows carry
+ * the colour here, and a filled bar reads as another message. `::before`/`::after` draw the
+ * rule so the label stays centred whatever its length, which matters because this string is
+ * the one piece of furniture in the room that is not a person's words.
+ *
+ * `scroll-margin-top` is not decoration. The divider is scrolled to the top of the view on
+ * entry, and without a margin it lands flush against the edge with the first new message
+ * half under the shell's header — so the reader's eye starts on a clipped line.
+ */
+.gb-new-messages {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 2px;
+  font-family: var(--font-read);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary-deep);
+  scroll-margin-top: 12px;
+}
+
+.gb-new-messages::before,
+.gb-new-messages::after {
+  content: '';
+  flex: 1;
+  height: 2px;
+  background: var(--primary-deep);
+  opacity: 0.45;
+}
+
+.gb-badge--staff {
+  background: var(--primary-deep);
+  color: var(--paper);
+}
+
+/* The composer sits above the nav rather than under it. */
+.gb-chat-composer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* ---- Photo gallery (ADR-047) ---- */
+
+.gb-photo-share {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/*
+ * Two columns at 320 px. `auto-fill` rather than a fixed count so a tablet fills its width,
+ * and a fixed 1fr row height is what stops the grid reflowing as lazy thumbs arrive.
+ */
+/* ADR-096 — the pull-to-refresh indicator riding above the Line-ups list. */
+.gb-pull__hint {
+  margin: 0 0 var(--space-1);
+  text-align: center;
+}
+
+.gb-photo-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-2);
+}
+
+.gb-photo-grid li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border: 3px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--paper);
+  padding: var(--space-1);
+}
+
+/*
+ * A fixed aspect box with `object-fit: cover`: a portrait and a landscape photo sit in the same
+ * grid without either one stretching, and the slot's height is known before the bytes land so
+ * the page does not jump as thumbs fill in.
+ */
+.gb-photo-thumb {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
+  image-rendering: auto;
+  background: var(--surface-deep);
+}
+
+.gb-photo-caption {
+  margin: 0;
+  font-family: var(--font-read);
+  font-size: 16px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.gb-chip {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  min-height: 32px;
+  padding: 0 var(--space-2);
+  color: var(--ink);
+  background: var(--surface);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+}
+
+.gb-chip--on {
+  background: var(--accent);
+}
+
+/* A quiet control: reporting should be reachable without competing with the like button. */
+.gb-link-button {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 4px 0;
+  font-family: var(--font-read);
+  font-size: 15px;
+  color: var(--ink-soft);
+  text-decoration: underline;
+}
+
+.gb-link-button:disabled {
+  text-decoration: none;
+  color: var(--secondary);
+}
+
+/*
+ * ADR-062 — the avatar peek.
+ *
+ * Borrows `.gb-panel`'s own border, radius, shadow and paper so it cannot drift from the rest of the
+ * theme: change the panel tokens and this changes with them.
+ *
+ * Hover lives behind `@media (hover: hover)` deliberately. A touch screen that synthesises hover
+ * after a tap would open the card from the pointer and close it from the click in the same gesture,
+ * so only a device with a real cursor gets the hover affordance; a finger gets the tap toggle.
+ */
+.gb-peek {
+  position: relative;
+  display: inline-flex;
+}
+
+.gb-peek__trigger {
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.gb-peek__card {
+  position: absolute;
+  bottom: calc(100% + var(--space-2));
+  /*
+   * Anchored to the trigger's left edge, not centred on it. In a roster or a leaderboard row the
+   * avatar sits close to the left margin, so a centred card is clipped off the side of a 320 px
+   * phone — measured at the narrowest supported width.
+   */
+  left: 0;
+  z-index: 20;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  background: var(--paper);
+  border: var(--panel-border);
+  border-radius: var(--radius);
+  box-shadow:
+    0 4px 0 var(--ink-soft),
+    inset 0 0 0 2px var(--surface);
+  cursor: pointer;
+  /* Wider than the trigger, narrow enough to sit inside a 320 px phone. */
+  min-width: 132px;
+}
+
+.gb-peek.is-open .gb-peek__card {
+  display: flex;
+}
+
+.gb-peek__name {
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-align: center;
+  word-break: break-all;
+}
+
+.gb-peek__title {
+  font-size: 12px;
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+@media (hover: hover) {
+  .gb-peek:hover .gb-peek__card,
+  .gb-peek__trigger:focus-visible + .gb-peek__card {
+    display: flex;
+  }
+}
+
+/*
+ * ADR-063 — the LED on a nav tab that needs attention.
+ *
+ * A dot rather than a count, so it never has to be legible at 8 px: it only has to be noticed. Its
+ * own red token rather than `--console-danger`, which belongs to the admin theme and reads wrong
+ * against the participant palette.
+ */
+.gb-nav {
+  /* The LED is positioned against each tab, so the tabs must be a containing block. */
+  position: relative;
+}
+
+.gb-nav a {
+  position: relative;
+}
+
+.gb-nav-led {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--led);
+  /* The same ink outline every other pixel element carries, so it reads as part of the art. */
+  box-shadow: 0 0 0 2px var(--ink);
+}
+
+/*
+ * ADR-074 — the announcement toast.
+ *
+ * Named `gb-announce`, not `gb-toast`: a `.gb-toast` rule already exists further up this file (fixed,
+ * centred, gold-bordered) with no component using it. Reusing the name meant its `left: 50%`,
+ * `bottom` and `translateX(-50%)` survived into this block — nothing here resets them — and the toast
+ * rendered half off the left of a 412 px screen. Measured, not guessed: x was -206 for a 412 px box.
+ * The dead rule is left alone rather than deleted from a file another session is editing; it is
+ * unused and can go whenever someone owns that cleanup.
+ *
+ * Sticky rather than fixed: it sits above the banner and travels with the top of the app, so it does
+ * not float over the content a participant is scrolling through. `z-index` above the nav LED's 20 so
+ * nothing can be drawn over the one message that has to be read.
+ *
+ * A full-width button, because the whole toast is the dismiss control — there is no small × to hit
+ * with wet hands in the sun. Borrows the panel's border and the leaderboard's gold so it reads
+ * as "the organisers are talking" in the app's own voice — the LED's alarm-red belonged to
+ * hardware chrome, not to a friendly announcement, and clashed with every page it sat on
+ * (ADR-090).
+ */
+/*
+ * ADR-183 — the overlay, which is now a COLUMN of alerts rather than a single slot.
+ *
+ * The positioning that used to live on `.gb-announce` moved up here: full-bleed, absolute
+ * against the viewport-locked shell (ADR-098), z-index above every other layer. Each alert
+ * inside is an ordinary block, so they stack downwards in DOM order instead of being painted
+ * on top of one another.
+ *
+ * The cap is ADR-074's original objection, honoured rather than overruled — a 320 px screen
+ * buried under full-bleed banners hides the app they are about. Limiting the COLUMN's height
+ * keeps that from happening without going back to a queue where only the oldest was ever
+ * visible. `overscroll-behavior: contain` stops a flick inside the stack from scrolling the
+ * page underneath it once the end is reached.
+ */
+.gb-announce-stack {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  max-height: 70%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.gb-announce {
+  width: 100%;
+  /* Each banner owns its own garland, which is absolute against this box. */
+  position: relative;
+  /* A short message must not be squeezed when several are stacked above it. */
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: calc(var(--space-2) + 12px) var(--space-3) var(--space-2);
+  text-align: left;
+  background: var(--accent);
+  color: var(--ink);
+  border: none;
+  border-bottom: 4px solid var(--ink);
+  border-radius: 0;
+  box-shadow: 0 4px 0 var(--ink-soft);
+  cursor: pointer;
+  /* Long words in an announcement must not widen the layout (the chat body's rule). */
+  overflow-wrap: anywhere;
+}
+
+/*
+ * ADR-133 — the up-soon call wears the same banner in the sky colour, so a participant can
+ * tell at a glance whether the organisers are talking (gold) or their court is (sky). Only
+ * the fill changes: same garland, same geometry, same dismiss affordance, because it is the
+ * same kind of interruption and learning it twice would be a cost for no reason.
+ *
+ * It occupies the same slot, not a second one: a 320 px screen covered in stacked full-bleed
+ * banners hides the app they are about, which is the reason announcements already queue one
+ * at a time. The component yields to an announcement rather than overlapping it.
+ */
+.gb-announce--upsoon {
+  background: var(--sky);
+}
+
+/*
+ * ADR-183 — every banner but the first wears its own top edge. Without it two gold
+ * announcements stacked together read as one tall block with a single garland, and the number
+ * of separate things the organisers have said stops being countable at a glance.
+ */
+.gb-announce-stack .gb-announce + .gb-announce {
+  border-top: 4px solid var(--ink);
+}
+
+/*
+ * ADR-104 — the app's own pixel bunting strung along the top edge, exactly as the banner
+ * wears it: same asset, same 48x12 rhythm, so the announcement is unmistakably part of
+ * this beach. "The organisers are talking" reads before a single word does.
+ */
+.gb-announce__garland {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: var(--motif-bunting) repeat-x center top / 48px 12px;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+/* `.gb-announce__from` is gone with the author line (ADR-103): the garland signs it now. */
+
+.gb-announce__body {
+  /* 18px matches the body type elsewhere; 15px read as fine print on a shouting banner. */
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.gb-announce__dismiss {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  letter-spacing: 1px;
+  opacity: 0.85;
+}
+
+/*
+ * ADR-103 — the spoken scan number as a pill. This is the one string a participant reads
+ * aloud across a sunlit counter, so it dresses like a badge: big digits, hard border,
+ * impossible to miss on the QR card.
+ */
+.gb-number-pill {
+  display: inline-block;
+  padding: 2px 14px;
+  margin-left: 2px;
+  background: var(--accent);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  font-family: var(--font-pixel);
+  font-size: 18px;
+  letter-spacing: 3px;
+  line-height: 1.6;
+  box-shadow: 0 2px 0 var(--ink-soft);
+  vertical-align: middle;
+}
+
+/*
+ * ADR-109 — the feed wears its states. One chip per row, three colours a glance apart:
+ * LIVE in the LED's alarm red (it IS the same signal — something is happening now),
+ * FINAL in palm green, VOIDED in driftwood grey with the result struck through. The
+ * row's left edge repeats the colour so the state scans even before the chip is read.
+ */
+.gb-chip {
+  flex: none;
+  padding: 2px 8px;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--ink);
+}
+
+.gb-chip--live {
+  background: var(--led);
+  color: #fff;
+}
+
+.gb-chip--ended {
+  background: var(--secondary);
+  color: #fff;
+}
+
+.gb-chip--voided {
+  background: var(--surface-deep);
+  opacity: 0.85;
+}
+
+.gb-feed-row {
+  border-left: 4px solid transparent;
+  padding-left: 8px;
+}
+
+.gb-feed-row--live {
+  border-left-color: var(--led);
+}
+
+.gb-feed-row--ended {
+  border-left-color: var(--secondary);
+}
+
+.gb-feed-row--voided {
+  border-left-color: var(--surface-deep);
+  opacity: 0.75;
+}
+
+/* ADR-109 — the projected kick-off chip on a Line-ups row: an estimate dressed as one. */
+.gb-badge--eta {
+  margin-left: 8px;
+  background: var(--primary-light);
+  color: var(--ink);
+}
+
+/* ADR-114 — the live score on a feed row, big enough to read from the sideline. */
+.gb-score {
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * ADR-146 — the typing line holds its height whether or not anybody is typing, so the room
+ * above it never jumps. One line's worth of space, reserved permanently, is cheaper than a
+ * reader losing their place every time a team-mate touches the keyboard.
+ */
+.gb-typing {
+  min-height: 1.2em;
+  margin: var(--space-1) 0;
+  font-style: italic;
+}
+
+/*
+ * ADR-181/204 — the spiral selector: one more square at the end of the backdrop palette.
+ *
+ * ADR-204 made that sentence literally true. It used to be a square under its own "Spiral"
+ * heading, sitting below the palette; it is now the last child of the palette's own
+ * `.gb-swatches` row, after the colour wheel. Nothing in this rule had to change, which is the
+ * point: it was always styled as a swatch, and it has finally been put where swatches live.
+ *
+ * It wears the backdrop colour it modifies and draws the rays over it in ink, so the square
+ * shows the effect it turns on rather than naming it. The gradient is a `repeating-conic-gradient`
+ * for the same reason the rest of this sheet avoids images: it is one declaration, it scales to
+ * any square, and it needs no asset to go stale.
+ *
+ * What used to be here was `.gb-avatar--spun` / `.gb-avatar__rays` / `@keyframes gb-avatar-spin`
+ * — the rotating two-layer studio preview. The preview is a single still image now, so the
+ * animation, the 150% oversized rays layer and the `prefers-reduced-motion` exception that
+ * parked it are all gone. Nothing moves, so nothing needs stopping.
+ */
+.gb-swatch--spiral {
+  background-image: repeating-conic-gradient(
+    from 0deg,
+    rgb(0 0 0 / 70%) 0deg 18deg,
+    rgb(0 0 0 / 0%) 18deg 36deg
+  );
+  background-origin: border-box;
+}
+
+/*
+ * ADR-207 — the second pattern's square, and the reason ADR-204's placement was right: a new
+ * pattern costs one more swatch and one more rule, with nothing above it to re-label.
+ *
+ * `repeating-radial-gradient` for the same reason the spiral uses a conic one — one
+ * declaration, scales to any square, no asset to go stale. It shows rings rather than the
+ * petals the default actually has, because at 44px the petals would read as a smudge and the
+ * square's job is to say WHICH pattern, not to preview the settings.
+ */
+/*
+ * ADR-208 — the third pattern's square. A zigzag needs corners, which no gradient keyword
+ * draws, so this is two linear gradients clipped against each other — the standard CSS
+ * chevron. Still one rule, still no asset.
+ */
+/*
+ * ADR-209 — the fourth and last pattern's square. Two offset radial gradients read as a liquid
+ * swirl at 44px in a way a single centred one does not; the off-centre second blob is doing
+ * the same job the domain warp does in the real pattern, which is to break the symmetry.
+ */
+.gb-swatch--psychedelic {
+  background-image:
+    repeating-radial-gradient(
+      circle at 30% 30%,
+      rgb(0 0 0 / 60%) 0 4px,
+      rgb(0 0 0 / 0%) 4px 9px
+    ),
+    repeating-radial-gradient(
+      circle at 75% 70%,
+      rgb(0 0 0 / 60%) 0 4px,
+      rgb(0 0 0 / 0%) 4px 9px
+    );
+  background-origin: border-box;
+}
+
+.gb-swatch--waves {
+  background-image:
+    repeating-linear-gradient(135deg, rgb(0 0 0 / 70%) 0 4px, rgb(0 0 0 / 0%) 4px 8px),
+    repeating-linear-gradient(45deg, rgb(0 0 0 / 70%) 0 4px, rgb(0 0 0 / 0%) 4px 8px);
+  background-size: 50% 100%;
+  background-position: left top, right top;
+  background-repeat: no-repeat;
+  background-origin: border-box;
+}
+
+.gb-swatch--concentric {
+  background-image: repeating-radial-gradient(
+    circle at 50% 50%,
+    rgb(0 0 0 / 70%) 0 5px,
+    rgb(0 0 0 / 0%) 5px 10px
+  );
+  background-origin: border-box;
+}
+
+/*
+ * ADR-182 — "a new version is ready", shown only on a station holding a newer build back.
+ *
+ * Pinned to the bottom rather than the top: the top of a facilitator screen is where the scan
+ * target and the court controls live, and a band that appears there mid-shift would push the
+ * thing being tapped out from under a thumb already moving towards it.
+ */
+.gb-update {
+  position: fixed;
+  right: var(--space-2);
+  bottom: var(--space-2);
+  left: var(--space-2);
+  z-index: 40;
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2);
+  border: 3px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--hot);
+  box-shadow: 0 4px 0 var(--ink);
+}

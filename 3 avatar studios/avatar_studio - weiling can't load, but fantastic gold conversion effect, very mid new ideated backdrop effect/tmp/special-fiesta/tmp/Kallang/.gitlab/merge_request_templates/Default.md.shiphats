@@ -1,0 +1,7 @@
+## What changed and why
+
+## Validation
+- [ ] `npm test` (Vitest) and `python -m pytest tests/python -q`
+- [ ] `npm run build`
+- [ ] Visual QA stills reviewed (`npm run qa:scene`) or Playwright e2e run
+- [ ] Addendum written/updated in `docs/addenda/` if a decision was made

@@ -1,0 +1,43 @@
+.gilded-portrait-sheen {
+  position: absolute;
+  top: -15%;
+  bottom: -15%;
+  left: -60%;
+  width: 34%;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 246, 220, 0.04) 30%,
+    rgba(255, 246, 220, 0.5) 52%,
+    rgba(248, 226, 155, 0.08) 70%,
+    transparent 100%
+  );
+  mix-blend-mode: screen;
+  transform: skewX(-16deg);
+  animation: gilded-portrait-sweep 8s ease-in-out infinite;
+}
+
+.gilded-portrait-sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(90deg, transparent 0 12px, rgba(255, 246, 220, 0.18) 13px 14px);
+}
+
+@keyframes gilded-portrait-sweep {
+  0%,
+  68% {
+    transform: translateX(-20%) skewX(-16deg);
+  }
+  100% {
+    transform: translateX(430%) skewX(-16deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gilded-portrait-sheen {
+    animation: none;
+    left: 38%;
+  }
+}

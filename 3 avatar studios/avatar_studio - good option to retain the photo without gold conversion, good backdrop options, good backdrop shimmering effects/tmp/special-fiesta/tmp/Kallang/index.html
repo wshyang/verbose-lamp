@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Active Day at The Kallang — animated pixel-art scene</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <h1>Active Day at The Kallang</h1>
+      <p>Dragon boats, kayaks and a waterfront full of people — every sprite on this page was cut out of the original artwork and animated live.</p>
+    </header>
+    <main>
+      <div class="stage" data-testid="app__stage">
+        <canvas id="scene" data-testid="app__canvas" width="2752" height="1536"></canvas>
+        <p id="loading" data-testid="app__loading">Loading sprites…</p>
+      </div>
+      <div class="controls" role="toolbar" aria-label="Scene controls">
+        <button type="button" id="btn-pause" data-testid="controls__pause">Pause</button>
+        <button type="button" id="btn-speed" data-testid="controls__speed">Speed: 1×</button>
+        <button type="button" id="btn-view" data-testid="controls__view">View: Scene</button>
+        <button type="button" id="btn-anchors" data-testid="controls__anchors" aria-pressed="false">Show anchor points</button>
+        <label>Backdrop
+          <select id="theme-select" data-testid="controls__theme">
+            <option value="dawn">Dawn</option>
+            <option value="morning">Morning</option>
+            <option value="day" selected>Day</option>
+            <option value="evening">Evening</option>
+            <option value="dusk">Dusk</option>
+          </select>
+        </label>
+        <a href="/sprites-atlas.html" data-testid="controls__atlas-link">Browse all 313 sprites</a>
+      </div>
+      <section class="notes">
+        <h2>How it was made</h2>
+        <ul>
+          <li>The boats' crews were painted <em>without</em> paddles. Each paddle you see is a separate cut-out, stitched to its paddler at a measured anchor point and swung through a rowing cycle — switch to the lab view and turn on anchor points to inspect the stitching.</li>
+          <li>Everything moves on named loops (dragon-boat stroke, kayak stroke, walk and cheer cycles, cloud drift) driven by a seeded clock, so the scene is identical frame-for-frame on every visit to the same moment.</li>
+          <li>313 sprites were extracted from five magenta-backed sheets by the pipeline in <code>tools/</code>; they are served from <code>/sprites/…</code> and indexed in a generated manifest.</li>
+        </ul>
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

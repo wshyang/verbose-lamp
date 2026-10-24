@@ -1,0 +1,13 @@
+# Cloud-dev image (CLAUDE §10.1): Vite dev server behind the platform agent.
+# The platform supplies viper-agent/ at build time; keep its contract when
+# present (PORT=3000 public, VIPER_APP_PORT=3001 app). Without it, the image
+# still runs the dev server directly on 3000 for plain local use.
+FROM node:22-alpine
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --ignore-scripts
+COPY . .
+ENV PORT=3000
+ENV VIPER_APP_PORT=3001
+EXPOSE 3000
+CMD ["sh", "-c", "if [ -f /viper-agent/entrypoint.sh ]; then exec /viper-agent/entrypoint.sh; else exec npm run dev; fi"]

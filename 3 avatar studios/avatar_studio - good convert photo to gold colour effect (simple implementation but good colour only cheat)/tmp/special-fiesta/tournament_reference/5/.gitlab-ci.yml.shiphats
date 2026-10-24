@@ -1,0 +1,43 @@
+# SHIP-HATS pipeline, kept INERT (GREENFIELD s10.3). Activate with
+# ./activate-shiphats.sh. Mirrors the local gates: typecheck, coverage, build,
+# plus a container-contract smoke test on port 3000.
+image: node:22.14.0-alpine
+
+stages:
+  - build
+  - test
+  - static-test
+  - sign
+  - runtime-test
+  - deploy
+
+build-job:
+  stage: build
+  script:
+    - npm ci --ignore-scripts
+    - npm run typecheck
+    - npm run build
+
+test-job:
+  stage: test
+  script:
+    - npm ci --ignore-scripts
+    - npm run coverage
+  coverage: '/All files[^|]*\|[^|]*100/'
+
+static-test-job:
+  stage: static-test
+  script:
+    - npm ci --ignore-scripts
+    - npx tsc --noEmit -p tsconfig.json
+
+runtime-test-job:
+  stage: runtime-test
+  script:
+    - echo "Build the image with Kaniko (.build-and-push-docker-image), run it, and reach @@SHIPHATS_PROJECT@@ on port 3000"
+
+deploy-prod-manual-job:
+  stage: deploy
+  when: manual
+  script:
+    - echo "Promote the signed image for @@SHIPHATS_PROJECT@@"
