@@ -37,13 +37,17 @@ Deliver a running production build, not a mockup, static image, video, or placeh
 
 ### Recommended module boundaries
 
-- `src/webgl/GatsbySceneManager.ts` — renderer, camera, lights, world, post-processing, timeline orchestration, pointer/resize disposal.
-- `src/webgl/decoFrames.ts` — beveled polyline geometry builder, trim-reveal shader, five frame archetypes, per-card rigs, frame disposal.
-- `src/webgl/decoTypography.ts` — bespoke geometric alphabet, solid/4-line pinstripe glyph rasterization, chamfer normal synthesis, extruded text rigs.
-- `src/webgl/environment.ts` — procedural ballroom environment map and tessellated Art Deco wall maps.
-- `src/audio/cinemaAudio.ts` — optional Web Audio drone and harp/celesta shimmer.
-- `src/data/gatsbyResearch.ts` — acts, copy, timing, research sections, defaults.
-- `src/components/ResearchModal.tsx` and `src/components/CustomTitleModal.tsx` — dialogs.
+- `src/features/premiere/scene/GatsbySceneManager.ts` — renderer, camera, lights, world, post-processing, timeline orchestration, pointer/resize disposal.
+- `src/features/premiere/scene/decoCards.ts` — act-specific card rigs and hero-lockup assembly.
+- `src/features/art-deco-frame/engine/frameGrammar/` — pure frame grammar, genome, archetypes, and tests.
+- `src/features/art-deco-frame/render/` — reusable beveled rail geometry, shared materials, and typography rendering.
+- `src/features/premiere/scene/environment.ts` — procedural ballroom environment map and tessellated Art Deco wall maps.
+- `src/features/premiere/audio/cinemaAudio.ts` — optional Web Audio drone and harp/celesta shimmer.
+- `src/features/premiere/data/sequence.ts` and `src/features/research/data/researchSections.ts` — sequence content and research content are separate feature-owned data.
+- `src/features/research/` and `src/features/title-customizer/` — reusable dossier and title editor surfaces.
+- `src/features/frame-studio/` and `src/features/qr-generator/` — independently importable editor/generator features with public barrels.
+- `src/shared/ui/` — generic buttons, dialogs, icon buttons, and range inputs used by multiple features.
+- `src/app/` — application shell and composition only; keep scene state in feature hooks and dispose every WebGL resource on unmount.
 - Keep files below 800 LOC and dispose every WebGL geometry, material, texture, render target, animation frame, and global event listener on unmount.
 
 ---

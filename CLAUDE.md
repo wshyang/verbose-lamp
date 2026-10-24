@@ -76,6 +76,10 @@ r186, Vitest. No backend, database, auth, or persistence.
 - Frontend: **a component renders, a hook decides.** Components hold JSX, view-only
   state and wiring; anything that computes over scene/timeline state lives in a hook
   or pure module. No `.filter/.reduce/.sort/.find` inside JSX.
+- Feature-first hierarchy: `src/app/` composes the host experience, `src/features/<name>/`
+  owns product behavior, and `src/shared/ui/` owns reusable interaction primitives.
+  Cross-feature imports go through a feature barrel; feature modules never import
+  from `src/app/`. See `docs/ARCHITECTURE.md` before adding a new surface.
 - Existing files that exceed these limits are listed in ADDENDUM-001 as known debt;
   do not grow them, split them when touched substantively.
 

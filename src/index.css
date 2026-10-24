@@ -6,6 +6,24 @@
     --gold-primary: #d4af37;
     --gold-deep: #8c661c;
     --obsidian: #050406;
+    --ui-accent: #d4af37;
+    --ui-accent-bright: #f8e29b;
+    --ui-accent-deep: #b88924;
+    --ui-accent-contrast: #09070c;
+    --ui-accent-glow: rgba(248, 226, 155, 0.28);
+    --ui-border: rgba(212, 175, 55, 0.4);
+    --ui-focus: #f8e29b;
+    --ui-foreground: #f5e7c6;
+    --ui-foreground-bright: #fff6dc;
+    --ui-selected-bg: rgba(212, 175, 55, 0.25);
+    --ui-selected-glow: rgba(248, 226, 155, 0.16);
+    --ui-surface: rgba(10, 8, 15, 0.8);
+    --ui-surface-hover: #191322;
+    --ui-surface-hover-soft: rgba(25, 19, 34, 0.6);
+    --ui-range-track: rgba(212, 175, 55, 0.25);
+    --ui-range-track-highlight: rgba(248, 226, 155, 0.55);
+    --ui-range-thumb: #f8e29b;
+    --ui-range-glow: rgba(248, 226, 155, 0.85);
   }
 
   * {
@@ -25,6 +43,17 @@
   }
 }
 
+@layer components {
+  .ui-button-accent {
+    background-image: linear-gradient(
+      90deg,
+      var(--ui-accent-deep),
+      var(--ui-accent-bright),
+      var(--ui-accent-deep)
+    );
+  }
+}
+
 .font-deco {
   font-family: "Cinzel", "Marcellus", serif;
 }
@@ -37,7 +66,8 @@
   font-family: "Poiret One", sans-serif;
 }
 
-/* Custom Art Deco timeline scrubber */
+/* Shared gold range control used by the timeline and frame studio. */
+input[type="range"].ui-range,
 input[type="range"].gatsby-range {
   -webkit-appearance: none;
   appearance: none;
@@ -45,32 +75,35 @@ input[type="range"].gatsby-range {
   cursor: pointer;
 }
 
+input[type="range"].ui-range::-webkit-slider-runnable-track,
 input[type="range"].gatsby-range::-webkit-slider-runnable-track {
   height: 2px;
   background: linear-gradient(
     90deg,
-    rgba(212, 175, 55, 0.25) 0%,
-    rgba(248, 226, 155, 0.55) 50%,
-    rgba(212, 175, 55, 0.25) 100%
+    var(--ui-range-track) 0%,
+    var(--ui-range-track-highlight) 50%,
+    var(--ui-range-track) 100%
   );
 }
 
+input[type="range"].ui-range::-webkit-slider-thumb,
 input[type="range"].gatsby-range::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 11px;
   height: 11px;
   margin-top: -4.5px;
-  background: #f8e29b;
+  background: var(--ui-range-thumb);
   border: 1.5px solid #050406;
-  box-shadow: 0 0 10px rgba(248, 226, 155, 0.85);
+  box-shadow: 0 0 10px var(--ui-range-glow);
   transform: rotate(45deg);
   transition: transform 0.15s ease, background-color 0.15s ease;
 }
 
+input[type="range"].ui-range:hover::-webkit-slider-thumb,
 input[type="range"].gatsby-range:hover::-webkit-slider-thumb {
   transform: rotate(45deg) scale(1.25);
-  background: #ffffff;
+  background: var(--ui-foreground-bright);
 }
 
 /* Custom subtle gold scrollbar for modals */
