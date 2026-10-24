@@ -17,3 +17,4 @@ numbers so the base spec stays stable. See `CLAUDE.md` §1 for the discipline.
 | [ADDENDUM-010](addenda/ADDENDUM-010-port-viewport-frame-and-fine-tune-proportions.md) | 2026-10-23 | Port viewport frame, dismissible overlay, fine-tune proportions from verbose-lamp | §3, §4, §6, §7 | Accepted (plan) |
 | [ADDENDUM-011](addenda/ADDENDUM-011-port-implementation-record.md) | 2026-10-23 | Port record: viewport frame, dismissible studio, proportion genes | §3, §4, §6, §7 | Implemented — visual check pending |
 | [ADDENDUM-012](addenda/ADDENDUM-012-composable-frame-layers-and-mobile-leveling.md) | 2026-10-24 | Composable frame layers, mobile auto-level framing, topmost studio | §3, §4, §5, §7, §9 | Implemented — visual check pending |
+| [ADDENDUM-013](addenda/ADDENDUM-013-golden-qr-code-generator.md) | 2026-10-24 | Golden QR code generator module (`src/qr/`), SVG shimmer renderer, export | §3, §5, §7 | Implemented — visual & scan check pending |

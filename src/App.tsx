@@ -26,6 +26,7 @@ import { ResearchModal } from './components/ResearchModal';
 import { CustomTitleModal } from './components/CustomTitleModal';
 import { FrameStudioControl } from './components/FrameStudioControl';
 import { useFrameStudio } from './lib/hooks/useFrameStudio';
+import { QrGeneratorLauncher } from './qr';
 
 function formatSeconds(sec: number): string {
   const s = Math.max(0, Math.floor(sec));
@@ -248,6 +249,8 @@ export function App() {
             <span className="hidden sm:inline">Customize Title</span>
             <span className="sm:hidden">Custom</span>
           </button>
+
+          <QrGeneratorLauncher />
 
           <button
             onClick={handleToggleCameraMode}
