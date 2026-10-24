@@ -16,6 +16,10 @@ src/
     components/                 # Stage, header, timeline, and HUD layout
   features/
     art-deco-frame/             # Frame grammar, glyphs, rails, materials
+    avatar-studio/              # Avatar composition, photo session, gold studio UI
+    background-removal/         # Matte reading, 128-grid cut-out, soft subject alpha
+    enamel-backdrop/            # Cloisonné pattern fields, gold leaf, panel renderer
+    face-detection/             # Avatar framing from BlazeFace detections
     frame-studio/               # Frame controls and state adapter
     gilded-portrait/            # Pure CPU image pipeline and optional portrait studio
     premiere/                   # Sequence domain, audio, and WebGL runtime
@@ -25,6 +29,7 @@ src/
   shared/
     ui/                         # Button, IconButton, RangeInput, Dialog
     lib/                        # Small framework-neutral utilities
+      raster/                   # RgbaImage/AlphaMask contracts, resample, morphology
 ```
 
 Each feature keeps its own `components`, `hooks`, `model`, `data`, or `engine`
@@ -45,6 +50,17 @@ supported import surface; internal files should remain private to that feature.
   renderer that implements the same operations.
 - `features/gilded-portrait` owns the tested RGBA-to-gold pipeline, local image
   adapters, and an opt-in modal/launcher. It is not mounted by the Gatsby host.
+- `shared/lib/raster` owns the pixel contracts every image feature speaks, plus
+  resampling and morphology, so no feature imports another just for a type.
+- `features/face-detection`, `features/background-removal` and
+  `features/enamel-backdrop` have no React and no knowledge of this app. Their
+  model loaders are thin, cached and never throw; the decisions (framing,
+  cut-out grid, pattern fields) are pure and tested. Any one can be reused alone.
+- `features/avatar-studio` composes those three with the gilded-portrait pipeline
+  into a framed avatar. Hooks decide (session machine, look, memoised layers);
+  components only render. The header mounts its launcher. The composite carries
+  a per-pixel metal map, so the preview's glint (`shimmer.ts`) lights gold and
+  leaves enamel and skin alone; the PNG export is always the still.
 - `features/title-customizer`, `features/research`, and `features/qr-generator`
   are independently importable product features with their own data and UI.
 - `shared/ui` contains interaction primitives, not page layouts. Its Button

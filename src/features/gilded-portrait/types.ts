@@ -1,8 +1,10 @@
-export interface RgbaImage {
-  readonly width: number;
-  readonly height: number;
-  readonly data: Readonly<Uint8ClampedArray>;
-}
+import type { AlphaMask, RasterDimensions, RgbaImage } from '@/shared/lib/raster';
+
+/**
+ * Raster contracts moved to `src/shared/lib/raster` (ADDENDUM-017 §3.0). Re-exported so
+ * this feature's public API, and every import of `./types`, stays unchanged.
+ */
+export type { AlphaMask, RasterDimensions, RgbaImage };
 
 export interface CurvePoint {
   readonly x: number;
@@ -54,11 +56,3 @@ export interface LevelsSettings {
   readonly gamma: number;
 }
 
-export interface RasterDimensions {
-  readonly width: number;
-  readonly height: number;
-}
-
-export interface AlphaMask extends RasterDimensions {
-  readonly data: Uint8ClampedArray;
-}

@@ -34,6 +34,7 @@ export { buildShapeMask, chokeMask } from './mask';
 export { fitWithin } from './fit';
 export { GILDING_PRESETS } from './presets';
 export { buildGildingToneLut, gildImage } from './pipeline';
+export { DEFAULT_TINT_STRENGTH, tintImageGold, type TintOptions } from './tint';
 export { MAX_IMAGE_FILE_SIZE, validateImageFile } from './validate';
 export { MAX_GILDED_IMAGE_EDGE, loadRgbaImage } from './load';
 export { downloadGildedPng } from './export';

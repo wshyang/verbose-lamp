@@ -7,6 +7,7 @@ import {
   VolumeX,
 } from 'lucide-react';
 import { QrGeneratorLauncher } from '@/features/qr-generator';
+import { AvatarStudioLauncher } from '@/features/avatar-studio';
 import type { CameraMode } from '@/features/premiere';
 import { Button, IconButton } from '@/shared/ui';
 import { cn } from '@/shared/lib/cn';
@@ -60,6 +61,7 @@ export function PremiereHeader({
           <span className="sm:hidden">Custom</span>
         </Button>
         <QrGeneratorLauncher />
+        <AvatarStudioLauncher />
         <Button
           onClick={onToggleCameraMode}
           variant={cameraMode === 'orbit' ? 'selected' : 'panel'}

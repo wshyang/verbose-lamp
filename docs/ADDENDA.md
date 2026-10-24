@@ -21,4 +21,6 @@ numbers so the base spec stays stable. See `CLAUDE.md` §1 for the discipline.
 | [ADDENDUM-014](addenda/ADDENDUM-014-feature-first-reusable-architecture.md) | 2026-10-24 | Feature-first modules, shared UI primitives, application composition | §2, §7, §9 | Implemented — visual check pending |
 | [ADDENDUM-015](addenda/ADDENDUM-015-gilded-portrait-assessment-and-plan.md) | 2026-10-24 | Gilded Portrait: assessment and plan | §3, §7 | Accepted (plan) |
 | [ADDENDUM-016](addenda/ADDENDUM-016-gilded-portrait-implementation.md) | 2026-10-24 | Gilded Portrait: implementation record and verification | §3, §7 | Implemented — visual check pending |
-| [ADDENDUM-017](addenda/ADDENDUM-017-gilded-avatar-studio-assessment-and-plan.md) | 2026-10-24 | Gilded Avatar Studio: face detection, background removal, enamel-gold backdrops | §3, §7 | Accepted (plan) |
+| [ADDENDUM-017](addenda/ADDENDUM-017-gilded-avatar-studio-assessment-and-plan.md) | 2026-10-24 | Gilded Avatar Studio: face detection, background removal, enamel-gold backdrops | §3, §7 | Implemented by ADDENDUM-018 |
+| [ADDENDUM-018](addenda/ADDENDUM-018-gilded-avatar-studio-implementation.md) | 2026-10-24 | Gilded Avatar Studio: implementation record, deviations, licences, measurements | §3, §7 | Implemented — visual check pending |
+| [ADDENDUM-019](addenda/ADDENDUM-019-avatar-studio-lifts-from-reference-implementations.md) | 2026-10-24 | Avatar Studio: gold wash (A), jewel backdrops + metal-aware shimmer (B), full gilding controls (C) | §3, §7 | Implemented — visual check pending |

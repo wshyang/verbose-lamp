@@ -6,9 +6,11 @@ interface GildedPortraitCanvasProps {
   readonly image: RgbaImage;
   readonly label: string;
   readonly isShimmering: boolean;
+  /** Lets other features reuse the canvas under their own testid convention (CLAUDE.md §5). */
+  readonly testId?: string;
 }
 
-export function GildedPortraitCanvas({ image, label, isShimmering }: GildedPortraitCanvasProps) {
+export function GildedPortraitCanvas({ image, label, isShimmering, testId = 'gilded-portrait__preview' }: GildedPortraitCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -29,7 +31,7 @@ export function GildedPortraitCanvas({ image, label, isShimmering }: GildedPortr
         role="img"
         aria-label={label}
         className="absolute inset-0 h-full w-full object-contain"
-        data-testid="gilded-portrait__preview"
+        data-testid={testId}
       />
       {isShimmering && <span aria-hidden="true" className="gilded-portrait-sheen" />}
     </div>
