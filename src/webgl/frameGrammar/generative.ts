@@ -250,7 +250,8 @@ function buildArcade(box: Box, level: number): PolylineSpec[] {
 export function buildGenerativeFrameSpecs(
   archetype: FrameArchetype,
   mainWidth: number,
-  formula: FrameFormula
+  formula: FrameFormula,
+  options: { includePrimaryFrame?: boolean; includeMonogram?: boolean } = {}
 ): PolylineSpec[] {
   const box = frameBox(archetype, mainWidth);
   const level = clampGenesisLevel(formula.level);
@@ -262,8 +263,9 @@ export function buildGenerativeFrameSpecs(
         ? buildRosette(box, level)
         : buildArcade(box, level);
 
-  const specs = mirrorHalves(rightHalf);
-  if (archetype !== 'monogram_gate') return specs;
+  const pattern = options.includePrimaryFrame === false ? rightHalf.slice(1) : rightHalf;
+  const specs = mirrorHalves(pattern);
+  if (archetype !== 'monogram_gate' || options.includeMonogram === false) return specs;
 
   const glyph = buildCoreFrameSpecs('monogram_gate', mainWidth).filter(
     (s) => s.kind === 'monogram' || s.kind === 'pinstripe'

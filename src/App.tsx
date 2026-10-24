@@ -186,7 +186,7 @@ export function App() {
   const currentChapter = SEQUENCE_CHAPTERS[activeAct] ?? SEQUENCE_CHAPTERS[0];
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-[#050407] select-none">
+    <div className="relative w-screen h-dvh overflow-hidden bg-[#050407] select-none">
       {/* Full-Viewport WebGL Stage */}
       <div
         ref={mountRef}
@@ -296,12 +296,14 @@ export function App() {
 
       {frameStudio.isOpen ? (
         <div
-          className={`transition-all duration-300 ${hudHidden ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+          className={`relative z-[70] transition-all duration-300 ${hudHidden ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
         >
           <FrameStudioControl
             isOpen
             surface={frameStudio.surface}
             patterns={frameStudio.patterns}
+            baseSource={frameStudio.baseSource}
+            layers={frameStudio.layers}
             designGallery={frameStudio.designGallery}
             activeDesignIndex={frameStudio.activeDesignIndex}
             designLabel={frameStudio.designLabel}
@@ -316,6 +318,8 @@ export function App() {
             borderWeight={frameStudio.borderWeight}
             onSurfaceChange={frameStudio.setSurface}
             onPatternChange={frameStudio.selectPattern}
+            onLayerToggle={frameStudio.setLayerEnabled}
+            onLayerLevelChange={frameStudio.setLayerLevel}
             onDesignChange={frameStudio.selectDesign}
             onLevelChange={frameStudio.setLevel}
             onDetailChange={frameStudio.setDetail}

@@ -48,11 +48,19 @@ export function buildFrame({
   intricacy = FILM_BASELINE_INTRICACY,
   formula = DEFAULT_FRAME_FORMULA,
 }: FrameRequest): PolylineSpec[] {
-  const core =
+  const base =
     formula.source === 'authored'
       ? buildCoreFrameSpecs(archetype, mainWidth, formula.genome)
       : buildGenerativeFrameSpecs(archetype, mainWidth, formula);
-  return applyIntricacy(core, intricacy);
+  const layers = (formula.layers ?? [])
+    .filter((layer) => layer.enabled && layer.source !== formula.source)
+    .flatMap((layer) => buildGenerativeFrameSpecs(
+      archetype,
+      mainWidth,
+      { ...formula, source: layer.source, level: layer.level },
+      { includePrimaryFrame: false, includeMonogram: false }
+    ));
+  return applyIntricacy([...base, ...layers], intricacy);
 }
 
 /** Back-compatible convenience wrapper (authored genesis). */

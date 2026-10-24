@@ -344,10 +344,16 @@ export function createGatsbyCardRig(
   const setFrameStyle = (next: FrameStyle) => {
     const sameStyle =
       Math.abs(next.intricacy - frameStyle.intricacy) < 1e-6 &&
-      next.formula.source === frameStyle.formula.source &&
-      next.formula.level === frameStyle.formula.level;
+      JSON.stringify(next.formula) === JSON.stringify(frameStyle.formula);
     if (sameStyle) return;
-    frameStyle = { intricacy: next.intricacy, formula: { ...next.formula } };
+    frameStyle = {
+      intricacy: next.intricacy,
+      formula: {
+        ...next.formula,
+        genome: { ...next.formula.genome },
+        layers: next.formula.layers?.map((layer) => ({ ...layer })),
+      },
+    };
     const previous = frameGeo;
     frameGeo = buildFrameGeometry(chapter.archetype, mainTextWidth, frameStyle);
     frameMesh.geometry = frameGeo;

@@ -57,14 +57,24 @@ export const INTRICACY_PRESETS: readonly IntricacyPreset[] = [
 /* -------------------------------------------------------------------------- */
 
 export type FrameSource = 'authored' | 'fractal' | 'rosette' | 'arcade';
+export type FrameLayerSource = Exclude<FrameSource, 'authored'>;
 export type FrameSurface = 'title-cards' | 'screen-border';
 
+export interface FramePatternLayer {
+  source: FrameLayerSource;
+  enabled: boolean;
+  level: number;
+}
+
 export interface FrameFormula {
+  /** The foundation pattern. Authored remains the unchanged, tunable default. */
   source: FrameSource;
   /** Recursion depth / form exponent, 1..4. Ignored by `authored` (fixed shape). */
   level: number;
   /** Proportion genes; the signature genome reproduces the delivered frame. */
   genome: BaseGenome;
+  /** Optional decorative patterns composited over the foundation. */
+  layers?: readonly FramePatternLayer[];
 }
 
 export interface FrameSourceInfo {
@@ -104,10 +114,23 @@ export const FRAME_SOURCES: readonly FrameSourceInfo[] = [
   },
 ] as const;
 
+export const FRAME_LAYER_SOURCES: readonly (FrameSourceInfo & { id: FrameLayerSource })[] = Object.freeze(
+  FRAME_SOURCES.filter(
+    (pattern): pattern is FrameSourceInfo & { id: FrameLayerSource } => pattern.id !== 'authored'
+  )
+);
+
+export const DEFAULT_FRAME_LAYERS: readonly FramePatternLayer[] = [
+  { source: 'fractal', enabled: false, level: 2 },
+  { source: 'rosette', enabled: false, level: 2 },
+  { source: 'arcade', enabled: false, level: 2 },
+] as const;
+
 export const DEFAULT_FRAME_FORMULA: FrameFormula = {
   source: 'authored',
   level: 2,
   genome: { ...SIGNATURE_GENOME },
+  layers: DEFAULT_FRAME_LAYERS,
 };
 
 export interface FrameStyle {

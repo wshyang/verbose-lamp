@@ -22,6 +22,7 @@ import {
 } from './frameGrammar';
 import { SIGNATURE_GENOME, clampGenome } from './frameGrammar/genome';
 import { createScreenBorderRig, ScreenBorderRig } from './ScreenBorderRig';
+import { getCinemaCameraPose, resolveViewportFit, ViewportFit } from './responsiveLayout';
 
 const CinemaNitrateShader = {
   uniforms: {
@@ -97,6 +98,8 @@ export class GatsbySceneManager {
   private renderer: THREE.WebGLRenderer;
   private scene: THREE.Scene;
   private camera: THREE.PerspectiveCamera;
+  private viewportFit: ViewportFit = resolveViewportFit(1, 1, false);
+  private readonly hasCoarsePointer: boolean;
   private composer: EffectComposer;
   private bloomPass: UnrealBloomPass;
   private nitratePass: ShaderPass;
@@ -155,11 +158,14 @@ export class GatsbySceneManager {
     }
   ) {
     this.container = container;
+    this.hasCoarsePointer =
+      window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
     this.onTelemetry = callbacks?.onTelemetry;
     this.onChapterChange = callbacks?.onChapterChange;
 
     const width = Math.max(1, container.clientWidth);
     const height = Math.max(1, container.clientHeight);
+    this.viewportFit = resolveViewportFit(width, height, this.hasCoarsePointer);
 
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
@@ -426,6 +432,7 @@ export class GatsbySceneManager {
         heroOverride: chapter.archetype === 'gatsby_hero' ? this.heroConfig : undefined,
         style: this.frameStyle,
       });
+      rig.root.scale.setScalar(this.viewportFit.cardScale);
       this.scene.add(rig.root);
       this.cardRigs.push(rig);
     }
@@ -443,6 +450,7 @@ export class GatsbySceneManager {
         heroOverride: this.heroConfig,
         style: this.frameStyle,
       });
+      updatedRig.root.scale.setScalar(this.viewportFit.cardScale);
       this.scene.add(updatedRig.root);
       this.cardRigs[heroIdx] = updatedRig;
     }
@@ -511,6 +519,11 @@ export class GatsbySceneManager {
         source: style.formula.source,
         level: THREE.MathUtils.clamp(Math.round(style.formula.level), 1, 4),
         genome: clampGenome(style.formula.genome),
+        layers: style.formula.layers?.map((layer) => ({
+          source: layer.source,
+          enabled: layer.enabled,
+          level: THREE.MathUtils.clamp(Math.round(layer.level), 1, 4),
+        })) ?? [],
       },
     };
     this.scheduleFrameRebuild();
@@ -544,6 +557,8 @@ export class GatsbySceneManager {
   private handleResize = () => {
     const width = Math.max(1, this.container.clientWidth);
     const height = Math.max(1, this.container.clientHeight);
+    this.viewportFit = resolveViewportFit(width, height, this.hasCoarsePointer);
+    for (const rig of this.cardRigs) rig.root.scale.setScalar(this.viewportFit.cardScale);
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
@@ -633,10 +648,7 @@ export class GatsbySceneManager {
     if (this.cameraMode === 'cinema') {
       const isFinale = activeIdx === SEQUENCE_CHAPTERS.length - 1;
       // Aspect-responsive framing pull-back so narrower viewports never clip side chevron/diamond wings
-      const aspectPullback =
-        this.camera.aspect < 1.65
-          ? THREE.MathUtils.clamp((1.65 - this.camera.aspect) * 6.5, 0, 5.8)
-          : 0;
+      const aspectPullback = this.viewportFit.cameraPullback;
 
       let targetZ: number;
 
@@ -671,16 +683,10 @@ export class GatsbySceneManager {
           drift;
       }
 
-      const breatheX = Math.sin(elapsed * 0.42) * 0.09 + this.pointerSmooth.x * 0.56;
-      const breatheY = 0.14 + Math.cos(elapsed * 0.35) * 0.06 + this.pointerSmooth.y * 0.36;
-
-      this.camera.position.set(breatheX, breatheY, targetZ);
-      this.camera.lookAt(
-        this.pointerSmooth.x * 0.18,
-        -0.18 + this.pointerSmooth.y * 0.12,
-        targetZ - 11.0
-      );
-      this.camera.rotation.z = -this.pointerSmooth.x * 0.018;
+      const pose = getCinemaCameraPose(this.viewportFit, this.pointerSmooth, elapsed);
+      this.camera.position.set(pose.x, pose.y, targetZ);
+      this.camera.lookAt(pose.targetX, pose.targetY, targetZ - 11.0);
+      this.camera.rotation.z = pose.roll;
     } else {
       this.controls.update();
     }

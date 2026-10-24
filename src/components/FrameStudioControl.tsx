@@ -3,6 +3,7 @@ import { ChevronDown, ChevronRight, RotateCcw, Sliders, X } from 'lucide-react';
 import {
   FrameSource,
   FrameSourceInfo,
+  FrameLayerSource,
   FrameSurface,
   IntricacyPreset,
 } from '../webgl/frameGrammar';
@@ -14,6 +15,14 @@ interface FrameStudioControlProps {
   isOpen: boolean;
   surface: FrameSurface;
   patterns: readonly FrameSourceInfo[];
+  baseSource: FrameSource;
+  layers: readonly {
+    source: FrameLayerSource;
+    label: string;
+    blurb: string;
+    enabled: boolean;
+    level: number;
+  }[];
   designGallery: readonly { index: number; label: string; kind: string }[];
   activeDesignIndex: number | null;
   designLabel: string;
@@ -28,6 +37,8 @@ interface FrameStudioControlProps {
   borderWeight: number;
   onSurfaceChange: (surface: FrameSurface) => void;
   onPatternChange: (source: FrameSource) => void;
+  onLayerToggle: (source: FrameLayerSource, enabled: boolean) => void;
+  onLayerLevelChange: (source: FrameLayerSource, level: number) => void;
   onDesignChange: (index: number) => void;
   onLevelChange: (level: number) => void;
   onDetailChange: (percent: number) => void;
@@ -50,6 +61,7 @@ export const FrameStudioControl: React.FC<FrameStudioControlProps> = (props) => 
   if (!props.isOpen) return null;
   const isTitle = props.surface === 'title-cards';
   const inertGenes = new Set<GeneKey>(props.genome.fractalDepth === 0 ? ['fractalRatio'] : []);
+  const layerRows = props.layers;
   const detailReadout = props.activePreset
     ? props.activePreset.id === 'baseline'
       ? 'Balanced'
@@ -58,7 +70,7 @@ export const FrameStudioControl: React.FC<FrameStudioControlProps> = (props) => 
 
   return (
     <section
-      className="absolute right-6 sm:right-9 top-28 z-20 w-[19rem] max-h-[calc(100dvh-11rem)] overflow-y-auto deco-scroll flex flex-col gap-3 px-3.5 py-3 bg-[#09070d]/93 border border-[#d4af37]/45 backdrop-blur-md shadow-[0_12px_40px_rgba(0,0,0,0.62)]"
+      className="absolute right-3 sm:right-9 top-28 z-[70] w-[min(19rem,calc(100vw-1.5rem))] max-h-[calc(100dvh-8.5rem)] overflow-y-auto deco-scroll flex flex-col gap-3 px-3.5 py-3 bg-[#09070d]/93 border border-[#d4af37]/45 backdrop-blur-md shadow-[0_12px_40px_rgba(0,0,0,0.62)]"
       data-testid="frame-studio__panel"
       aria-label="Frame Studio"
     >
@@ -97,22 +109,25 @@ export const FrameStudioControl: React.FC<FrameStudioControlProps> = (props) => 
       {isTitle ? (
         <>
           <div className="space-y-1.5">
-            <div className="text-[9px] tracking-[0.2em] uppercase text-[#d4af37]/80">Pattern</div>
-            <div className="grid grid-cols-2 gap-1" role="group" aria-label="Title-card pattern">
+            <div className="text-[9px] tracking-[0.2em] uppercase text-[#d4af37]/80">Foundation</div>
+            <div className="grid grid-cols-2 gap-1" role="group" aria-label="Base frame pattern">
               {props.patterns.map((pattern) => (
                 <button
                   key={pattern.id}
                   type="button"
                   onClick={() => props.onPatternChange(pattern.id)}
-                  aria-pressed={false}
+                  aria-pressed={props.baseSource === pattern.id}
                   title={pattern.blurb}
-                  className={`px-2 py-1.5 text-[9px] tracking-[0.12em] uppercase ${chip(false)}`}
+                  className={`px-2 py-1.5 text-[9px] tracking-[0.12em] uppercase ${chip(props.baseSource === pattern.id)}`}
                   data-testid="frame-studio__pattern"
                 >
                   {pattern.label}
                 </button>
               ))}
             </div>
+            <p className="text-[10px] font-editorial leading-snug text-[#d9c7a3]/75">
+              Keep the authored frame as your base, or build from another foundation.
+            </p>
           </div>
 
           {props.isDesignPattern && (
@@ -141,16 +156,57 @@ export const FrameStudioControl: React.FC<FrameStudioControlProps> = (props) => 
             </div>
           )}
 
-          <div className="space-y-1">
+          <div className="space-y-1.5">
+            <div className="text-[9px] tracking-[0.2em] uppercase text-[#d4af37]/80">Pattern layers</div>
+            <div className="space-y-1">
+              {layerRows.map((layer) => (
+                <div key={layer.source} className="border-b border-[#d4af37]/15 last:border-b-0">
+                  <label className="flex items-center gap-2 py-1.5 cursor-pointer" title={layer.blurb}>
+                    <input
+                      type="checkbox"
+                      checked={layer.enabled}
+                      onChange={(event) => props.onLayerToggle(layer.source, event.target.checked)}
+                      className="accent-[#d4af37] w-3.5 h-3.5 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#f8e29b] focus-visible:outline-offset-2"
+                      aria-label={`Add ${layer.label} layer`}
+                      data-testid="frame-studio__layer-toggle"
+                    />
+                    <span className="flex-1 text-[10px] uppercase tracking-[0.12em] text-[#e6d5b2]">{layer.label}</span>
+                  </label>
+                  {layer.enabled && (
+                    <div className="pl-5 pb-2 space-y-1">
+                      <div className="flex items-baseline justify-between">
+                        <span className="text-[8px] tracking-[0.18em] uppercase text-[#d4af37]/75">Layer level</span>
+                        <span className="text-[9px] font-mono text-[#f5e7c6]">{layer.level}</span>
+                      </div>
+                      <input
+                        type="range" min={1} max={4} step={1} value={layer.level}
+                        onChange={(event) => props.onLayerLevelChange(layer.source, Number(event.target.value))}
+                        className="w-full gatsby-range focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#f8e29b] focus-visible:outline-offset-2"
+                        aria-label={`${layer.label} layer level`}
+                        data-testid="frame-studio__layer-level"
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+            <p className="text-[10px] font-editorial leading-snug text-[#d9c7a3]/75">
+              Layers combine with the foundation; their levels stay independent.
+            </p>
+          </div>
+
+          <div className={props.isDesignPattern ? 'space-y-1 opacity-40' : 'space-y-1'}>
             <div className="flex items-baseline justify-between">
-              <span className="text-[9px] tracking-[0.2em] uppercase text-[#d4af37]/80">Level</span>
+              <span className="text-[9px] tracking-[0.2em] uppercase text-[#d4af37]/80">Base level</span>
               <span className="text-[10px] font-mono text-[#f5e7c6]" data-testid="frame-studio__level-readout">{props.level}</span>
             </div>
             <input
               id="frame-studio-level"
               type="range" min={1} max={4} step={1} value={props.level}
-              onChange={(e) => props.onLevelChange(Number(e.target.value))}
-              className="w-full gatsby-range" aria-label="Pattern level, 1 to 4"
+              disabled={props.isDesignPattern}
+              onChange={(event) => props.onLevelChange(Number(event.target.value))}
+              className="w-full gatsby-range focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#f8e29b] focus-visible:outline-offset-2 disabled:cursor-not-allowed"
+              aria-label="Base pattern level, 1 to 4"
               data-testid="frame-studio__level"
             />
           </div>
@@ -164,7 +220,7 @@ export const FrameStudioControl: React.FC<FrameStudioControlProps> = (props) => 
               id="frame-studio-detail"
               type="range" min={0} max={100} step={5} value={props.detailPercent}
               onChange={(e) => props.onDetailChange(Number(e.target.value))}
-              className="w-full gatsby-range" aria-label="Ornament detail, 50 is balanced"
+              className="w-full gatsby-range focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#f8e29b] focus-visible:outline-offset-2" aria-label="Ornament detail, 50 is balanced"
               data-testid="frame-studio__detail"
             />
             <div className="flex justify-between">
@@ -183,37 +239,39 @@ export const FrameStudioControl: React.FC<FrameStudioControlProps> = (props) => 
             </div>
           </div>
 
-          <div className="border-t border-[#d4af37]/20 pt-2">
-            <button
-              type="button"
-              onClick={() => props.onProportionsToggle(!props.proportionsOpen)}
-              aria-expanded={props.proportionsOpen}
-              className="inline-flex items-center gap-1.5 text-[10px] tracking-[0.18em] uppercase text-[#d4af37] hover:text-[#fff4d4] cursor-pointer"
-              data-testid="frame-studio__proportions-toggle"
-            >
-              {props.proportionsOpen ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
-              <Sliders className="w-3 h-3" />
-              {props.proportionsOpen ? 'Hide proportions' : 'Fine-tune proportions'}
-            </button>
-            {props.proportionsOpen && (
-              <div className="mt-2.5 space-y-3" data-testid="frame-studio__proportions">
-                {GENE_GROUPS.map((group) => (
-                  <fieldset key={group.id} className="space-y-2 border-t border-[#d4af37]/20 pt-2">
-                    <div className="flex items-baseline justify-between">
-                      <span className="text-[10px] font-deco tracking-[0.2em] uppercase text-[#f8e29b]">{group.title}</span>
-                      <span className="text-[8px] uppercase text-[#d4af37]/55">{group.caption}</span>
-                    </div>
-                    {group.genes.map((key) => (
-                      <GeneSlider key={key} geneKey={key} value={props.genome[key]} isInert={inertGenes.has(key)} onChange={props.onGeneChange} />
-                    ))}
-                  </fieldset>
-                ))}
-                <p className="text-[10px] font-editorial leading-snug text-[#d9c7a3]/80">
-                  Sliders override the selected design. Setback changes keep the same total inset, so the type always fits.
-                </p>
-              </div>
-            )}
-          </div>
+          {props.isDesignPattern && (
+            <div className="border-t border-[#d4af37]/20 pt-2">
+              <button
+                type="button"
+                onClick={() => props.onProportionsToggle(!props.proportionsOpen)}
+                aria-expanded={props.proportionsOpen}
+                className="inline-flex items-center gap-1.5 text-[10px] tracking-[0.18em] uppercase text-[#d4af37] hover:text-[#fff4d4] cursor-pointer"
+                data-testid="frame-studio__proportions-toggle"
+              >
+                {props.proportionsOpen ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+                <Sliders className="w-3 h-3" />
+                {props.proportionsOpen ? 'Hide proportions' : 'Fine-tune proportions'}
+              </button>
+              {props.proportionsOpen && (
+                <div className="mt-2.5 space-y-3" data-testid="frame-studio__proportions">
+                  {GENE_GROUPS.map((group) => (
+                    <fieldset key={group.id} className="space-y-2 border-t border-[#d4af37]/20 pt-2">
+                      <div className="flex items-baseline justify-between">
+                        <span className="text-[10px] font-deco tracking-[0.2em] uppercase text-[#f8e29b]">{group.title}</span>
+                        <span className="text-[8px] uppercase text-[#d4af37]/55">{group.caption}</span>
+                      </div>
+                      {group.genes.map((key) => (
+                        <GeneSlider key={key} geneKey={key} value={props.genome[key]} isInert={inertGenes.has(key)} onChange={props.onGeneChange} />
+                      ))}
+                    </fieldset>
+                  ))}
+                  <p className="text-[10px] font-editorial leading-snug text-[#d9c7a3]/80">
+                    Sliders override the selected design. Setback changes keep the same total inset, so the type always fits.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
         </>
       ) : (
         <div className="space-y-3">
@@ -239,7 +297,7 @@ export const FrameStudioControl: React.FC<FrameStudioControlProps> = (props) => 
               type="range" min={0} max={100} step={5} value={props.borderWeight}
               disabled={!props.borderEnabled}
               onChange={(e) => props.onBorderWeightChange(Number(e.target.value))}
-              className="w-full gatsby-range disabled:cursor-not-allowed" aria-label="Border weight"
+              className="w-full gatsby-range focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#f8e29b] focus-visible:outline-offset-2 disabled:cursor-not-allowed" aria-label="Border weight"
               data-testid="frame-studio__border-weight"
             />
             <p className="text-[10px] font-editorial leading-snug text-[#d9c7a3]/70">
