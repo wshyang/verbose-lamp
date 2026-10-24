@@ -1,0 +1,194 @@
+{
+  "images": [
+    {
+      "path": "src/images/backdrops/kallang-day-clean.jpeg",
+      "originalName": "Gemini_Generated_Image_2jlj7b2jlj7b2jlj.jpeg",
+      "role": "backdrop",
+      "notes": "Primary scene base: National Stadium + Indoor Stadium, daylight, no people/boats.",
+      "sha256": "be1544b902071fc680b66ac06a918c78d7de303e6473e4ac54cec58fe4708ab3",
+      "width": 2752,
+      "height": 1536,
+      "bytes": 2993070
+    },
+    {
+      "path": "src/images/backdrops/kallang-day-populated-reference.jpeg",
+      "originalName": "Gemini_Generated_Image_on5iyhon5iyhon5i.jpeg",
+      "role": "backdrop-reference",
+      "notes": "Same viewpoint as kallang-day-clean with people/boats baked in; placement reference for the animated scene.",
+      "sha256": "24182c9b506ceceac9a01abc7af6d995504d26071111a08b94263e843dab6adb",
+      "width": 2752,
+      "height": 1536,
+      "bytes": 3064446
+    },
+    {
+      "path": "src/images/backdrops/kallang-magenta-sky-front.jpeg",
+      "originalName": "Gemini_Generated_Image_1t2nkv1t2nkv1t2n.jpeg",
+      "role": "backdrop",
+      "notes": "Near-duplicate variant of kallang-sunset-front: identical composition, magenta key sky for sky replacement.",
+      "sha256": "c5dc3081122cb6634cab965c494f4f667e0638a64ec824be2d7585e422743d41",
+      "width": 2752,
+      "height": 1536,
+      "bytes": 2722249
+    },
+    {
+      "path": "src/images/backdrops/kallang-sunset-front.jpeg",
+      "originalName": "Gemini_Generated_Image_7x6cuk7x6cuk7x6c.jpeg",
+      "role": "backdrop",
+      "notes": "Frontal viewpoint, finished sunset sky. Alternate backdrop geometry (not used by the v1 scene layout).",
+      "sha256": "5c1906f69b2691315be4d278a991a5e83363d355509ff71f91ff79fe0c1623a4",
+      "width": 2752,
+      "height": 1536,
+      "bytes": 3050669
+    },
+    {
+      "path": "src/images/backdrops/sky-gradient-blue.jpeg",
+      "originalName": "Gemini_Generated_Image_wiwaelwiwaelwiwa.jpeg",
+      "role": "sky-plate",
+      "notes": "Plain dithered blue sky gradient plate (sky-replacement / letterbox fill).",
+      "sha256": "76a011031deb6c1d74b90c17230985106be4dea3309a8f2b81cf8803461a1315",
+      "width": 2752,
+      "height": 1536,
+      "bytes": 2340678
+    },
+    {
+      "path": "src/images/reference/sportshub-photo.png",
+      "originalName": "SportsHub.png",
+      "role": "reference-photo",
+      "notes": "Real-world photo of the National Stadium; likeness reference only, never rendered in the pixel-art scene.",
+      "sha256": "6c8f2cdfa8adad86beffcea7bc64ceed427b16cc09a443acf82b004daccb0f33",
+      "width": 1152,
+      "height": 744,
+      "bytes": 1741836
+    },
+    {
+      "path": "src/images/sprite-sheets/boats-dragon-and-kayak.jpeg",
+      "originalName": "Gemini_Generated_Image_7cr2ov7cr2ov7cr2.jpeg",
+      "role": "sprite-sheet",
+      "notes": "6 dragon boats (crew, no paddles), kayaks K1/K2/K3, loose paddles/oars, splashes. Magenta key. Paddles are separate: composite-object source.",
+      "sha256": "91a865632da6dc31afc5b6450d77eaa2d0bc4bf105079667f134e0a241f1a340",
+      "width": 2400,
+      "height": 1792,
+      "bytes": 2828207
+    },
+    {
+      "path": "src/images/sprite-sheets/characters-six-kits.jpeg",
+      "originalName": "Gemini_Generated_Image_3opyjq3opyjq3opy.jpeg",
+      "role": "sprite-sheet",
+      "notes": "Chibi characters in 6 shirt colours (red/blue/green/yellow/orange/purple): idle, side, run, cheer, point poses. Magenta key.",
+      "sha256": "0c480ac2819a5503e3098be1bdad6c73b5d4b6c6f82f795d1475668c87a0ffba",
+      "width": 2400,
+      "height": 1792,
+      "bytes": 2811859
+    },
+    {
+      "path": "src/images/sprite-sheets/clouds.jpeg",
+      "originalName": "Gemini_Generated_Image_aoywriaoywriaoyw.jpeg",
+      "role": "sprite-sheet",
+      "notes": "26 clouds: small puffs, large cumulus, wispy streaks. Magenta key.",
+      "sha256": "746f6f614beea8de6c38fa9adc5b245314bcfd2bf4f0e2c810d1a74225cb5021",
+      "width": 2752,
+      "height": 1536,
+      "bytes": 1908718
+    },
+    {
+      "path": "src/images/sprite-sheets/water-effects-and-props-v1.jpeg",
+      "originalName": "Gemini_Generated_Image_n64hnkn64hnkn64h.jpeg",
+      "role": "sprite-sheet",
+      "notes": "Water wakes/splashes/ripples/oar-splashes + PSD Active Day props, tents, arches, podium. Magenta key, text headings baked in (excluded at extraction).",
+      "sha256": "24f6dfc5e8e4a304a5d5ca64ed138ed942be20fe6d9c4ae31dcf0d5893f5db31",
+      "width": 2752,
+      "height": 1536,
+      "bytes": 2856194
+    },
+    {
+      "path": "src/images/sprite-sheets/water-effects-and-props-v2.jpeg",
+      "originalName": "Gemini_Generated_Image_v7m2evv7m2evv7m2.jpeg",
+      "role": "sprite-sheet",
+      "notes": "Alternate rendition of the same effects/props set with category labels baked in (excluded at extraction). Magenta key.",
+      "sha256": "07c0ff32161710da2439fb71e5c53912e0c13931c2aa8404e41f586803ea0a21",
+      "width": 2528,
+      "height": 1696,
+      "bytes": 2859115
+    },
+    {
+      "path": "src/images/backdrops/kallang-scene-dawn.jpeg",
+      "originalName": "backdrop dawn (sky corruption).jpeg",
+      "role": "backdrop-scene-layer",
+      "notes": "Dawn-lit scene plate with magenta key sky (layered backdrop, addendum 0009). Sky corrupted: mirrored ghost skyline rows 3-355; removed by tools/prepare_backdrops.py. Source: main branch commit 357c3fb (Added more base images).",
+      "sha256": "9fea3e884f84c90d59ffacf9a40336783a99c673c4fee4e8dc8bd946ed60b790",
+      "width": 2752,
+      "height": 1536,
+      "bytes": 3028145
+    },
+    {
+      "path": "src/images/backdrops/kallang-scene-day.jpeg",
+      "originalName": "backdrop day.jpeg",
+      "role": "backdrop-scene-layer",
+      "notes": "Day-lit scene plate with magenta key sky; clean single-component silhouette (addendum 0009). Source: main branch commit 357c3fb (Added more base images).",
+      "sha256": "53a9bc3e98be1989ce522a595ecabc8919cb8838b92c1c8d61ee8893b09a01ce",
+      "width": 2752,
+      "height": 1536,
+      "bytes": 2805742
+    },
+    {
+      "path": "src/images/backdrops/kallang-scene-dusk.jpeg",
+      "originalName": "backdrop dusk.jpeg",
+      "role": "backdrop-scene-layer",
+      "notes": "Dusk-lit scene plate with magenta key sky. Same duplicate-strip sky corruption as dawn (rows 29-354), found on induction; removed by tools/prepare_backdrops.py. Source: main branch commit 357c3fb (Added more base images).",
+      "sha256": "472f53a5968a0de1d8da9a7719e102a7c19fba5597281552cd2d771edb0b753b",
+      "width": 2752,
+      "height": 1536,
+      "bytes": 2886816
+    },
+    {
+      "path": "src/images/backdrops/sky-early-morning.jpeg",
+      "originalName": "sky early morning.jpeg",
+      "role": "backdrop-sky-layer",
+      "notes": "Full-frame dithered gradient sky for the dawn theme (layered backdrop). Source: main branch commit 357c3fb (Added more base images).",
+      "sha256": "28223b996016ee7d63062128a59c7e6caf51709344d1d5733872216abc15cc03",
+      "width": 2752,
+      "height": 1536,
+      "bytes": 3428195
+    },
+    {
+      "path": "src/images/backdrops/sky-late-morning.jpeg",
+      "originalName": "sky late morning.jpeg",
+      "role": "backdrop-sky-layer",
+      "notes": "Full-frame dithered gradient sky for the morning theme (layered backdrop). Source: main branch commit 357c3fb (Added more base images).",
+      "sha256": "f33701ff776886308aa2ed0dea54bb4b9d59a970da4df95154f7a9457afb4e5b",
+      "width": 2752,
+      "height": 1536,
+      "bytes": 2360383
+    },
+    {
+      "path": "src/images/backdrops/sky-afternoon.jpeg",
+      "originalName": "sky afternoon.jpeg",
+      "role": "backdrop-sky-layer",
+      "notes": "Full-frame dithered gradient sky for the day theme (layered backdrop). Source: main branch commit 357c3fb (Added more base images).",
+      "sha256": "831378b692ec7b12f9180feaccf6c86862bbe85751cfd0b53681965ecf8a5067",
+      "width": 2752,
+      "height": 1536,
+      "bytes": 2704497
+    },
+    {
+      "path": "src/images/backdrops/sky-late-afternoon.jpeg",
+      "originalName": "sky late afternoon.jpeg",
+      "role": "backdrop-sky-layer",
+      "notes": "Full-frame dithered gradient sky for the evening theme (layered backdrop). Source: main branch commit 357c3fb (Added more base images).",
+      "sha256": "d89dfc008a91b0806b4f5c672d18daf6a608aa7f886cb8c1d5088edd032d801b",
+      "width": 2752,
+      "height": 1536,
+      "bytes": 2874696
+    },
+    {
+      "path": "src/images/backdrops/sky-dusk.jpeg",
+      "originalName": "sky dusk.jpeg",
+      "role": "backdrop-sky-layer",
+      "notes": "Full-frame dithered gradient sky for the dusk theme (layered backdrop). Source: main branch commit 357c3fb (Added more base images).",
+      "sha256": "20284c2758e65411239f6d9447a424eb87d72360fc498d9ac3a2c37328d86901",
+      "width": 2752,
+      "height": 1536,
+      "bytes": 2796213
+    }
+  ]
+}

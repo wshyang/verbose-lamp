@@ -1,0 +1,4 @@
+# Cloudflare tunnel sidecar (CLAUDE §10.1): pinned release, no autoupdate;
+# TUNNEL_TOKEN is provided at runtime only, tunnel routes to the app on 3000.
+FROM cloudflare/cloudflared:2025.9.1
+CMD ["tunnel", "--no-autoupdate", "run"]

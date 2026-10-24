@@ -1,0 +1,62 @@
+/*
+ * ADR-301..306 — The Kallang backdrop: the Sports Hub waterfront plate with the
+ * reference scene project's population living on it.
+ *
+ * THE STAGE (ADR-303). The source renders its 2752 x 1536 world full-height, and
+ * on screens narrower than the world it crops horizontally around the National
+ * Stadium's opening (focus x 750 of 2752, its `computeSceneView`). The shared
+ * strip box (styles/gameboy.css `.gb-scene`) only knew how to be a bottom strip,
+ * so this venue's scene box is the full screen, and `.kallang-stage` inside it
+ * is the world at its own aspect — bottom-anchored and full-width on wide
+ * screens; on narrower ones full-height, world-left flush to screen-left until
+ * aspect 125/128, and stadium-centred only below that (ADR-309). The canvas
+ * renders the whole world; the crop moves the whole world together.
+ *
+ * THE POPULATION (ADR-306) is no longer CSS. The reference project's canvas
+ * engine is ported into `src/themes/kallang/engine/` and draws every entity as
+ * a pure function of time — seeded population, gait, stitched paddles,
+ * stroke-timed splashes, layered water — so there are no layer rules left here
+ * to drift from the source's geometry. Reduced motion is the component's
+ * business (one still frame), not this stylesheet's.
+ *
+ * The plate is a photograph, not pixel art, so nothing here asks for
+ * `image-rendering: pixelated`; the canvas itself disables smoothing, as the
+ * source's renderer does.
+ */
+
+/* The full screen, not the shared strip: geometry is the stage's business now. */
+.gb-scene.venue-scene--kallang {
+  height: 100dvh;
+  background-color: var(--scene-sky);
+}
+
+.venue-scene--kallang .kallang-stage {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: max(100vw, calc(100dvh * 1.7916667));
+  aspect-ratio: 2752 / 1536;
+}
+
+/*
+ * Narrower than the world, down to aspect 125/128: the stage is full-height and
+ * wider than the screen, sitting at left:0 — the clamped end of the source's
+ * computeSceneView (`x = max(0, focus − width/2)`). Only below 125/128 is the
+ * stage wide enough that centring the stadium opening (x 750 of 2752 = 27.25%)
+ * keeps the left edge covered; applying the centring at any wider aspect pulled
+ * the stage's left edge on-screen and showed plain sky beside the plate
+ * (ADR-309). The breakpoint is exact: 125/128 = 2·750/1536, where the centred
+ * left edge passes through 0, so the handover has no jump.
+ */
+@media (max-aspect-ratio: 125/128) {
+  .venue-scene--kallang .kallang-stage {
+    left: 50%;
+    transform: translateX(-27.25%);
+  }
+}
+
+.venue-scene--kallang .kallang-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

@@ -1,0 +1,176 @@
+@import './tokens.css';
+@import '../themes/themes.css';
+@import './gameboy.css';
+@import './console.css';
+@import './print.css';
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  /*
+   * ADR-265 — never let a mobile browser "helpfully" inflate some text and not the
+   * rest (font boosting): it made handset text sizes inconsistent with the sizes the
+   * stylesheets asked for. The stylesheets size text deliberately per surface, so
+   * 100% means "as written" on every engine.
+   */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-read);
+  font-size: 20px;
+  line-height: 1.35;
+  color: var(--ink);
+  background: var(--primary-deep);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+.app-shell {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.loading,
+.error-text,
+.empty-state {
+  padding: var(--space-4);
+  text-align: center;
+}
+
+.error-text {
+  color: var(--hot);
+  font-weight: bold;
+}
+
+/* ADR-027 — the confirmation dialog, shared by both presentations. */
+.psd-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background: rgba(6, 12, 20, 0.78);
+}
+
+.psd-modal__body {
+  width: min(460px, 100%);
+  padding: var(--space-4);
+  border: 4px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 12px 0 rgba(0, 0, 0, 0.25);
+}
+
+.psd-modal__body h2 {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-pixel);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.psd-modal__body p {
+  margin: 0 0 var(--space-3);
+}
+
+.psd-modal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.psd-modal__button {
+  flex: 1 1 140px;
+  min-height: var(--tap-min);
+  padding: var(--space-2) var(--space-3);
+  border: 3px solid var(--ink);
+  border-radius: var(--radius);
+  background: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.psd-modal__button--confirm {
+  background: var(--primary-deep);
+  color: #fff;
+}
+
+.psd-modal__button--danger {
+  background: var(--hot);
+  color: #fff;
+}
+
+.psd-modal__button--cancel {
+  background: #fff;
+}
+
+.psd-modal__button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* The console is dark, so the dialog follows it there. */
+.theme-console .psd-modal__body {
+  border-color: var(--console-accent);
+  background: var(--console-panel);
+  color: var(--console-text);
+}
+
+.theme-console .psd-modal__body h2 {
+  font-family: inherit;
+  font-size: 22px;
+}
+
+.theme-console .psd-modal__button {
+  border-color: var(--console-line);
+  background: var(--console-bg);
+  color: var(--console-text);
+}
+
+.theme-console .psd-modal__button--confirm {
+  background: var(--console-accent);
+  color: #06121c;
+}
+
+.theme-console .psd-modal__button--danger {
+  background: var(--console-danger);
+  color: #101720;
+}
