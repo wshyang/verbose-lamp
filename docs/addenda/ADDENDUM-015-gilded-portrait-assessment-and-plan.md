@@ -1,4 +1,4 @@
-# ADDENDUM-014 — Gilded Portrait: assessment and plan
+# ADDENDUM-015 — Gilded Portrait: assessment and plan
 
 **Date:** 2026-10-24 · **Relates to:** BUILD_PROMPT §3 (visual system, palette), §7 (interface surfaces); CLAUDE.md §2, §4, §5, §6
 **Status:** Accepted (plan) — not implemented. Implementation record will be a later addendum.

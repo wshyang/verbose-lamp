@@ -22,6 +22,7 @@ export type {
 
 export { encodeQr, tryEncodeQr, MAX_QR_TEXT_LENGTH } from './encode';
 export { buildRenderPlan, resolveQrStyle, DEFAULT_QR_STYLE } from './geometry';
+export { toSafeFileStem } from './export';
 export { QR_PRESETS } from './presets';
 export { useQrGenerator } from './useQrGenerator';
 export { GoldenQrCode } from './GoldenQrCode';

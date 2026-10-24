@@ -19,3 +19,5 @@ numbers so the base spec stays stable. See `CLAUDE.md` §1 for the discipline.
 | [ADDENDUM-012](addenda/ADDENDUM-012-composable-frame-layers-and-mobile-leveling.md) | 2026-10-24 | Composable frame layers, mobile auto-level framing, topmost studio | §3, §4, §5, §7, §9 | Implemented — visual check pending |
 | [ADDENDUM-013](addenda/ADDENDUM-013-golden-qr-code-generator.md) | 2026-10-24 | Golden QR code generator module (`src/qr/`), SVG shimmer renderer, export | §3, §5, §7 | Implemented — visual & scan check pending |
 | [ADDENDUM-014](addenda/ADDENDUM-014-feature-first-reusable-architecture.md) | 2026-10-24 | Feature-first modules, shared UI primitives, application composition | §2, §7, §9 | Implemented — visual check pending |
+| [ADDENDUM-015](addenda/ADDENDUM-015-gilded-portrait-assessment-and-plan.md) | 2026-10-24 | Gilded Portrait: assessment and plan | §3, §7 | Accepted (plan) |
+| [ADDENDUM-016](addenda/ADDENDUM-016-gilded-portrait-implementation.md) | 2026-10-24 | Gilded Portrait: implementation record and verification | §3, §7 | Implemented — visual check pending |

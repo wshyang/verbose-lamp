@@ -17,6 +17,7 @@ src/
   features/
     art-deco-frame/             # Frame grammar, glyphs, rails, materials
     frame-studio/               # Frame controls and state adapter
+    gilded-portrait/            # Pure CPU image pipeline and optional portrait studio
     premiere/                   # Sequence domain, audio, and WebGL runtime
     qr-generator/               # Encode, render, export, and modal surface
     research/                   # Read-only dossier and content
@@ -42,6 +43,8 @@ supported import surface; internal files should remain private to that feature.
 - `features/frame-studio` owns editor state and control presentation. Its hook
   talks to a small `FrameStudioTarget` port, so an editor can bind to another
   renderer that implements the same operations.
+- `features/gilded-portrait` owns the tested RGBA-to-gold pipeline, local image
+  adapters, and an opt-in modal/launcher. It is not mounted by the Gatsby host.
 - `features/title-customizer`, `features/research`, and `features/qr-generator`
   are independently importable product features with their own data and UI.
 - `shared/ui` contains interaction primitives, not page layouts. Its Button
