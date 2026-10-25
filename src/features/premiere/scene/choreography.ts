@@ -31,6 +31,11 @@ export interface ChapterTiming {
   readonly zPosition: number;
 }
 
+/** Local progress through a chapter: 0 at its start, 1 at its end, unclamped outside it. */
+export function chapterProgress(t: number, chapter: ChapterTiming): number {
+  return (t - chapter.startTime) / (chapter.endTime - chapter.startTime);
+}
+
 /** The chapter that owns time `t`; anything outside the sequence reads as the finale. */
 export function activeChapterIndex(t: number, chapters: readonly ChapterTiming[]): number {
   for (let index = 0; index < chapters.length; index += 1) {
@@ -158,9 +163,11 @@ export function openingNitrate(t: number): number {
   return 1 - smoothstep(t, NITRATE_FADE_START, NITRATE_FADE_END);
 }
 
+export type NitrateMode = 'auto' | 'forced';
+
 /** Nitrate mix for the shader: the manual toggle forces the look, otherwise the opener fades out. */
-export function nitrateStrength(t: number, forced: boolean): number {
-  return forced ? FORCED_NITRATE : openingNitrate(t) * OPENING_NITRATE_GAIN;
+export function nitrateLevel(t: number, mode: NitrateMode): number {
+  return mode === 'forced' ? FORCED_NITRATE : openingNitrate(t) * OPENING_NITRATE_GAIN;
 }
 
 export interface GreenLight {

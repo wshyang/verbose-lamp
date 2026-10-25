@@ -4,6 +4,7 @@ import { SEQUENCE_CHAPTERS, TOTAL_SEQUENCE_DURATION } from '../data/sequence';
 import {
   CARD_WINDOW,
   activeChapterIndex,
+  chapterProgress,
   cardPhase,
   cardRole,
   cinemaCameraZ,
@@ -14,7 +15,7 @@ import {
   greenLight,
   lerp,
   lightRig,
-  nitrateStrength,
+  nitrateLevel,
   OPENING_NITRATE_GAIN,
   openingNitrate,
   rigAnchors,
@@ -268,14 +269,18 @@ describe('nitrate', () => {
   });
 
   it.each([
-    ['full opening at t=0', 0, false, 0.82],
-    ['still full when the fade begins', 0.35, false, 0.82],
-    ['mid-fade', 1.45, false, 0.40999999999999986],
-    ['gone after the opening', 2.55, false, 0],
-    ['forced on at t=0', 0, true, 0.92],
-    ['forced on late in the film', 30, true, 0.92],
-  ])('the shader strength is %s', (_label, t, forced, expected) => {
-    expect(nitrateStrength(t, forced)).toBeCloseTo(expected, 12);
+    ['full opening at t=0', 0, 'auto', 0.82],
+    ['still full when the fade begins', 0.35, 'auto', 0.82],
+    ['mid-fade', 1.45, 'auto', 0.40999999999999986],
+    ['gone after the opening', 2.55, 'auto', 0],
+    ['forced on at t=0', 0, 'forced', 0.92],
+    ['forced on late in the film', 30, 'forced', 0.92],
+  ] as const)('the shader strength is %s', (_label, t, mode, expected) => {
+    expect(nitrateLevel(t, mode)).toBeCloseTo(expected, 12);
+  });
+
+  it('is weaker for the automatic opening than for the forced filter', () => {
+    expect(nitrateLevel(0, 'auto')).toBeLessThan(nitrateLevel(0, 'forced'));
   });
 
   it('keeps the gain and forced level as named constants', () => {
@@ -345,5 +350,254 @@ describe('rigAnchors', () => {
       backdropZ: -23.5,
       lightZ: -16.5,
     });
+  });
+});
+
+// ---- Assertions merged from the other four PRs' suites (ADDENDUM-028), de-duplicated
+// ---- against the oracle tests above. Each block names where it came from.
+
+describe('chapterProgress (PR #2)', () => {
+  const chapter = { startTime: 10, endTime: 20, zPosition: 0 };
+
+  it('is unclamped local progress through a chapter', () => {
+    expect(chapterProgress(10, chapter)).toBe(0);
+    expect(chapterProgress(15, chapter)).toBe(0.5);
+    expect(chapterProgress(20, chapter)).toBe(1);
+  });
+
+  it('runs below 0 before the chapter and above 1 after it', () => {
+    expect(chapterProgress(8, chapter)).toBeCloseTo(-0.2, 12);
+    expect(chapterProgress(23, chapter)).toBeCloseTo(1.3, 12);
+  });
+});
+
+describe('smoothstep shape (PR #6)', () => {
+  it('is symmetric about the midpoint of its window', () => {
+    expect(smoothstep(0.5, 0, 1)).toBeCloseTo(0.5, 12);
+    expect(smoothstep(0.25, 0, 1) + smoothstep(0.75, 0, 1)).toBeCloseTo(1, 12);
+  });
+
+  it('matches three across several windows (PRs #2, #5)', () => {
+    for (const [min, max] of [[0, 1], [0.1, 0.9], [-0.15, 0.04], [0.8, 1.03]] as const) {
+      for (let i = 0; i <= 50; i += 1) {
+        const x = -0.5 + i * 0.05;
+        expect(smoothstep(x, min, max)).toBeCloseTo(THREE.MathUtils.smoothstep(x, min, max), 12);
+      }
+    }
+  });
+});
+
+describe('lerp extrapolation (PR #6)', () => {
+  it('extrapolates rather than clamping', () => {
+    expect(lerp(2, 4, 2)).toBe(6);
+    expect(lerp(2, 4, -1)).toBe(0);
+  });
+});
+
+describe('activeChapterIndex boundaries (PR #6)', () => {
+  it('hands over exactly at each start time, from either side', () => {
+    SEQUENCE_CHAPTERS.forEach((chapter, index) => {
+      expect(activeChapterIndex(chapter.startTime + 1e-6, SEQUENCE_CHAPTERS)).toBe(index);
+      if (index > 0) {
+        expect(activeChapterIndex(chapter.startTime - 1e-6, SEQUENCE_CHAPTERS)).toBe(index - 1);
+      }
+    });
+  });
+
+  it('gives a huge overshoot to the last chapter', () => {
+    expect(activeChapterIndex(1e6, SEQUENCE_CHAPTERS)).toBe(SEQUENCE_CHAPTERS.length - 1);
+  });
+});
+
+describe('cardPhase behaviour (PRs #2, #4, #5, #6)', () => {
+  it('draws the frame before the type arrives and parts the gate last', () => {
+    const early = cardPhase({ localT: 0.2, role: 'standard' });
+
+    expect(early.drawProgress).toBeGreaterThan(0.5);
+    expect(early.textProgress).toBeGreaterThan(0);
+    expect(early.textProgress).toBeLessThan(early.drawProgress);
+    expect(early.partOpen).toBe(0);
+  });
+
+  it('fades in from the corridor before the card starts, and out past the lens', () => {
+    const entering = cardPhase({ localT: -0.1, role: 'standard' });
+
+    expect(entering.opacity).toBeGreaterThan(0);
+    expect(entering.opacity).toBeLessThan(0.2);
+    expect(entering.drawProgress).toBe(0);
+    expect(cardPhase({ localT: 1.05, role: 'standard' }).opacity).toBeLessThan(0.2);
+  });
+
+  it('fully parts a standard card by the end and reaches 1', () => {
+    expect(cardPhase({ localT: 0.79, role: 'standard' }).partOpen).toBe(0);
+    expect(cardPhase({ localT: 1.05, role: 'standard' }).partOpen).toBe(1);
+    expect(cardPhase({ localT: 1.1, role: 'standard' }).partOpen).toBe(1);
+  });
+
+  it('never parts the finale, at any point across its window', () => {
+    for (let localT = -0.18; localT <= 1.18; localT += 0.02) {
+      expect(cardPhase({ localT, role: 'finale' }).partOpen).toBe(0);
+    }
+  });
+
+  it('holds the finale at full opacity until its fade begins at 0.91', () => {
+    expect(cardPhase({ localT: 0.9, role: 'finale' }).opacity).toBe(1);
+    expect(cardPhase({ localT: 1.02, role: 'finale' }).opacity).toBe(0);
+    expect(cardPhase({ localT: 1.02, role: 'standard' }).opacity).toBeGreaterThan(0);
+  });
+
+  it('fades on the same curve over each role’s own window (PR #6)', () => {
+    for (const fraction of [0, 0.25, 0.5, 0.75, 1]) {
+      const finale = 0.91 + (0.995 - 0.91) * fraction;
+      const standard = 0.94 + (1.08 - 0.94) * fraction;
+
+      expect(cardPhase({ localT: finale, role: 'finale' }).opacity).toBeCloseTo(
+        cardPhase({ localT: standard, role: 'standard' }).opacity,
+        12,
+      );
+    }
+  });
+});
+
+describe('cinemaCameraZ properties (PRs #2, #5, #6)', () => {
+  const at = (activeIdx: number, chapterLocal: number, pullback = 0): number =>
+    cinemaCameraZ({ chapters: SEQUENCE_CHAPTERS, activeIdx, chapterLocal, pullback });
+  const last = SEQUENCE_CHAPTERS.length - 1;
+
+  it('pushes in monotonically across the hold', () => {
+    let previous = Number.POSITIVE_INFINITY;
+    for (let local = 0; local <= 0.78; local += 0.05) {
+      const z = at(0, local);
+      expect(z).toBeLessThan(previous);
+      previous = z;
+    }
+  });
+
+  it('uses the wider start distance when flying into the finale', () => {
+    expect(at(last - 1, 1)).toBeCloseTo(SEQUENCE_CHAPTERS[last].zPosition + 15.2, 9);
+    expect(at(0, 1)).toBeCloseTo(SEQUENCE_CHAPTERS[1].zPosition + 12.2, 9);
+  });
+
+  it('frames the finale from 15.2 and drifts 0.75 over its whole time', () => {
+    const hero = SEQUENCE_CHAPTERS[last].zPosition;
+
+    expect(at(last, 0)).toBeCloseTo(hero + 15.2, 9);
+    expect(at(last, 0.52)).toBeCloseTo(hero + 12.4 - 0.52 * 0.75, 9);
+    expect(at(last, 1)).toBeCloseTo(hero + 12.4 - 0.75, 9);
+    expect(at(last, 0.52) - at(last, 1)).toBeCloseTo(0.48 * 0.75, 9);
+  });
+
+  it('adds the full pull-back at the start of a hold but only 85 % at its end', () => {
+    expect(at(0, 0, 5.8) - at(0, 0)).toBeCloseTo(5.8, 9);
+    expect(at(0, 0.78, 5.8) - at(0, 0.78)).toBeCloseTo(5.8 * 0.85, 9);
+    expect(at(last, 0, 2) - at(last, 0)).toBeCloseTo(2, 9);
+  });
+});
+
+describe('rig bounds (PRs #2, #4, #5, #6)', () => {
+  it('keeps the searchlight sway within 0.14 rad of its rest angles', () => {
+    for (let elapsed = 0; elapsed < 40; elapsed += 0.37) {
+      const sway = searchlightSway(elapsed);
+
+      expect(Math.abs(sway.left + 0.36)).toBeLessThanOrEqual(0.14 + 1e-9);
+      expect(Math.abs(sway.right - 0.36)).toBeLessThanOrEqual(0.14 + 1e-9);
+    }
+  });
+
+  it('keeps the cool light fixed overhead and the key and rim bounded', () => {
+    for (let elapsed = 0; elapsed < 30; elapsed += 1.3) {
+      const rig = lightRig(elapsed, -40);
+
+      expect(rig.cool).toEqual([0, 4.5, -42]);
+      expect(rig.key[2]).toBeCloseTo(-36.8, 9);
+      expect(rig.rim[2]).toBeCloseTo(-38.5, 9);
+      expect(Math.abs(rig.key[0])).toBeLessThanOrEqual(5.5);
+      expect(Math.abs(rig.rim[0])).toBeLessThanOrEqual(6);
+    }
+  });
+
+  it('anchors a mid-sequence camera and card as the other PRs pinned them', () => {
+    expect(rigAnchors({ cameraMode: 'cinema', cameraZ: 10, chapterZ: -26 })).toEqual({
+      backdropZ: -2,
+      lightZ: 3.5,
+    });
+    expect(rigAnchors({ cameraMode: 'orbit', cameraZ: 10, chapterZ: -26 })).toEqual({
+      backdropZ: -29.5,
+      lightZ: -22.5,
+    });
+  });
+});
+
+describe('greenLight behaviour (PRs #2, #4, #5, #6)', () => {
+  const heroZ = SEQUENCE_CHAPTERS[SEQUENCE_CHAPTERS.length - 1].zPosition;
+
+  it('is exactly full at t=0 and exactly dark in the middle of the film', () => {
+    expect(greenLight(0, heroZ)).toEqual({ intensity: 1, z: -7.5 });
+    expect(greenLight(20, heroZ).intensity).toBe(0);
+  });
+
+  it('stays below the mesh’s visibility threshold between the two appearances', () => {
+    for (let t = 8; t < 34; t += 0.5) expect(greenLight(t, heroZ).intensity).toBeLessThan(0.01);
+  });
+
+  it('reaches the bookend’s 0.65 level and sits behind the hero card', () => {
+    const bookend = greenLight(37.6, heroZ);
+
+    expect(bookend.intensity).toBeCloseTo(0.65, 12);
+    expect(bookend.z).toBe(heroZ - 7.5);
+  });
+});
+
+describe('lightRig at the origin (PR #6)', () => {
+  it('orbits the key and rim lights around a negative focus plane', () => {
+    expect(lightRig(0, -6.5)).toEqual({
+      key: [0, 4, -3.3],
+      rim: [-6, -2.2, -5],
+      cool: [0, 4.5, -8.5],
+    });
+  });
+});
+
+describe('the whole sequence, sampled every 0.25 s (PRs #2, #3, #4, #5, #6)', () => {
+  it('stages the same frame at every sample', () => {
+    const lines: string[] = [];
+    for (let step = 0; step * 0.25 <= TOTAL_SEQUENCE_DURATION; step += 1) {
+      const t = Math.min(step * 0.25, TOTAL_SEQUENCE_DURATION - 0.001);
+      const index = activeChapterIndex(t, SEQUENCE_CHAPTERS);
+      const chapter = SEQUENCE_CHAPTERS[index];
+      const phase = cardPhase({
+        localT: chapterProgress(t, chapter),
+        role: cardRole(index, SEQUENCE_CHAPTERS.length),
+      });
+      const beacon = greenLight(t, SEQUENCE_CHAPTERS[SEQUENCE_CHAPTERS.length - 1].zPosition);
+      const sway = searchlightSway(t);
+      const rig = lightRig(t, chapter.zPosition);
+      const z = cinemaCameraZ({
+        chapters: SEQUENCE_CHAPTERS,
+        activeIdx: index,
+        chapterLocal: clamp(chapterProgress(t, chapter), 0, 1),
+        pullback: 0,
+      });
+      lines.push(
+        [
+          t.toFixed(2),
+          index,
+          phase.drawProgress.toFixed(4),
+          phase.textProgress.toFixed(4),
+          phase.partOpen.toFixed(4),
+          phase.opacity.toFixed(4),
+          z.toFixed(4),
+          beacon.intensity.toFixed(4),
+          beacon.z.toFixed(2),
+          nitrateLevel(t, 'auto').toFixed(4),
+          sway.left.toFixed(4),
+          sway.right.toFixed(4),
+          ...rig.key.map((n) => n.toFixed(3)),
+          ...rig.cool.map((n) => n.toFixed(3)),
+        ].join(','),
+      );
+    }
+
+    expect(lines).toMatchSnapshot();
   });
 });
