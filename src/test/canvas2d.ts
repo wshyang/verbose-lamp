@@ -1,0 +1,108 @@
+import { vi } from 'vitest';
+
+/**
+ * A recording 2D canvas context for jsdom (which ships no canvas backend).
+ *
+ * It records draw calls as text and returns real typed arrays for pixel APIs, so
+ * texture builders run their actual arithmetic instead of being mocked out
+ * (ADDENDUM-029 §4). Gradients, paths and text are inert: only the numbers the
+ * code computes are observable, which is exactly what a geometry-level test
+ * wants.
+ */
+export interface Canvas2d {
+  /** Every draw call, in order, as `name(args)`. */
+  calls: string[];
+  /** One entry per `getContext('2d')` call, in creation order. */
+  contexts: CanvasRenderingContext2D[];
+  /** Every `putImageData` payload, in call order. */
+  images: ImageData[];
+}
+
+let current: Canvas2d | null = null;
+
+function createGradient(calls: string[], id: number) {
+  return {
+    __gradient: id,
+    addColorStop: (offset: number, color: string) =>
+      calls.push(`gradient#${id}.addColorStop(${offset},${color})`),
+  };
+}
+
+function createContext(calls: string[], images: ImageData[]): CanvasRenderingContext2D {
+  const state: Record<string, unknown> = {};
+  const noop =
+    (name: string) =>
+    (...args: unknown[]) =>
+      calls.push(`${name}(${args.map((arg) => (typeof arg === 'number' ? Math.round(arg * 1000) / 1000 : String(arg))).join(',')})`);
+
+  let gradientCount = 0;
+  const api: Record<string, unknown> = {
+    createLinearGradient: (...args: unknown[]) => {
+      calls.push(`createLinearGradient(${args.join(',')})`);
+      gradientCount += 1;
+      return createGradient(calls, gradientCount);
+    },
+    createRadialGradient: (...args: unknown[]) => {
+      calls.push(`createRadialGradient(${args.join(',')})`);
+      gradientCount += 1;
+      return createGradient(calls, gradientCount);
+    },
+    createPattern: () => ({ __pattern: true }),
+    getImageData: (_x: number, _y: number, w: number, h: number) => {
+      calls.push(`getImageData(${w}x${h})`);
+      return { data: new Uint8ClampedArray(w * h * 4), width: w, height: h } as ImageData;
+    },
+    createImageData: (w: number, h: number) => {
+      calls.push(`createImageData(${w}x${h})`);
+      return { data: new Uint8ClampedArray(w * h * 4), width: w, height: h } as ImageData;
+    },
+    putImageData: (image: ImageData) => {
+      images.push(image);
+      calls.push(`putImageData(${image.width}x${image.height})`);
+    },
+    measureText: (text: string) => ({ width: String(text).length * 10 }),
+    getContextAttributes: () => ({}),
+  };
+
+  for (const name of [
+    'fillRect', 'clearRect', 'strokeRect', 'beginPath', 'closePath', 'moveTo', 'lineTo',
+    'arc', 'arcTo', 'ellipse', 'rect', 'fill', 'stroke', 'save', 'restore', 'translate',
+    'rotate', 'scale', 'setTransform', 'resetTransform', 'clip', 'drawImage', 'fillText',
+    'strokeText', 'setLineDash', 'quadraticCurveTo', 'bezierCurveTo', 'createPattern',
+  ]) {
+    api[name] = noop(name);
+  }
+
+  return new Proxy(state, {
+    get(target, prop: string) {
+      return prop in api ? api[prop] : target[prop];
+    },
+    set(target, prop: string, value) {
+      target[prop] = value;
+      calls.push(`${prop}=${String(value)}`);
+      return true;
+    },
+  }) as unknown as CanvasRenderingContext2D;
+}
+
+/**
+ * Installs the stub on `HTMLCanvasElement.prototype.getContext` and returns the
+ * recorder. Call from `beforeEach`; `getContext` is restored by
+ * `vi.restoreAllMocks()`.
+ */
+export function installCanvas2d(): Canvas2d {
+  const recorder: Canvas2d = { calls: [], contexts: [], images: [] };
+  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(((kind: string) => {
+    if (kind !== '2d') return null;
+    const ctx = createContext(recorder.calls, recorder.images);
+    recorder.contexts.push(ctx);
+    return ctx;
+  }) as HTMLCanvasElement['getContext']);
+  vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue('data:image/png;base64,');
+  current = recorder;
+  return recorder;
+}
+
+export function canvasCalls(): string[] {
+  return current?.calls ?? [];
+}

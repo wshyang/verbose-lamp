@@ -16,6 +16,8 @@ import { createBallroomEnvironment, createDecoWallpaperTextures } from './enviro
 import { createGatsbyCardRig, type GatsbyCardRig } from './decoCards';
 import {
   DEFAULT_FRAME_STYLE,
+  DEFAULT_SCREEN_BORDER_PATTERN,
+  DEFAULT_SCREEN_BORDER_SEED,
   DEFAULT_SCREEN_BORDER_STYLE,
   FrameStyle,
   ScreenBorderStyle,
@@ -544,9 +546,13 @@ export class GatsbySceneManager implements PremiereSceneApi {
   }
 
   public setScreenBorderStyle(style: ScreenBorderStyle) {
+    // `pattern`/`seed` select the Deco Lattice proscenium (ADDENDUM-021 §3.5);
+    // dropping them here would pin the rig to the printed poster edge.
     this.screenBorderStyle = {
       weight: THREE.MathUtils.clamp(style.weight, 0, 1),
       genome: clampGenome(style.genome),
+      pattern: style.pattern ?? DEFAULT_SCREEN_BORDER_PATTERN,
+      seed: style.seed ?? DEFAULT_SCREEN_BORDER_SEED,
     };
     this.screenBorderRig.setStyle(this.screenBorderStyle);
   }
