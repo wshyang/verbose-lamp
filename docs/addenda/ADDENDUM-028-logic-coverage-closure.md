@@ -117,6 +117,8 @@ the branch. `npm run test:coverage` fails otherwise. That is the point.
    (ADDENDUM-043), but *likeness* is a judgement about the film, not about run-to-run
    stability, and that is still the user's to make.
 4. Deleting `GatsbySceneManager.ts` once that comparison passes (ADDENDUM-022 §2.5).
+   **The comparison now exists** (ADDENDUM-045): the two renderers match to ≤ 0.3/255 on
+   four steady frames. Deletion is one commit and awaits the user's likeness call.
 5. ~~Phase 1's `FrameStudioControl.test.tsx` missing under that name~~ — **closed in
    ADDENDUM-042 §4**: `src/features/frame-studio/components/FrameStudioControl.test.tsx`
    exists and holds the plan's assertions (surface swap, detail presets, close/collapse)

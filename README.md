@@ -128,6 +128,8 @@ Three test-only guards are worth knowing about:
   24 likeness plates), executed here against a Chromium shipped as an npm tarball:
   `npm run e2e:sandbox`. The likeness baselines live in
   `e2e/likeness.spec.ts-snapshots/` (ADDENDUM-043).
+- `scripts/compare-renderers.mjs` — photographs both renderers at five frozen frames and
+  reports the per-channel difference, so "the port is 1:1" is a number (ADDENDUM-045).
 
 ## Contributing conventions
 
