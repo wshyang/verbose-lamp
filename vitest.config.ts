@@ -70,6 +70,8 @@ export default defineConfig({
         'src/test/digest.ts': FULL,
         'src/features/premiere/scene/shaders/glslDeclarations.ts': FULL,
         'src/features/premiere/model/freeze.ts': FULL,
+        'src/features/premiere/scene/choreography.ts': FULL,
+        'src/features/premiere/scene/orbitFocus.ts': FULL,
       },
     },
   },
