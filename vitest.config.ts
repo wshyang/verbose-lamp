@@ -78,6 +78,8 @@ export default defineConfig({
         'src/features/premiere/scene3d/storeSceneApi.ts': FULL,
         'src/features/premiere/scene3d/pointerAim.ts': FULL,
         'src/features/premiere/scene3d/usePointerAim.ts': FULL,
+        'src/features/premiere/scene3d/applyRendererLook.ts': FULL,
+        'src/features/premiere/scene3d/composer.ts': FULL,
       },
     },
   },
