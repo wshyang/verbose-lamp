@@ -29,7 +29,7 @@ WebGL support. No `.env` or secrets are needed.
 | `npm run build` | Production build into `dist/` (a single self-contained HTML file, via `vite-plugin-singlefile`) |
 | `npm run preview` | Serve the built `dist/` locally to check the production bundle |
 | `npm test` | Run the Vitest tests once (`vitest run`; DOM suites opt in to jsdom per file) |
-| `npm run test:coverage` | The same run with the coverage gate (logic surface, ratcheted floors) |
+| `npm run test:coverage` | The same run with the coverage gate (the logic surface at 100 %) |
 | `npx tsc --noEmit` | Type-check the whole project |
 
 Before calling a change done, run `npx tsc --noEmit`, `npm test`, `npm run test:coverage` and `npm run build`.
@@ -90,7 +90,7 @@ node environment (`vitest.config.ts`, deliberately separate from `vite.config.ts
 logic such as frame grammar, timing math, and image pipelines is tested; geometry is
 protected by snapshot tests on data, not pixels. Three.js and DOM rendering code is kept
 thin; jsdom and headless-scene tests cover its wiring, never its pixels. `npm run
-test:coverage` gates the logic surface (excludes are stated by rule in `vitest.config.ts`).
+test:coverage` gates the logic surface at 100 % (excludes are stated by rule in `vitest.config.ts`).
 `src/discipline.test.ts` holds the function and file limits as a ratchet (ADDENDUM-034).
 `npm run e2e` runs the Playwright flows, likeness shots and avatar spec in Chromium on a
 software rasteriser (ADDENDUM-035); baselines are OS-specific and re-recording them with

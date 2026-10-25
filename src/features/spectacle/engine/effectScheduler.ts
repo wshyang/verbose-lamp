@@ -24,7 +24,7 @@ function fadeOf(effect: ActiveEffect, now: number): number {
 }
 
 function createEntry(layer: LayerId, instance: EffectInstance): { entry: ActiveEffect; finished: Promise<void> } {
-  let resolve = () => {};
+  let resolve!: () => void;
   const finished = new Promise<void>((r) => {
     resolve = r;
   });

@@ -81,10 +81,15 @@ function unitNormal(a: Point2, b: Point2): Point2 {
   return { x: -dy / len, y: dx / len };
 }
 
-function miterAt(prev: Point2 | null, curr: Point2, next: Point2 | null): Point2 {
-  if (!prev && next) return unitNormal(curr, next);
-  if (!next && prev) return unitNormal(prev, curr);
-  if (!prev || !next) return { x: 0, y: 1 };
+export function miterAt(prev: Point2 | null, curr: Point2, next: Point2 | null): Point2 {
+  if (prev && next) return miterBetween(prev, curr, next);
+  // `offsetPolylineOutward` returns early below two points, so an end point always has one neighbour.
+  const only = prev ?? next;
+  if (!only) throw new Error('A polyline point needs at least one neighbour.');
+  return prev ? unitNormal(prev, curr) : unitNormal(curr, only);
+}
+
+function miterBetween(prev: Point2, curr: Point2, next: Point2): Point2 {
   const n1 = unitNormal(prev, curr);
   const n2 = unitNormal(curr, next);
   const mx = n1.x + n2.x;

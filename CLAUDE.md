@@ -33,9 +33,10 @@ r186, Vitest. No backend, database, auth, or persistence.
 - Rendering code (Three.js, DOM) is kept thin. jsdom and headless-scene tests cover its
   *wiring* (the DOM it writes, the calls it makes), never its pixels; the logic lives in
   the pure layer, which is where correctness is proved. `npm run test:coverage` gates the
-  logic surface: excludes are stated by rule in `vitest.config.ts`, global floors only
-  rise, and rewritten modules are named there at 100 %. A literal 100 % is not required
-  (ADDENDUM-027 §3, ADDENDUM-034 §4).
+  logic surface at 100 % of statements, branches, functions and lines: excludes are stated
+  by rule in `vitest.config.ts`, and a guard no test can reach is removed or made
+  structural, never hidden with `v8 ignore` (ADDENDUM-036 §5). That number measures
+  execution, not assertion strength.
 - **N/A:** real-database integration tests, session-scoping negative tests, OWASP
   endpoint matrix — there is no server or persisted data. Revisit the moment either
   appears.

@@ -32,7 +32,7 @@
 
 ## 4. Changes to CLAUDE.md
 
-- **§2** says: rendering code is kept thin and is covered by jsdom and headless-scene tests for its *wiring* (DOM written, calls made), never its pixels; logic still lives in the pure layer. The coverage gate measures the logic surface, with excludes stated by rule in `vitest.config.ts` and 100 % thresholds on named modules (ADDENDUM-027 §3). A literal 100 % is not required; the gate is a ratchet.
+- **§2** says: rendering code is kept thin and is covered by jsdom and headless-scene tests for its *wiring* (DOM written, calls made), never its pixels; logic still lives in the pure layer. The coverage gate measures the logic surface, with excludes stated by rule in `vitest.config.ts` and 100 % thresholds on named modules (ADDENDUM-027 §3). A literal 100 % is not required; the gate is a ratchet. *(Superseded by ADDENDUM-036 §5: the gate is now 100 % of the measured surface.)*
 - **§2** says: Playwright e2e and the likeness gate are a later phase of this integration; until it lands the deferral in ADDENDUM-001 stands (see ADDENDUM-035 for what then replaced it). Video-on is not the default; traces are kept on failure.
 - **§3** says: `npm test` is `vitest run`; `npm run test:coverage` is the gated run; DOM suites opt in per file with `// @vitest-environment jsdom`; `vitest.config.ts` stays separate from `vite.config.ts`.
 - **§6** points at `src/discipline.test.ts` as the enforcement, and says a split that introduces a new offender is not finished.
@@ -48,6 +48,6 @@ These follow PR #3's wording where it was accurate and correct it where it was n
 
 ## 6. Validation actually performed
 
-- `npx tsc --noEmit`, `npm test`, `npm run test:coverage` (global floors 82 / 77 / 78 / 84 hold) and `npm run build` pass.
+- `npx tsc --noEmit`, `npm test`, `npm run test:coverage` (global floors 82 / 77 / 78 / 84 held at the time; ADDENDUM-036 later raised the gate to 100 %) and `npm run build` pass.
 - Hand mutation of the new pure modules and hooks: every mutation was caught except a handful of equivalents, each argued in its commit (a genome clamp that cannot bite for gallery genomes, preset aliasing made harmless by copy-on-edit, and a list key that only affects a React warning).
 - **Not performed:** any browser run. The DOM comparisons prove the markup is byte-identical, not that it looks right.

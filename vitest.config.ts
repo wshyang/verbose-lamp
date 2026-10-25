@@ -35,14 +35,14 @@ export const COVERAGE_EXCLUDES = [
 const FULL = { statements: 100, branches: 100, functions: 100, lines: 100 } as const;
 
 /**
- * Global floors are a ratchet at the logic-surface level measured when this gate was
- * introduced (65.3 % statements, 64.3 % branches, 58.5 % functions, 65.7 % lines, raised to 66.3 / 65.8 / 60.0 / 66.7 by Phase 1 67.6 / 66.6 / 62.6 / 68.2 by Phase 2 68.1 / 67.4 / 62.7 / 68.6 by Phase 3 76.1 / 74.1 / 72.4 / 76.8 by Phase 4 and 81.1 / 75.7 / 76.9 / 82.2 by Phase 5 and 82.6 / 77.0 / 78.4 / 83.8 by Phase 6, with
- * every non-excluded file counted, loaded by a test or not): raise them whenever a phase
- * raises coverage, never lower them. Modules
- * the integration adds or rewrites are named below at 100% as they land, so a later
- * change cannot quietly drop them.
+ * The global gate is the full logic surface at 100 %. It started as a ratchet at the figures
+ * measured when the gate was introduced (65.3 / 64.3 / 58.5 / 65.7) and was raised phase by phase;
+ * ADDENDUM-036 closed the last gap. It holds without a single `v8 ignore`: a guard no test can
+ * reach was removed or made structural, not hidden. Anything the rules above exclude is excluded
+ * by name and reason, so the number cannot be bought with an exclude added later without
+ * editing that list in review.
  */
-const GLOBAL_FLOORS = { statements: 82, branches: 77, functions: 78, lines: 84 } as const;
+const GLOBAL_FLOORS = FULL;
 
 // Separate from vite.config.ts on purpose: the single-file and Tailwind plugins are
 // irrelevant to node unit tests, and the project rule forbids editing vite.config.ts.

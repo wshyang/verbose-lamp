@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import ReactThreeTestRenderer from '@react-three/test-renderer';
 import { useThree } from '@react-three/fiber';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import type { Camera, Mesh, MeshStandardMaterial, Points, ShaderMaterial } from 'three';
 import { AdditiveBlending, Group } from 'three';
 import { SEQUENCE_CHAPTERS } from '../data/sequence';
@@ -81,6 +81,16 @@ describe('createSearchlightTexture', () => {
 
     expect(canvas.width).toBe(128);
     expect(canvas.height).toBe(256);
+  });
+
+  it('still hands back a texture over the blank canvas when there is no 2D context', () => {
+    const noContext = vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null);
+
+    try {
+      expect((createSearchlightTexture().image as HTMLCanvasElement).width).toBe(128);
+    } finally {
+      noContext.mockRestore();
+    }
   });
 });
 

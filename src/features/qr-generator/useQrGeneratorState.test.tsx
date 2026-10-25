@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { act, renderHook } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { MAX_QR_TEXT_LENGTH, QR_EMPTY_MESSAGE, tryEncodeQr } from './encode';
 import { buildRenderPlan, resolveQrStyle } from './geometry';
 import { MAX_QR_CAPTION_LENGTH, QR_PRESETS } from './presets';
@@ -172,3 +172,25 @@ describe('useQrGenerator state', () => {
     expect([result.current.setCaption, result.current.applyPreset]).toEqual(before);
   });
 });
+
+describe('useQrGenerator export failures that are not Errors', () => {
+  it('names a PNG failure plainly when whatever was thrown carries no message', async () => {
+    vi.resetModules();
+    vi.doMock('./export', async (importOriginal) => ({
+      ...(await importOriginal<typeof import('./export')>()),
+      downloadSvgAsPng: () => Promise.reject('nope'),
+    }));
+    const { useQrGenerator: freshHook } = await import('./useQrGenerator');
+    const { result } = renderHook(() => freshHook());
+    (result.current.svgRef as { current: SVGSVGElement | null }).current = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'svg'
+    );
+
+    await act(() => result.current.downloadPng());
+
+    expect(result.current.exportError).toBe('The PNG could not be made.');
+    vi.doUnmock('./export');
+  });
+});
+

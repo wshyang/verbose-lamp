@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { installCanvas2d, canvasCalls, type Canvas2d } from './canvas2d';
 
 /**
@@ -95,3 +95,21 @@ describe('installCanvas2d', () => {
     expect(canvasCalls()).toEqual(['save()']);
   });
 });
+
+describe('installCanvas2d, the corners', () => {
+  it('reports empty context attributes', () => {
+    expect(ctx.getContextAttributes()).toEqual({});
+  });
+
+  it('reads an empty log as long as nothing has been installed yet', async () => {
+    vi.resetModules();
+    const fresh = await import('./canvas2d');
+
+    expect(fresh.canvasCalls()).toEqual([]);
+  });
+
+  it('hands back no context for anything but 2d', () => {
+    expect(document.createElement('canvas').getContext('webgl')).toBeNull();
+  });
+});
+

@@ -275,7 +275,7 @@ function extentsOf(specs: readonly PolylineSpec[]): { extentX: number; extentY: 
 }
 
 /** Grammar kind of a lattice rail, so intricacy drops the right parts first. */
-function latticeKind(spec: LatticeSpec): RailKind {
+export function latticeKind(spec: LatticeSpec): RailKind {
   if (spec.rank === 0) return 'frame';
   if (spec.layer <= 1) return 'rule';
   return spec.rank >= 3 ? 'reed' : 'diamond';
@@ -294,7 +294,7 @@ export function buildLatticeProscenium(
   const { specs } = buildNineSlice({ hw: aspect, hh: 1, density, level: 1 + Math.round(density * 3) });
   const converted: PolylineSpec[] = specs.map((spec) => ({
     points: spec.points.map((point) => ({ x: snap(point.x), y: snap(point.y) })),
-    closed: spec.closed ?? false,
+    closed: spec.closed,
     width: spec.width,
     depth: Math.max(spec.width * LATTICE_DEPTH_RATIO, LATTICE_MIN_DEPTH),
     z: -spec.layer * LATTICE_Z_STEP,
