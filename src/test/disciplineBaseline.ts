@@ -66,8 +66,6 @@ export const DISCIPLINE_DEBT: readonly DebtEntry[] = [
   { file: 'src/features/deco-lattice/model/nineSlice.ts', name: 'rail', maxLines: 9, maxParams: 5, maxDepth: 0, reason: 'geometry-primitive' },
   { file: 'src/features/deco-lattice/model/walk.ts', name: 'stepRun', maxLines: 17, maxParams: 5, maxDepth: 2, reason: 'geometry-primitive' },
   { file: 'src/features/event-night/components/EventNightStage.tsx', name: 'EventNightStage', maxLines: 51, maxParams: 1, maxDepth: 0, reason: 'component' },
-  { file: 'src/features/frame-studio/components/FrameStudioControl.tsx', name: 'FrameStudioControl', maxLines: 291, maxParams: 1, maxDepth: 1, reason: 'component' },
-  { file: 'src/features/frame-studio/hooks/useFrameStudio.ts', name: 'useFrameStudio', maxLines: 211, maxParams: 1, maxDepth: 1, reason: 'feature-hook' },
   { file: 'src/features/gilded-portrait/curve.ts', name: 'endpointSlope', maxLines: 6, maxParams: 4, maxDepth: 1, reason: 'geometry-primitive' },
   { file: 'src/features/gilded-portrait/curve.ts', name: 'interiorTangent', maxLines: 6, maxParams: 4, maxDepth: 1, reason: 'geometry-primitive' },
   { file: 'src/features/gilded-portrait/curve.ts', name: 'interpolateSegment', maxLines: 11, maxParams: 5, maxDepth: 0, reason: 'geometry-primitive' },
