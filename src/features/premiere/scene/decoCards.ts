@@ -177,6 +177,9 @@ export function createGatsbyCardRig(
 
   const frameMesh = new THREE.Mesh(frameGeo, goldMat);
   root.add(frameMesh);
+  // Introspection handle for scene tests and probes (ADDENDUM-022 §7): the
+  // exact uniforms object bound into the frame shader program.
+  root.userData.frameUniforms = frameUniforms;
 
   const setFrameStyle = (next: FrameStyle) => {
     const sameStyle =
