@@ -4,7 +4,7 @@ import type { FireworkShellType, OrbTransitionParams } from '../model/types';
 import { hashText } from '../testing/recordingCanvas';
 import { shellSparks } from './fireworks/shells';
 import { planShow } from './fireworks/show';
-import { planOrbTransition } from './orbs/orbPlan';
+import { planOrbCrossfade, planOrbTransition } from './orbs/orbPlan';
 
 const ORIGIN = { x: 0.5, y: 0.5 } as const;
 const SHELL_TYPES: readonly FireworkShellType[] = [
@@ -30,15 +30,15 @@ describe('planning golden snapshots', () => {
 
   for (const type of SHELL_TYPES) {
     it(`shellSparks ${type} keeps its recipe`, () => {
-      expect(digest(shellSparks(type, mulberry32(1925), 1, true))).toMatchSnapshot();
-      expect(digest(shellSparks(type, mulberry32(1925), 0.5, false))).toMatchSnapshot();
+      expect(digest(shellSparks({ type, rng: mulberry32(1925), scale: 1, pistil: 'emerald' }))).toMatchSnapshot();
+      expect(digest(shellSparks({ type, rng: mulberry32(1925), scale: 0.5, pistil: 'gold' }))).toMatchSnapshot();
     });
   }
 
   for (const config of ORB_CONFIGS) {
     it(`planOrbTransition ${config.pattern}/${config.direction} keeps its timeline`, () => {
-      expect(digest(planOrbTransition(config, false))).toMatchSnapshot();
-      expect(digest(planOrbTransition(config, true))).toMatchSnapshot();
+      expect(digest(planOrbTransition(config))).toMatchSnapshot();
+      expect(digest(planOrbCrossfade(config))).toMatchSnapshot();
     });
   }
 });

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { farthestCornerDistance } from '../../model/geometry';
-import { irisRadiusAt, planIris } from './irisPlan';
+import { irisRadiusAt, planIris, planIrisCrossfade } from './irisPlan';
 
 const origins = [
   { x: 0.5, y: 0.5 },
@@ -12,7 +12,7 @@ const origins = [
 describe('irisPlan', () => {
   it('fully covers the viewport at onCovered for edge and corner origins', () => {
     for (const origin of origins) {
-      const plan = planIris({ origin }, false);
+      const plan = planIris({ origin });
       const r = irisRadiusAt(plan, plan.onCoveredMs, 3.2);
       expect(r).toBeGreaterThanOrEqual(farthestCornerDistance(origin, 3.2));
       expect(plan.onCoveredMs).toBe(plan.coverEndMs);
@@ -20,12 +20,12 @@ describe('irisPlan', () => {
   });
 
   it('retracts to zero by the end', () => {
-    const plan = planIris({ origin: origins[0] }, false);
+    const plan = planIris({ origin: origins[0] });
     expect(irisRadiusAt(plan, plan.durationMs, 16 / 9)).toBeCloseTo(0);
   });
 
   it('reduced motion degrades to a short crossfade', () => {
-    const plan = planIris({ origin: origins[0] }, true);
+    const plan = planIrisCrossfade({ origin: origins[0] });
     expect(plan.crossfade).toBe(true);
     expect(plan.durationMs).toBe(400);
   });

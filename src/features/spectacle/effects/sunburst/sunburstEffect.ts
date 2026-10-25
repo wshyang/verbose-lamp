@@ -1,8 +1,14 @@
 import type { EffectDefinition, FrameInfo } from '../../engine/types';
 import type { SunburstWipeParams } from '../../model/types';
-import { irisRadiusAt, planIris, type IrisPlan } from './irisPlan';
+import { irisRadiusAt, planIris, planIrisCrossfade, type IrisPlan } from './irisPlan';
 
-function drawWedges(plan: IrisPlan, radiusPx: number, t: number, frame: FrameInfo): void {
+interface WedgeView {
+  radiusPx: number;
+  t: number;
+}
+
+function drawWedges(plan: IrisPlan, view: WedgeView, frame: FrameInfo): void {
+  const { radiusPx, t } = view;
   const { ctx, w, h, fade } = frame;
   const cx = plan.origin.x * w;
   const cy = plan.origin.y * h;
@@ -47,7 +53,7 @@ export const sunburstEffect: EffectDefinition<SunburstWipeParams> = {
   id: 'sunburst-wipe',
   layer: 'solid-overlay',
   create(ctx, params) {
-    const plan = planIris(params, ctx.reducedMotion);
+    const plan = ctx.reducedMotion ? planIrisCrossfade(params) : planIris(params);
     let coveredFired = false;
     return {
       update(t, frame) {
@@ -64,7 +70,7 @@ export const sunburstEffect: EffectDefinition<SunburstWipeParams> = {
           frame.ctx.globalAlpha = 1;
         } else {
           const r = irisRadiusAt(plan, Math.min(t, plan.durationMs), frame.w / Math.max(1, frame.h));
-          if (r > 1) drawWedges(plan, r * frame.h, t, frame);
+          if (r > 1) drawWedges(plan, { radiusPx: r * frame.h, t }, frame);
         }
         return t > plan.durationMs ? 'done' : 'running';
       },

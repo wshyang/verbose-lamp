@@ -1,73 +1,50 @@
-import {
-  createContext, useCallback, useContext, useEffect, useMemo, useRef, useState,
-  type ReactNode,
-} from 'react';
-import { SpectacleLayer } from '../components/SpectacleLayer';
-import { createSpectacleStage } from '../engine/createSpectacleStage';
-import type { EffectHandle, QualityTier, SpectacleStage } from '../model/types';
+import { createContext, useContext, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useReducedMotion } from '@/shared/hooks/useReducedMotion';
+import { SpectacleLayer } from '../components/SpectacleLayer';
+import type { QualityTier, SpectacleStage } from '../model/types';
+import { useSpectacleStage } from './useSpectacleStage';
 
 interface SpectacleApi {
   play: SpectacleStage['play'];
   stopAll(): void;
   qualityTier: QualityTier | null;
+  /** True once the stage exists; `play` is a no-op before that. */
+  isReady: boolean;
   reducedMotion: boolean;
   simulatedReducedMotion: boolean;
   setSimulatedReducedMotion(value: boolean): void;
 }
 
+interface SpectacleProviderProps {
+  children: ReactNode;
+  className?: string;
+}
+
 const SpectacleContext = createContext<SpectacleApi | null>(null);
 
-const NOOP_HANDLE: EffectHandle = { finished: Promise.resolve(), stop: () => {} };
-
 /** Mounts the stage once; React never touches canvas internals. */
-export function SpectacleProvider({ children }: { children: ReactNode }) {
+export function SpectacleProvider({ children, className }: SpectacleProviderProps) {
   const hostRef = useRef<HTMLDivElement | null>(null);
-  const stageRef = useRef<SpectacleStage | null>(null);
   const [announcement, setAnnouncement] = useState('');
-  const [qualityTier, setQualityTier] = useState<QualityTier | null>(null);
   const [simulated, setSimulated] = useState(false);
   const systemReduced = useReducedMotion();
   const reducedMotion = systemReduced || simulated;
-
-  useEffect(() => {
-    if (!hostRef.current) return;
-    const stage = createSpectacleStage({
-      host: hostRef.current,
-      onAnnounce: setAnnouncement,
-      reducedMotion: systemReduced || simulated,
-    });
-    stageRef.current = stage;
-    setQualityTier(stage.qualityTier);
-    return () => {
-      stage.dispose();
-      stageRef.current = null;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    stageRef.current?.setReducedMotion(reducedMotion);
-  }, [reducedMotion]);
-
-  const play = useCallback<SpectacleStage['play']>(
-    (id, params) => stageRef.current?.play(id, params) ?? NOOP_HANDLE,
-    [],
-  );
-  const stopAll = useCallback(() => stageRef.current?.stopAll(), []);
+  const { play, stopAll, qualityTier, isReady } = useSpectacleStage({
+    hostRef, reducedMotion, onAnnounce: setAnnouncement,
+  });
 
   const api = useMemo<SpectacleApi>(
     () => ({
-      play, stopAll, qualityTier, reducedMotion,
+      play, stopAll, qualityTier, isReady, reducedMotion,
       simulatedReducedMotion: simulated,
       setSimulatedReducedMotion: setSimulated,
     }),
-    [play, stopAll, qualityTier, reducedMotion, simulated],
+    [play, stopAll, qualityTier, isReady, reducedMotion, simulated],
   );
 
   return (
     <SpectacleContext.Provider value={api}>
-      <SpectacleLayer hostRef={hostRef} announcement={announcement}>
+      <SpectacleLayer hostRef={hostRef} announcement={announcement} className={className}>
         {children}
       </SpectacleLayer>
     </SpectacleContext.Provider>

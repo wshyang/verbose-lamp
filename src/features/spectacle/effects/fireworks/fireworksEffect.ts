@@ -36,10 +36,22 @@ interface FwState {
   durationMs: number;
 }
 
-function explodeShell(s: FwState, x: number, y: number, depth: number, type: FireworkShellType, t: number, minDim: number): void {
+interface Burst {
+  x: number;
+  y: number;
+  depth: number;
+  type: FireworkShellType;
+  t: number;
+  minDim: number;
+}
+
+function explodeShell(s: FwState, burst: Burst): void {
+  const { x, y, depth, type, t, minDim } = burst;
   const r = shellRecipe(type);
   const scale = s.shellScale * (0.75 + (1 - depth) * 0.45);
-  const sparks = shellSparks(type, s.rng, scale, s.params.greenLight ?? false);
+  const sparks = shellSparks({
+    type, rng: s.rng, scale, pistil: s.params.greenLight ? 'emerald' : 'gold',
+  });
   s.glows.push({ x, y, bornMs: t, strength: 0.05 + (1 - depth) * 0.06 });
   for (const sp of sparks) {
     s.pool.spawn(t, {
@@ -80,14 +92,14 @@ function advanceSchedule(s: FwState, t: number, frame: FrameInfo): void {
   for (const l of s.launches) {
     if (!l.exploded && t >= l.burstMs) {
       l.exploded = true;
-      explodeShell(s, l.ev.x * frame.w, l.ev.y * frame.h, l.ev.depth, l.ev.type, t, minDim);
+      explodeShell(s, { x: l.ev.x * frame.w, y: l.ev.y * frame.h, depth: l.ev.depth, type: l.ev.type, t, minDim });
     }
   }
   s.launches = s.launches.filter((l) => !l.exploded);
   for (let i = s.subs.length - 1; i >= 0; i -= 1) {
     if (t >= s.subs[i].atMs) {
       const sub = s.subs.splice(i, 1)[0];
-      explodeShell(s, sub.x, sub.y, sub.depth, 'strobe', t, minDim * 0.4);
+      explodeShell(s, { x: sub.x, y: sub.y, depth: sub.depth, type: 'strobe', t, minDim: minDim * 0.4 });
     }
   }
   const lastT = s.events.length ? s.events[s.events.length - 1].tMs : 0;
@@ -129,7 +141,13 @@ function drawCometsAndGlow(s: FwState, t: number, frame: FrameInfo): void {
   }
 }
 
-function drawSparks(s: FwState, t: number, frame: FrameInfo, trailSamples: number): void {
+interface SparkPass {
+  t: number;
+  trailSamples: number;
+}
+
+function drawSparks(s: FwState, pass: SparkPass, frame: FrameInfo): void {
+  const { t, trailSamples } = pass;
   const rects = s.params.keepClear ?? [];
   const keepClearFade = (x: number, y: number) => {
     const p = { x: x / frame.w, y: y / frame.h };
@@ -140,8 +158,8 @@ function drawSparks(s: FwState, t: number, frame: FrameInfo, trailSamples: numbe
       const gate = hash01(spark.seed, Math.floor((age / 1000) * spark.glitterRate));
       if (gate < 0.55) return;
     }
-    drawSparkTrail(frame.ctx, s.sprites, spark, age, {
-      samples: trailSamples, fade: frame.fade, keepClearFade,
+    drawSparkTrail(frame.ctx, s.sprites, {
+      spark, ageMs: age, samples: trailSamples, fade: frame.fade, keepClearFade,
     });
   });
 }
@@ -181,7 +199,7 @@ export const fireworksEffect: EffectDefinition<FireworksParams> = {
           advanceSchedule(s, t, frame);
           drawCometsAndGlow(s, t, frame);
         }
-        drawSparks(s, t, frame, reduced ? 2 : ctx.quality.trailSamples);
+        drawSparks(s, { t, trailSamples: reduced ? 2 : ctx.quality.trailSamples }, frame);
         const settled = t > s.offsetMs + s.durationMs + 5200 && s.pool.aliveCount(t) === 0;
         return !params.continuous && settled && s.launches.length === 0 ? 'done' : 'running';
       },

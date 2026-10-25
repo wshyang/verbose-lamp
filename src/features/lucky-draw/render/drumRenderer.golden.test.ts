@@ -18,7 +18,7 @@ describe('drawDrum golden recordings', () => {
   for (const testCase of CASES) {
     it(`${testCase.name} draws identically`, () => {
       const { ctx, log } = createRecordingContext();
-      drawDrum(ctx, { ...testCase, entries: ENTRIES }, WIDTH, HEIGHT);
+      drawDrum(ctx, { ...testCase, entries: ENTRIES }, { w: WIDTH, h: HEIGHT });
       expect({ calls: log.length, hash: hashText(log.join('\n')) }).toMatchSnapshot();
     });
   }

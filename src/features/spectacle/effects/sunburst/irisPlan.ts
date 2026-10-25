@@ -13,19 +13,36 @@ export interface IrisPlan {
   variant: 'iris' | 'fan';
 }
 
-export function planIris(params: SunburstWipeParams, reducedMotion: boolean): IrisPlan {
-  const duration = reducedMotion ? 400 : (params.durationMs ?? 1800);
-  const coverEnd = reducedMotion ? 180 : Math.round(duration * 0.4);
-  const holdEnd = reducedMotion ? 220 : coverEnd + Math.round(duration * 0.18);
+const CROSSFADE_DURATION_MS = 400;
+const CROSSFADE_COVER_END_MS = 180;
+const CROSSFADE_HOLD_END_MS = 220;
+
+function planFields(params: SunburstWipeParams): Pick<IrisPlan, 'origin' | 'rays' | 'variant'> {
+  return { origin: params.origin, rays: params.rays ?? 24, variant: params.variant ?? 'iris' };
+}
+
+export function planIris(params: SunburstWipeParams): IrisPlan {
+  const duration = params.durationMs ?? 1800;
+  const coverEnd = Math.round(duration * 0.4);
   return {
-    crossfade: reducedMotion,
+    ...planFields(params),
+    crossfade: false,
     durationMs: duration,
     coverEndMs: coverEnd,
-    holdEndMs: holdEnd,
+    holdEndMs: coverEnd + Math.round(duration * 0.18),
     onCoveredMs: coverEnd,
-    origin: params.origin,
-    rays: params.rays ?? 24,
-    variant: params.variant ?? 'iris',
+  };
+}
+
+/** Reduced-motion plan: a short gold crossfade instead of the growing iris. */
+export function planIrisCrossfade(params: SunburstWipeParams): IrisPlan {
+  return {
+    ...planFields(params),
+    crossfade: true,
+    durationMs: CROSSFADE_DURATION_MS,
+    coverEndMs: CROSSFADE_COVER_END_MS,
+    holdEndMs: CROSSFADE_HOLD_END_MS,
+    onCoveredMs: CROSSFADE_COVER_END_MS,
   };
 }
 

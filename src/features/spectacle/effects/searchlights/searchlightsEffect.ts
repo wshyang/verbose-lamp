@@ -1,15 +1,9 @@
-import type { EffectDefinition } from '../../engine/types';
+import type { EffectDefinition, FrameInfo } from '../../engine/types';
 import type { NormRect, SearchlightParams } from '../../model/types';
 import { beamAngleAt, planSearchlights, type SearchlightBeam } from './searchlightPlan';
 
-function drawBeam(
-  ctx: CanvasRenderingContext2D,
-  beam: SearchlightBeam,
-  tSec: number,
-  w: number,
-  h: number,
-  fade: number,
-): void {
+function drawBeam(beam: SearchlightBeam, tSec: number, frame: FrameInfo): void {
+  const { ctx, w, h, fade } = frame;
   const angle = beamAngleAt(beam, tSec, 0);
   const ox = beam.baseX * w;
   const oy = h * 1.05;
@@ -32,12 +26,8 @@ function drawBeam(
   }
 }
 
-function dimKeepClear(
-  ctx: CanvasRenderingContext2D,
-  rects: readonly NormRect[],
-  w: number,
-  h: number,
-): void {
+function dimKeepClear(rects: readonly NormRect[], frame: FrameInfo): void {
+  const { ctx, w, h } = frame;
   if (rects.length === 0) return;
   ctx.globalCompositeOperation = 'destination-out';
   ctx.fillStyle = 'rgba(0,0,0,0.55)';
@@ -54,9 +44,9 @@ export const searchlightsEffect: EffectDefinition<SearchlightParams> = {
     const keepClear = params.keepClear ?? [];
     const speedScale = ctx.reducedMotion ? 0.25 : 1;
     return {
-      update(t, { ctx: c, w, h, fade }) {
-        for (const beam of beams) drawBeam(c, beam, (t / 1000) * speedScale, w, h, fade);
-        dimKeepClear(c, keepClear, w, h);
+      update(t, frame) {
+        for (const beam of beams) drawBeam(beam, (t / 1000) * speedScale, frame);
+        dimKeepClear(keepClear, frame);
         return 'running';
       },
     };

@@ -32,17 +32,21 @@ function arcControl(from: NormPoint, to: NormPoint, sign: number): NormPoint {
 }
 
 /** Pure timeline for all four orb configurations (ADDENDUM-020 §3.4). */
-export function planOrbTransition(
-  params: OrbTransitionParams,
-  reducedMotion: boolean,
-): OrbPlan {
-  const duration = params.durationMs ?? 1600;
-  const targets = offscreenTargets(params.origin, params.pattern);
-  const tracks = targets.map((target, i) => ({
+function buildTracks(params: OrbTransitionParams): readonly OrbTrack[] {
+  return offscreenTargets(params.origin, params.pattern).map((target, i) => ({
     target,
     control: arcControl(params.origin, target, i % 2 === 0 ? 1 : -1),
   }));
-  if (reducedMotion) return crossfadePlan(params, tracks);
+}
+
+/** Reduced-motion plan: a short flash crossfade, no flying orbs. */
+export function planOrbCrossfade(params: OrbTransitionParams): OrbPlan {
+  return crossfadePlan(params, buildTracks(params));
+}
+
+export function planOrbTransition(params: OrbTransitionParams): OrbPlan {
+  const duration = params.durationMs ?? 1600;
+  const tracks = buildTracks(params);
   return params.direction === 'outward'
     ? outwardPlan(params.origin, duration, tracks)
     : inwardPlan(params.origin, duration, tracks);

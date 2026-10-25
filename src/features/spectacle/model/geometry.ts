@@ -56,12 +56,15 @@ export function pointInRect(p: NormPoint, r: NormRect): boolean {
 }
 
 /** Circle (aspect-corrected) vs rect overlap, used by the show scheduler. */
-export function circleOverlapsRect(
-  centre: NormPoint,
-  radius: number,
-  rect: NormRect,
-  aspect: number,
-): boolean {
+export interface CircleOverlapQuery {
+  centre: NormPoint;
+  radius: number;
+  rect: NormRect;
+  aspect: number;
+}
+
+export function circleOverlapsRect(query: CircleOverlapQuery): boolean {
+  const { centre, radius, rect, aspect } = query;
   const cx = centre.x * aspect;
   const cy = centre.y;
   const nx = Math.max(rect.x * aspect, Math.min(cx, (rect.x + rect.w) * aspect));

@@ -39,7 +39,7 @@ function pickPoint(
     const y = 0.06 + rng() * 0.56;
     const depth = rng();
     const r = burstRadiusNorm(depth) + 0.02;
-    const blocked = keepClear.some((rect) => circleOverlapsRect({ x, y }, r, rect, aspect));
+    const blocked = keepClear.some((rect) => circleOverlapsRect({ centre: { x, y }, radius: r, rect, aspect }));
     if (!blocked) return { x, y, depth };
   }
   return null;
@@ -61,17 +61,19 @@ export function planShow(opts: ShowOptions): readonly ShellEvent[] {
     const type = WEIGHTED[Math.floor(rng() * WEIGHTED.length)];
     events.push({ tMs: (i + rng() * 0.8) * (bodyMs / count), ...p, type });
   }
-  if (opts.finale) addFinale(events, rng, duration, keepClear, aspect);
+  if (opts.finale) addFinale(events, { rng, durationMs: duration, keepClear, aspect });
   return events.sort((a, b) => a.tMs - b.tMs);
 }
 
-function addFinale(
-  events: ShellEvent[],
-  rng: () => number,
-  duration: number,
-  keepClear: readonly NormRect[],
-  aspect: number,
-): void {
+interface FinaleContext {
+  rng: () => number;
+  durationMs: number;
+  keepClear: readonly NormRect[];
+  aspect: number;
+}
+
+function addFinale(events: ShellEvent[], finale: FinaleContext): void {
+  const { rng, durationMs: duration, keepClear, aspect } = finale;
   const start = duration - 3500;
   for (let i = 0; i < 16; i += 1) {
     const p = pickPoint(rng, keepClear, aspect);

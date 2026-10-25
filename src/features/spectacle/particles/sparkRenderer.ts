@@ -41,20 +41,17 @@ export function createSpriteCache(): SpriteCache {
   };
 }
 
-export interface TrailDrawOptions {
+export interface TrailRequest {
+  spark: Spark;
+  ageMs: number;
   samples: number;
   fade: number;
   keepClearFade?: (x: number, y: number) => number;
 }
 
 /** Long-exposure streak: the spark sampled at t, t−Δ, t−2Δ… */
-export function drawSparkTrail(
-  ctx: CanvasRenderingContext2D,
-  cache: SpriteCache,
-  s: Spark,
-  ageMs: number,
-  opts: TrailDrawOptions,
-): void {
+export function drawSparkTrail(ctx: CanvasRenderingContext2D, cache: SpriteCache, request: TrailRequest): void {
+  const { spark: s, ageMs, ...opts } = request;
   const t = ageMs / 1000;
   const lifeT = ageMs / s.lifeMs;
   const step = 0.018;

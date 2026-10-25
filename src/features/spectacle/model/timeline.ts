@@ -27,7 +27,14 @@ export function easeInOutCubic(t: number): number {
 }
 
 /** Quadratic Bézier point — orb flight arcs. */
-export function quadBezier(p0: NormPoint, p1: NormPoint, p2: NormPoint, t: number): NormPoint {
+export interface QuadCurve {
+  p0: NormPoint;
+  p1: NormPoint;
+  p2: NormPoint;
+}
+
+export function quadBezier(curve: QuadCurve, t: number): NormPoint {
+  const { p0, p1, p2 } = curve;
   const u = 1 - t;
   return {
     x: u * u * p0.x + 2 * u * t * p1.x + t * t * p2.x,

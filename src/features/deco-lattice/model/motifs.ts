@@ -29,7 +29,17 @@ export function cornerDiamond(at: Pt, r: number): readonly Pt[] {
 }
 
 /** Castellated corner staircase from (hx−steps·d, hy) to (hx, hy−steps·d). */
-export function cornerSteps(hx: number, hy: number, steps: number, d: number): readonly Pt[] {
+export interface StaircaseSpec {
+  /** Half extents of the rectangle the staircase belongs to. */
+  hx: number;
+  hy: number;
+  steps: number;
+  /** Size of one step. */
+  d: number;
+}
+
+export function cornerSteps(spec: StaircaseSpec): readonly Pt[] {
+  const { hx, hy, steps, d } = spec;
   const pts: Pt[] = [{ x: hx - steps * d, y: hy }];
   let x = hx - steps * d;
   let y = hy;
@@ -43,8 +53,8 @@ export function cornerSteps(hx: number, hy: number, steps: number, d: number): r
 }
 
 /** Closed stepped border of a rectangle, corners built from one staircase. */
-export function steppedBorder(hw: number, hh: number, steps: number, d: number): readonly Pt[] {
-  const tr = cornerSteps(hw, hh, steps, d);
+export function steppedBorder(spec: StaircaseSpec): readonly Pt[] {
+  const tr = cornerSteps(spec);
   const br = tr.map((p) => ({ x: p.x, y: -p.y })).reverse();
   const bl = tr.map((p) => ({ x: -p.x, y: -p.y }));
   const tl = tr.map((p) => ({ x: -p.x, y: p.y })).reverse();

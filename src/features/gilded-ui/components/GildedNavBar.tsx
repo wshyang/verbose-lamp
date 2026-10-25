@@ -11,7 +11,7 @@ interface GildedNavBarProps {
 /** Bottom navigation in shimmering gold, generated from emoji + label. */
 export function GildedNavBar({ items, activeId, onSelect, ariaLabel = 'Event sections' }: GildedNavBarProps) {
   return (
-    <nav aria-label={ariaLabel} data-testid="gilded-nav-bar" className="flex items-end justify-center gap-2 sm:gap-3">
+    <nav aria-label={ariaLabel} data-testid="gilded-nav-bar__root" className="flex items-end justify-center gap-2 sm:gap-3">
       {items.map((item) => (
         <GildedTile
           key={item.id}

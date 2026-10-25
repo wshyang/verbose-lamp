@@ -1,5 +1,5 @@
 import { mulberry32 } from '@/shared/lib/random';
-import type { EffectDefinition } from '../../engine/types';
+import type { EffectDefinition, FrameInfo } from '../../engine/types';
 import type { ConfettiParams } from '../../model/types';
 import { flutterX, foilY, type Flutter, type FoilFall } from './confettiPhysics';
 
@@ -49,7 +49,8 @@ function makePieces(params: ConfettiParams, seed: number, scale: number): readon
   });
 }
 
-function drawPiece(p: Piece, tSec: number, w: number, h: number, ctx: CanvasRenderingContext2D, fade: number): void {
+function drawPiece(p: Piece, tSec: number, frame: FrameInfo): void {
+  const { ctx, w, h, fade } = frame;
   const x = flutterX(p.flutter, tSec) * w;
   const y = foilY(p.fall, tSec) * h;
   if (y > h + 30) return;
@@ -86,10 +87,11 @@ export const confettiEffect: EffectDefinition<ConfettiParams> = {
     return {
       update(t, frame) {
         const fade = frame.fade * Math.min(1, Math.max(0, (duration + 1400 - t) / 700));
+        const faded: FrameInfo = { ...frame, fade };
         for (const p of pieces) {
           const local = t - p.bornMs;
           if (local < 0) continue;
-          drawPiece(p, local / 1000, frame.w, frame.h, frame.ctx, fade);
+          drawPiece(p, local / 1000, faded);
         }
         return t > duration + 1500 ? 'done' : 'running';
       },

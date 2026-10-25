@@ -22,12 +22,19 @@ function drawRays(t: number, alpha: number, frame: FrameInfo): void {
   ctx.restore();
 }
 
-function drawNumeral(plan: CountdownPlan, value: number, local: number, reduced: boolean, frame: FrameInfo): void {
+interface NumeralView {
+  value: number;
+  localMs: number;
+  motion: 'full' | 'still';
+}
+
+function drawNumeral(plan: CountdownPlan, view: NumeralView, frame: FrameInfo): void {
+  const { value, localMs: local, motion } = view;
   const { ctx, w, h, fade } = frame;
   const beat = plan.beats[plan.beats.length - 1 - value];
   const reveal = easeOutCubic(Math.min(1, local / beat.revealMs));
   const exitU = Math.max(0, (local - (plan.beatMs - beat.exitMs)) / beat.exitMs);
-  const scale = reduced ? 1 : (1.18 - 0.18 * reveal) * (1 + exitU * 0.55);
+  const scale = motion === 'still' ? 1 : (1.18 - 0.18 * reveal) * (1 + exitU * 0.55);
   const alpha = reveal * (1 - exitU) * fade;
   const size = Math.min(w, h) * 0.4 * scale;
   ctx.save();
@@ -66,7 +73,8 @@ export const countdownEffect: EffectDefinition<CountdownParams> = {
         if (beat) {
           const local = t - beat.startMs;
           drawRays(t, 0.3 * frame.fade * Math.min(1, local / 200), frame);
-          drawNumeral(plan, beat.value, local, ctx.reducedMotion, frame);
+          const motion = ctx.reducedMotion ? 'still' : 'full';
+          drawNumeral(plan, { value: beat.value, localMs: local, motion }, frame);
         }
         if (!completed && t >= plan.totalMs) {
           completed = true;

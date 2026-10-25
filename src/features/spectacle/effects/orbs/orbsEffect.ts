@@ -5,7 +5,7 @@ import { clamp01, easeInQuad, easeOutCubic, quadBezier } from '../../model/timel
 import type { NormPoint, OrbTransitionParams } from '../../model/types';
 import { createParticlePool, type ParticlePool } from '../../particles/particlePool';
 import { createSpriteCache, drawSparkTrail, type SpriteCache } from '../../particles/sparkRenderer';
-import { planOrbTransition, type OrbPlan } from './orbPlan';
+import { planOrbCrossfade, planOrbTransition, type OrbPlan } from './orbPlan';
 
 function drawFlash(plan: OrbPlan, t: number, frame: FrameInfo): void {
   const level = flashIntensityAt(plan.flash, t) * frame.fade;
@@ -31,7 +31,17 @@ function drawFlash(plan: OrbPlan, t: number, frame: FrameInfo): void {
   ctx.fillRect(0, cy - h * 0.035 * level, w, h * 0.07 * level);
 }
 
-function drawFireOrb(x: number, y: number, dirX: number, dirY: number, t: number, idx: number, frame: FrameInfo): void {
+interface FireOrb {
+  x: number;
+  y: number;
+  dirX: number;
+  dirY: number;
+  t: number;
+  index: number;
+}
+
+function drawFireOrb(orb: FireOrb, frame: FrameInfo): void {
+  const { x, y, dirX, dirY, t, index: idx } = orb;
   const { ctx, fade } = frame;
   const scale = Math.min(frame.w, frame.h) / 700;
   const back = Math.atan2(-dirY, -dirX);
@@ -74,8 +84,9 @@ function orbPosition(plan: OrbPlan, trackIdx: number, t: number): { p: NormPoint
   const e = outward ? easeInQuad(u) : easeOutCubic(u);
   const from = outward ? plan.origin : track.target;
   const to = outward ? track.target : plan.origin;
-  const p = quadBezier(from, track.control, to, e);
-  const q = quadBezier(from, track.control, to, Math.min(1, e + 0.02));
+  const curve = { p0: from, p1: track.control, p2: to };
+  const p = quadBezier(curve, e);
+  const q = quadBezier(curve, Math.min(1, e + 0.02));
   return { p, dx: q.x - p.x, dy: q.y - p.y };
 }
 
@@ -99,7 +110,7 @@ export const orbsEffect: EffectDefinition<OrbTransitionParams> = {
   id: 'orb-transition',
   layer: 'light-overlay',
   create(ctx, params) {
-    const plan = planOrbTransition(params, ctx.reducedMotion);
+    const plan = ctx.reducedMotion ? planOrbCrossfade(params) : planOrbTransition(params);
     const pool: ParticlePool = createParticlePool(700);
     const sprites: SpriteCache = createSpriteCache();
     let coveredFired = false;
@@ -112,13 +123,14 @@ export const orbsEffect: EffectDefinition<OrbTransitionParams> = {
         }
         drawFlash(plan, t, frame);
         if (!plan.crossfade) {
-          updateOrbs(plan, t, frame, pool, sprites);
-          fireCollisionSpray(plan, t, frame, pool, sprayFired);
+          const tick: OrbTick = { plan, t, frame, pool };
+          updateOrbs(tick);
+          if (!sprayFired) fireCollisionSpray(tick);
           if (plan.collisionMs !== null && t >= plan.collisionMs) sprayFired = true;
           drawShockwave(plan, t, frame);
         }
-        pool.forEachAlive(t, (s, age) =>
-          drawSparkTrail(frame.ctx, sprites, s, age, { samples: 3, fade: frame.fade }),
+        pool.forEachAlive(t, (spark, age) =>
+          drawSparkTrail(frame.ctx, sprites, { spark, ageMs: age, samples: 3, fade: frame.fade }),
         );
         return t > plan.durationMs + 500 ? 'done' : 'running';
       },
@@ -126,14 +138,21 @@ export const orbsEffect: EffectDefinition<OrbTransitionParams> = {
   },
 };
 
-function updateOrbs(plan: OrbPlan, t: number, frame: FrameInfo, pool: ParticlePool, sprites: SpriteCache): void {
-  void sprites;
+interface OrbTick {
+  plan: OrbPlan;
+  t: number;
+  frame: FrameInfo;
+  pool: ParticlePool;
+}
+
+function updateOrbs(tick: OrbTick): void {
+  const { plan, t, frame, pool } = tick;
   for (let i = 0; i < plan.tracks.length; i += 1) {
     const pos = orbPosition(plan, i, t);
     if (!pos) continue;
     const x = pos.p.x * frame.w;
     const y = pos.p.y * frame.h;
-    drawFireOrb(x, y, pos.dx, pos.dy, t, i, frame);
+    drawFireOrb({ x, y, dirX: pos.dx, dirY: pos.dy, t, index: i }, frame);
     for (let j = 0; j < 2; j += 1) {
       pool.spawn(t, {
         x, y,
@@ -145,8 +164,9 @@ function updateOrbs(plan: OrbPlan, t: number, frame: FrameInfo, pool: ParticlePo
   }
 }
 
-function fireCollisionSpray(plan: OrbPlan, t: number, frame: FrameInfo, pool: ParticlePool, already: boolean): void {
-  if (already || plan.collisionMs === null || t < plan.collisionMs) return;
+function fireCollisionSpray(tick: OrbTick): void {
+  const { plan, t, frame, pool } = tick;
+  if (plan.collisionMs === null || t < plan.collisionMs) return;
   const cx = plan.origin.x * frame.w;
   const cy = plan.origin.y * frame.h;
   const speed = Math.min(frame.w, frame.h) * 0.5;

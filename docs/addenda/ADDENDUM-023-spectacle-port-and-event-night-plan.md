@@ -346,3 +346,16 @@ the original iris behaviour.
   determinism check), `drawDrum`, `planShow`/`shellSparks`/`planOrbTransition`,
   `buildDecoLattice` and `planSpin` snapshots. Nothing is mounted in the app yet.
   Validation: tsc ✓ vitest ✓ (393 tests) build ✓ — browser not available in sandbox.
+- **Commit B (Step 5) — landed.** Behaviour-preserving refactor to CLAUDE.md §6. Every golden
+  snapshot from commit A is byte-identical after it. The AST audit (functions >50 lines, >3
+  parameters, boolean-flag parameters) went from 37 findings to 0 across the five ported features.
+  Highlights: `createSpectacleStage` split into `engine/layers.ts` + `engine/effectScheduler.ts`;
+  `SpectacleProvider` delegates to `useSpectacleStage` (exposes `isReady`); `useSpectaclePreview`
+  composed from seven focused hooks and the panel from per-section components; lucky draw split
+  into `useDrawPool`, `useSpinAnimation`, `useDrumCanvas`, `LuckyDrawResult`, `LuckyDrawControls`
+  and now renders inside the shared `Dialog` (adds Escape, focus trap, `aria-modal`);
+  `DecoLatticeFrame` renders pre-grouped layers from `useDecoLatticePaths` + `BrassDefs`.
+  Boolean flags became split functions (`planIris`/`planIrisCrossfade`,
+  `planOrbTransition`/`planOrbCrossfade`) or typed fields (`pistil: 'emerald' | 'gold'`,
+  `motion: 'full' | 'still'`). New pure `resolveActiveId` (tested, test written first).
+  Validation: tsc ✓ vitest ✓ (396 tests) build ✓ — browser not available in sandbox.

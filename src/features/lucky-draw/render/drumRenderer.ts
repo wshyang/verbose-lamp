@@ -10,7 +10,29 @@ export interface DrumState {
   landedPlateGlow: boolean;
 }
 
-function platePath(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
+interface Rect {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+interface Viewport {
+  w: number;
+  h: number;
+}
+
+/** One visible plate: where it sits on the drum and whether it faces the viewer. */
+interface PlateDraw {
+  state: DrumState;
+  index: number;
+  theta: number;
+  isFront: boolean;
+  viewport: Viewport;
+}
+
+function platePath(ctx: CanvasRenderingContext2D, rect: Rect): void {
+  const { x, y, w, h } = rect;
   const c = Math.min(h * 0.32, 12);
   ctx.beginPath();
   ctx.moveTo(x + c, y);
@@ -24,14 +46,9 @@ function platePath(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
   ctx.closePath();
 }
 
-function drawPlate(
-  ctx: CanvasRenderingContext2D,
-  state: DrumState,
-  theta: number,
-  isFront: boolean,
-  w: number,
-  h: number,
-): void {
+function drawPlate(ctx: CanvasRenderingContext2D, plate: PlateDraw): void {
+  const { state, theta, isFront, viewport } = plate;
+  const { w, h } = viewport;
   const facing = Math.cos(theta);
   const cy = h / 2;
   const radius = h * 0.46;
@@ -50,7 +67,7 @@ function drawPlate(
     ctx.shadowColor = 'rgba(255,220,130,0.9)';
     ctx.shadowBlur = 30;
   }
-  platePath(ctx, x, y, pw, plateH);
+  platePath(ctx, { x, y, w: pw, h: plateH });
   ctx.fillStyle = grad;
   ctx.fill();
   ctx.shadowBlur = 0;
@@ -60,21 +77,26 @@ function drawPlate(
   ctx.restore();
 }
 
+function visiblePlates(state: DrumState, viewport: Viewport): readonly PlateDraw[] {
+  return Array.from({ length: PLATE_COUNT }, (_, i) => i)
+    .map((index) => ({ index, theta: wrapHalf(index - state.position) * ((Math.PI * 2) / PLATE_COUNT) }))
+    .filter((p) => Math.cos(p.theta) > 0.06)
+    .sort((a, b) => Math.cos(a.theta) - Math.cos(b.theta))
+    .map(({ index, theta }) => ({
+      state, index, theta, viewport, isFront: Math.abs(theta) < Math.PI / PLATE_COUNT,
+    }));
+}
+
 /** Draws the 16-plate gold drum; labels relabel only on the hidden back half. */
-export function drawDrum(ctx: CanvasRenderingContext2D, state: DrumState, w: number, h: number): void {
+export function drawDrum(ctx: CanvasRenderingContext2D, state: DrumState, viewport: Viewport): void {
+  const { w, h } = viewport;
   ctx.clearRect(0, 0, w, h);
   const backdrop = ctx.createRadialGradient(w / 2, h / 2, 10, w / 2, h / 2, w * 0.7);
   backdrop.addColorStop(0, 'rgba(46,32,12,0.9)');
   backdrop.addColorStop(1, 'rgba(8,6,3,0.95)');
   ctx.fillStyle = backdrop;
   ctx.fillRect(0, 0, w, h);
-  const order = Array.from({ length: PLATE_COUNT }, (_, i) => i)
-    .map((i) => ({ i, theta: wrapHalf(i - state.position) * ((Math.PI * 2) / PLATE_COUNT) }))
-    .filter((p) => Math.cos(p.theta) > 0.06)
-    .sort((a, b) => Math.cos(a.theta) - Math.cos(b.theta));
-  for (const p of order) {
-    drawPlateWithLabel(ctx, state, p.i, p.theta, Math.abs(p.theta) < Math.PI / PLATE_COUNT, w, h);
-  }
+  for (const plate of visiblePlates(state, viewport)) drawPlateWithLabel(ctx, plate);
   const fog = ctx.createLinearGradient(0, 0, 0, h);
   fog.addColorStop(0, 'rgba(6,4,2,0.96)');
   fog.addColorStop(0.22, 'rgba(6,4,2,0)');
@@ -84,24 +106,50 @@ export function drawDrum(ctx: CanvasRenderingContext2D, state: DrumState, w: num
   ctx.fillRect(0, 0, w, h);
 }
 
-function drawPlateWithLabel(
-  ctx: CanvasRenderingContext2D,
-  state: DrumState,
-  plate: number,
-  theta: number,
-  isFront: boolean,
-  w: number,
-  h: number,
-): void {
-  drawPlate(ctx, state, theta, isFront, w, h);
+/** Vertical placement of a plate on the drum, shared by label and sheen. */
+interface PlateBand {
+  facing: number;
+  centreY: number;
+  height: number;
+}
+
+function plateBand(theta: number, h: number): PlateBand {
   const facing = Math.cos(theta);
   const radius = h * 0.46;
-  const plateH = ((Math.PI * 2 * radius) / PLATE_COUNT) * facing;
-  const cy = h / 2 + Math.sin(theta) * radius;
-  const entry = state.entries[plateEntryIndex(plate, state.position, state.entries.length)];
-  const fitted = fitLabel(entry.name, w * 0.7, 26 * Math.max(0.55, facing), 11, (text, size) => {
-    ctx.font = `600 ${size}px Cinzel, Georgia, serif`;
-    return ctx.measureText(text).width;
+  return {
+    facing,
+    centreY: h / 2 + Math.sin(theta) * radius,
+    height: ((Math.PI * 2 * radius) / PLATE_COUNT) * facing,
+  };
+}
+
+function drawSpeedSheen(ctx: CanvasRenderingContext2D, band: PlateBand, view: { smear: number; w: number }): void {
+  const { facing, centreY: cy, height: plateH } = band;
+  ctx.globalAlpha = view.smear * 0.25 * facing;
+  const sheen = ctx.createLinearGradient(0, cy - plateH / 2, 0, cy + plateH / 2);
+  sheen.addColorStop(0, 'rgba(255,240,200,0)');
+  sheen.addColorStop(0.5, 'rgba(255,240,200,0.8)');
+  sheen.addColorStop(1, 'rgba(255,240,200,0)');
+  ctx.fillStyle = sheen;
+  ctx.fillRect(view.w * 0.1, cy - plateH / 2, view.w * 0.8, plateH);
+}
+
+function drawPlateWithLabel(ctx: CanvasRenderingContext2D, plate: PlateDraw): void {
+  const { state, index, theta, isFront, viewport } = plate;
+  const { w, h } = viewport;
+  drawPlate(ctx, plate);
+  const band = plateBand(theta, h);
+  const { facing, centreY: cy, height: plateH } = band;
+  const entry = state.entries[plateEntryIndex(index, state.position, state.entries.length)];
+  const fitted = fitLabel({
+    text: entry.name,
+    maxWidth: w * 0.7,
+    baseSize: 26 * Math.max(0.55, facing),
+    minSize: 11,
+    measure: (text, size) => {
+      ctx.font = `600 ${size}px Cinzel, Georgia, serif`;
+      return ctx.measureText(text).width;
+    },
   });
   ctx.save();
   ctx.globalAlpha = Math.pow(facing, 0.8);
@@ -118,14 +166,6 @@ function drawPlateWithLabel(
     ctx.fillStyle = isFront && state.landedPlateGlow ? '#fff2c8' : '#2c1c07';
     ctx.fillText(fitted.text, w / 2, cy + dy);
   }
-  if (smear > 0.4) {
-    ctx.globalAlpha = smear * 0.25 * facing;
-    const sheen = ctx.createLinearGradient(0, cy - plateH / 2, 0, cy + plateH / 2);
-    sheen.addColorStop(0, 'rgba(255,240,200,0)');
-    sheen.addColorStop(0.5, 'rgba(255,240,200,0.8)');
-    sheen.addColorStop(1, 'rgba(255,240,200,0)');
-    ctx.fillStyle = sheen;
-    ctx.fillRect(w * 0.1, cy - plateH / 2, w * 0.8, plateH);
-  }
+  if (smear > 0.4) drawSpeedSheen(ctx, band, { smear, w });
   ctx.restore();
 }

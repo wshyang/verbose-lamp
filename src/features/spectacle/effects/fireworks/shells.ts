@@ -54,7 +54,14 @@ function sphereDir(rng: () => number): { dx: number; dy: number; f: number } {
   return { dx: Math.cos(a) * r * f, dy: Math.sin(a) * r * f, f };
 }
 
-function baseSpark(r: ShellRecipe, rng: () => number, dx: number, dy: number, f: number): ShellSpark {
+interface Direction {
+  dx: number;
+  dy: number;
+  f: number;
+}
+
+function baseSpark(r: ShellRecipe, rng: () => number, dir: Direction): ShellSpark {
+  const { dx, dy, f } = dir;
   return {
     dx, dy,
     speed: r.speed * f * (0.82 + rng() * 0.3),
@@ -65,12 +72,16 @@ function baseSpark(r: ShellRecipe, rng: () => number, dx: number, dy: number, f:
   };
 }
 
-export function shellSparks(
-  type: FireworkShellType,
-  rng: () => number,
-  scale: number,
-  greenLight: boolean,
-): readonly ShellSpark[] {
+export interface ShellRequest {
+  type: FireworkShellType;
+  rng: () => number;
+  scale: number;
+  /** `emerald` is the green light across the bay; `gold` keeps the pistil warm. */
+  pistil: 'emerald' | 'gold';
+}
+
+export function shellSparks(request: ShellRequest): readonly ShellSpark[] {
+  const { type, rng, scale, pistil } = request;
   const r = RECIPES[type];
   const n = Math.max(6, Math.round(r.count * scale));
   const out: ShellSpark[] = [];
@@ -78,28 +89,30 @@ export function shellSparks(
     if (type === 'ring') {
       const a = (i / n) * Math.PI * 2;
       const tilt = 0.55 + rng() * 0.02;
-      out.push(baseSpark(r, rng, Math.cos(a), Math.sin(a) * tilt, 1));
+      out.push(baseSpark(r, rng, { dx: Math.cos(a), dy: Math.sin(a) * tilt, f: 1 }));
     } else {
-      const d = sphereDir(rng);
-      const s = baseSpark(r, rng, d.dx, d.dy, d.f);
+      const s = baseSpark(r, rng, sphereDir(rng));
       if (type === 'crossette') out.push({ ...s, splits: true });
       else out.push(s);
     }
   }
-  if (type === 'double-break') addPistil(out, r, rng, n, greenLight);
+  if (type === 'double-break') addPistil({ out, recipe: r, rng, count: n, pistil });
   return out;
 }
 
-function addPistil(
-  out: ShellSpark[],
-  r: ShellRecipe,
-  rng: () => number,
-  n: number,
-  greenLight: boolean,
-): void {
-  for (let i = 0; i < Math.round(n * 0.4); i += 1) {
-    const d = sphereDir(rng);
-    const s = baseSpark(r, rng, d.dx, d.dy, d.f);
-    out.push({ ...s, speed: r.speed * 0.42, band: greenLight ? 2 : 0.02, green: greenLight });
+interface PistilRequest {
+  out: ShellSpark[];
+  recipe: ShellRecipe;
+  rng: () => number;
+  count: number;
+  pistil: 'emerald' | 'gold';
+}
+
+function addPistil(request: PistilRequest): void {
+  const { out, recipe: r, rng, count, pistil } = request;
+  const isEmerald = pistil === 'emerald';
+  for (let i = 0; i < Math.round(count * 0.4); i += 1) {
+    const s = baseSpark(r, rng, sphereDir(rng));
+    out.push({ ...s, speed: r.speed * 0.42, band: isEmerald ? 2 : 0.02, green: isEmerald });
   }
 }

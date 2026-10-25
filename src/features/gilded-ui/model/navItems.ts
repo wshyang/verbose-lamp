@@ -38,3 +38,9 @@ export function parseNavLines(text: string): readonly NavItem[] {
       };
     });
 }
+
+/** The highlighted item: the requested id if it is in the bar, else the first item. */
+export function resolveActiveId(items: readonly NavItem[], activeId: string): string {
+  const isPresent = items.some((item) => item.id === activeId);
+  return isPresent ? activeId : items[0]?.id ?? '';
+}

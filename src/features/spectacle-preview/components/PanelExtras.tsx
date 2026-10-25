@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Gem, Shuffle } from 'lucide-react';
-import { GildedNavBar } from '@/features/gilded-ui';
+import { GildedNavBar, resolveActiveId } from '@/features/gilded-ui';
 import type { SpectaclePreview } from '../hooks/useSpectaclePreview';
 import { Section, SliderRow } from './PanelBits';
 
@@ -8,7 +8,7 @@ import { Section, SliderRow } from './PanelBits';
 export function GoldUiSection({ preview }: { preview: SpectaclePreview }) {
   const [activeId, setActiveId] = useState('');
   const items = preview.navItems;
-  const resolvedActive = items.some((i) => i.id === activeId) ? activeId : items[0]?.id ?? '';
+  const resolvedActive = resolveActiveId(items, activeId);
   return (
     <Section title="GOLD UI KIT">
       <textarea
@@ -57,7 +57,7 @@ export function LatticeSection({ preview }: { preview: SpectaclePreview }) {
       </label>
       <button
         type="button"
-        onClick={() => preview.setLatticeSeed(Math.floor(Math.random() * 1e6))}
+        onClick={preview.rerollLattice}
         data-testid="spectacle-preview__lattice-reroll"
         className="flex items-center gap-2 border border-[#8a6a2f]/50 px-2.5 py-1.5 text-[11px] tracking-wider text-[#d8b878] transition hover:bg-[#8a6a2f]/20"
       >

@@ -23,6 +23,16 @@ export interface DecoLatticeGeometry {
   hh: number;
 }
 
+/** Shared inputs of the four tutorial layers. */
+interface LayerContext {
+  req: DecoLatticeRequest;
+  /** Shorter half extent: every proportion scales from it. */
+  m: number;
+  /** Heaviest stroke width. */
+  heavy: number;
+  density: number;
+}
+
 function rect(hw: number, hh: number): readonly Pt[] {
   return [{ x: -hw, y: -hh }, { x: hw, y: -hh }, { x: hw, y: hh }, { x: -hw, y: hh }];
 }
@@ -35,11 +45,11 @@ function rotate90(points: readonly Pt[]): readonly Pt[] {
   return points.map((p) => ({ x: -p.y, y: p.x }));
 }
 
-function layer1(req: DecoLatticeRequest, m: number, heavy: number): readonly LatticeSpec[] {
+function layer1({ req, m, heavy }: LayerContext): readonly LatticeSpec[] {
   const fx = req.hw - 0.25 * m;
   const fy = req.hh - 0.25 * m;
   const specs: LatticeSpec[] = [
-    { points: steppedBorder(req.hw * 0.985, req.hh * 0.985, 2, 0.06 * m), closed: true, width: heavy * 0.8, layer: 0, rank: 0 },
+    { points: steppedBorder({ hx: req.hw * 0.985, hy: req.hh * 0.985, steps: 2, d: 0.06 * m }), closed: true, width: heavy * 0.8, layer: 0, rank: 0 },
     { points: rect(fx, fy), closed: true, width: heavy * 1.6, layer: 0, rank: 0 },
     { points: rect(req.hw - 0.28 * m, req.hh - 0.28 * m), closed: true, width: heavy * 0.45, layer: 0, rank: 1 },
     { points: rect(req.hw - 0.31 * m, req.hh - 0.31 * m), closed: true, width: heavy * 0.45, layer: 0, rank: 1 },
@@ -55,7 +65,7 @@ function layer1(req: DecoLatticeRequest, m: number, heavy: number): readonly Lat
   return specs;
 }
 
-function layer2(req: DecoLatticeRequest, m: number, heavy: number): readonly LatticeSpec[] {
+function layer2({ req, m, heavy }: LayerContext): readonly LatticeSpec[] {
   if (req.mode === 'frame') return [];
   const rings = nestedOctagram(0.396 * m, 3, 0.8);
   return rings.map((points, i) => ({
@@ -64,7 +74,7 @@ function layer2(req: DecoLatticeRequest, m: number, heavy: number): readonly Lat
   }));
 }
 
-function layer3(req: DecoLatticeRequest, m: number, heavy: number, density: number): readonly LatticeSpec[] {
+function layer3({ req, m, heavy, density }: LayerContext): readonly LatticeSpec[] {
   const specs: LatticeSpec[] = [];
   const seed = req.seed ?? 1925;
   if (req.mode === 'medallion') {
@@ -92,7 +102,7 @@ function layer3(req: DecoLatticeRequest, m: number, heavy: number, density: numb
   return specs;
 }
 
-function layer4(req: DecoLatticeRequest, m: number, heavy: number): readonly LatticeSpec[] {
+function layer4({ req, m, heavy }: LayerContext): readonly LatticeSpec[] {
   const at = { x: req.hw - 0.34 * m, y: req.hh - 0.34 * m };
   const specs: LatticeSpec[] = [
     { points: cornerDiamond(at, 0.085 * m), closed: true, width: heavy * 0.35, layer: 3, rank: 2 },
@@ -119,12 +129,8 @@ export function buildDecoLattice(req: DecoLatticeRequest): DecoLatticeGeometry {
   const density = Math.min(1, Math.max(0, req.density ?? 0.7));
   const level = Math.min(4, Math.max(1, req.level ?? 4));
   const group = Math.abs(req.hw - req.hh) < 1e-9 ? D4 : D2;
-  const layers = [
-    layer1(req, m, heavy),
-    layer2(req, m, heavy),
-    layer3(req, m, heavy, density),
-    layer4(req, m, heavy),
-  ];
+  const context: LayerContext = { req, m, heavy, density };
+  const layers = [layer1(context), layer2(context), layer3(context), layer4(context)];
   const specs = layers.slice(0, level).flatMap((layer, i) => orbit(layer, i === 0 || i === 3 ? dedupeGroup(group) : group));
   return { specs, hw: req.hw, hh: req.hh };
 }

@@ -4,17 +4,32 @@ import { canRenderInDecoGlyphs } from '../../model/decoGlyphs';
 import { easeOutCubic } from '../../model/timeline';
 import type { NameRevealParams } from '../../model/types';
 
-function fitFont(ctx: CanvasRenderingContext2D, text: string, maxW: number, base: number, family: string): number {
-  let size = base;
+interface FontFit {
+  text: string;
+  maxWidth: number;
+  baseSize: number;
+  family: string;
+}
+
+function fitFont(ctx: CanvasRenderingContext2D, fit: FontFit): number {
+  const { text, maxWidth, baseSize, family } = fit;
+  let size = baseSize;
   ctx.font = `700 ${size}px ${family}`;
-  while (ctx.measureText(text).width > maxW && size > 18) {
+  while (ctx.measureText(text).width > maxWidth && size > 18) {
     size *= 0.94;
     ctx.font = `700 ${size}px ${family}`;
   }
   return size;
 }
 
-function drawSparkRain(t: number, cx: number, cy: number, halfW: number, frame: FrameInfo): void {
+interface RainSource {
+  cx: number;
+  cy: number;
+  halfW: number;
+}
+
+function drawSparkRain(t: number, source: RainSource, frame: FrameInfo): void {
+  const { cx, cy, halfW } = source;
   const { ctx, fade } = frame;
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
@@ -52,10 +67,10 @@ export const nameRevealEffect: EffectDefinition<NameRevealParams> = {
         const appear = easeOutCubic(Math.min(1, t / 550));
         const out = Math.min(1, Math.max(0, (duration - t) / 500));
         const alpha = appear * out * fade;
-        const size = fitFont(c, text, w * 0.84, Math.min(w, h) * 0.115, family);
+        const size = fitFont(c, { text, maxWidth: w * 0.84, baseSize: Math.min(w, h) * 0.115, family });
         const cx = w / 2;
         const cy = h * 0.46 + (1 - appear) * 24;
-        drawSparkRain(t, cx, cy, size * text.length * 0.3, frame);
+        drawSparkRain(t, { cx, cy, halfW: size * text.length * 0.3 }, frame);
         c.save();
         c.globalAlpha = alpha;
         c.font = `700 ${size}px ${family}`;

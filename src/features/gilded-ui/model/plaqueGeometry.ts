@@ -6,7 +6,15 @@ export function chamferPlaque(w: number, h: number, c: number): string {
   ].join(' ');
 }
 
-export function plaquePinstripe(w: number, h: number, c: number, inset: number): string {
+export interface PinstripeSpec {
+  w: number;
+  h: number;
+  chamfer: number;
+  inset: number;
+}
+
+export function plaquePinstripe(spec: PinstripeSpec): string {
+  const { w, h, chamfer: c, inset } = spec;
   return chamferPlaque(w - inset * 2, h - inset * 2, Math.max(1, c - inset))
     .replace(/^M/, `M`) // path is relative to its own origin
     .trim();

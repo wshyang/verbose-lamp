@@ -9,8 +9,8 @@ describe('lattice', () => {
   });
 
   it('every axis/diagonal motif is octilinear', () => {
-    expect(isOctilinear(cornerSteps(1, 1, 3, 0.06))).toBe(true);
-    expect(isOctilinear([...steppedBorder(1, 1, 2, 0.06), steppedBorder(1, 1, 2, 0.06)[0]])).toBe(true);
+    expect(isOctilinear(cornerSteps({ hx: 1, hy: 1, steps: 3, d: 0.06 }))).toBe(true);
+    expect(isOctilinear([...steppedBorder({ hx: 1, hy: 1, steps: 2, d: 0.06 }), steppedBorder({ hx: 1, hy: 1, steps: 2, d: 0.06 })[0]])).toBe(true);
     expect(isOctilinear([...trapezoidClasp(0.9, 0.12), { x: -0.45, y: 0 }])).toBe(true);
     expect(isOctilinear(axisArrow(0.5, 0.12))).toBe(true);
     expect(isOctilinear([...diagonalArm(0.38, 0.05), diagonalArm(0.38, 0.05)[0]])).toBe(true);

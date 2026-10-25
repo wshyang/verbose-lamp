@@ -5,14 +5,17 @@ export interface FittedLabel {
 
 export type MeasureFn = (text: string, size: number) => number;
 
+export interface LabelFit {
+  text: string;
+  maxWidth: number;
+  baseSize: number;
+  minSize: number;
+  measure: MeasureFn;
+}
+
 /** Shrink-to-fit with a floor, then ellipsis. Measure function injected. */
-export function fitLabel(
-  text: string,
-  maxWidth: number,
-  baseSize: number,
-  minSize: number,
-  measure: MeasureFn,
-): FittedLabel {
+export function fitLabel(fit: LabelFit): FittedLabel {
+  const { text, maxWidth, baseSize, minSize, measure } = fit;
   let size = baseSize;
   while (size > minSize && measure(text, size) > maxWidth) size *= 0.92;
   size = Math.max(minSize, size);
