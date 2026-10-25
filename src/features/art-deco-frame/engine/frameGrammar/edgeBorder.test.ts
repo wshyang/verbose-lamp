@@ -4,6 +4,8 @@ import {
   SIGNATURE_GENOME,
   clampGenome,
   genomeForVariant,
+  GENE_DEFINITIONS,
+  type GeneKey,
   isSignatureGenome,
   withGene,
   type BaseGenome,
@@ -126,4 +128,84 @@ describe('viewport edge border', () => {
     expect(border(1.78)).toEqual(border(1.78));
     expect(viewportScaleAtDistance(3, Math.PI / 3)).toBeCloseTo(3 * Math.tan(Math.PI / 6), 10);
   });
+});
+
+describe('reeding recursion on every edge', () => {
+  const aspect = 1.6;
+  const recursive = { ...SIGNATURE_GENOME, fractalDepth: 1, fractalRatio: 0.45 };
+  const plain = { ...SIGNATURE_GENOME, fractalDepth: 0 };
+
+  // Sub-ticks sit one z-step behind their parent ticks (z -0.01 to -0.02). On the side runs
+  // a tick points sideways, so its sub-tick is a horizontal segment hugging the side edge.
+  // Corner-fan rays share that z and can lie flat near the edge too, so only reeding
+  // ticks (kind 'rule') count; without that filter this passes even when the bug is present.
+  const sideSubTicks = (genome: BaseGenome) =>
+    buildEdgeBorder({ aspect, density: 0.5, genome }).specs.filter(
+      (spec) =>
+        spec.kind === 'rule' &&
+        spec.z === -0.02 &&
+        spec.points.length === 2 &&
+        spec.points[0].y === spec.points[1].y &&
+        Math.abs(spec.points[0].x) > aspect - 0.2
+    );
+
+  it('subdivides the vertical (side) runs as well as the horizontal ones', () => {
+    expect(sideSubTicks(recursive).length).toBeGreaterThan(0);
+  });
+
+  it('adds no side sub-ticks when recursion is off', () => {
+    expect(sideSubTicks(plain)).toHaveLength(0);
+  });
+
+  it('gives the left and right side runs the same number of sub-ticks', () => {
+    const ticks = sideSubTicks(recursive);
+    const right = ticks.filter((spec) => spec.points[0].x > 0).length;
+    const left = ticks.filter((spec) => spec.points[0].x < 0).length;
+
+    expect(right).toBeGreaterThan(0);
+    expect(left).toBe(right);
+  });
+});
+
+// Replaces the per-rib and per-tick length guards the border used to carry. The claim is that
+// no legal genome can make a ray or tick degenerate, so this sweeps every corner of the gene
+// box (each gene at its min and max) over the extreme aspects and weights and checks it.
+describe('edge border genome sweep', () => {
+  const KEYS = Object.keys(GENE_DEFINITIONS) as GeneKey[];
+  const MIN_VISIBLE_LENGTH = 0.004;
+
+  const corners = (): BaseGenome[] =>
+    Array.from({ length: 2 ** KEYS.length }, (_, mask) =>
+      KEYS.reduce(
+        (genome, key, bit) =>
+          withGene(genome, key, mask & (1 << bit) ? GENE_DEFINITIONS[key].max : GENE_DEFINITIONS[key].min),
+        { ...SIGNATURE_GENOME }
+      )
+    );
+
+  const segmentLength = (points: readonly { x: number; y: number }[]) =>
+    Math.hypot(points[1].x - points[0].x, points[1].y - points[0].y);
+
+  // One assertion over the whole sweep: thousands of `expect` calls would dominate the run time,
+  // and collecting the offenders gives a failure message that names the genome.
+  it('never produces a degenerate or non-finite ray or tick for any legal genome', () => {
+    const offenders: string[] = [];
+    let checked = 0;
+    for (const genome of corners()) {
+      for (const [aspect, density] of [[0.5, 0], [3.2, 1], [1.78, 0.5]] as const) {
+        for (const spec of buildEdgeBorder({ aspect, density, genome }).specs) {
+          checked += 1;
+          const isFinitePath = spec.points.every((p) => Number.isFinite(p.x) && Number.isFinite(p.y));
+          const isMeasured = (spec.kind === 'ray' || spec.kind === 'rule') && spec.points.length === 2;
+          const isTooShort = isMeasured && segmentLength(spec.points) < MIN_VISIBLE_LENGTH;
+          if (!isFinitePath || isTooShort) {
+            offenders.push(`${spec.kind} @ aspect ${aspect}, density ${density}: ${JSON.stringify(genome)}`);
+          }
+        }
+      }
+    }
+
+    expect(checked).toBeGreaterThan(100_000);
+    expect(offenders.slice(0, 3)).toEqual([]);
+  }, 60_000);
 });
