@@ -23,6 +23,8 @@ import {
 import { SIGNATURE_GENOME, clampGenome } from '@/features/art-deco-frame';
 import { createScreenBorderRig, type ScreenBorderRig } from '@/features/art-deco-frame';
 import { getCinemaCameraPose, resolveViewportFit, ViewportFit } from './responsiveLayout';
+import type { PremiereSceneApi } from './sceneApi';
+import { createPrng, DUST_SEED } from '@/shared/lib/prng';
 
 const CinemaNitrateShader = {
   uniforms: {
@@ -93,7 +95,17 @@ export interface PlaybackTelemetry {
   isPlaying: boolean;
 }
 
-export class GatsbySceneManager {
+/** Seconds before the frozen frame is reported as ready for screenshots. */
+const FRAME_READY_FRAMES = 3;
+
+export interface GatsbySceneManagerOptions {
+  onTelemetry?: (t: PlaybackTelemetry) => void;
+  onChapterChange?: (idx: number) => void;
+  /** Test affordance: pin the sequence to this time and stop playback. */
+  freezeAt?: number;
+}
+
+export class GatsbySceneManager implements PremiereSceneApi {
   private container: HTMLElement;
   private renderer: THREE.WebGLRenderer;
   private scene: THREE.Scene;
@@ -146,22 +158,23 @@ export class GatsbySceneManager {
   private rafId: number | null = null;
   private clock = new THREE.Clock();
   private lastChapterIdx = -1;
+  private freezeAt: number | null = null;
+  private framesRendered = 0;
 
   private onTelemetry?: (telemetry: PlaybackTelemetry) => void;
   private onChapterChange?: (chapterIdx: number) => void;
 
-  constructor(
-    container: HTMLElement,
-    callbacks?: {
-      onTelemetry?: (t: PlaybackTelemetry) => void;
-      onChapterChange?: (idx: number) => void;
-    }
-  ) {
+  constructor(container: HTMLElement, options?: GatsbySceneManagerOptions) {
     this.container = container;
     this.hasCoarsePointer =
       window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
-    this.onTelemetry = callbacks?.onTelemetry;
-    this.onChapterChange = callbacks?.onChapterChange;
+    this.onTelemetry = options?.onTelemetry;
+    this.onChapterChange = options?.onChapterChange;
+    this.freezeAt = options?.freezeAt ?? null;
+    if (this.freezeAt !== null) {
+      this.currentTime = this.freezeAt;
+      this.isPlaying = false;
+    }
 
     const width = Math.max(1, container.clientWidth);
     const height = Math.max(1, container.clientHeight);
@@ -358,12 +371,13 @@ export class GatsbySceneManager {
     const scales = new Float32Array(count);
     const phases = new Float32Array(count);
 
+    const random = createPrng(DUST_SEED);
     for (let i = 0; i < count; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 24;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 14;
-      positions[i * 3 + 2] = 12 - Math.random() * 136; // spans entire theatrical Z corridor
-      scales[i] = 0.4 + Math.random() * 1.8;
-      phases[i] = Math.random() * Math.PI * 2;
+      positions[i * 3] = (random() - 0.5) * 24;
+      positions[i * 3 + 1] = (random() - 0.5) * 14;
+      positions[i * 3 + 2] = 12 - random() * 136; // spans entire theatrical Z corridor
+      scales[i] = 0.4 + random() * 1.8;
+      phases[i] = random() * Math.PI * 2;
     }
 
     const dustGeo = new THREE.BufferGeometry();
@@ -569,6 +583,7 @@ export class GatsbySceneManager {
   };
 
   private handlePointerMove = (e: PointerEvent) => {
+    if (this.freezeAt !== null) return;
     const nx = (e.clientX / Math.max(1, window.innerWidth)) * 2 - 1;
     const ny = -((e.clientY / Math.max(1, window.innerHeight)) * 2 - 1);
     this.pointerTarget.set(nx, ny);
@@ -578,9 +593,9 @@ export class GatsbySceneManager {
     this.rafId = requestAnimationFrame(this.animate);
 
     const dt = Math.min(0.05, this.clock.getDelta());
-    const elapsed = this.clock.elapsedTime;
+    const elapsed = this.freezeAt ?? this.clock.elapsedTime;
 
-    if (this.isPlaying) {
+    if (this.freezeAt === null && this.isPlaying) {
       this.currentTime += dt;
       if (this.currentTime >= TOTAL_SEQUENCE_DURATION) {
         this.currentTime = 0;
@@ -732,6 +747,7 @@ export class GatsbySceneManager {
     this.screenBorderRig.update(elapsed);
 
     this.composer.render();
+    if (this.freezeAt !== null) this.markFrameReady();
 
     this.onTelemetry?.({
       currentTime: this.currentTime,
@@ -739,6 +755,12 @@ export class GatsbySceneManager {
       isPlaying: this.isPlaying,
     });
   };
+
+  /** Screenshot tests wait for three composited frames before capturing. */
+  private markFrameReady(): void {
+    this.framesRendered += 1;
+    if (this.framesRendered === FRAME_READY_FRAMES) this.container.dataset.frameReady = 'true';
+  }
 
   public dispose() {
     if (this.rafId !== null) {

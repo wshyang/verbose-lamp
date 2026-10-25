@@ -24,6 +24,7 @@ export interface FrameStudioTarget {
 }
 
 const detailPercent = (value: number) => Math.round(value * 100);
+const SEED_REROLL_RANGE = 1_000_000;
 const detailValue = (percent: number) => Math.min(1, Math.max(0, percent / 100));
 
 const defaultFrameFormula = (): FrameFormula => ({
@@ -111,6 +112,12 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
   const setDetail = useCallback(
     (percent: number) => commitSequence(formula, detailValue(percent)),
     [commitSequence, formula]
+  );
+
+  /** A fresh lattice pattern from a new seed; the choreography is unchanged. */
+  const rerollPattern = useCallback(
+    () => commitSequence({ ...formula, seed: Math.floor(Math.random() * SEED_REROLL_RANGE) }, intricacy),
+    [commitSequence, formula, intricacy]
   );
 
   const setBorderWeight = useCallback(
@@ -204,6 +211,7 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
     detailPresets: INTRICACY_PRESETS,
     activePreset,
     isDesignPattern: formula.source === 'authored',
+    rerollPattern,
     setLayerEnabled,
     setLayerLevel,
     proportionsOpen,

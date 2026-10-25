@@ -13,6 +13,7 @@ export function CinematicStage({ mountRef, cameraMode, hudHidden }: CinematicSta
     <>
       <div
         ref={mountRef}
+        data-testid="cinematic-stage__canvas"
         className={cn(
           'absolute inset-0 h-full w-full',
           cameraMode === 'orbit' && 'cursor-grab active:cursor-grabbing'

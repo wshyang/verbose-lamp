@@ -1,5 +1,6 @@
 import { FrameArchetype } from '../../model/types';
 import { buildCoreFrameSpecs } from './archetypes';
+import { buildLatticeSpecs } from './latticeSource';
 import { FrameFormula, Point2, PolylineSpec, RailKind } from './types';
 
 /* -------------------------------------------------------------------------- */
@@ -256,6 +257,16 @@ export function buildGenerativeFrameSpecs(
   const box = frameBox(archetype, mainWidth);
   const level = clampGenesisLevel(formula.level);
 
+  if (formula.source === 'lattice') {
+    const lattice = buildLatticeSpecs({
+      box,
+      level,
+      seed: formula.seed,
+      includePrimaryFrame: options.includePrimaryFrame !== false,
+    });
+    return withMonogram(lattice, archetype, mainWidth, options.includeMonogram);
+  }
+
   const rightHalf =
     formula.source === 'fractal'
       ? buildFractal(box, level)
@@ -264,9 +275,17 @@ export function buildGenerativeFrameSpecs(
         : buildArcade(box, level);
 
   const pattern = options.includePrimaryFrame === false ? rightHalf.slice(1) : rightHalf;
-  const specs = mirrorHalves(pattern);
-  if (archetype !== 'monogram_gate' || options.includeMonogram === false) return specs;
+  return withMonogram(mirrorHalves(pattern), archetype, mainWidth, options.includeMonogram);
+}
 
+/** The authored G/pinstripe letterforms every source must preserve. */
+function withMonogram(
+  specs: PolylineSpec[],
+  archetype: FrameArchetype,
+  mainWidth: number,
+  includeMonogram: boolean | undefined
+): PolylineSpec[] {
+  if (archetype !== 'monogram_gate' || includeMonogram === false) return specs;
   const glyph = buildCoreFrameSpecs('monogram_gate', mainWidth).filter(
     (s) => s.kind === 'monogram' || s.kind === 'pinstripe'
   );

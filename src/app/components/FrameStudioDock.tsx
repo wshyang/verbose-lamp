@@ -34,6 +34,7 @@ export function FrameStudioDock({ studio, hudHidden }: FrameStudioDockProps) {
           borderWeight={studio.borderWeight}
           onSurfaceChange={studio.setSurface}
           onPatternChange={studio.selectPattern}
+          onRerollPattern={studio.rerollPattern}
           onLayerToggle={studio.setLayerEnabled}
           onLayerLevelChange={studio.setLayerLevel}
           onDesignChange={studio.selectDesign}

@@ -5,6 +5,7 @@ import { clamp01, easeInQuad, easeOutCubic, quadBezier } from '../../model/timel
 import type { NormPoint, OrbTransitionParams } from '../../model/types';
 import { createParticlePool, type ParticlePool } from '../../particles/particlePool';
 import { createSpriteCache, drawSparkTrail, type SpriteCache } from '../../particles/sparkRenderer';
+import { drawSparklerHead } from '../sparklers/sparklerRenderer';
 import { planOrbCrossfade, planOrbTransition, type OrbPlan } from './orbPlan';
 
 function drawFlash(plan: OrbPlan, t: number, frame: FrameInfo): void {
@@ -40,40 +41,35 @@ interface FireOrb {
   index: number;
 }
 
+/**
+ * The flying "orb" is a party sparkler held at the travelling point: a
+ * crackling head with a comet of sparks behind it (ADDENDUM-025 §3). The
+ * transition choreography is unchanged — only the look of the head.
+ */
 function drawFireOrb(orb: FireOrb, frame: FrameInfo): void {
   const { x, y, dirX, dirY, t, index: idx } = orb;
   const { ctx, fade } = frame;
   const scale = Math.min(frame.w, frame.h) / 700;
   const back = Math.atan2(-dirY, -dirX);
+  const seed = 1925 + idx * 7919;
   for (let i = 0; i < 6; i += 1) {
-    const jitter = (hash01(idx * 31 + i, Math.floor(t / 60)) - 0.5) * 0.9;
-    const len = (26 + hash01(i, Math.floor(t / 90)) * 30) * scale;
+    const jitter = (hash01(seed + i, Math.floor(t / 60)) - 0.5) * 1.1;
+    const len = (30 + hash01(i + seed, Math.floor(t / 90)) * 42) * scale;
     const a = back + jitter;
     const tx = x + Math.cos(a) * len;
     const ty = y + Math.sin(a) * len;
     const g = ctx.createLinearGradient(x, y, tx, ty);
-    g.addColorStop(0, `rgba(255,190,90,${0.5 * fade})`);
+    g.addColorStop(0, `rgba(255,214,132,${0.58 * fade})`);
     g.addColorStop(1, 'rgba(220,80,20,0)');
     ctx.strokeStyle = g;
-    ctx.lineWidth = (7 - i) * scale;
+    ctx.lineWidth = Math.max(0.8, (5 - i * 0.7) * scale);
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.lineTo(tx, ty);
     ctx.stroke();
   }
-  for (const [r, color] of [
-    [40, `rgba(255,120,30,${0.35 * fade})`],
-    [22, `rgba(255,190,80,${0.8 * fade})`],
-    [10, `rgba(255,252,240,${fade})`],
-  ] as const) {
-    const g = ctx.createRadialGradient(x, y, 0, x, y, r * scale);
-    g.addColorStop(0, color);
-    g.addColorStop(1, 'rgba(255,120,30,0)');
-    ctx.fillStyle = g;
-    ctx.beginPath();
-    ctx.arc(x, y, r * scale, 0, Math.PI * 2);
-    ctx.fill();
-  }
+  const heat = 0.82 + hash01(seed, Math.floor(t / 50)) * 0.18;
+  drawSparklerHead({ ctx, x, y, radius: 17 * scale, heat, fade, seed, tMs: t, rayCount: 18 });
 }
 
 function orbPosition(plan: OrbPlan, trackIdx: number, t: number): { p: NormPoint; dx: number; dy: number } | null {

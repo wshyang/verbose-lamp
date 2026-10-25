@@ -38,6 +38,8 @@ interface FrameStudioControlProps {
   borderWeight: number;
   onSurfaceChange: (surface: FrameSurface) => void;
   onPatternChange: (source: FrameSource) => void;
+  /** Reroll the seeded Deco Lattice pattern (ADDENDUM-021 §3.5). */
+  onRerollPattern: () => void;
   onLayerToggle: (source: FrameLayerSource, enabled: boolean) => void;
   onLayerLevelChange: (source: FrameLayerSource, level: number) => void;
   onDesignChange: (index: number) => void;
@@ -129,6 +131,17 @@ export const FrameStudioControl: React.FC<FrameStudioControlProps> = (props) => 
             <p className="text-[10px] font-editorial leading-snug text-[#d9c7a3]/75">
               Keep the authored frame as your base, or build from another foundation.
             </p>
+            {props.baseSource === 'lattice' && (
+              <button
+                type="button"
+                onClick={props.onRerollPattern}
+                className={`w-full px-2 py-1.5 text-[9px] tracking-[0.12em] uppercase ${chip(false)}`}
+                title="Draw a new seeded lattice pattern"
+                data-testid="frame-studio__reroll"
+              >
+                Reroll pattern
+              </button>
+            )}
           </div>
 
           {props.isDesignPattern && (

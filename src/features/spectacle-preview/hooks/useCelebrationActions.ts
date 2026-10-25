@@ -28,5 +28,12 @@ export function useCelebrationActions({ runner, origin, seed, onCountdownComplet
     run('name-reveal', 'name-reveal', { name: 'Jay Gatsby', subtitle: 'Lucky draw winner' });
   }, [run]);
 
-  return { playConfetti, playCountdown, playNameReveal };
+  const playSparklers = useCallback(
+    (count: number) => {
+      run(`sparkler-${count}`, 'sparkler', { origin, count, seed, intensity: 0.9 });
+    },
+    [run, origin, seed],
+  );
+
+  return { playConfetti, playCountdown, playNameReveal, playSparklers };
 }

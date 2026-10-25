@@ -60,6 +60,7 @@ export function PremiereTimeline({
                 key={chapter.id}
                 onClick={() => onSelectAct(index)}
                 variant={index === activeAct ? 'selected' : 'panel'}
+                aria-pressed={index === activeAct}
                 size="small"
                 className="whitespace-nowrap tracking-[0.18em]"
                 data-testid="timeline__chapter"

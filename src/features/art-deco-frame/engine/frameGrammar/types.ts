@@ -18,7 +18,11 @@ export type RailKind =
   | 'column'
   | 'chevron'
   | 'ray'
-  | 'arch';
+  | 'arch'
+  /** Deco Lattice parallel strand bundles (ADDENDUM-021). */
+  | 'strand'
+  /** Deco Lattice reed rows: thin equal-gap ticks. */
+  | 'reed';
 
 export interface PolylineSpec {
   points: Point2[];
@@ -56,7 +60,7 @@ export const INTRICACY_PRESETS: readonly IntricacyPreset[] = [
 /*  FRAME GENESIS (ADDENDUM-004): the rule that draws the base rails           */
 /* -------------------------------------------------------------------------- */
 
-export type FrameSource = 'authored' | 'fractal' | 'rosette' | 'arcade';
+export type FrameSource = 'authored' | 'fractal' | 'rosette' | 'arcade' | 'lattice';
 export type FrameLayerSource = Exclude<FrameSource, 'authored'>;
 export type FrameSurface = 'title-cards' | 'screen-border';
 
@@ -73,6 +77,8 @@ export interface FrameFormula {
   level: number;
   /** Proportion genes; the signature genome reproduces the delivered frame. */
   genome: BaseGenome;
+  /** Seed for the seeded lattice source (ADDENDUM-021 §3.5). */
+  seed?: number;
   /** Optional decorative patterns composited over the foundation. */
   layers?: readonly FramePatternLayer[];
 }
@@ -112,6 +118,12 @@ export const FRAME_SOURCES: readonly FrameSourceInfo[] = [
     blurb: 'Recursive bays of stepped arches between piers, each level nested inward.',
     isGenerative: true,
   },
+  {
+    id: 'lattice',
+    label: 'Deco Lattice',
+    blurb: 'The film\'s parallel-line bundles on a 45° lattice, built from a seed.',
+    isGenerative: true,
+  },
 ] as const;
 
 export const FRAME_LAYER_SOURCES: readonly (FrameSourceInfo & { id: FrameLayerSource })[] = Object.freeze(
@@ -124,6 +136,7 @@ export const DEFAULT_FRAME_LAYERS: readonly FramePatternLayer[] = [
   { source: 'fractal', enabled: false, level: 2 },
   { source: 'rosette', enabled: false, level: 2 },
   { source: 'arcade', enabled: false, level: 2 },
+  { source: 'lattice', enabled: false, level: 3 },
 ] as const;
 
 export const DEFAULT_FRAME_FORMULA: FrameFormula = {

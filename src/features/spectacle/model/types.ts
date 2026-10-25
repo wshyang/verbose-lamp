@@ -94,6 +94,16 @@ export interface NameRevealParams {
   durationMs?: number;
 }
 
+export interface SparklerParams {
+  origin: NormPoint;
+  /** 1 = one handheld sparkler, up to 5 for a fan. */
+  count?: number;
+  seed?: number;
+  /** 0..1 — density, head size and smoke. */
+  intensity?: number;
+  durationMs?: number;
+}
+
 export interface FlashParams {
   origin?: NormPoint;
   durationMs?: number;
@@ -108,6 +118,7 @@ export interface EffectParamsMap {
   searchlights: SearchlightParams;
   countdown: CountdownParams;
   'name-reveal': NameRevealParams;
+  sparkler: SparklerParams;
   flash: FlashParams;
 }
 

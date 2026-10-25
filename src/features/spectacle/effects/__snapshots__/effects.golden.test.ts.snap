@@ -155,8 +155,8 @@ exports[`effect golden recordings > name reveal draws identically (reduced motio
 exports[`effect golden recordings > orbs corners inward draws identically (full motion) 1`] = `
 {
   "announced": [],
-  "calls": 12277,
-  "hash": "26815c1c35b0a0331ee55fc0ade770c56ec6f909",
+  "calls": 18965,
+  "hash": "29d2fd8e3a7075b81fb5c09bcd1299b3dcdf973c",
   "status": "done",
 }
 `;
@@ -173,8 +173,8 @@ exports[`effect golden recordings > orbs corners inward draws identically (reduc
 exports[`effect golden recordings > orbs corners outward draws identically (full motion) 1`] = `
 {
   "announced": [],
-  "calls": 7374,
-  "hash": "36458a5101f1f171dc90f9f301eb0d45049478fb",
+  "calls": 14690,
+  "hash": "ce8299b36616e15b8eb96e6f9eaaa3dce83f24eb",
   "status": "done",
 }
 `;
@@ -191,8 +191,8 @@ exports[`effect golden recordings > orbs corners outward draws identically (redu
 exports[`effect golden recordings > orbs sides inward draws identically (full motion) 1`] = `
 {
   "announced": [],
-  "calls": 8955,
-  "hash": "1d9c0e66bd6d0a6882aa6bf82f04a604b85402d9",
+  "calls": 12309,
+  "hash": "a0f37e9ce3d20ed9a17005cb3a52a115814cb2e3",
   "status": "done",
 }
 `;
@@ -209,8 +209,8 @@ exports[`effect golden recordings > orbs sides inward draws identically (reduced
 exports[`effect golden recordings > orbs sides outward draws identically (full motion) 1`] = `
 {
   "announced": [],
-  "calls": 3750,
-  "hash": "bd8e1de0548d8b003818e1e69173559588e4741f",
+  "calls": 7388,
+  "hash": "592c61aad98b0ccc3b54614461d528ed30278149",
   "status": "done",
 }
 `;
@@ -239,6 +239,42 @@ exports[`effect golden recordings > searchlights draws identically (reduced moti
   "calls": 3660,
   "hash": "a6a8843664f534b243b9c9ca5e66c4fd3a25fe05",
   "status": "running",
+}
+`;
+
+exports[`effect golden recordings > sparkler fan draws identically (full motion) 1`] = `
+{
+  "announced": [],
+  "calls": 404031,
+  "hash": "4eaf96c9cf52c3182b5cb472dca3e90ec35dec26",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > sparkler fan draws identically (reduced motion) 1`] = `
+{
+  "announced": [],
+  "calls": 4375,
+  "hash": "92ec2578f6fae84e36c4385112f4493b64748714",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > sparkler single draws identically (full motion) 1`] = `
+{
+  "announced": [],
+  "calls": 95399,
+  "hash": "6af04a2f4980cc6f36b5c9628a298195076c07d4",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > sparkler single draws identically (reduced motion) 1`] = `
+{
+  "announced": [],
+  "calls": 875,
+  "hash": "6f6eda2821c920dfc0a765f2e9a2810922469bbe",
+  "status": "done",
 }
 `;
 
