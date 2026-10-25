@@ -10,6 +10,12 @@ export const SUNBURST_DEMOS = [
   { key: 'sunburst-fan', label: 'Deco fan', variant: 'fan' },
 ] as const;
 
+/** Party sparklers: a single head or a fanned show. `key` is the effect-run id. */
+export const SPARKLER_DEMOS = [
+  { key: 'sparkler-1', label: 'Party sparkler', count: 1 },
+  { key: 'sparkler-5', label: 'Sparkler fan ×5', count: 5 },
+] as const;
+
 export const DEFAULT_NAV_LINES = [
   '🏛️,Foyer',
   '🎷,Program',

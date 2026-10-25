@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import type { EffectRunner } from './useEffectRunner';
 
 const COUNTDOWN_FROM = 5;
+const SPARKLER_INTENSITY = 0.9;
 
 interface CelebrationInputs {
   runner: EffectRunner;
@@ -11,7 +12,7 @@ interface CelebrationInputs {
   onCountdownComplete: () => void;
 }
 
-/** Confetti, countdown and the gilded name reveal. */
+/** Confetti, countdown, the gilded name reveal and party sparklers. */
 export function useCelebrationActions({ runner, origin, seed, onCountdownComplete }: CelebrationInputs) {
   const { run } = runner;
 
@@ -28,5 +29,12 @@ export function useCelebrationActions({ runner, origin, seed, onCountdownComplet
     run('name-reveal', 'name-reveal', { name: 'Jay Gatsby', subtitle: 'Lucky draw winner' });
   }, [run]);
 
-  return { playConfetti, playCountdown, playNameReveal };
+  const playSparklers = useCallback(
+    (count: number) => {
+      run(`sparkler-${count}`, 'sparkler', { origin, count, seed, intensity: SPARKLER_INTENSITY });
+    },
+    [run, origin, seed],
+  );
+
+  return { playConfetti, playCountdown, playNameReveal, playSparklers };
 }
