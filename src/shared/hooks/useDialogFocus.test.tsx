@@ -6,7 +6,7 @@ import { getFocusableElements, useDialogFocus } from './useDialogFocus';
 
 /**
  * Focus moves into a dialog one frame after it opens, and back to the trigger when
- * it closes (ADDENDUM-043). That one frame is why `useEscapeKey` exists as a second
+ * it closes (ADDENDUM-033). That one frame is why `useEscapeKey` exists as a second
  * path, so both halves need to be pinned.
  */
 const nextFrame = () => new Promise((resolve) => requestAnimationFrame(() => resolve(null)));

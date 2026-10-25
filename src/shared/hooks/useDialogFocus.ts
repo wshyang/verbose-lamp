@@ -14,7 +14,7 @@ export function getFocusableElements(container: HTMLElement): HTMLElement[] {
  * Moves focus into a dialog when it opens, and back to the trigger when it closes.
  *
  * The move happens on the next animation frame so the panel is laid out first. That
- * one-frame gap is why a window-level Escape listener is needed as well (ADDENDUM-043):
+ * one-frame gap is why a window-level Escape listener is needed as well (ADDENDUM-033):
  * anything pressed in the gap has no focused dialog to reach.
  */
 export function useDialogFocus(open: boolean, dialogRef: RefObject<HTMLElement | null>): void {

@@ -1,5 +1,5 @@
 /**
- * Whether the Frame Studio should be showing when the page loads (ADDENDUM-044).
+ * Whether the Frame Studio should be showing when the page loads (ADDENDUM-033).
  *
  * The panel is a 320 px column pinned to the right edge. On a desktop that is a
  * dock beside the stage; on a phone it is most of the screen — and it is on top,

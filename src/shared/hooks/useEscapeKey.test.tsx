@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { useEscapeKey } from './useEscapeKey';
 
 /**
- * The window-level Escape contract (ADDENDUM-043). `Dialog` depends on this hook,
+ * The window-level Escape contract (ADDENDUM-033). `Dialog` depends on this hook,
  * and the reason it exists — a keypress that never reaches the dialog — is exactly
  * what a test that fires inside the dialog cannot see.
  */

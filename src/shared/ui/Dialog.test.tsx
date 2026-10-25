@@ -225,7 +225,7 @@ describe('Dialog focus restoration edge cases', () => {
 });
 
 /**
- * The dialog's Escape contract (ADDENDUM-043).
+ * The dialog's Escape contract (ADDENDUM-033).
  *
  * The original test for this lived three levels up, in a modal that types into one
  * of its own fields first — which is exactly why it passed: focus was already

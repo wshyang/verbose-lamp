@@ -1,5 +1,5 @@
 /**
- * Font readiness (ADDENDUM-030).
+ * Font readiness (ADDENDUM-033).
  *
  * The sequence rasterises type on a canvas — `Cinzel` in the lucky drum,
  * `Cinzel Decorative` in the countdown and the name reveal. Canvas drawing does not
