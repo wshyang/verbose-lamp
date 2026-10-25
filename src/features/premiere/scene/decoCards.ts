@@ -115,7 +115,9 @@ export function createGatsbyCardRig(
         tracking: isHero ? 0.32 : 0.42,
         weight: 'regular',
       });
-      topRig.group.position.set(0, isHero ? 2.48 : 1.18, 0.16);
+      // In front of the keystone plate's crest (z 0.14): at 0.16 the letters'
+      // back half sat inside the plate's extrusion and the rails cut through them.
+      topRig.group.position.set(0, isHero ? 2.48 : 1.18, 0.24);
       root.add(topRig.group);
       textRigs.push(topRig);
     }
@@ -123,14 +125,17 @@ export function createGatsbyCardRig(
     if (botStr.trim()) {
       const botRig = createExtrudedDecoTextMesh({
         text: botStr,
-        worldHeight: isHero ? 0.23 : 0.25,
+        worldHeight: isHero ? 0.18 : 0.25,
         extrudeDepth: 0.05,
         finish: 'pure-gold',
         alternatePinstripes: false,
         tracking: 0.34,
         weight: 'fine',
       });
-      botRig.group.position.set(0, isHero ? -2.62 : -1.18, 0.12);
+      // The credit belongs in the lower pediment's one clear band: below the
+      // diamond (bottom -1.64) and above the inner frame's bottom rail (-1.90).
+      // At -2.62 it sat on the fan, with the rays crossing the words.
+      botRig.group.position.set(0, isHero ? -1.77 : -1.18, 0.22);
       root.add(botRig.group);
       textRigs.push(botRig);
     }

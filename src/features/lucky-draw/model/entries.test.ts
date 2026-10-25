@@ -23,3 +23,17 @@ describe('validateEntries', () => {
     expect(pool.map((e) => e.id)).toEqual(['buchanan-d']);
   });
 });
+
+describe('validateEntries edge cases', () => {
+  it('flags an entry that lost its id and one with no name', () => {
+    const result = validateEntries([
+      { id: '', name: 'Nobody' },
+      { id: 'g2', name: '' },
+    ]);
+
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.issues.join(" ")).toContain('missing its id');
+    expect(result.issues.join(" ")).toContain('empty name');
+  });
+});

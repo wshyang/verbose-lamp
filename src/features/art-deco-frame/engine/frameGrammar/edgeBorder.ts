@@ -7,8 +7,13 @@
  * Pure and deterministic. Adapted to our PolylineSpec/RailKind so it renders through
  * the same chamfered gold geometry and trim shader as the title cards.
  */
+// Deep imports on purpose: the engine must not pull the deco-lattice barrel,
+// which exports a React component, into a pure module (CLAUDE.md §2).
+import { buildNineSlice } from '@/features/deco-lattice/model/nineSlice';
+import { brassAngleFor, toneForLayer } from '@/features/deco-lattice/model/tone';
+import type { LatticeSpec } from '@/features/deco-lattice/model/lattice';
 import { BaseGenome, clampGenome } from './genome';
-import { PolylineSpec, Point2, RailKind } from './types';
+import { PolylineSpec, Point2, RailKind, ScreenBorderPattern } from './types';
 
 export interface EdgeBorderRequest {
   /** width / height of the viewport */
@@ -16,6 +21,10 @@ export interface EdgeBorderRequest {
   genome?: BaseGenome;
   /** 0..1 — how many nested rules and how dense the reeding */
   density: number;
+  /** `'poster'` (default) or the Deco Lattice proscenium. */
+  pattern?: ScreenBorderPattern;
+  /** Seed for the lattice proscenium's brass angles; default 1925. */
+  seed?: number;
 }
 
 export interface EdgeBorderGeometry {
@@ -252,10 +261,47 @@ function innerHairline(aspect: number, density: number): PolylineSpec[] {
   ];
 }
 
+const LATTICE_DEFAULT_SEED = 1925;
+const LATTICE_DEPTH_RATIO = 1.7;
+const LATTICE_MIN_DEPTH = 0.012;
+const LATTICE_Z_STEP = 0.012;
+
+/** Grammar kind of a lattice rail, so intricacy drops the right parts first. */
+function latticeKind(spec: LatticeSpec): RailKind {
+  if (spec.rank === 0) return 'frame';
+  if (spec.layer <= 1) return 'rule';
+  return spec.rank >= 3 ? 'reed' : 'diamond';
+}
+
+/**
+ * The Deco Lattice proscenium: a nine-slice border with a clear aperture, so the
+ * picture still reads while the frame carries the film's line style. Tone and
+ * gradient angle come from the layer and the seed (ADDENDUM-021 §3.6).
+ */
+export function buildLatticeProscenium(aspect: number, density: number, seed = LATTICE_DEFAULT_SEED): EdgeBorderGeometry {
+  const { specs } = buildNineSlice({ hw: aspect, hh: 1, density, level: 1 + Math.round(density * 3) });
+  const converted: PolylineSpec[] = specs.map((spec) => ({
+    points: spec.points.map((point) => ({ x: snap(point.x), y: snap(point.y) })),
+    closed: spec.closed ?? false,
+    width: spec.width,
+    depth: Math.max(spec.width * LATTICE_DEPTH_RATIO, LATTICE_MIN_DEPTH),
+    z: -spec.layer * LATTICE_Z_STEP,
+    delay: 0.06 + spec.layer * 0.06 + spec.rank * 0.01,
+    kind: latticeKind(spec),
+    partDir: 0,
+    tone: toneForLayer(spec.layer),
+    brassAngle: brassAngleFor(seed, spec.layer),
+  }));
+  const extentX = Math.max(...converted.flatMap((spec) => spec.points.map((point) => Math.abs(point.x))));
+  const extentY = Math.max(...converted.flatMap((spec) => spec.points.map((point) => Math.abs(point.y))));
+  return { specs: converted, extentX, extentY };
+}
+
 export function buildEdgeBorder(request: EdgeBorderRequest): EdgeBorderGeometry {
   const aspect = Math.min(3.2, Math.max(0.5, request.aspect));
   const genome = clampGenome(request.genome);
   const density = Math.min(1, Math.max(0, request.density));
+  if (request.pattern === 'lattice') return buildLatticeProscenium(aspect, density, request.seed);
   const nestedCount = Math.min(MAX_NESTED_RULES, 1 + Math.round(density * 3));
 
   const specs = [

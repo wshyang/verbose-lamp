@@ -76,6 +76,16 @@ const VARIANTS: readonly { pattern: BackdropPattern; bands: number }[] = [
   { pattern: { kind: 'swirl', swirl: 4, frequency: 5, ripple: 10, scale: 5 }, bands: 2 },
 ];
 
+describe('the pattern switch', () => {
+  it('refuses an unknown pattern kind instead of guessing a field', () => {
+    const frame = { size: 4, bands: 6 };
+
+    expect(() => fieldAt({ x: 0, y: 0 }, frame, { kind: 'laser' } as unknown as BackdropPattern)).toThrow(
+      'Unhandled backdrop pattern: {"kind":"laser"}'
+    );
+  });
+});
+
 describe('pattern fields', () => {
   it('reproduce the reference band functions on the 128 grid', () => {
     for (const { pattern, bands } of VARIANTS) {

@@ -12,6 +12,7 @@ import {
   FrameStyle,
   FrameSurface,
   INTRICACY_PRESETS,
+  ScreenBorderPattern,
   ScreenBorderStyle,
 } from '@/features/art-deco-frame';
 import { SIGNATURE_GENOME, clampGenome, withGene, type GeneKey } from '@/features/art-deco-frame';
@@ -24,6 +25,7 @@ export interface FrameStudioTarget {
 }
 
 const detailPercent = (value: number) => Math.round(value * 100);
+const SEED_REROLL_RANGE = 1_000_000;
 const detailValue = (percent: number) => Math.min(1, Math.max(0, percent / 100));
 
 const defaultFrameFormula = (): FrameFormula => ({
@@ -113,8 +115,29 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
     [commitSequence, formula]
   );
 
+  /** A fresh lattice pattern from a new seed; the choreography is unchanged. */
+  const rerollPattern = useCallback(
+    () => commitSequence({ ...formula, seed: Math.floor(Math.random() * SEED_REROLL_RANGE) }, intricacy),
+    [commitSequence, formula, intricacy]
+  );
+
   const setBorderWeight = useCallback(
     (weight: number) => commitBorder({ ...border, weight: detailValue(weight) }),
+    [border, commitBorder]
+  );
+
+  /** Switch the proscenium between the printed poster edge and Deco Lattice. */
+  const setBorderPattern = useCallback(
+    (pattern: ScreenBorderPattern) => {
+      if (pattern === (border.pattern ?? 'poster')) return;
+      commitBorder({ ...border, pattern });
+    },
+    [border, commitBorder]
+  );
+
+  /** A fresh proscenium seed; only the brass angles and ornament move. */
+  const rerollBorder = useCallback(
+    () => commitBorder({ ...border, seed: Math.floor(Math.random() * SEED_REROLL_RANGE) }),
     [border, commitBorder]
   );
 
@@ -204,6 +227,7 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
     detailPresets: INTRICACY_PRESETS,
     activePreset,
     isDesignPattern: formula.source === 'authored',
+    rerollPattern,
     setLayerEnabled,
     setLayerLevel,
     proportionsOpen,
@@ -212,6 +236,9 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
     setGene: setGeneForSurface,
     borderEnabled,
     setBorderEnabled,
+    borderPattern: border.pattern ?? 'poster',
+    setBorderPattern,
+    rerollBorder,
     borderWeight: detailPercent(border.weight),
     setBorderWeight,
     resetAll,

@@ -1,4 +1,5 @@
-import { Crown, PartyPopper, Timer } from 'lucide-react';
+import { Crown, PartyPopper, Sparkles, Timer } from 'lucide-react';
+import { SPARKLER_DEMOS } from '../data/previewCatalogue';
 import type { SpectaclePreview } from '../hooks/useSpectaclePreview';
 import { ActionButton, Section, ToggleRow } from './PanelBits';
 
@@ -11,6 +12,16 @@ export function CelebrationSection({ preview: p }: { preview: SpectaclePreview }
         <ActionButton label="Confetti rain" icon={PartyPopper} onClick={() => p.playConfetti('rain')} testId="spectacle-preview__confetti" />
         <ActionButton label="Countdown 5→0" icon={Timer} active={p.playing.has('countdown')} onClick={p.playCountdown} testId="spectacle-preview__countdown" />
         <ActionButton label="Name reveal" icon={Crown} active={p.playing.has('name-reveal')} onClick={p.playNameReveal} testId="spectacle-preview__name-reveal" />
+        {SPARKLER_DEMOS.map((demo) => (
+          <ActionButton
+            key={demo.key}
+            label={demo.label}
+            icon={Sparkles}
+            active={p.playing.has(demo.key)}
+            onClick={() => p.playSparklers(demo.count)}
+            testId="spectacle-preview__sparkler"
+          />
+        ))}
       </div>
       <ToggleRow label="Marquee bulb border" checked={p.marqueeOn} onChange={p.setMarqueeOn} testId="spectacle-preview__marquee" />
     </Section>

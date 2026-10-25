@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 import type { DecoLatticeRequest } from '../model/composition';
 import { useDecoLatticePaths } from '../hooks/useDecoLatticePaths';
 import { BrassDefs } from './BrassDefs';
@@ -7,6 +7,8 @@ interface DecoLatticeFrameProps {
   request?: Partial<DecoLatticeRequest>;
   className?: string;
   children?: ReactNode;
+  /** Ref to the `<svg>`, so a host can export it (ADDENDUM-021 §3.5.4). */
+  svgRef?: Ref<SVGSVGElement>;
 }
 
 const LAYER_OPACITY = [1, 0.95, 0.85, 0.78] as const;
@@ -15,12 +17,13 @@ const LAYER_OPACITY = [1, 0.95, 0.85, 0.78] as const;
  * The film's octilinear line-bundle frame as live SVG with the tutorial's
  * brass finish: per-layer gradient angles, chisel edge, layered shadow.
  */
-export function DecoLatticeFrame({ request, className = '', children }: DecoLatticeFrameProps) {
+export function DecoLatticeFrame({ request, className = '', children, svgRef }: DecoLatticeFrameProps) {
   const { uid, groups, viewBox, aspectMode } = useDecoLatticePaths(request);
 
   return (
     <div className={`relative ${className}`} data-testid="deco-lattice-frame__root">
       <svg
+        ref={svgRef}
         viewBox={viewBox}
         preserveAspectRatio={aspectMode}
         className="absolute inset-0 h-full w-full"

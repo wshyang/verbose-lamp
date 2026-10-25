@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_TUNING, HAWKER_CROP, SECOND_HEAD, buildHawkerFrame, buildHawkerMatte } from '@/features/background-removal';
 import { DEFAULT_BACKDROPS, renderEnamelPanel } from '@/features/enamel-backdrop';
 import { GILDING_PRESETS } from '@/features/gilded-portrait';
-import { AVATAR_SIZE, composeAvatar, composeLayers, cutOutSubject, outlineRing } from './compose';
+import { AVATAR_SIZE, composeAvatar, composeLayers, cutOutSubject, emptySubject, outlineRing } from './compose';
 import { boxToPhoto, clampBox, moveBox, photoToBox, resizeBox, startingBox } from './cropBox';
 import { STAGE_HINTS, nextStage } from './stage';
 import type { AvatarComposition, StageFacts } from './types';
@@ -84,6 +84,31 @@ describe('composeAvatar', () => {
     const subject = cutOutSubject({ ...composition(), matte: null, size: 32 });
     expect(subject.alpha.data.every((value) => value === 255)).toBe(true);
     expect(outlineRing(subject.alpha).data.every((value) => value === 0)).toBe(true);
+  });
+
+  it('offers a transparent subject so the backdrop can be previewed first', () => {
+    const subject = emptySubject(8);
+
+    expect(subject.pixels.data.every((value) => value === 0)).toBe(true);
+    expect(subject.alpha.data.every((value) => value === 0)).toBe(true);
+    expect(subject.shine).toBe(0);
+    expect(outlineRing(subject.alpha).data.every((value) => value === 0)).toBe(true);
+  });
+
+  it('refuses layers that do not share one square size', () => {
+    const backdrop = renderEnamelPanel(DEFAULT_BACKDROPS[0].spec, 16);
+
+    expect(() =>
+      composeLayers({
+        backdrop,
+        subject: emptySubject(8),
+        rampId: 'bright',
+        frame: 'plaque',
+      })
+    ).toThrow(RangeError);
+    expect(() =>
+      composeLayers({ backdrop, subject: emptySubject(8), rampId: 'bright', frame: 'plaque' })
+    ).toThrow('Backdrop and subject layers must share one square size.');
   });
 
   it('matches the 16×16 composition data snapshot', () => {

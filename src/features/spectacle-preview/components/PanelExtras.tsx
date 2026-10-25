@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Gem, Shuffle } from 'lucide-react';
+import { Download, Gem, Shuffle } from 'lucide-react';
+import { DecoLatticeFrame, useLatticeExport } from '@/features/deco-lattice';
 import { GildedNavBar, resolveActiveId } from '@/features/gilded-ui';
 import type { SpectaclePreview } from '../hooks/useSpectaclePreview';
 import { Section, SliderRow } from './PanelBits';
@@ -39,6 +40,7 @@ export function GoldUiSection({ preview }: { preview: SpectaclePreview }) {
 
 /** Deco Lattice controls — the title medallion regenerates live. */
 export function LatticeSection({ preview }: { preview: SpectaclePreview }) {
+  const exporter = useLatticeExport(`deco-lattice-${preview.latticeSeed}`);
   return (
     <Section title="DECO LATTICE">
       <SliderRow label="Density" value={preview.latticeDensity} min={0} max={1} step={0.05} onChange={preview.setLatticeDensity} testId="spectacle-preview__lattice-density" />
@@ -63,6 +65,29 @@ export function LatticeSection({ preview }: { preview: SpectaclePreview }) {
       >
         <Shuffle size={12} aria-hidden /> Reroll pattern · seed {preview.latticeSeed}
       </button>
+      <DecoLatticeFrame
+        request={{ mode: 'medallion', seed: preview.latticeSeed, density: preview.latticeDensity, level: preview.latticeLevel }}
+        className="h-24 w-full border border-[#8a6a2f]/30 bg-[#0a0703]"
+        svgRef={exporter.svgRef}
+      />
+      <div className="grid grid-cols-2 gap-1.5">
+        <button
+          type="button"
+          onClick={exporter.exportSvg}
+          data-testid="spectacle-preview__lattice-export-svg"
+          className="flex items-center justify-center gap-1.5 border border-[#8a6a2f]/50 px-2 py-1.5 text-[10px] tracking-wider text-[#d8b878] transition hover:bg-[#8a6a2f]/20"
+        >
+          <Download size={11} aria-hidden /> Export SVG
+        </button>
+        <button
+          type="button"
+          onClick={() => void exporter.exportPng()}
+          data-testid="spectacle-preview__lattice-export-png"
+          className="flex items-center justify-center gap-1.5 border border-[#8a6a2f]/50 px-2 py-1.5 text-[10px] tracking-wider text-[#d8b878] transition hover:bg-[#8a6a2f]/20"
+        >
+          <Download size={11} aria-hidden /> Export PNG
+        </button>
+      </div>
       <p className="text-[10px] leading-4 text-[#9a7c48]">
         Octilinear bundles on a 45° lattice, D4 symmetry, octagram centre, reed rows — the film's line style, from rules and a seed.
       </p>

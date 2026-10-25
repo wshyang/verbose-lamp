@@ -2,15 +2,15 @@
 
 exports[`buildDecoLattice golden snapshots > default medallion keeps its geometry 1`] = `
 {
-  "hash": "1fd4633e56f22eaa473fda7d36a9d112bffd9e22",
-  "paths": 10,
-  "specs": 123,
+  "hash": "e6d42a16607188a0eb966142db067d237fb39b3a",
+  "paths": 11,
+  "specs": 243,
 }
 `;
 
 exports[`buildDecoLattice golden snapshots > invitation-panel preset keeps its geometry 1`] = `
 {
-  "hash": "8afeb59f64e0a9da4a4d475d663c56f8a59e2249",
+  "hash": "9788210219b92d73935bba76e03d50cc5e925658",
   "paths": 5,
   "specs": 24,
 }
@@ -18,7 +18,7 @@ exports[`buildDecoLattice golden snapshots > invitation-panel preset keeps its g
 
 exports[`buildDecoLattice golden snapshots > lucky-draw frame keeps its geometry 1`] = `
 {
-  "hash": "3d2f8166295a89b9f35db1f28fff757735bb4ab7",
+  "hash": "38cb8c10f443e194f3ea8b1d70aaf374a6df41c8",
   "paths": 5,
   "specs": 24,
 }
@@ -42,23 +42,23 @@ exports[`buildDecoLattice golden snapshots > medallion level 2 keeps its geometr
 
 exports[`buildDecoLattice golden snapshots > medallion level 3 keeps its geometry 1`] = `
 {
-  "hash": "b00eaa8c504812f1aceabb9221fb033b3500f922",
-  "paths": 7,
-  "specs": 27,
+  "hash": "581753a3413e30e4abdb3607b5e8d401d413aa55",
+  "paths": 8,
+  "specs": 147,
 }
 `;
 
 exports[`buildDecoLattice golden snapshots > medallion level 4 keeps its geometry 1`] = `
 {
-  "hash": "1fd4633e56f22eaa473fda7d36a9d112bffd9e22",
-  "paths": 10,
-  "specs": 123,
+  "hash": "e6d42a16607188a0eb966142db067d237fb39b3a",
+  "paths": 11,
+  "specs": 243,
 }
 `;
 
 exports[`buildDecoLattice golden snapshots > premiere-frame preset keeps its geometry 1`] = `
 {
-  "hash": "dd4de1faec2c16597ae15c218107388d0cd2ff61",
+  "hash": "ac2d3c7d908011da39a48e9b077eeebe862ed259",
   "paths": 8,
   "specs": 194,
 }
@@ -74,8 +74,8 @@ exports[`buildDecoLattice golden snapshots > screen-proscenium preset keeps its 
 
 exports[`buildDecoLattice golden snapshots > spooner-medallion preset keeps its geometry 1`] = `
 {
-  "hash": "1fd4633e56f22eaa473fda7d36a9d112bffd9e22",
-  "paths": 10,
-  "specs": 123,
+  "hash": "e6d42a16607188a0eb966142db067d237fb39b3a",
+  "paths": 11,
+  "specs": 243,
 }
 `;

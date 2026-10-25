@@ -34,6 +34,15 @@ describe('gilding pipeline', () => {
     expect(output.data[(4 * source.width + 4) * 4 + 3]).toBe(255);
   });
 
+  it('rejects images whose dimensions or buffer do not describe a real bitmap', () => {
+    expect(() =>
+      gildImage({ width: 0, height: 8, data: new Uint8ClampedArray(0) }, GILDING_PRESETS[0].params)
+    ).toThrow('Image dimensions must be positive integers.');
+    expect(() =>
+      gildImage({ width: 2, height: 2, data: new Uint8ClampedArray(4) }, GILDING_PRESETS[0].params)
+    ).toThrow('Image buffer size does not match its dimensions.');
+  });
+
   it('snapshots signature preset tone LUTs and the 8 by 8 fixture pixels', () => {
     const presetLuts = Object.fromEntries(
       GILDING_PRESETS.map((preset) => [preset.id, Array.from(buildGildingToneLut(preset.params)).join(',')])

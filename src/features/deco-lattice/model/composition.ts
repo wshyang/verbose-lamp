@@ -1,3 +1,4 @@
+import { mulberry32 } from '@/shared/lib/random';
 import { bundle } from './bundle';
 import type { LatticeSpec, Pt } from './lattice';
 import {
@@ -91,13 +92,10 @@ function layer3({ req, m, heavy, density }: LayerContext): readonly LatticeSpec[
     specs.push({ points: diagonalArm(0.38 * m, 0.045 * m), closed: true, width: heavy * 0.5, layer: 2, rank: 2 });
     specs.push({ points: axisArrow(0.46 * m, 0.12 * m), width: heavy * 0.5, layer: 2, rank: 2 });
   } else {
-    const bracket: readonly Pt[] = [
-      { x: req.hw - 0.55 * m, y: req.hh - 0.36 * m },
-      { x: req.hw - 0.48 * m, y: req.hh - 0.36 * m },
-      { x: req.hw - 0.36 * m, y: req.hh - 0.48 * m },
-      { x: req.hw - 0.36 * m, y: req.hh - 0.55 * m },
-    ];
-    specs.push(...bundle(bracket, { strands: 3, spacing: heavy * 0.6, width: heavy * 0.25, layer: 2, rank: 2 }));
+    specs.push(...bundle(frameBracket(req, m), {
+      strands: 2 + Math.round(mulberry32(seed + 1)() * 2),
+      spacing: heavy * 0.6, width: heavy * 0.25, layer: 2, rank: 2,
+    }));
   }
   return specs;
 }
@@ -120,6 +118,22 @@ function layer4({ req, m, heavy }: LayerContext): readonly LatticeSpec[] {
     specs.push({ points: tick, width: heavy * 0.3, layer: 3, rank: 3 });
   }
   return specs;
+}
+
+/**
+ * The frame-mode L3 bracket. Seeded along the edge, so "reroll" draws a new
+ * pattern; the 45° segment keeps every strand octilinear.
+ */
+function frameBracket(req: DecoLatticeRequest, m: number): readonly Pt[] {
+  const random = mulberry32(req.seed ?? 1925);
+  const along = 0.34 + random() * 0.14;
+  const arm = 0.07 + random() * 0.04;
+  return [
+    { x: req.hw - 0.55 * m, y: req.hh - along * m },
+    { x: req.hw - (0.55 - arm) * m, y: req.hh - along * m },
+    { x: req.hw - along * m, y: req.hh - (0.55 - arm) * m },
+    { x: req.hw - along * m, y: req.hh - 0.55 * m },
+  ];
 }
 
 /** The four-layer tutorial recipe, generated from rules and a seed. */

@@ -16,4 +16,13 @@ export default defineConfig({
       "@": path.resolve(__dirname, "src"),
     },
   },
+  // The dev server also runs inside a hosted preview, which reaches it through
+  // a proxied host name rather than localhost. Vite rejects unknown Host
+  // headers by default, so allow the sandbox preview suffix explicitly.
+  server: {
+    allowedHosts: [".e2b.app"],
+  },
+  preview: {
+    allowedHosts: [".e2b.app"],
+  },
 });

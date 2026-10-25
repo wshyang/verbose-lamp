@@ -119,6 +119,12 @@ describe('matte shapes and the segmenter loader', () => {
     expect(alphaOf({ data: [1, 2, 3, 4, 5, 6], width: 2, height: 1, channels: 3 })).toBeNull();
     expect(alphaOf({ data: [1, 2, 3], width: 2, height: 1 })).toBeNull();
     expect(planeOf(null)).toBeNull();
+    // An object that carries neither an alpha image nor a mask is not a matte.
+    expect(planeOf({})).toBeNull();
+    expect(planeOf([{ width: 2, height: 1 }])).toBeNull();
+    // A plane with no pixels cannot be a matte either, whatever its buffer holds.
+    expect(alphaOf({ data: [], width: 0, height: 1 })).toBeNull();
+    expect(alphaOf({ data: [1], width: 1.5, height: 1 })).toBeNull();
   });
 
   it('returns the matte from a fake model, and null when loading fails', async () => {
