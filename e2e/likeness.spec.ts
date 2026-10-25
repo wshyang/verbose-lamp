@@ -14,6 +14,10 @@ function shot(page: Page, name: string) {
 /**
  * Visual likeness gate for the premiere (ADDENDUM-022 §0.5).
  *
+ * No baselines are committed: they are only comparable on the OS, browser build and GPU
+ * path that recorded them (ADDENDUM-028 §6). Run `npm run e2e:update` once on the target
+ * machine to record them; treat every later `npm run e2e` as the gate.
+ *
  * Every shot pins one moment of the 38-second sequence. `?freezeAt=` holds the clock, so
  * the camera, cards, dust and nitrate are identical between runs; the shot names are the
  * snapshot keys, so a diff reads as `act2-hold` rather than a numbered frame.
