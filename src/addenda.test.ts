@@ -65,7 +65,7 @@ function walk(dir: string, found: string[] = []): string[] {
  * test below fails once a listed number has a file, so each entry is deleted the moment it is
  * written, and a typo in a citation cannot hide here for long.
  */
-const FORWARD_REFERENCES: readonly number[] = [35, 36];
+const FORWARD_REFERENCES: readonly number[] = [36];
 
 describe('the addenda register', () => {
   it('lists no forward reference whose addendum has been written', () => {

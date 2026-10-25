@@ -39,8 +39,11 @@ r186, Vitest. No backend, database, auth, or persistence.
 - **N/A:** real-database integration tests, session-scoping negative tests, OWASP
   endpoint matrix — there is no server or persisted data. Revisit the moment either
   appears.
-- Playwright e2e with video-on default is **deferred**; see ADDENDUM-001 for the
-  explicit decision and the trigger that un-defers it.
+- Playwright e2e is live (ADDENDUM-035): `npm run e2e` runs the interaction flows, the
+  likeness (screenshot) gate and the avatar spec in real Chromium on SwiftShader. Video-on
+  was not taken; traces are kept on failure. Baselines are OS-suffixed and only comparable
+  on the same OS, browser build and rasteriser, so `npm run e2e:update` is a deliberate,
+  reviewed act, never a reflex after a red run. Only `darwin` baselines are recorded.
 
 ## 3. Test infrastructure defaults
 
@@ -49,7 +52,8 @@ r186, Vitest. No backend, database, auth, or persistence.
   run. Keep `vite.config.ts` untouched; Vitest has its own config file on purpose.
 - Fixture data is deterministic and domain-realistic (named acts, real archetype
   names), never `item-1`.
-- Layout by type: unit tests beside modules; any future e2e under `e2e/`.
+- Layout by type: unit tests beside modules; browser specs under `e2e/`, with
+  `src/test/e2eContract.test.ts` failing when a spec selects a test id nothing renders.
 
 ## 4. Data discipline
 

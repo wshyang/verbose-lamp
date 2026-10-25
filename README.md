@@ -92,7 +92,9 @@ protected by snapshot tests on data, not pixels. Three.js and DOM rendering code
 thin; jsdom and headless-scene tests cover its wiring, never its pixels. `npm run
 test:coverage` gates the logic surface (excludes are stated by rule in `vitest.config.ts`).
 `src/discipline.test.ts` holds the function and file limits as a ratchet (ADDENDUM-034).
-Playwright e2e is deferred (see ADDENDUM-001).
+`npm run e2e` runs the Playwright flows, likeness shots and avatar spec in Chromium on a
+software rasteriser (ADDENDUM-035); baselines are OS-specific and re-recording them with
+`npm run e2e:update` is a reviewed act.
 
 ## Contributing conventions
 
