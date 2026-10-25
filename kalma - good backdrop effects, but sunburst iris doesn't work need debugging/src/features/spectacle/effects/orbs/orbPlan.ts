@@ -1,0 +1,101 @@
+import { offscreenTargets } from '../../model/geometry';
+import { sanitizeFlashPlan, type FlashSegment } from '../../model/motionPolicy';
+import type { NormPoint, OrbTransitionParams } from '../../model/types';
+
+export interface OrbTrack {
+  target: NormPoint;
+  control: NormPoint;
+}
+
+export interface OrbPlan {
+  direction: 'outward' | 'inward';
+  crossfade: boolean;
+  durationMs: number;
+  origin: NormPoint;
+  tracks: readonly OrbTrack[];
+  flash: readonly FlashSegment[];
+  onCoveredMs: number;
+  travelStartMs: number;
+  travelEndMs: number;
+  /** Inward only: the moment all orbs meet at the origin. */
+  collisionMs: number | null;
+}
+
+function arcControl(from: NormPoint, to: NormPoint, sign: number): NormPoint {
+  const mx = (from.x + to.x) / 2;
+  const my = (from.y + to.y) / 2;
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const len = Math.hypot(dx, dy) || 1;
+  const bend = 0.16 * len * sign;
+  return { x: mx - (dy / len) * bend, y: my + (dx / len) * bend };
+}
+
+/** Pure timeline for all four orb configurations (ADDENDUM-020 §3.4). */
+export function planOrbTransition(
+  params: OrbTransitionParams,
+  reducedMotion: boolean,
+): OrbPlan {
+  const duration = params.durationMs ?? 1600;
+  const targets = offscreenTargets(params.origin, params.pattern);
+  const tracks = targets.map((target, i) => ({
+    target,
+    control: arcControl(params.origin, target, i % 2 === 0 ? 1 : -1),
+  }));
+  if (reducedMotion) return crossfadePlan(params, tracks);
+  return params.direction === 'outward'
+    ? outwardPlan(params.origin, duration, tracks)
+    : inwardPlan(params.origin, duration, tracks);
+}
+
+function crossfadePlan(params: OrbTransitionParams, tracks: readonly OrbTrack[]): OrbPlan {
+  return {
+    direction: params.direction,
+    crossfade: true,
+    durationMs: 400,
+    origin: params.origin,
+    tracks,
+    flash: [{ startMs: 0, attackMs: 180, holdMs: 40, decayMs: 180, peak: 0.55 }],
+    onCoveredMs: 200,
+    travelStartMs: 0,
+    travelEndMs: 400,
+    collisionMs: null,
+  };
+}
+
+function outwardPlan(origin: NormPoint, duration: number, tracks: readonly OrbTrack[]): OrbPlan {
+  const flash = sanitizeFlashPlan([
+    { startMs: 0, attackMs: 120, holdMs: 260, decayMs: 620, peak: 1 },
+  ]);
+  return {
+    direction: 'outward',
+    crossfade: false,
+    durationMs: duration,
+    origin,
+    tracks,
+    flash,
+    onCoveredMs: 120,
+    travelStartMs: 260,
+    travelEndMs: duration - 150,
+    collisionMs: null,
+  };
+}
+
+function inwardPlan(origin: NormPoint, duration: number, tracks: readonly OrbTrack[]): OrbPlan {
+  const collision = Math.round(duration * 0.62);
+  const flash = sanitizeFlashPlan([
+    { startMs: collision, attackMs: 120, holdMs: 230, decayMs: duration - collision - 350, peak: 1 },
+  ]);
+  return {
+    direction: 'inward',
+    crossfade: false,
+    durationMs: duration,
+    origin,
+    tracks,
+    flash,
+    onCoveredMs: collision + 120,
+    travelStartMs: 0,
+    travelEndMs: collision,
+    collisionMs: collision,
+  };
+}
