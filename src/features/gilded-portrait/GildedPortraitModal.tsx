@@ -2,7 +2,7 @@ import { useRef, type ChangeEvent, type RefObject } from 'react';
 import { Download, Image as ImageIcon, Sparkles, Upload, X } from 'lucide-react';
 import { Button, Dialog, IconButton, RangeInput } from '@/shared/ui';
 import { GILDING_PRESETS } from './presets';
-import { GOLD_RAMPS } from './goldRamp';
+import { GOLD_RAMPS } from '@/shared/lib/goldRamp';
 import { GildedPortraitCanvas } from './GildedPortraitCanvas';
 import { useGildedPortrait } from './useGildedPortrait';
 import type { GildedPortraitState } from './useGildedPortrait';

@@ -1,4 +1,5 @@
-import { GILDING_PRESETS, GOLD_RAMPS } from '@/features/gilded-portrait';
+import { GILDING_PRESETS } from '@/features/gilded-portrait';
+import { GOLD_RAMPS } from '@/shared/lib/goldRamp';
 import { GILDING_TONE_RANGES, gildingSliderValue } from '../gilding';
 import type { AvatarLook } from '../hooks/useAvatarLook';
 import { Chip, ChipRow, RangeControl } from './studioUi';

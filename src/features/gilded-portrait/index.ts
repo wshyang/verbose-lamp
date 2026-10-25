@@ -29,7 +29,7 @@ export type { FittedSize } from './fit';
 export type { ImageFileMetadata, ImageFileValidation } from './validate';
 export { toLuminance, applyLevels, applyClarity, boxBlur } from './tone';
 export { buildCurveLut, foldTone, buildFoldLut } from './curve';
-export { GOLD_RAMPS, buildGoldRampLut } from './goldRamp';
+export { GOLD_RAMPS, buildGoldRampLut } from '@/shared/lib/goldRamp';
 export { buildShapeMask, chokeMask } from './mask';
 export { fitWithin } from './fit';
 export { GILDING_PRESETS } from './presets';

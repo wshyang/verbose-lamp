@@ -1,4 +1,4 @@
-import type { GoldRampId } from '@/features/gilded-portrait';
+import type { GoldRampId } from '@/shared/lib/goldRamp';
 
 /**
  * Backdrop patterns ported from the reference studio's spiral / concentric / waves /

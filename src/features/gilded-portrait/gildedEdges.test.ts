@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { RgbaImage } from '@/shared/lib/raster';
 import { buildCurveLut, buildFoldLut, foldTone } from './curve';
 import { downloadGildedPng } from './export';
-import { buildGoldRampLut } from './goldRamp';
+import { buildGoldRampLut } from '@/shared/lib/goldRamp';
 import { loadRgbaImage } from './load';
 import { buildShapeMask, chokeMask } from './mask';
 import { buildGildingToneLut, gildImage } from './pipeline';

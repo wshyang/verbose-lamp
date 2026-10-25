@@ -41,7 +41,8 @@ src/
     lib/                        # Small framework-neutral utilities
       random.ts                 # Seeded PRNG (mulberry32, hash01) and crypto pick
       svgExport.ts              # SVG/PNG download shared by the QR code and Deco Lattice
-      raster/                   # RgbaImage/AlphaMask contracts, resample, morphology
+      raster/                   # RgbaImage/AlphaMask contracts, resample, morphology, box blur
+      goldRamp/                 # Photo gold ramps (stops + 256-entry RGB lookup); not gilded-ui's UI palettes
 ```
 
 Each feature keeps its own `components`, `hooks`, `model`, `data`, or `engine`
@@ -64,7 +65,7 @@ supported import surface; internal files should remain private to that feature.
   renderer that implements the same operations.
 - `features/gilded-portrait` owns the tested RGBA-to-gold pipeline, local image
   adapters, and an opt-in modal/launcher. It is not mounted by the Gatsby host.
-- `shared/lib/raster` owns the pixel contracts every image feature speaks, plus
+- `shared/lib/raster` owns the pixel contracts every image feature speaks, plus the box blur,
   resampling and morphology, so no feature imports another just for a type.
 - `features/face-detection`, `features/background-removal` and
   `features/enamel-backdrop` have no React and no knowledge of this app. Their

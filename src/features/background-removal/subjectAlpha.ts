@@ -1,5 +1,4 @@
-import { boxBlur } from '@/features/gilded-portrait';
-import { dilateAlpha, erodeAlpha, resampleAlpha, solidAlpha, type AlphaMask } from '@/shared/lib/raster';
+import { boxBlur, dilateAlpha, erodeAlpha, resampleAlpha, solidAlpha, type AlphaMask } from '@/shared/lib/raster';
 import { DECISION_GRID, gridFromMatte, trimEdge, tunedGrid } from './cutOut';
 import type { CutOutTuning, DecisionGrid, SubjectMatte } from './types';
 

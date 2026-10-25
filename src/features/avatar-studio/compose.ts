@@ -2,14 +2,12 @@ import { subjectAlpha } from '@/features/background-removal';
 import { renderEnamelPanel, rampColour } from '@/features/enamel-backdrop';
 import {
   DEFAULT_TINT_STRENGTH,
-  GOLD_RAMPS,
-  boxBlur,
-  buildGoldRampLut,
   gildImage,
   tintImageGold,
   type GildingParams,
 } from '@/features/gilded-portrait';
-import { cropSquare, dilateAlpha, resampleAlpha, solidAlpha, type AlphaMask, type RgbaImage } from '@/shared/lib/raster';
+import { GOLD_RAMPS, buildGoldRampLut } from '@/shared/lib/goldRamp';
+import { boxBlur, cropSquare, dilateAlpha, resampleAlpha, solidAlpha, type AlphaMask, type RgbaImage } from '@/shared/lib/raster';
 import { framePaintAt } from './frame';
 import type { AvatarComposition, ComposedAvatar, LayerComposition, SubjectInput, SubjectLayer } from './types';
 

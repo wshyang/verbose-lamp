@@ -1,4 +1,4 @@
-import { GOLD_RAMPS, buildGoldRampLut } from '@/features/gilded-portrait';
+import { GOLD_RAMPS, buildGoldRampLut } from '@/shared/lib/goldRamp';
 import type { AlphaMask, RgbaImage } from '@/shared/lib/raster';
 import { lumaOf, mixRgb, parseHexColour, rampColour, scaleRgb, type Rgb } from './colour';
 import { LEAF_SEED, fleckAt, leafAt } from './goldLeaf';

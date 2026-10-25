@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { buildCurveLut } from './curve';
-import { buildGoldRampLut } from './goldRamp';
+import { buildGoldRampLut } from '@/shared/lib/goldRamp';
 import type { CurvePoint, GoldRampStop } from './types';
 
 /**

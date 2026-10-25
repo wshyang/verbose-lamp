@@ -1,3 +1,4 @@
+import type { GoldRampDefinition, GoldRampId, GoldRampStop } from '@/shared/lib/goldRamp';
 import type { AlphaMask, RasterDimensions, RgbaImage } from '@/shared/lib/raster';
 
 /**
@@ -6,13 +7,15 @@ import type { AlphaMask, RasterDimensions, RgbaImage } from '@/shared/lib/raster
  */
 export type { AlphaMask, RasterDimensions, RgbaImage };
 
+/** The gold ramps moved to `@/shared/lib/goldRamp`; re-exported so this feature's API is unchanged. */
+export type { GoldRampDefinition, GoldRampId, GoldRampStop };
+
 export interface CurvePoint {
   readonly x: number;
   readonly y: number;
 }
 
 export type MaskShape = 'none' | 'oval' | 'rounded-rect';
-export type GoldRampId = 'bright' | 'deep' | 'champagne';
 
 export interface GildingMaskParams {
   readonly shape: MaskShape;
@@ -37,17 +40,6 @@ export interface GildingPreset {
   readonly id: string;
   readonly name: string;
   readonly params: GildingParams;
-}
-
-export interface GoldRampStop {
-  readonly position: number;
-  readonly color: string;
-}
-
-export interface GoldRampDefinition {
-  readonly id: GoldRampId;
-  readonly name: string;
-  readonly stops: readonly GoldRampStop[];
 }
 
 export interface LevelsSettings {

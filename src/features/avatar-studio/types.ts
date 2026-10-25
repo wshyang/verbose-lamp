@@ -1,6 +1,7 @@
 import type { CutOutTuning, SubjectMatte } from '@/features/background-removal';
 import type { BackdropSpec } from '@/features/enamel-backdrop';
-import type { GildingParams, GoldRampId } from '@/features/gilded-portrait';
+import type { GildingParams } from '@/features/gilded-portrait';
+import type { GoldRampId } from '@/shared/lib/goldRamp';
 import type { AlphaMask, RgbaImage, SquareBox } from '@/shared/lib/raster';
 
 /**

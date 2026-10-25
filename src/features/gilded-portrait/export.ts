@@ -1,4 +1,4 @@
-import { toSafeFileStem } from '@/features/qr-generator';
+import { toSafeFileStem } from '@/shared/lib/svgExport';
 import type { RgbaImage } from './types';
 
 function createImageCanvas(image: RgbaImage): HTMLCanvasElement {

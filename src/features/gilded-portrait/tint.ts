@@ -1,4 +1,4 @@
-import { GOLD_RAMPS, buildGoldRampLut } from './goldRamp';
+import { GOLD_RAMPS, buildGoldRampLut } from '@/shared/lib/goldRamp';
 import type { GoldRampId, RgbaImage } from './types';
 
 /**

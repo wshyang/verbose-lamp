@@ -2,3 +2,4 @@
 export type { AlphaMask, RasterDimensions, RgbaImage, SquareBox } from './types';
 export { cropSquare, resampleAlpha, solidAlpha } from './resample';
 export { dilateAlpha, erodeAlpha } from './morphology';
+export { boxBlur, type BlurOptions } from './blur';

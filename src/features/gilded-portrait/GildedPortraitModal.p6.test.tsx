@@ -12,7 +12,7 @@ import { setupDomTests } from '@/test/dom';
 
 import { installCanvas2d } from '@/test/canvas2d';
 
-import { GOLD_RAMPS } from './goldRamp';
+import { GOLD_RAMPS } from '@/shared/lib/goldRamp';
 
 setupDomTests();
 /**

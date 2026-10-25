@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { buildCurveLut, foldTone } from './curve';
-import { buildGoldRampLut } from './goldRamp';
+import { buildGoldRampLut } from '@/shared/lib/goldRamp';
 import { buildShapeMask, chokeMask } from './mask';
 import { gildImage } from './pipeline';
 import { GILDING_PRESETS } from './presets';

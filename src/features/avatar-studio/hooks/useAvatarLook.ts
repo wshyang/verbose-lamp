@@ -15,7 +15,8 @@ import {
   type InlayStyle,
   type SpecKnob,
 } from '@/features/enamel-backdrop';
-import { GILDING_PRESETS, type GildingParams, type GildingPreset, type GoldRampId } from '@/features/gilded-portrait';
+import { GILDING_PRESETS, type GildingParams, type GildingPreset } from '@/features/gilded-portrait';
+import type { GoldRampId } from '@/shared/lib/goldRamp';
 import { withGildingTone, type GildingToneKey } from '../gilding';
 import type { AvatarFrame, SubjectFinish } from '../types';
 

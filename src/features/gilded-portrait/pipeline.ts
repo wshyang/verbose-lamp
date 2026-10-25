@@ -1,5 +1,5 @@
 import { buildCurveLut, buildFoldLut } from './curve';
-import { buildGoldRampLut, GOLD_RAMPS } from './goldRamp';
+import { buildGoldRampLut, GOLD_RAMPS } from '@/shared/lib/goldRamp';
 import { buildShapeMask, chokeMask } from './mask';
 import { applyClarity, applyLevels, toLuminance } from './tone';
 import type { GildingParams, LevelsSettings, RgbaImage } from './types';

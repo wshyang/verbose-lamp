@@ -52,27 +52,27 @@ Goal: `art-deco-frame` owns "what is a legal frame style". Premiere and the Fram
 - [x] 1.8 Addendum 037 + register row. It states the two level policies, the removed copies and the one behaviour delta (Frame Studio NaN).
 - [x] 1.9 Gate.
 
-## [ ] Phase 2 — Finding 5 (Minor): image features stop borrowing from siblings
+## [x] Phase 2 — Finding 5 (Minor): image features stop borrowing from siblings
 Goal: `background-removal`, `enamel-backdrop` and `gilded-portrait` import no other feature.
 
-- [ ] 2.1 **boxBlur → shared raster.**
+- [x] 2.1 **boxBlur → shared raster.**
   - Find its tests: `grep -rn boxBlur src --include='*.test.*'`. Move them to `src/shared/lib/raster/blur.test.ts` (RED against the new path).
   - New `src/shared/lib/raster/blur.ts` with `boxBlur`, `BlurOptions`, `blurRows`, `blurColumns`, `preserveMean`, moved from `gilded-portrait/tone.ts:46-120`.
   - `hasRasterShape` (`tone.ts:17`) and `clamp`: if `tone.ts` still needs them, export them from `raster` instead of duplicating.
   - Export from `shared/lib/raster/index.ts`.
   - `tone.ts` imports it. `gilded-portrait/index.ts` keeps re-exporting `boxBlur` and `BlurOptions` so its public API is unchanged.
   - Point `background-removal/subjectAlpha.ts` and `avatar-studio/compose.ts` at `@/shared/lib/raster`.
-- [ ] 2.2 **Gold ramps → shared.**
-  - New `src/shared/lib/gold/` with `goldRamp.ts` (`GOLD_RAMPS`, `buildGoldRampLut`) and the types `GoldRampId`, `GoldRampDefinition`, `GoldRampStop`, plus `index.ts`. Move the ramp tests from `gilded-portrait/goldRamp*.test.ts`.
+- [x] 2.2 **Gold ramps → shared.** (done as `src/shared/lib/goldRamp/`, not `gold/`: `gilded-ui` has an unrelated `GOLD_RAMPS` and the name should stay distinct)
+  - New `src/shared/lib/goldRamp/` with `goldRamp.ts` (`GOLD_RAMPS`, `buildGoldRampLut`) and the types `GoldRampId`, `GoldRampDefinition`, `GoldRampStop`, plus `index.ts`. Move the ramp tests from `gilded-portrait/goldRamp*.test.ts`.
   - `gilded-portrait/types.ts` re-exports the three types, as it already does for the raster types.
   - `gilded-portrait/index.ts` re-exports `GOLD_RAMPS` and `buildGoldRampLut`.
   - Point `enamel-backdrop/renderBackdrop.ts`, `enamel-backdrop/types.ts` and `avatar-studio/{types,compose,hooks/useAvatarLook}.ts` at `@/shared/lib/gold`.
-- [ ] 2.3 **File stem.**
+- [x] 2.3 **File stem.**
   - `gilded-portrait/export.ts`: import `toSafeFileStem` from `@/shared/lib/svgExport`. Its call already passes the `'gilded-portrait'` fallback, so behaviour is identical.
   - Check `export.p3/p6.test.ts` for mocks of `@/features/qr-generator` and retarget them.
-  - If nothing else consumes `qr-generator`'s barrel export `toSafeFileStem`, remove that export.
-- [ ] 2.4 Verify with `grep -rn "@/features/" src/features/{background-removal,enamel-backdrop,gilded-portrait,face-detection}` (non-test). Expect no hits.
-- [ ] 2.5 Addendum 038 + register row, and fix the `docs/ARCHITECTURE.md` shared-lib map (`raster/blur`, `gold/`). Gate.
+  - `qr-generator`'s barrel export `toSafeFileStem` stays: its own tests and mock use it.
+- [x] 2.4 Verify with `grep -rn "@/features/" src/features/{background-removal,enamel-backdrop,gilded-portrait,face-detection}` (non-test). Expect no hits.
+- [x] 2.5 Addendum 038 + register row, and fix the `docs/ARCHITECTURE.md` shared-lib map (`raster/blur`, `gold/`). Gate.
 
 ## [ ] Phase 3 — Finding 3 (Significant): the host composes the Frame Studio
 Goal: `premiere` no longer imports `frame-studio`, and there is one port type, not two.
