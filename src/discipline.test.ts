@@ -14,7 +14,7 @@ import { DISCIPLINE_DEBT, REASON_TEXT, type DebtReason } from './test/discipline
  * can only shrink.
  *
  * Why a ratchet rather than a clean sweep: the violations are real but they are
- * mostly the original import's render rigs and components, and rewriting 53
+ * mostly the original import's render rigs and components, and rewriting 52
  * functions in one round would be exactly the kind of unverifiable change this
  * project's addenda exist to prevent. The rule is enforced from now on. One of the
  * entries — `decoTypography.createExtrudedDecoTextMesh`, at 371 lines the worst
@@ -172,7 +172,7 @@ describe('CLAUDE.md hard limits', () => {
 
   it('records the debt no faster than it is paid', () => {
     // The ceiling: raise it only with an addendum that says why.
-    expect(DISCIPLINE_DEBT.length).toBeLessThanOrEqual(53);
+    expect(DISCIPLINE_DEBT.length).toBeLessThanOrEqual(52);
     const byReason = DISCIPLINE_DEBT.reduce<Record<string, number>>((acc, entry) => {
       acc[entry.reason] = (acc[entry.reason] ?? 0) + 1;
       return acc;

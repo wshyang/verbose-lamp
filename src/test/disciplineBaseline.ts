@@ -62,7 +62,6 @@ export const DISCIPLINE_DEBT: readonly DebtEntry[] = [
   { file: 'src/features/background-removal/fixtures.ts', name: 'buildHawkerMatte', maxLines: 11, maxParams: 0, maxDepth: 4, reason: 'logic-orchestrator' },
   { file: 'src/features/deco-lattice/model/walk.ts', name: 'reserve', maxLines: 8, maxParams: 4, maxDepth: 2, reason: 'logic-orchestrator' },
   { file: 'src/features/deco-lattice/model/walk.ts', name: 'traceWalks', maxLines: 30, maxParams: 1, maxDepth: 4, reason: 'logic-orchestrator' },
-  { file: 'src/features/frame-studio/hooks/useFrameStudio.ts', name: 'useFrameStudio', maxLines: 180, maxParams: 1, maxDepth: 1, reason: 'feature-hook' },
   { file: 'src/features/gilded-portrait/curve.ts', name: 'endpointSlope', maxLines: 6, maxParams: 4, maxDepth: 1, reason: 'logic-orchestrator' },
   { file: 'src/features/gilded-portrait/curve.ts', name: 'interiorTangent', maxLines: 6, maxParams: 4, maxDepth: 1, reason: 'logic-orchestrator' },
   { file: 'src/features/gilded-portrait/curve.ts', name: 'interpolateSegment', maxLines: 11, maxParams: 5, maxDepth: 0, reason: 'logic-orchestrator' },
