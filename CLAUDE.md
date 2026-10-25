@@ -36,8 +36,13 @@ r186, Vitest. No backend, database, auth, or persistence.
 - **N/A:** real-database integration tests, session-scoping negative tests, OWASP
   endpoint matrix — there is no server or persisted data. Revisit the moment either
   appears.
-- Playwright e2e with video-on default is **deferred**; see ADDENDUM-001 for the
-  explicit decision and the trigger that un-defers it.
+- Playwright e2e is live (ADDENDUM-022 §0.5, ADDENDUM-026): `npm run e2e` runs the
+  likeness screenshot gate and the interaction flows in real Chromium (SwiftShader).
+  Video-on default was not taken; traces are kept on failure instead. Baselines are
+  OS-suffixed and only comparable on the same OS, browser and version, so
+  `npm run e2e:update` is a deliberate, reviewed act — never a reflex after a red run.
+  The sandbox has no browser and cannot reach the Playwright CDN, so screenshot runs are
+  a local step.
 
 ## 3. Test infrastructure defaults
 
