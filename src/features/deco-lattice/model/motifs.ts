@@ -100,6 +100,12 @@ export interface ReedRowOptions {
   tickLen: number;
   barW: number;
   gap: number;
+  /**
+   * Exact reed count. Given one, the gaps are recomputed to fit (still equal at
+   * both ends), so a caller that must mirror a half band gets an integer count
+   * by construction instead of whatever the gap formula rounds to.
+   */
+  count?: number;
 }
 
 /**
@@ -112,7 +118,10 @@ export function reedRow(opts: ReedRowOptions): readonly (readonly Pt[])[] {
   const len = Math.hypot(dx, dy);
   const ux = dx / len;
   const uy = dy / len;
-  const n = Math.max(1, Math.floor((len - opts.gap) / (opts.barW + opts.gap)));
+  const n = Math.max(
+    1,
+    opts.count ?? Math.floor((len - opts.gap) / (opts.barW + opts.gap))
+  );
   const g = (len - n * opts.barW) / (n + 1);
   return Array.from({ length: n }, (_, i) => {
     const c = g + i * (opts.barW + g) + opts.barW / 2;

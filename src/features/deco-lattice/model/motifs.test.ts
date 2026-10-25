@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { nestedOctagram, octagram } from './motifs';
+import { nestedOctagram, octagram, reedRow } from './motifs';
 
 describe('octagram closed form', () => {
   it('alternates a√2 and a·sec(π/8) radii at the right angles', () => {
@@ -36,5 +36,34 @@ describe('octagram closed form', () => {
     const rings = nestedOctagram(0.4, 3, 0.8);
     expect(rings.length).toBe(3);
     expect(Math.hypot(rings[1][0].x, rings[1][0].y)).toBeCloseTo(0.4 * 0.8 * Math.SQRT2, 12);
+  });
+});
+describe('reedRow exact count', () => {
+  const row = { from: { x: 0, y: 0 }, to: { x: 1, y: 0 }, tickLen: 0.1, barW: 0.05, gap: 0.05 };
+
+  it('uses the caller’s count instead of the gap formula', () => {
+    expect(reedRow({ ...row, count: 5 })).toHaveLength(5);
+    expect(reedRow({ ...row, count: 2 })).toHaveLength(2);
+  });
+
+  it('spaces an exact count with equal gaps at both ends', () => {
+    // Each tick sits at its reed's centre, so gaps are measured edge to edge.
+    const centres = reedRow({ ...row, count: 4 }).map(([a]) => a.x);
+    const half = row.barW / 2;
+    const gaps = [
+      centres[0] - half,
+      ...centres.slice(1).map((x, i) => x - centres[i] - row.barW),
+      1 - (centres[3] + half),
+    ];
+
+    for (const gap of gaps) expect(gap).toBeCloseTo(gaps[0], 9);
+  });
+
+  it('derives the count from the length when none is given', () => {
+    expect(reedRow(row)).toHaveLength(Math.floor((1 - row.gap) / (row.barW + row.gap)));
+  });
+
+  it('never returns fewer than one reed', () => {
+    expect(reedRow({ ...row, count: 0 })).toHaveLength(1);
   });
 });

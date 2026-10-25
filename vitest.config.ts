@@ -82,6 +82,8 @@ export default defineConfig({
         'src/features/premiere/scene3d/composer.ts': FULL,
         'src/features/deco-lattice/model/clip.ts': FULL,
         'src/features/deco-lattice/model/walk.ts': FULL,
+        'src/features/deco-lattice/model/nineSlice.ts': FULL,
+        'src/features/deco-lattice/model/motifs.ts': FULL,
       },
     },
   },
