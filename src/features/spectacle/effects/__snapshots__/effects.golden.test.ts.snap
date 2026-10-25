@@ -155,8 +155,8 @@ exports[`effect golden recordings > name reveal draws identically (reduced motio
 exports[`effect golden recordings > orbs corners inward draws identically (full motion) 1`] = `
 {
   "announced": [],
-  "calls": 12277,
-  "hash": "26815c1c35b0a0331ee55fc0ade770c56ec6f909",
+  "calls": 22131,
+  "hash": "1d017a0efb049284aba6350edd0e8281a5929489",
   "status": "done",
 }
 `;
@@ -173,8 +173,8 @@ exports[`effect golden recordings > orbs corners inward draws identically (reduc
 exports[`effect golden recordings > orbs corners outward draws identically (full motion) 1`] = `
 {
   "announced": [],
-  "calls": 7374,
-  "hash": "36458a5101f1f171dc90f9f301eb0d45049478fb",
+  "calls": 18500,
+  "hash": "2cfa946fa00a12034210fd54c83f1dc6df5ac0a1",
   "status": "done",
 }
 `;
@@ -191,8 +191,8 @@ exports[`effect golden recordings > orbs corners outward draws identically (redu
 exports[`effect golden recordings > orbs sides inward draws identically (full motion) 1`] = `
 {
   "announced": [],
-  "calls": 8955,
-  "hash": "1d9c0e66bd6d0a6882aa6bf82f04a604b85402d9",
+  "calls": 13523,
+  "hash": "0aac7a065ae6cfb525b35114c62dc2ac08f2ba77",
   "status": "done",
 }
 `;
@@ -209,8 +209,8 @@ exports[`effect golden recordings > orbs sides inward draws identically (reduced
 exports[`effect golden recordings > orbs sides outward draws identically (full motion) 1`] = `
 {
   "announced": [],
-  "calls": 3750,
-  "hash": "bd8e1de0548d8b003818e1e69173559588e4741f",
+  "calls": 9264,
+  "hash": "8692eb71bd3055c52ce09edd493368c4b96fdf24",
   "status": "done",
 }
 `;

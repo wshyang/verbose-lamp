@@ -4,8 +4,8 @@ import { countdownEffect } from '../effects/countdown/countdownEffect';
 import { fireworksEffect } from '../effects/fireworks/fireworksEffect';
 import { flashEffect } from '../effects/flash/flashEffect';
 import { nameRevealEffect } from '../effects/nameReveal/nameRevealEffect';
-import { orbsEffect } from '../effects/orbs/orbsEffect';
 import { searchlightsEffect } from '../effects/searchlights/searchlightsEffect';
+import { sparklerTransitionEffect } from '../effects/sparklers/sparklerTransitionEffect';
 import { sparklersEffect } from '../effects/sparklers/sparklersEffect';
 import { sunburstEffect } from '../effects/sunburst/sunburstEffect';
 import type { EffectParamsMap } from '../model/types';
@@ -16,7 +16,9 @@ export const effectRegistry: {
   [K in keyof EffectParamsMap]: EffectDefinition<EffectParamsMap[K]>;
 } = {
   fireworks: fireworksEffect,
-  'orb-transition': orbsEffect,
+  'sparkler-transition': sparklerTransitionEffect,
+  // Deprecated alias: one implementation under two ids, so the old name cannot drift from the new.
+  'orb-transition': sparklerTransitionEffect,
   'sunburst-wipe': sunburstEffect,
   confetti: confettiEffect,
   champagne: champagneEffect,
