@@ -26,4 +26,6 @@ export interface PlaybackTelemetry {
 export interface SceneManagerOptions {
   onTelemetry?: (telemetry: PlaybackTelemetry) => void;
   onChapterChange?: (chapterIndex: number) => void;
+  /** Test affordance: hold one frame and stop advancing (ADDENDUM-022 §4.0.2). */
+  freezeAt?: number;
 }

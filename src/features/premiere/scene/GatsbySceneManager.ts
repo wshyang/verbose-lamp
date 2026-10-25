@@ -151,6 +151,10 @@ export class GatsbySceneManager implements PremiereSceneApi {
   private onTelemetry?: (telemetry: PlaybackTelemetry) => void;
   private onChapterChange?: (chapterIdx: number) => void;
 
+  /** Set only by the screenshot affordance: hold this time and never advance. */
+  private readonly freezeAt: number | null;
+  private frozenFrames = 0;
+
   constructor(container: HTMLElement, options?: SceneManagerOptions) {
     const callbacks = options;
     this.container = container;
@@ -158,6 +162,11 @@ export class GatsbySceneManager implements PremiereSceneApi {
       window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
     this.onTelemetry = callbacks?.onTelemetry;
     this.onChapterChange = callbacks?.onChapterChange;
+    this.freezeAt = callbacks?.freezeAt ?? null;
+    if (this.freezeAt !== null) {
+      this.currentTime = this.freezeAt;
+      this.isPlaying = false;
+    }
 
     const width = Math.max(1, container.clientWidth);
     const height = Math.max(1, container.clientHeight);
@@ -566,6 +575,7 @@ export class GatsbySceneManager implements PremiereSceneApi {
   };
 
   private handlePointerMove = (e: PointerEvent) => {
+    if (this.freezeAt !== null) return;
     const nx = (e.clientX / Math.max(1, window.innerWidth)) * 2 - 1;
     const ny = -((e.clientY / Math.max(1, window.innerHeight)) * 2 - 1);
     this.pointerTarget.set(nx, ny);
@@ -574,8 +584,8 @@ export class GatsbySceneManager implements PremiereSceneApi {
   private animate = () => {
     this.rafId = requestAnimationFrame(this.animate);
 
-    const dt = Math.min(0.05, this.clock.getDelta());
-    const elapsed = this.clock.elapsedTime;
+    const dt = this.freezeAt === null ? Math.min(0.05, this.clock.getDelta()) : 0;
+    const elapsed = this.freezeAt ?? this.clock.elapsedTime;
 
     if (this.isPlaying) {
       this.currentTime += dt;
@@ -729,6 +739,11 @@ export class GatsbySceneManager implements PremiereSceneApi {
     this.screenBorderRig.update(elapsed);
 
     this.composer.render();
+
+    if (this.freezeAt !== null) {
+      this.frozenFrames += 1;
+      if (this.frozenFrames === 3) this.container.dataset.frameReady = 'true';
+    }
 
     this.onTelemetry?.({
       currentTime: this.currentTime,

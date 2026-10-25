@@ -14,6 +14,7 @@ const env = vi.hoisted(() => ({
   disposeScene: vi.fn(),
   audioConstructed: 0,
   sceneConstructed: 0,
+  freezeAt: undefined as number | undefined,
 }));
 
 vi.mock('../audio/cinemaAudio', () => ({
@@ -34,11 +35,16 @@ vi.mock('../scene/GatsbySceneManager', () => ({
   GatsbySceneManager: class {
     constructor(
       _host: HTMLElement,
-      options: { onTelemetry: (t: unknown) => void; onChapterChange: (i: number) => void },
+      options: {
+        onTelemetry: (t: unknown) => void;
+        onChapterChange: (i: number) => void;
+        freezeAt?: number;
+      },
     ) {
       env.sceneConstructed += 1;
       env.telemetry = options.onTelemetry;
       env.chapter = options.onChapterChange;
+      env.freezeAt = options.freezeAt;
     }
     dispose() {
       env.disposeScene();
@@ -52,6 +58,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   env.audioConstructed = 0;
   env.sceneConstructed = 0;
+  env.freezeAt = undefined;
 });
 
 function options() {
@@ -95,6 +102,21 @@ describe('usePremiereRuntime', () => {
     env.chapter?.(3);
     expect(second.onChapterChange).toHaveBeenCalledWith(3);
     expect(env.triggerActShimmer).toHaveBeenCalledWith(3);
+  });
+
+  it('forwards the freeze time from the query string', () => {
+    window.history.replaceState({}, '', '/?freezeAt=4.32');
+    try {
+      renderHook(() => usePremiereRuntime(options()));
+      expect(env.freezeAt).toBe(4.32);
+    } finally {
+      window.history.replaceState({}, '', '/');
+    }
+  });
+
+  it('passes no freeze time for a plain visit', () => {
+    renderHook(() => usePremiereRuntime(options()));
+    expect(env.freezeAt).toBeUndefined();
   });
 
   it('disposes both engines on unmount', () => {

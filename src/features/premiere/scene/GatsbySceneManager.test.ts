@@ -476,6 +476,27 @@ describe('GatsbySceneManager edge branches', () => {
     manager.dispose();
   });
 
+  it('holds one frozen frame, ignores the pointer and flags the container ready', () => {
+    const { manager, container } = createManager({ freezeAt: 4.32 });
+    expect(manager['currentTime']).toBe(4.32);
+    expect(manager['isPlaying']).toBe(false);
+
+    window.dispatchEvent(new PointerEvent('pointermove', { clientX: 400, clientY: 300 }));
+    expect(manager['pointerTarget'].x).toBe(0);
+    expect(manager['pointerTarget'].y).toBe(0);
+
+    // The constructor renders the first frame; two more complete the freeze contract.
+    expect(container.dataset.frameReady).toBeUndefined();
+    runFrames(1);
+    expect(container.dataset.frameReady).toBeUndefined();
+    expect(manager['currentTime']).toBe(4.32);
+
+    runFrames(1);
+    expect(container.dataset.frameReady).toBe('true');
+    expect(manager['currentTime']).toBe(4.32);
+    manager.dispose();
+  });
+
   it('can be disposed twice without cancelling a stale frame', () => {
     const { manager } = createManager();
     manager.dispose();
