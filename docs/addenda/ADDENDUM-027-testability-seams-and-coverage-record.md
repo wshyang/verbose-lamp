@@ -34,6 +34,7 @@ Mocking `GatsbySceneManager` in the hooks would have coupled the tests to the cl
 | `src/test/setupDom.ts` | jsdom API shims only: `matchMedia`, `ResizeObserver` (and R3F canvas/`getContext` stubs) |
 | `src/test/dom.ts` | `setupDomTests()` — registers `afterEach(cleanup)` from the *test* module |
 | `src/app/testid-coverage.test.tsx` | asserts that every `data-testid` the flows rely on still exists |
+| `src/features/spectacle-preview/testing/stubPreview.ts` | typed stand-in for the console state, so panel sections render without a WebGL stage |
 
 Two harness facts that cost real time and should not be rediscovered:
 
@@ -44,9 +45,9 @@ Two harness facts that cost real time and should not be rediscovered:
 
 The target is 100%. In this environment it is enforced as follows, and the difference matters:
 
-- **Per-file 100 % line/branch/function thresholds** on the pure model modules — the recipe, planning, lattice and composition code. These are now genuinely at 100 %, thresholds included: `sparklerPlan.ts`, `latticeSource.ts`, `composition.ts` (100 % branches), and the rest of the planning/grammar set. `npm test` is 70 files / 547 tests; `npx tsc --noEmit` is clean.
+- **Per-file 100 % line/branch/function thresholds** on the pure model modules — the recipe, planning, lattice and composition code. These are now genuinely at 100 %, thresholds included: `sparklerPlan.ts`, `latticeSource.ts`, `composition.ts` (100 % branches), and the rest of the planning/grammar set. `npm test` is 76 files / 590 tests; `npx tsc --noEmit` and `npm run build` are clean.
 - **Not** at 100 %: the WebGL/Three.js modules (`GatsbySceneManager`, the shader materials, `ScreenBorderRig`, `DecoLatticeFrame`), whose pixels and GL objects jsdom cannot meaningfully execute. Instrumenting them produces line counts that measure the mock, not the code. `Dialog.tsx` (focus trap, Escape) and `useReducedMotion.ts` are also below the bar.
-- The **strict-global** rollout the user asked for is therefore staged, not delivered. What stands today is: global lines/statements/branches ≈ 56/52/51 %, with hard 100 % gates on the modules where 100 % is a meaningful statement.
+- The **strict-global** rollout the user asked for is therefore staged, not delivered. What stands today is: global lines/statements/branches ≈ 57/55/54 %, with hard 100 % gates on the modules where 100 % is a meaningful statement. The console's rendered surface is now covered end to end (`SpectaclePreviewPanel`, `PanelBits`, `PanelExtras`, the four sections, `Dialog` at 100 % lines, `useReducedMotion`), so the remaining global gap is concentrated in the WebGL scene modules and the premiere's camera/hook layer.
 
 This is a deliberate, reversible decision, not a quiet lowering of the bar: the per-file thresholds are stricter than a global figure (they forbid the "well-averaged" module), and the global number is the remaining work — Phases 1–3 of ADDENDUM-022, which extract the choreography R3F runs so it can be covered in `node`.
 
