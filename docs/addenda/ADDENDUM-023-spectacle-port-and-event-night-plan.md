@@ -359,3 +359,12 @@ the original iris behaviour.
   `planOrbTransition`/`planOrbCrossfade`) or typed fields (`pistil: 'emerald' | 'gold'`,
   `motion: 'full' | 'still'`). New pure `resolveActiveId` (tested, test written first).
   Validation: tsc ✓ vitest ✓ (396 tests) build ✓ — browser not available in sandbox.
+- **Commit C (Step 6) — landed.** Sunburst iris fix. `sunburstEffect` compared the aspect-corrected
+  radius (1 = viewport height) against a pixel threshold, so the iris was never drawn on portrait
+  screens and only during the full-cover hold on desktop, while `onCovered` still fired. The
+  guard now uses the new pure `irisRadiusPx` and `MIN_VISIBLE_RADIUS_PX`. Tests were written
+  first and failed for the right reasons (`irisRadiusPx` missing; zero wedge fills at mid-cover
+  through the recording canvas), then pass on 1440×900 and 390×844. Only the two full-motion
+  sunburst golden snapshots changed (iris 1183 → 2873 draw calls, fan 1530 → 2890); every other
+  snapshot, including reduced motion, is untouched. Browser confirmation is still pending.
+  Validation: tsc ✓ vitest ✓ (406 tests) build ✓ — browser not available in sandbox.

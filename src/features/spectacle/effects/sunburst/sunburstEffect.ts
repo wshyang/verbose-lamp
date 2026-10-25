@@ -1,6 +1,6 @@
 import type { EffectDefinition, FrameInfo } from '../../engine/types';
 import type { SunburstWipeParams } from '../../model/types';
-import { irisRadiusAt, planIris, planIrisCrossfade, type IrisPlan } from './irisPlan';
+import { MIN_VISIBLE_RADIUS_PX, irisRadiusPx, planIris, planIrisCrossfade, type IrisPlan } from './irisPlan';
 
 interface WedgeView {
   radiusPx: number;
@@ -69,8 +69,8 @@ export const sunburstEffect: EffectDefinition<SunburstWipeParams> = {
           frame.ctx.fillRect(0, 0, frame.w, frame.h);
           frame.ctx.globalAlpha = 1;
         } else {
-          const r = irisRadiusAt(plan, Math.min(t, plan.durationMs), frame.w / Math.max(1, frame.h));
-          if (r > 1) drawWedges(plan, { radiusPx: r * frame.h, t }, frame);
+          const radiusPx = irisRadiusPx(plan, Math.min(t, plan.durationMs), frame);
+          if (radiusPx > MIN_VISIBLE_RADIUS_PX) drawWedges(plan, { radiusPx, t }, frame);
         }
         return t > plan.durationMs ? 'done' : 'running';
       },

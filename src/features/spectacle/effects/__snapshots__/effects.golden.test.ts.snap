@@ -245,8 +245,8 @@ exports[`effect golden recordings > searchlights draws identically (reduced moti
 exports[`effect golden recordings > sunburst fan draws identically (full motion) 1`] = `
 {
   "announced": [],
-  "calls": 1530,
-  "hash": "f6f163b2cf7cb524a2fd2acd8e56d1f754609957",
+  "calls": 2890,
+  "hash": "90c0859cebea8dd975d936f2b1cfc9ef97fe80c7",
   "status": "done",
 }
 `;
@@ -263,8 +263,8 @@ exports[`effect golden recordings > sunburst fan draws identically (reduced moti
 exports[`effect golden recordings > sunburst iris draws identically (full motion) 1`] = `
 {
   "announced": [],
-  "calls": 1183,
-  "hash": "45886b69d09f5b2fe0f8ff732a2baf12092699e9",
+  "calls": 2873,
+  "hash": "3b29995f14dbd4edafa64b87d7e24c0432d0cd6a",
   "status": "done",
 }
 `;

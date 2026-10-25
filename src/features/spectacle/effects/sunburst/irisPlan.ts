@@ -57,3 +57,15 @@ export function irisRadiusAt(plan: IrisPlan, tMs: number, aspect: number): numbe
   const u = (tMs - plan.holdEndMs) / (plan.durationMs - plan.holdEndMs);
   return full * (1 - easeInOutCubic(Math.min(1, u)));
 }
+
+/** Below this the iris is a speck; the effect skips drawing it. Measured in pixels. */
+export const MIN_VISIBLE_RADIUS_PX = 1;
+
+/**
+ * Covering radius in pixels. `irisRadiusAt` works in aspect-corrected units
+ * where 1 is the viewport height; compare against pixel thresholds only after
+ * converting here (comparing units to pixels hid the iris on most screens).
+ */
+export function irisRadiusPx(plan: IrisPlan, tMs: number, viewport: { w: number; h: number }): number {
+  return irisRadiusAt(plan, tMs, viewport.w / Math.max(1, viewport.h)) * viewport.h;
+}
