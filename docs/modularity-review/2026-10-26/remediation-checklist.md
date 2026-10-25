@@ -144,15 +144,12 @@ Goal: the "barrel is the only door" rule becomes a test. Run after Phases 1–4 
 - [x] 5.6 Docs: `docs/ARCHITECTURE.md` (the `model` entry, the dependency table, premiere/frame-studio ownership and spectacle-preview scope as they now are), CLAUDE.md §6 ("through a feature barrel **or its `model` entry**"). Addendum 041 + register row. Gate.
 
 ## [ ] Phase 6 (not done, see note)
-> **Status: deliberately not done.** The plan called this phase optional ("when the next premiere setting is added"). On reading the hooks it is a behaviour change, not a layout change, and cannot be verified here:
-> - `togglePlayback` sets React state from the value the store returns, so the HUD flips in the same tick as the click; a selector would flip it on the store's next notification.
-> - `selectAct` and `applyHeroTitle` set `activeAct` ahead of the store's own chapter detection; a selector would show the old act until the next frame.
-> - The 48 ms telemetry throttle keeps the HUD from re-rendering every frame; how it interacts with selector-driven fields only shows in a real browser.
+> **Status: deliberately not done, and the review's diagnosis of it was partly wrong.** The plan called this phase optional ("when the next premiere setting is added"). Reading the hooks and their tests showed two things:
 >
-> The unit tests mock the scene and this sandbox has no browser, so a green gate would say nothing about any of these. Do it when a browser is available, ideally with the next premiere setting. `managerRef` is still threaded through 31 sites.
-
- — Finding 6 (Minor, optional): one source of truth for premiere state
-Do this when the next premiere setting is added, or drop it. It is the largest change and the one with HUD re-render risk.
+> 1. **`managerRef` is not dead plumbing.** The review (Issue 6) called it a leftover of the removed imperative manager. Its nullability is real lifecycle: the scene API and the audio engine are created when the stage element mounts and released when it unmounts (`useSceneLifecycle`, pinned by `usePremiereRuntime` tests: "builds nothing until there is a mount element", "clears both refs on unmount"), and the hooks' `if (!manager) return` guards cover a click that lands before the canvas mounts or during teardown. Making the scene API always-present would delete those states and the tests that guard them.
+> 2. **The mirrored React state is timing, not duplication.** `togglePlayback` sets React state from the value the store returns, so the HUD flips in the same tick as the click; `selectAct` and `applyHeroTitle` set `activeAct` ahead of the store's own chapter detection; the 48 ms telemetry throttle keeps the HUD from re-rendering every frame. A selector changes when each of those shows, which only a browser can judge, and the unit tests mock the scene.
+>
+> So there is no mechanical slice to do safely here. If this is revisited: do it with a browser, move one field at a time (start with `cameraMode`, which has no telemetry feedback), and keep `managerRef`'s null states as an explicit `isStageMounted` rather than deleting them. `managerRef` is still threaded through 31 sites.
 
 - [ ] 6.1 Inventory and record which store fields are mirrored by React state: `currentTime`, `isPlaying`, `activeChapterIndex` (as `activeAct`), `cameraMode`, `isNitrateForced` (as `nitrateMode`), `heroConfig`. `soundOn` is audio-only and stays in React.
 - [ ] 6.2 **Remove `managerRef`.**

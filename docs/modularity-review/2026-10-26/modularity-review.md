@@ -175,7 +175,7 @@ Trade-off: `shared/` grows slightly; this is acceptable because the items are us
 
 ### Knowledge Leakage
 
-The playback and settings state is held in more than one place inside one module: the zustand store owns `currentTime`, `isPlaying`, `cameraMode`, `isNitrateForced` and `heroConfig`; `usePlaybackDisplay` and `usePremiereSettings` hold React copies of them (the first fed by throttled telemetry, the second set by the transport hooks in parallel with the store). `storeSceneApi` then adapts the store back to the `PremiereSceneApi` that the hooks call through `managerRef`. The imperative manager that motivated this port was removed in ADDENDUM-030, but `managerRef` is still threaded through 31 sites in the hooks.
+The playback and settings state is held in more than one place inside one module: the zustand store owns `currentTime`, `isPlaying`, `cameraMode`, `isNitrateForced` and `heroConfig`; `usePlaybackDisplay` and `usePremiereSettings` hold React copies of them (the first fed by throttled telemetry, the second set by the transport hooks in parallel with the store). `storeSceneApi` then adapts the store back to the `PremiereSceneApi` that the hooks call through `managerRef`. The imperative manager that motivated this port was removed in ADDENDUM-030, and `managerRef` is still threaded through 31 sites in the hooks. *(Correction after the remediation work: `managerRef` is not a leftover. It is null before the stage element mounts and after it unmounts, the runtime tests pin that, and the hooks' null guards cover a click landing in either window. Only the mirrored React state is a candidate for change.)*
 
 ### Complexity Impact
 
@@ -187,9 +187,9 @@ Adding a playback setting means a store field, a store action, a `PremiereSceneA
 
 ### Recommended Improvement
 
-Let React read the store through zustand selectors (`useStore(store, selector)`) for time, play state, camera and hero config, and drop the mirrored hook state and telemetry throttle where the store can serve it. Keep `PremiereSceneApi` as the write port, but pass `store.getState` (or the adapter) directly to hooks instead of through `managerRef`.
+Let React read the store through zustand selectors (`useStore(store, selector)`) for camera, nitrate and hero config first, then play state and act, and drop the mirrored hook state where the store can serve it. Keep `PremiereSceneApi` as the write port. Leave `managerRef` (or replace it with an explicit `isStageMounted`), because its null states are real lifecycle.
 
-Trade-off: React re-renders become a function of selectors, so the 48 ms telemetry throttle's protection against re-rendering the HUD every frame must be preserved (a selector with an equality function, or a throttled subscription). This is the least urgent change here and is best done when the next premiere setting is added.
+Trade-off: React re-renders become a function of selectors, so the 48 ms telemetry throttle's protection against re-rendering the HUD every frame must be preserved (a selector with an equality function, or a throttled subscription). This is the least urgent change here, is best done when the next premiere setting is added, and needs a browser: the HUD flips in the same tick as a click today (`togglePlayback` sets React state from the value the store returns), and a selector changes when that shows. It was not attempted in the remediation (see the checklist).
 
 ---
 
