@@ -72,14 +72,13 @@ export interface PremiereStoreOptions {
   freezeAt?: number;
 }
 
-/**
- * The scene's state machine (ADDENDUM-022 §2.1). A vanilla store, not a React
- * one: the render loop reads it per frame without re-rendering React, and pure
- * tests can drive it with no DOM at all.
- */
-export function createPremiereStore(options: PremiereStoreOptions = {}): PremiereStoreApi {
-  const freezeAt = options.freezeAt ?? null;
-  return createStore<PremiereStore>()((set, get) => ({
+/** The setter/getter pair zustand hands the initialiser. */
+type StoreWrite = (partial: Partial<PremiereStore> | ((state: PremiereStore) => Partial<PremiereStore>)) => void;
+type StoreRead = () => PremiereStore;
+
+/** A frozen playhead starts paused; a live one starts playing. */
+export function initialPremiereState(freezeAt: number | null): PremiereState {
+  return {
     currentTime: freezeAt ?? 0,
     isPlaying: freezeAt === null,
     cameraMode: 'cinema',
@@ -92,42 +91,38 @@ export function createPremiereStore(options: PremiereStoreOptions = {}): Premier
     activeChapterIndex: activeChapterIndex(freezeAt ?? 0, SEQUENCE_CHAPTERS),
     orbitFocus: null,
     elapsed: freezeAt ?? 0,
+  };
+}
 
-    setTime: (t) => set({ currentTime: clamp(t, 0, TOTAL_SEQUENCE_DURATION - 0.001) }),
-
-    setPlaying: (playing) => set({ isPlaying: playing }),
-
+/** The playhead, the pause flag and the chapter jumps. */
+export function playbackActions(set: StoreWrite, get: StoreRead) {
+  return {
+    setTime: (t: number) => set({ currentTime: clamp(t, 0, TOTAL_SEQUENCE_DURATION - 0.001) }),
+    setPlaying: (playing: boolean) => set({ isPlaying: playing }),
     togglePlaying: () => {
       const next = !get().isPlaying;
       set({ isPlaying: next });
       return next;
     },
-
-    setCameraMode: (mode) => {
-      set({ cameraMode: mode });
-      if (mode === 'orbit') {
-        get().focusOrbit(activeChapterIndex(get().currentTime, SEQUENCE_CHAPTERS));
-      }
-    },
-
-    setNitrateMode: (forced) => set({ isNitrateForced: forced }),
-
-    setHeroConfig: (config) => set({ heroConfig: { ...config } }),
-
-    setSequenceFrameStyle: (style) => set({ frameStyle: clampFrameStyle(style) }),
-
-    setScreenBorderStyle: (style) => set({ borderStyle: clampBorderStyle(style) }),
-
-    setScreenBorderEnabled: (enabled) => set({ isBorderEnabled: enabled }),
-
-    jumpToChapter: (index) => {
+    jumpToChapter: (index: number) => {
       const chapterIndex = clamp(index, 0, SEQUENCE_CHAPTERS.length - 1);
       const time = SEQUENCE_CHAPTERS[chapterIndex].startTime + CHAPTER_JUMP_OFFSET;
       set({ currentTime: time, activeChapterIndex: chapterIndex });
       if (get().cameraMode === 'orbit') get().focusOrbit(chapterIndex);
     },
+    setActiveChapterIndex: (index: number) => set({ activeChapterIndex: index }),
+    setElapsed: (seconds: number) => set({ elapsed: seconds }),
+  };
+}
 
-    focusOrbit: (chapterIndex) => {
+/** The camera: the mode switch, and the orbit snap that seeks the playhead if it must. */
+export function cameraActions(set: StoreWrite, get: StoreRead) {
+  return {
+    setCameraMode: (mode: CameraMode) => {
+      set({ cameraMode: mode });
+      if (mode === 'orbit') get().focusOrbit(activeChapterIndex(get().currentTime, SEQUENCE_CHAPTERS));
+    },
+    focusOrbit: (chapterIndex: number) => {
       const chapter = SEQUENCE_CHAPTERS[chapterIndex];
       const focus = orbitFocusTime({ currentTime: get().currentTime, chapter });
       set((state) => ({
@@ -136,10 +131,36 @@ export function createPremiereStore(options: PremiereStoreOptions = {}): Premier
         orbitFocus: { chapterIndex, nonce: (state.orbitFocus?.nonce ?? 0) + 1 },
       }));
     },
+  };
+}
 
-    setActiveChapterIndex: (index) => set({ activeChapterIndex: index }),
+/** Everything the host pushes in: the title, the frame, the border and the film stock. */
+export function styleActions(set: StoreWrite) {
+  return {
+    setNitrateMode: (forced: boolean) => set({ isNitrateForced: forced }),
+    setHeroConfig: (config: HeroTitleConfig) => set({ heroConfig: { ...config } }),
+    setSequenceFrameStyle: (style: FrameStyle) => set({ frameStyle: clampFrameStyle(style) }),
+    setScreenBorderStyle: (style: ScreenBorderStyle) => set({ borderStyle: clampBorderStyle(style) }),
+    setScreenBorderEnabled: (enabled: boolean) => set({ isBorderEnabled: enabled }),
+  };
+}
 
-    setElapsed: (seconds) => set({ elapsed: seconds }),
+/**
+ * The scene's state machine (ADDENDUM-022 §2.1). A vanilla store, not a React
+ * one: the render loop reads it per frame without re-rendering React, and pure
+ * tests can drive it with no DOM at all.
+ *
+ * The actions are three groups — playback, camera, host-pushed style — composed
+ * here, so each group can be read (and tested) without the other two in the way
+ * (ADDENDUM-039).
+ */
+export function createPremiereStore(options: PremiereStoreOptions = {}): PremiereStoreApi {
+  const freezeAt = options.freezeAt ?? null;
+  return createStore<PremiereStore>()((set, get) => ({
+    ...initialPremiereState(freezeAt),
+    ...playbackActions(set, get),
+    ...cameraActions(set, get),
+    ...styleActions(set),
   }));
 }
 
