@@ -14,7 +14,11 @@ import { OrbitHint } from './components/OrbitHint';
 import { PremiereHeader } from './components/PremiereHeader';
 import { PremiereTimeline } from './components/PremiereTimeline';
 
-export function GatsbyPremiere() {
+interface GatsbyPremiereProps {
+  onOpenEventNight: () => void;
+}
+
+export function GatsbyPremiere({ onOpenEventNight }: GatsbyPremiereProps) {
   const premiere = usePremiereController();
   const [hudHidden, setHudHidden] = useState(false);
   const [showResearch, setShowResearch] = useState(false);
@@ -45,6 +49,7 @@ export function GatsbyPremiere() {
         hudHidden={hudHidden}
         onOpenResearch={() => setShowResearch(true)}
         onOpenCustomizer={() => setShowCustomizer(true)}
+        onOpenEventNight={onOpenEventNight}
         onToggleCameraMode={premiere.toggleCameraMode}
         onToggleNitrate={premiere.toggleNitrateMode}
         onToggleSound={premiere.toggleSound}

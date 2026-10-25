@@ -1,7 +1,7 @@
-import { GatsbyPremiere } from './app';
+import { DemoHost } from './app/DemoHost';
 
 export function App() {
-  return <GatsbyPremiere />;
+  return <DemoHost />;
 }
 
 export default App;

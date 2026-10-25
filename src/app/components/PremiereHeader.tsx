@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { QrGeneratorLauncher } from '@/features/qr-generator';
 import { AvatarStudioLauncher } from '@/features/avatar-studio';
+import { EventNightLauncher } from '@/features/event-night';
 import type { CameraMode } from '@/features/premiere';
 import { Button, IconButton } from '@/shared/ui';
 import { cn } from '@/shared/lib/cn';
@@ -19,6 +20,7 @@ interface PremiereHeaderProps {
   hudHidden: boolean;
   onOpenResearch: () => void;
   onOpenCustomizer: () => void;
+  onOpenEventNight: () => void;
   onToggleCameraMode: () => void;
   onToggleNitrate: () => void;
   onToggleSound: () => void;
@@ -31,6 +33,7 @@ export function PremiereHeader({
   hudHidden,
   onOpenResearch,
   onOpenCustomizer,
+  onOpenEventNight,
   onToggleCameraMode,
   onToggleNitrate,
   onToggleSound,
@@ -62,6 +65,7 @@ export function PremiereHeader({
         </Button>
         <QrGeneratorLauncher />
         <AvatarStudioLauncher />
+        <EventNightLauncher onOpen={onOpenEventNight} />
         <Button
           onClick={onToggleCameraMode}
           variant={cameraMode === 'orbit' ? 'selected' : 'panel'}

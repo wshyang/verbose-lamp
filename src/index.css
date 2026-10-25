@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+@theme {
+  --font-display: "Cinzel Decorative", "Cinzel", Georgia, serif;
+  --font-body: "Jost", "Segoe UI", sans-serif;
+}
+
 @layer base {
   :root {
     --gold-bright: #f8e29b;

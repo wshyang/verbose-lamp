@@ -368,3 +368,13 @@ the original iris behaviour.
   sunburst golden snapshots changed (iris 1183 → 2873 draw calls, fan 1530 → 2890); every other
   snapshot, including reduced motion, is untouched. Browser confirmation is still pending.
   Validation: tsc ✓ vitest ✓ (406 tests) build ✓ — browser not available in sandbox.
+- **Commit D (Steps 7–8) — landed.** `src/features/event-night/` holds kalma's host screen as a
+  feature (header with a back button, title medallion, crosshair, keep-clear speaker, ambient
+  show, nav and lucky-draw wiring). Pure `navActions` and `parseDemoScreen` have tests written
+  first. `src/app/DemoHost` mounts the premiere or Event Night, driven by `useDemoScreen` over
+  the History API (`#event-night`, browser Back works). The premiere changed by four lines in
+  its header (an `EventNightLauncher`, testid `event-night__launch`) plus one prop on
+  `GatsbyPremiere`. Fonts and `--font-display`/`--font-body` theme tokens added; no existing
+  premiere style changed. Deviations from the plan: the launcher is a small feature component
+  so the premiere header stays within its prior footprint.
+  Validation: tsc ✓ vitest ✓ (414 tests) build ✓ — browser not available in sandbox.

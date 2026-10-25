@@ -17,10 +17,3 @@ export const DEFAULT_NAV_LINES = [
   '🥂,Toast',
   '📸,Gallery',
 ].join('\n');
-
-export const SECTION_TAGLINES: Record<string, string> = {
-  foyer: 'CHAMPAGNE ON ARRIVAL · THE ORCHESTRA TUNES',
-  program: 'THREE SETS OF JAZZ UNTIL THE SMALL HOURS',
-  toast: 'RAISE A GLASS TO THE GREEN LIGHT',
-  gallery: 'THE NIGHT, GILDED AND REMEMBERED',
-};
