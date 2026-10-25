@@ -1,0 +1,57 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`delivered gold program > is unchanged by the brass finish 1`] = `
+{
+  "cacheKey": "gatsby-gold-frame-trim-v2",
+  "color": "f4c95d",
+  "emissive": "281802",
+  "envMapIntensity": 2.35,
+  "fragmentShader": "#include <common>
+     uniform float uDraw;
+     uniform float uOpacity;
+     uniform float uTime;
+     varying vec3 vPathData;
+     varying vec3 vWorldPosDeco;
+#include <clipping_planes_fragment>
+     float segU = vPathData.x;
+     float delay = vPathData.y;
+     float localDraw = clamp((uDraw - delay) / max(0.25, 1.0 - delay), 0.0, 1.0);
+     localDraw = 1.0 - pow(1.0 - localDraw, 2.4);
+     if (segU > localDraw || localDraw <= 0.001 || uOpacity <= 0.01) discard;
+#include <color_fragment>
+#include <normal_fragment_maps>
+#include <emissivemap_fragment>
+     float localTipDraw = clamp((uDraw - vPathData.y) / max(0.25, 1.0 - vPathData.y), 0.0, 1.0);
+     localTipDraw = 1.0 - pow(1.0 - localTipDraw, 2.4);
+     float distToTip = max(0.0, localTipDraw - vPathData.x);
+     float tipSpark = exp(-distToTip * 26.0) * step(0.01, localTipDraw) * (1.0 - smoothstep(0.94, 1.0, localTipDraw));
+     float diagCoord = vWorldPosDeco.x * 0.22 + vWorldPosDeco.y * 0.18;
+     float sweepCenter = mod(uTime * 0.55, 4.4) - 2.2;
+     float sheen = exp(-pow((diagCoord - sweepCenter) * 3.6, 2.0));
+     float brush = sin(vWorldPosDeco.x * 38.0 + vWorldPosDeco.y * 12.0) * 0.04 + 0.96;
+     totalEmissiveRadiance *= brush;
+     totalEmissiveRadiance += vec3(1.0, 0.88, 0.52) * (tipSpark * 2.2 + sheen * 0.48);
+#include <opaque_fragment>
+     gl_FragColor.a *= uOpacity;",
+  "metalness": 0.96,
+  "roughness": 0.17,
+  "transparent": true,
+  "uniforms": [
+    "uDraw",
+    "uPartOpen",
+    "uOpacity",
+    "uTime",
+  ],
+  "vertexShader": "#include <common>
+     attribute vec3 aPathData;
+     uniform float uPartOpen;
+     varying vec3 vPathData;
+     varying vec3 vWorldPosDeco;
+#include <begin_vertex>
+     vPathData = aPathData;
+     float openEase = uPartOpen * uPartOpen * (3.0 - 2.0 * uPartOpen);
+     transformed.x += aPathData.z * openEase * 5.2;
+     vec4 wpDeco = modelMatrix * vec4(transformed, 1.0);
+     vWorldPosDeco = wpDeco.xyz;",
+}
+`;

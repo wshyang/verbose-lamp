@@ -5,8 +5,13 @@ interface GeometryAccumulator {
   positions: number[];
   normals: number[];
   pathData: number[]; // x: normalized u (0..1), y: delay (0..0.7), z: partSide (-1..+1)
+  /** x: brass tone 0..1, y: gradient angle in radians (ADDENDUM-021 §3.6). */
+  toneData: number[];
   indices: number[];
 }
+
+const DEFAULT_TONE = 0.5;
+const DEG_TO_RAD = Math.PI / 180;
 
 /**
  * Appends a 3D chamfered 24k gold bar along a 2D polyline at plane `z`.
@@ -29,11 +34,10 @@ function appendChamferedPolyline(acc: GeometryAccumulator, spec: PolylineSpec) {
     const a = pts[i];
     const b = pts[(i + 1) % count];
     const d = Math.hypot(b.x - a.x, b.y - a.y);
+    // Floored per segment, so a rail with two or more points always has a positive length.
     totalLen += Math.max(1e-4, d);
     cumLen.push(totalLen);
   }
-
-  if (totalLen < 1e-4) return;
 
   // Cross-section profile in (lateralOffset, zOffset, normalLateral, normalZ)
   // 6 vertices across the front + bevels + sides for crisp jewelry-grade facets:
@@ -135,12 +139,15 @@ function appendChamferedPolyline(acc: GeometryAccumulator, spec: PolylineSpec) {
     const nLen = Math.hypot(tx, ty) || 1;
     const unx = tx / nLen;
     const uny = ty / nLen;
+    const tone = spec.tone ?? DEFAULT_TONE;
+    const angleRad = (spec.brassAngle ?? 0) * DEG_TO_RAD;
 
     for (let p = 0; p < profN; p++) {
       const [lat, zOff, nLat, nZ] = profile[p];
       acc.positions.push(curr.x + tx * lat, curr.y + ty * lat, spec.z + zOff);
       acc.normals.push(unx * nLat, uny * nLat, nZ);
       acc.pathData.push(uNorm, spec.delay, partSide);
+      acc.toneData.push(tone, angleRad);
     }
   }
 
@@ -159,12 +166,13 @@ function appendChamferedPolyline(acc: GeometryAccumulator, spec: PolylineSpec) {
 
 /** Shared rail extrusion for title cards and camera-attached poster borders. */
 export function createChamferedFrameGeometry(specs: PolylineSpec[]): THREE.BufferGeometry {
-  const acc: GeometryAccumulator = { positions: [], normals: [], pathData: [], indices: [] };
+  const acc: GeometryAccumulator = { positions: [], normals: [], pathData: [], toneData: [], indices: [] };
   for (const spec of specs) appendChamferedPolyline(acc, spec);
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(acc.positions, 3));
   geometry.setAttribute('normal', new THREE.Float32BufferAttribute(acc.normals, 3));
   geometry.setAttribute('aPathData', new THREE.Float32BufferAttribute(acc.pathData, 3));
+  geometry.setAttribute('aTone', new THREE.Float32BufferAttribute(acc.toneData, 2));
   geometry.setIndex(acc.indices);
   geometry.computeBoundingSphere();
   return geometry;

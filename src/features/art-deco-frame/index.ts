@@ -9,8 +9,13 @@ export {
   type ScreenBorderRig,
 } from './render/ScreenBorderRig';
 export {
+  FRAME_FINISHES,
   createGoldFrameMaterial,
   createGoldFrameUniforms,
+  finishForFormula,
+  frameMaterialCacheKey,
+  type FrameFinish,
+  type GoldFrameMaterialOptions,
   type GoldFrameUniforms,
 } from './render/frameMaterial';
 export {

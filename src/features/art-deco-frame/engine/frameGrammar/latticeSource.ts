@@ -1,4 +1,6 @@
 import { buildDecoLattice, type LatticeSpec } from '@/features/deco-lattice';
+// Deep import: the pure engine must not load the deco-lattice barrel's React component.
+import { brassAngleFor, toneForLayer } from '@/features/deco-lattice/model/tone';
 import type { Point2, PolylineSpec, RailKind } from './types';
 
 /**
@@ -37,7 +39,7 @@ export function kindForLayer(spec: LatticeSpec): RailKind {
   return spec.rank >= 3 ? 'reed' : 'diamond';
 }
 
-export function toPolylineSpec(spec: LatticeSpec): PolylineSpec {
+export function toPolylineSpec(spec: LatticeSpec, seed = LATTICE_DEFAULT_SEED): PolylineSpec {
   const points: Point2[] = spec.points.map((point) => ({ x: point.x, y: point.y }));
   return {
     points,
@@ -48,6 +50,8 @@ export function toPolylineSpec(spec: LatticeSpec): PolylineSpec {
     delay: spec.layer * 0.12 + spec.rank * 0.02,
     kind: kindForLayer(spec),
     partDir: 0,
+    tone: toneForLayer(spec.layer),
+    brassAngle: brassAngleFor(seed, spec.layer),
   };
 }
 
@@ -73,15 +77,16 @@ export function fitVertexBudget(specs: readonly PolylineSpec[], budget = VERTEX_
 /** Lattice rails for one frame extent, ready for `applyIntricacy`. */
 export function buildLatticeSpecs(request: LatticeSourceRequest): PolylineSpec[] {
   const level = Math.min(4, Math.max(1, Math.round(request.level)));
+  const seed = request.seed ?? LATTICE_DEFAULT_SEED;
   const geometry = buildDecoLattice({
     mode: 'frame',
     hw: request.box.hw,
     hh: request.box.hh,
-    seed: request.seed ?? LATTICE_DEFAULT_SEED,
+    seed,
     density: request.density ?? DEFAULT_DENSITY,
     level,
   });
-  const all = geometry.specs.map(toPolylineSpec);
+  const all = geometry.specs.map((spec) => toPolylineSpec(spec, seed));
   const foundation = request.includePrimaryFrame === false
     ? all.filter((spec) => spec.kind !== 'frame')
     : all;

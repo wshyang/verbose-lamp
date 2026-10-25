@@ -1,8 +1,14 @@
 import * as THREE from 'three';
-import { buildEdgeBorder, viewportScaleAtDistance, type ScreenBorderStyle } from '../engine/frameGrammar';
+import {
+  DEFAULT_SCREEN_BORDER_SEED,
+  buildEdgeBorder,
+  viewportScaleAtDistance,
+  type ScreenBorderPattern,
+  type ScreenBorderStyle,
+} from '../engine/frameGrammar';
 import { clampGenome } from '../engine/frameGrammar/genome';
 import { createChamferedFrameGeometry } from './railGeometry';
-import { createGoldFrameMaterial, createGoldFrameUniforms } from './frameMaterial';
+import { createGoldFrameMaterial, createGoldFrameUniforms, type FrameFinish } from './frameMaterial';
 
 export interface ScreenBorderRig {
   root: THREE.Group;
@@ -14,6 +20,10 @@ export interface ScreenBorderRig {
 }
 
 const DISTANCE = 3;
+/** Finish per pattern, exported for the tests and for hosts that pre-warm programs. */
+export function finishFor(pattern: ScreenBorderPattern): FrameFinish {
+  return pattern === 'lattice' ? 'brass' : 'gold';
+}
 
 /**
  * The poster's printed edge border as a persistent proscenium, parented to the camera
@@ -28,15 +38,35 @@ export function createScreenBorderRig(
   root.visible = false;
   camera.add(root);
 
-  let style: ScreenBorderStyle = { weight: initialStyle.weight, genome: clampGenome(initialStyle.genome) };
+  const normalise = (next: ScreenBorderStyle): Required<ScreenBorderStyle> => ({
+    weight: THREE.MathUtils.clamp(next.weight, 0, 1),
+    genome: clampGenome(next.genome),
+    pattern: next.pattern ?? 'poster',
+    seed: next.seed ?? DEFAULT_SCREEN_BORDER_SEED,
+  });
+  const sameStyle = (a: Required<ScreenBorderStyle>, b: Required<ScreenBorderStyle>) =>
+    a.weight === b.weight &&
+    a.pattern === b.pattern &&
+    a.seed === b.seed &&
+    JSON.stringify(a.genome) === JSON.stringify(b.genome);
+
+  let style = normalise(initialStyle);
   let aspectRatio = aspect;
   const uniforms = createGoldFrameUniforms(1, 1);
-  const material = createGoldFrameMaterial(uniforms);
+  /** The lattice proscenium is brass; the printed poster edge stays 24k gold. */
+  let finish = finishFor(style.pattern);
+  let material = createGoldFrameMaterial(uniforms, { finish });
   material.depthTest = false;
   material.depthWrite = false;
 
   const buildGeometry = () => {
-    const { specs } = buildEdgeBorder({ aspect: aspectRatio, genome: style.genome, density: style.weight });
+    const { specs } = buildEdgeBorder({
+      aspect: aspectRatio,
+      genome: style.genome,
+      density: style.weight,
+      pattern: style.pattern,
+      seed: style.seed,
+    });
     return createChamferedFrameGeometry(specs);
   };
 
@@ -63,11 +93,20 @@ export function createScreenBorderRig(
   return {
     root,
     setStyle: (next) => {
-      const genome = clampGenome(next.genome);
-      const weight = THREE.MathUtils.clamp(next.weight, 0, 1);
-      if (weight === style.weight && JSON.stringify(genome) === JSON.stringify(style.genome)) return;
-      style = { weight, genome };
+      const normalised = normalise(next);
+      if (sameStyle(normalised, style)) return;
+      style = normalised;
       rebuild();
+      const nextFinish = finishFor(style.pattern);
+      if (nextFinish !== finish) {
+        finish = nextFinish;
+        const previous = material;
+        material = createGoldFrameMaterial(uniforms, { finish });
+        material.depthTest = false;
+        material.depthWrite = false;
+        mesh.material = material;
+        previous.dispose();
+      }
     },
     setEnabled: (enabled) => {
       root.visible = enabled;

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { LatticeSpec } from '@/features/deco-lattice';
+import { LAYER_TONES, brassAngleFor } from '@/features/deco-lattice/model/tone';
 import {
   buildLatticeSpecs,
   fitVertexBudget,
@@ -67,6 +68,31 @@ describe('toPolylineSpec', () => {
 
   it('leaves partDir auto so halves can be inferred from x', () => {
     expect(toPolylineSpec(spec(0, 0)).partDir).toBe(0);
+  });
+});
+
+describe('brass tone on lattice rails', () => {
+  it('stamps each rail with its layer tone and a seeded angle', () => {
+    for (const layer of [0, 1, 2, 3] as const) {
+      const converted = toPolylineSpec(spec(layer, 1), 1925);
+
+      expect(converted.tone).toBe(LAYER_TONES[layer]);
+      expect(converted.brassAngle).toBe(brassAngleFor(1925, layer));
+    }
+  });
+
+  it('defaults the seed to 1925 and tilts differently for another seed', () => {
+    expect(toPolylineSpec(spec(2, 2)).brassAngle).toBe(brassAngleFor(1925, 2));
+    expect(toPolylineSpec(spec(2, 2), 7).brassAngle).not.toBe(toPolylineSpec(spec(2, 2), 1925).brassAngle);
+  });
+
+  it('carries the request seed into every rail of a built frame', () => {
+    const angles = new Set(buildLatticeSpecs({ box: BOX, level: 4, seed: 4321 }).map((s) => s.brassAngle));
+
+    expect(angles.size).toBeLessThanOrEqual(4);
+    for (const angle of angles) {
+      expect([0, 1, 2, 3].map((layer) => brassAngleFor(4321, layer))).toContain(angle);
+    }
   });
 });
 

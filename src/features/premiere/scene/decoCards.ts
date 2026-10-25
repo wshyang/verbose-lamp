@@ -6,6 +6,7 @@ import {
   createGoldFrameMaterial,
   createGoldFrameUniforms,
   DEFAULT_FRAME_STYLE,
+  finishForFormula,
   type DecoTextRig,
   type FrameStyle,
 } from '@/features/art-deco-frame';
@@ -171,7 +172,9 @@ export function createGatsbyCardRig(
   let frameGeo = buildFrameGeometry(chapter.archetype, mainTextWidth, frameStyle);
 
   const frameUniforms = createGoldFrameUniforms();
-  const goldMat = createGoldFrameMaterial(frameUniforms);
+  // A lattice foundation or layer wears antique brass; every other frame stays 24k gold.
+  let frameFinish = finishForFormula(frameStyle.formula);
+  let goldMat = createGoldFrameMaterial(frameUniforms, { finish: frameFinish });
 
   const frameMesh = new THREE.Mesh(frameGeo, goldMat);
   root.add(frameMesh);
@@ -193,6 +196,14 @@ export function createGatsbyCardRig(
     frameGeo = buildFrameGeometry(chapter.archetype, mainTextWidth, frameStyle);
     frameMesh.geometry = frameGeo;
     previous.dispose();
+
+    const nextFinish = finishForFormula(frameStyle.formula);
+    if (nextFinish === frameFinish) return;
+    frameFinish = nextFinish;
+    const previousMaterial = goldMat;
+    goldMat = createGoldFrameMaterial(frameUniforms, { finish: frameFinish });
+    frameMesh.material = goldMat;
+    previousMaterial.dispose();
   };
 
   return {
