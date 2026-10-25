@@ -54,7 +54,26 @@ None of its behaviour. The manager now receives `freezeAt` from the runtime and 
 callbacks are routed through the store-backed adapter; its drawing code is untouched,
 so the pending screenshot gate compares like with like.
 
-## 5. Verification and the honest caveat
+## 5. Deviations from the plan as written
+
+Recorded rather than quietly absorbed, because a reader comparing ADDENDUM-022 to the
+tree will find different names:
+
+| Plan said | Tree holds | Why |
+|---|---|---|
+| `src/shared/lib/prng.ts`, `createPrng(seed)` | `src/shared/lib/random.ts`, `mulberry32(seed)` + `hash01` | One barrel for every seeded decision the suite needs; `createPrng` would have been a second name for the same function |
+| `scene3d/shaders/{greenLight,goldDust,cinemaNitrate}.glsl.ts` | `scene3d/shaders.ts` (136 LOC) | Three short GLSL strings; three files would have been three barrels for one screen of code |
+| `Atmosphere.tsx`, `DecoWall.tsx`, `Searchlights.tsx`, `GreenLight.tsx`, `GoldDust.tsx` | `Atmosphere.tsx` (191 LOC) with `DecoWall`/`Searchlights`/`GreenLight`/`GoldDust` as local components | Each is 25–40 lines and only ever mounted by `Atmosphere`; the 800-LOC rule is satisfied without five files |
+| `scene/searchlightTexture.ts`, `scene/orbitFocus.ts` | `scene3d/searchlightTexture.ts`, `scene3d/orbitFocus.ts` | Both are scene3d inputs; `orbitFocus` keeps its tests beside it |
+| `vitest-canvas-mock@1` | `src/test/canvasStub.ts` | The package needs `node-canvas`; the stub records draw calls, which is what the painter tests assert (`ADDENDUM-028 §3`). Pixels are never asserted |
+| `FrameStudioControl.test.tsx` | `src/app/components/FrameStudioDock.test.tsx` | The dock renders the control; the assertions are exactly the plan's (surface swap, presets, layer level, proportions, dismiss) |
+| `testid-coverage.test.tsx` | `src/app/testidCoverage.test.tsx` | Same test, house naming |
+
+Two plan items are **not** deviations but open work: Phase 3 (`@react-three/test-renderer`
+suites) and Phase 2.5 (delete `GatsbySceneManager.ts` once the baselines pass). Both are
+listed in ADDENDUM-028 §6 with their blockers.
+
+## 6. Verification and the honest caveat
 
 - `npx tsc --noEmit` — clean.
 - `npm test` — green (see ADDENDUM-028 for the counts).

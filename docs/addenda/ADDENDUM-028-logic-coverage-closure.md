@@ -107,14 +107,16 @@ the branch. `npm run test:coverage` fails otherwise. That is the point.
 
 ## 6. Still open
 
-1. `@react-three/test-renderer` suites for `scene3d/` — the package is not in the
-   lockfile; installing it here would be a registry round-trip for a renderer that
-   cannot be seen.
+1. `@react-three/test-renderer` suites for `scene3d/` (ADDENDUM-022 Phase 3) — the
+   package is not in the lockfile; installing it here would be a registry round-trip
+   for a renderer that cannot be seen.
 2. Playwright (`e2e/flows.spec.ts`, `e2e/likeness.spec.ts`, both written and never
    run) — no browser in this sandbox.
 3. The visual check of the Deco Lattice frames against the film stills (specs 123 →
    243), and of the R3F sequence against the classic renderer.
-4. Deleting `GatsbySceneManager.ts` once that comparison passes.
+4. Deleting `GatsbySceneManager.ts` once that comparison passes (ADDENDUM-022 §2.5).
+5. Phase 1's `FrameStudioControl.test.tsx` exists as `FrameStudioDock.test.tsx`; the
+   assertions the plan listed are all there, the file name is not (ADDENDUM-026 §5).
 
 **No browser in this sandbox; visual verification pending.** Every number in this
 record is honest as a *test* number, and says nothing about how the result looks.
