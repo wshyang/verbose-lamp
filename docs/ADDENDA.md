@@ -32,3 +32,4 @@ numbers so the base spec stays stable. See `CLAUDE.md` §1 for the discipline.
 | [ADDENDUM-025](addenda/ADDENDUM-025-glsl-shader-source-files-assessment-and-plan.md) | 2026-10-25 | GLSL shader source: best-practice assessment; move standalone shaders to `?raw` files | §2, §3 | Implemented by ADDENDUM-026 |
 | [ADDENDUM-026](addenda/ADDENDUM-026-glsl-shader-source-files-implementation.md) | 2026-10-25 | GLSL shader source files: implementation record, Playwright validation | §2, §3 | Implemented — real-GPU check pending |
 | [ADDENDUM-027](addenda/ADDENDUM-027-pr-integration-plan-and-baseline.md) | 2026-10-25 | Integrating PRs #2-#6: plan, decisions and baseline (Phase 0) | §2, §3, §7 | Accepted — Phase 0 implemented |
+| [ADDENDUM-028](addenda/ADDENDUM-028-premiere-pure-seams.md) | 2026-10-25 | Premiere pure seams: choreography, orbit focus, clamps, clock, scene port (Phase 1) | §3, §5, §7 | Implemented |

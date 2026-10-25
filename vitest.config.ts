@@ -37,13 +37,13 @@ const FULL = { statements: 100, branches: 100, functions: 100, lines: 100 } as c
 
 /**
  * Global floors are a ratchet at the logic-surface level measured when this gate was
- * introduced (65.3 % statements, 64.3 % branches, 58.5 % functions, 65.7 % lines, with
+ * introduced (65.3 % statements, 64.3 % branches, 58.5 % functions, 65.7 % lines, raised to 66.3 / 65.8 / 60.0 / 66.7 by Phase 1, with
  * every non-excluded file counted, loaded by a test or not): raise them whenever a phase
  * raises coverage, never lower them. Modules
  * the integration adds or rewrites are named below at 100% as they land, so a later
  * change cannot quietly drop them.
  */
-const GLOBAL_FLOORS = { statements: 65, branches: 64, functions: 58, lines: 65 } as const;
+const GLOBAL_FLOORS = { statements: 66, branches: 65, functions: 60, lines: 66 } as const;
 
 // Separate from vite.config.ts on purpose: the single-file and Tailwind plugins are
 // irrelevant to node unit tests, and the project rule forbids editing vite.config.ts.
