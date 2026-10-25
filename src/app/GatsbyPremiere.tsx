@@ -41,6 +41,11 @@ export function GatsbyPremiere({ onOpenEventNight }: GatsbyPremiereProps) {
         mountRef={premiere.stageRef}
         cameraMode={premiere.cameraMode}
         hudHidden={hudHidden}
+        renderer={premiere.runtime.renderer}
+        store={premiere.runtime.store}
+        onSceneTelemetry={premiere.runtime.onSceneTelemetry}
+        onSceneChapterChange={premiere.runtime.onSceneChapterChange}
+        onSceneFrameReady={premiere.runtime.onSceneFrameReady}
       />
       <PremiereHeader
         cameraMode={premiere.cameraMode}
