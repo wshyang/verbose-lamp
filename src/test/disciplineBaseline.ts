@@ -85,10 +85,8 @@ export const DISCIPLINE_DEBT: readonly DebtEntry[] = [
   { file: 'src/features/qr-generator/GoldenQrDefs.tsx', name: 'GoldenQrDefs', maxLines: 55, maxParams: 1, maxDepth: 0, reason: 'component' },
   { file: 'src/features/qr-generator/geometry.ts', name: 'chamferedSquarePath', maxLines: 9, maxParams: 4, maxDepth: 0, reason: 'geometry-primitive' },
   { file: 'src/features/qr-generator/useQrGenerator.ts', name: 'useQrGenerator', maxLines: 61, maxParams: 0, maxDepth: 1, reason: 'feature-hook' },
-  { file: 'src/features/research/components/ResearchModal.tsx', name: 'ResearchModal', maxLines: 161, maxParams: 1, maxDepth: 1, reason: 'component' },
   { file: 'src/features/spectacle-preview/testing/stubPreview.ts', name: 'stubPreview', maxLines: 56, maxParams: 1, maxDepth: 0, reason: 'logic-orchestrator' },
   { file: 'src/features/spectacle/effects/sparklers/sparklerRenderer.ts', name: 'drawSparklerSmoke', maxLines: 16, maxParams: 5, maxDepth: 1, reason: 'geometry-primitive' },
   { file: 'src/features/spectacle/effects/sparklers/sparklersEffect.ts', name: 'emitForPlan', maxLines: 7, maxParams: 5, maxDepth: 1, reason: 'geometry-primitive' },
-  { file: 'src/features/title-customizer/components/CustomTitleModal.tsx', name: 'CustomTitleModal', maxLines: 182, maxParams: 1, maxDepth: 1, reason: 'component' },
   { file: 'src/shared/ui/Dialog.tsx', name: 'Dialog', maxLines: 72, maxParams: 1, maxDepth: 2, reason: 'component' },
 ];
