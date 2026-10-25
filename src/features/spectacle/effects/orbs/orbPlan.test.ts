@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { maxFlashRate } from '../../model/motionPolicy';
 import { planOrbCrossfade, planOrbTransition } from './orbPlan';
+import { planSparklerCrossfade, planSparklerTransition } from '../sparklers/sparklerPlan';
 
 const origins = [
   { x: 0.5, y: 0.5 },
@@ -43,6 +44,12 @@ describe('planOrbTransition', () => {
       expect(maxFlashRate(plan.flash)).toBeLessThanOrEqual(3);
       for (const s of plan.flash) expect(s.attackMs).toBeGreaterThanOrEqual(80);
     }
+  });
+
+  it('the sparkler spelling plans the identical choreography (ADDENDUM-025)', () => {
+    const params = { origin: origins[0], pattern: 'corners', direction: 'inward' } as const;
+    expect(planSparklerTransition(params)).toEqual(planOrbTransition(params));
+    expect(planSparklerCrossfade(params)).toEqual(planOrbCrossfade(params));
   });
 
   it('reduced motion becomes a 400 ms crossfade that still covers', () => {

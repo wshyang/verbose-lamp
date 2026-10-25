@@ -29,7 +29,7 @@ export function farthestCornerDistance(origin: NormPoint, aspect: number): numbe
   return Math.hypot(dx, dy);
 }
 
-/** Off-screen orb targets for the two named patterns. Always outside 0..1. */
+/** Off-screen sparkler targets for the two named patterns. Always outside 0..1. */
 export function offscreenTargets(
   origin: NormPoint,
   pattern: 'sides' | 'corners' | readonly NormPoint[],

@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { QrGeneratorLauncher } from '@/features/qr-generator';
 import { AvatarStudioLauncher } from '@/features/avatar-studio';
+import { CelebrationLauncher } from '@/features/celebration-overlay';
 import { EventNightLauncher } from '@/features/event-night';
 import type { CameraMode } from '@/features/premiere';
 import { Button, IconButton } from '@/shared/ui';
@@ -65,6 +66,7 @@ export function PremiereHeader({
         </Button>
         <QrGeneratorLauncher />
         <AvatarStudioLauncher />
+        <CelebrationLauncher />
         <EventNightLauncher onOpen={onOpenEventNight} />
         <Button
           onClick={onToggleCameraMode}

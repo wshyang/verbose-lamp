@@ -39,7 +39,7 @@ export function useEventNight(navItems: readonly NavItem[]) {
         return;
       }
       const from = navRef.current ? pointFromElement(navRef.current) : FALLBACK_NAV_ORIGIN;
-      play('orb-transition', {
+      play('sparkler-transition', {
         origin: { x: from.x, y: Math.min(from.y, MAX_NAV_ORIGIN_Y) },
         pattern: 'sides',
         direction: 'outward',

@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { SpectacleProvider } from '@/features/spectacle';
 import { CustomTitleModal } from '@/features/title-customizer';
 import { ResearchModal } from '@/features/research';
 import {
@@ -37,6 +38,7 @@ export function GatsbyPremiere({ onOpenEventNight }: GatsbyPremiereProps) {
 
   return (
     <main className="relative h-dvh w-screen select-none overflow-hidden bg-[#050407]">
+      <SpectacleProvider className="relative h-full w-full overflow-hidden">
       <CinematicStage
         mountRef={premiere.stageRef}
         cameraMode={premiere.cameraMode}
@@ -78,6 +80,7 @@ export function GatsbyPremiere({ onOpenEventNight }: GatsbyPremiereProps) {
         onApply={premiere.applyHeroTitle}
         onClose={closeCustomizer}
       />
+      </SpectacleProvider>
     </main>
   );
 }

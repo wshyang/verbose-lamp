@@ -8,18 +8,20 @@ interface TransitionInputs {
   origin: { x: number; y: number };
 }
 
-/** Orb and sunburst transitions; the A/B demo screen swaps while covered. */
+/** Sparkler and sunburst transitions; the A/B demo screen swaps while covered. */
 export function useTransitionActions({ runner, origin }: TransitionInputs) {
   const { run } = runner;
   const [demoScreen, setDemoScreen] = useState<DemoScreen>('A');
   const swapDemo = useCallback(() => setDemoScreen((s) => (s === 'A' ? 'B' : 'A')), []);
 
-  const playOrb = useCallback(
+  const playSparkler = useCallback(
     (key: string, pattern: 'sides' | 'corners', direction: 'outward' | 'inward') => {
-      run(key, 'orb-transition', { origin, pattern, direction, onCovered: swapDemo });
+      run(key, 'sparkler-transition', { origin, pattern, direction, onCovered: swapDemo });
     },
     [run, origin, swapDemo],
   );
+  // Legacy spelling kept for existing preview compositions (ADDENDUM-025).
+  const playOrb = playSparkler;
 
   const playSunburst = useCallback(
     (key: string, variant: 'iris' | 'fan') => {
@@ -32,5 +34,5 @@ export function useTransitionActions({ runner, origin }: TransitionInputs) {
     [run, origin, swapDemo],
   );
 
-  return { demoScreen, playOrb, playSunburst };
+  return { demoScreen, playSparkler, playOrb, playSunburst };
 }
