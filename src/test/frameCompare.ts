@@ -38,25 +38,40 @@ interface PngHeader {
   colourType: number;
 }
 
-function readChunks(buffer: Buffer): { header: PngHeader; compressed: Buffer } {
+const CHUNK_OVERHEAD = 12;
+
+interface Chunk {
+  type: string;
+  body: Buffer;
+}
+
+/** The chunks of a PNG in order, stopping after IEND. */
+function* chunksOf(buffer: Buffer): Generator<Chunk> {
   let offset = 8;
-  const header: PngHeader = { width: 0, height: 0, bitDepth: 0, colourType: 0 };
-  const parts: Buffer[] = [];
   while (offset < buffer.length) {
     const length = buffer.readUInt32BE(offset);
     const type = buffer.subarray(offset + 4, offset + 8).toString('ascii');
-    const body = buffer.subarray(offset + 8, offset + 8 + length);
-    if (type === 'IHDR') {
-      header.width = body.readUInt32BE(0);
-      header.height = body.readUInt32BE(4);
-      header.bitDepth = body[8];
-      header.colourType = body[9];
-    } else if (type === 'IDAT') {
-      parts.push(body);
-    } else if (type === 'IEND') {
-      break;
-    }
-    offset += length + 12;
+    yield { type, body: buffer.subarray(offset + 8, offset + 8 + length) };
+    if (type === 'IEND') return;
+    offset += length + CHUNK_OVERHEAD;
+  }
+}
+
+function headerOf(body: Buffer): PngHeader {
+  return {
+    width: body.readUInt32BE(0),
+    height: body.readUInt32BE(4),
+    bitDepth: body[8],
+    colourType: body[9],
+  };
+}
+
+function readChunks(buffer: Buffer): { header: PngHeader; compressed: Buffer } {
+  let header: PngHeader = { width: 0, height: 0, bitDepth: 0, colourType: 0 };
+  const parts: Buffer[] = [];
+  for (const chunk of chunksOf(buffer)) {
+    if (chunk.type === 'IHDR') header = headerOf(chunk.body);
+    else if (chunk.type === 'IDAT') parts.push(chunk.body);
   }
   return { header, compressed: Buffer.concat(parts) };
 }
@@ -70,16 +85,40 @@ function paeth(left: number, up: number, upLeft: number): number {
   return toUp <= toUpLeft ? up : upLeft;
 }
 
-/** Undoes one scanline's filter in place. The five PNG filters are four short cases. */
-function unfilter(filter: number, current: Buffer, previous: Buffer, channels: number): void {
+interface Neighbours {
+  left: number;
+  up: number;
+  upLeft: number;
+}
+
+/** What each PNG filter adds back to a byte, given the bytes around it. Filter 0 adds nothing. */
+const PREDICTORS: Readonly<Record<number, (n: Neighbours) => number>> = {
+  1: (n) => n.left,
+  2: (n) => n.up,
+  3: (n) => (n.left + n.up) >> 1,
+  4: (n) => paeth(n.left, n.up, n.upLeft),
+};
+
+interface Scanline {
+  filter: number;
+  current: Buffer;
+  previous: Buffer;
+  /** Bytes per pixel, so "left" means the same channel of the previous pixel. */
+  channels: number;
+}
+
+/** Undoes one scanline's filter in place. */
+function unfilter({ filter, current, previous, channels }: Scanline): void {
+  const predict = PREDICTORS[filter];
+  if (!predict) return;
   for (let x = 0; x < current.length; x += 1) {
-    const left = x >= channels ? current[x - channels] : 0;
-    const up = previous[x];
-    const upLeft = x >= channels ? previous[x - channels] : 0;
-    if (filter === 1) current[x] = (current[x] + left) & 0xff;
-    else if (filter === 2) current[x] = (current[x] + up) & 0xff;
-    else if (filter === 3) current[x] = (current[x] + ((left + up) >> 1)) & 0xff;
-    else if (filter === 4) current[x] = (current[x] + paeth(left, up, upLeft)) & 0xff;
+    const hasLeft = x >= channels;
+    const neighbours = {
+      left: hasLeft ? current[x - channels] : 0,
+      up: previous[x],
+      upLeft: hasLeft ? previous[x - channels] : 0,
+    };
+    current[x] = (current[x] + predict(neighbours)) & 0xff;
   }
 }
 
@@ -100,7 +139,7 @@ export function decodePng(buffer: Buffer): Frame {
   for (let y = 0; y < header.height; y += 1) {
     const filter = raw[y * (stride + 1)];
     const current = Buffer.from(raw.subarray(y * (stride + 1) + 1, (y + 1) * (stride + 1)));
-    unfilter(filter, current, previous, channels);
+    unfilter({ filter, current, previous, channels });
     for (let x = 0; x < header.width; x += 1) {
       const from = x * channels;
       const to = (y * header.width + x) * 4;

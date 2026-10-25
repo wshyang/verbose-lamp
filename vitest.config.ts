@@ -42,7 +42,7 @@ const FULL = { statements: 100, branches: 100, functions: 100, lines: 100 } as c
  * the integration adds or rewrites are named below at 100% as they land, so a later
  * change cannot quietly drop them.
  */
-const GLOBAL_FLOORS = { statements: 82, branches: 77, functions: 78, lines: 83 } as const;
+const GLOBAL_FLOORS = { statements: 82, branches: 77, functions: 78, lines: 84 } as const;
 
 // Separate from vite.config.ts on purpose: the single-file and Tailwind plugins are
 // irrelevant to node unit tests, and the project rule forbids editing vite.config.ts.
@@ -101,6 +101,7 @@ export default defineConfig({
         'src/shared/hooks/useEscapeKey.ts': FULL,
         'src/features/gilded-ui/model/glyphIcons.ts': FULL,
         'src/features/gilded-ui/model/navItems.ts': FULL,
+        'src/features/premiere/hooks/usePremiereShortcuts.ts': FULL,
         'src/shared/hooks/useDialogFocus.ts': FULL,
         'src/features/art-deco-frame/engine/frameGrammar/latticeSource.ts': FULL,
         'src/features/frame-studio/model/patternSeed.ts': FULL,

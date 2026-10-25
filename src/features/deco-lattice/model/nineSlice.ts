@@ -208,23 +208,29 @@ function edgeBand(run: number, plan: BandPlan, y: number, tick: number, density:
   return out;
 }
 
+interface BandRuns {
+  x: number;
+  y: number;
+  planX: BandPlan;
+  planY: BandPlan;
+}
+
+interface BandBox {
+  hw: number;
+  hh: number;
+  inset: number;
+  density: number;
+}
+
 /** The top band and its y-mirror, plus the left/right bands. */
-function allBands(
-  runX: number,
-  runY: number,
-  planX: BandPlan,
-  planY: BandPlan,
-  hw: number,
-  hh: number,
-  inset: number,
-  density: number
-): readonly LatticeSpec[] {
+function allBands(runs: BandRuns, box: BandBox): readonly LatticeSpec[] {
+  const { hw, hh, inset, density } = box;
   const topY = n(hh - inset * 0.55);
   const sideX = n(hw - inset * 0.55);
   const tick = 0.026 + 0.012 * density;
 
-  const horizontal = edgeBand(runX, planX, topY, tick, density);
-  const vertical = edgeBand(runY, planY, sideX, tick, density).map((spec) => ({
+  const horizontal = edgeBand(runs.x, runs.planX, topY, tick, density);
+  const vertical = edgeBand(runs.y, runs.planY, sideX, tick, density).map((spec) => ({
     ...spec,
     points: rotate90(spec.points),
   }));
@@ -246,7 +252,20 @@ function borderReach(hw: number, hh: number, aperture?: { hw: number; hh: number
   return Math.max(1e-3, Math.min(MIN_APERTURE_MARGIN, hw - aperture.hw, hh - aperture.hh));
 }
 
-export function buildNineSlice(request: NineSliceRequest): NineSliceGeometry {
+/** The request with every input made finite and bounded, and the sizes derived from it. */
+interface ResolvedSlice {
+  hw: number;
+  hh: number;
+  level: number;
+  density: number;
+  corner: number;
+  aperture: { hw: number; hh: number };
+  inset: number;
+  runX: number;
+  runY: number;
+}
+
+function resolveSlice(request: NineSliceRequest): ResolvedSlice {
   const hw = Math.max(MIN_CORNER * 2, finiteOr(request.hw, 1));
   const hh = Math.max(MIN_CORNER * 2, finiteOr(request.hh, 1));
   const level = Math.min(4, Math.max(1, Math.round(finiteOr(request.level, DEFAULT_LEVEL))));
@@ -267,42 +286,43 @@ export function buildNineSlice(request: NineSliceRequest): NineSliceGeometry {
     MIN_CORNER,
     Math.min(Math.min(hw, hh) * ratio, hw - aperture.hw, hh - aperture.hh)
   );
+  return {
+    hw, hh, level, density, corner, aperture,
+    inset: borderReach(hw, hh, request.aperture),
+    runX: Math.max(1e-3, n(hw - corner)),
+    runY: Math.max(1e-3, n(hh - corner)),
+  };
+}
 
-  const inset = borderReach(hw, hh, request.aperture);
-  const innerHw = n(hw - inset);
-  const innerHh = n(hh - inset);
-  const runX = Math.max(1e-3, n(hw - corner));
-  const runY = Math.max(1e-3, n(hh - corner));
-  const planX = planBand(runX, density);
-  const planY = planBand(runY, density);
-
-  const specs: LatticeSpec[] = [];
-
-  // L1 — the outer frame bar.
-  specs.push(box(n(hw), n(hh), 0.019 + 0.004 * density, 0, 0));
-
-  // L2 — the inner hairline (drawn as the aperture boundary) and the corners.
+/** The four layers, each a superset of the one below: bar, hairline and corners, frieze, nested rail. */
+function layersFor(slice: ResolvedSlice, plans: { x: BandPlan; y: BandPlan }): LatticeSpec[] {
+  const { hw, hh, level, density, corner, inset } = slice;
+  const specs: LatticeSpec[] = [box(n(hw), n(hh), 0.019 + 0.004 * density, 0, 0)];
   if (level >= 2) {
-    specs.push(box(innerHw, innerHh, 0.006, 3, 2));
+    specs.push(box(n(hw - inset), n(hh - inset), 0.006, 3, 2));
     specs.push(...corners(corner, n(hw), n(hh), density, level));
   }
-
-  // L3 — the frieze bands and their centred clasps.
   if (level >= 3) {
-    specs.push(...allBands(runX, runY, planX, planY, n(hw), n(hh), inset, density));
+    specs.push(...allBands(
+      { x: slice.runX, y: slice.runY, planX: plans.x, planY: plans.y },
+      { hw: n(hw), hh: n(hh), inset, density }
+    ));
   }
-
-  // L4 — a second rail nested between the bar and the aperture.
   if (level >= 4) {
     const nested = n(inset * 0.5);
     specs.push(box(n(hw - nested), n(hh - nested), 0.004, 3, 3));
   }
+  return specs;
+}
 
+export function buildNineSlice(request: NineSliceRequest): NineSliceGeometry {
+  const slice = resolveSlice(request);
+  const plans = { x: planBand(slice.runX, slice.density), y: planBand(slice.runY, slice.density) };
   return {
-    specs,
-    corner: n(corner),
-    counts: { long: planX.reps, short: planY.reps },
-    aperture,
-    bounds: { hw: n(hw), hh: n(hh) },
+    specs: layersFor(slice, plans),
+    corner: n(slice.corner),
+    counts: { long: plans.x.reps, short: plans.y.reps },
+    aperture: slice.aperture,
+    bounds: { hw: n(slice.hw), hh: n(slice.hh) },
   };
 }
