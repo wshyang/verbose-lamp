@@ -65,9 +65,10 @@ describe('EventNightStage', () => {
     render(<EventNightStage onExit={vi.fn()} />);
     expect(screen.getByText('Backdrop mock')).toBeTruthy();
     expect(screen.getByText('Medallion mock')).toBeTruthy();
-    fireEvent.click(screen.getByRole('main').parentElement!, { clientX: 5, clientY: 6 });
+    fireEvent.click(screen.getByRole('main'), { clientX: 5, clientY: 6 });
     expect(mocks.preview.onStageClick).toHaveBeenCalledWith(5, 6);
     await user.click(screen.getByText('Launcher false'));
+    expect(mocks.preview.onStageClick).toHaveBeenCalledTimes(1);
     expect(mocks.preview.setOpen).toHaveBeenCalledWith(true);
     expect(mocks.ambient[0].isReady).toBe(true);
     mocks.ambient[0].start();

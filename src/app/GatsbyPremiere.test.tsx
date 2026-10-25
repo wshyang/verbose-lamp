@@ -61,7 +61,11 @@ vi.mock('@/features/premiere', () => ({
   usePremiereShortcuts: (options: { isDialogOpen: boolean }) => mocks.shortcutOptions.push(options),
 }));
 vi.mock('./hooks/usePremiereSpectacle', () => ({ usePremiereSpectacle: () => mocks.spectacle }));
-vi.mock('./components/CinematicStage', () => ({ CinematicStage: () => <span>Stage mock</span> }));
+vi.mock('./components/CinematicStage', () => ({
+  CinematicStage: ({ onStageClick }: { onStageClick: (clientX: number, clientY: number) => void }) => (
+    <button type="button" onClick={(event) => onStageClick(event.clientX, event.clientY)}>Stage mock</button>
+  ),
+}));
 vi.mock('./components/FrameStudioDock', () => ({ FrameStudioDock: () => <span>Dock mock</span> }));
 vi.mock('./components/OrbitHint', () => ({
   OrbitHint: ({ isVisible }: { isVisible: boolean }) => <span>Orbit visible {String(isVisible)}</span>,
@@ -100,9 +104,12 @@ describe('GatsbyPremiere composition', () => {
     expect(screen.getByText('Glyph defs')).toBeTruthy();
     expect(screen.getByText('Panel left')).toBeTruthy();
     fireEvent.click(screen.getByRole('main'), { clientX: 12, clientY: 34 });
+    expect(mocks.preview.onStageClick).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByText('Stage mock'), { clientX: 12, clientY: 34 });
     expect(mocks.preview.onStageClick).toHaveBeenCalledWith(12, 34);
 
     await user.click(screen.getByText('Open event'));
+    expect(mocks.preview.onStageClick).toHaveBeenCalledTimes(1);
     expect(onOpenEventNight).toHaveBeenCalledOnce();
     await user.click(screen.getByText('Open research'));
     expect(mocks.shortcutOptions.at(-1)?.isDialogOpen).toBe(true);

@@ -17,6 +17,9 @@ test('chapter buttons move the sequence into each act', async ({ page }) => {
   await gotoLive(page);
   const chapters = page.getByTestId('timeline__chapter');
   await expect(chapters).toHaveCount(5);
+  // The Frame Studio dock opens over the right-hand chapter buttons.
+  await page.getByTestId('frame-studio__dismiss').click();
+  await expect(page.getByTestId('frame-studio__panel')).toHaveCount(0);
   for (const [index, act] of ['ACT I', 'ACT II', 'ACT III', 'ACT IV', 'ACT V'].entries()) {
     await chapters.nth(index).click();
     await expect(page.getByText(act, { exact: true })).toBeVisible();
@@ -63,4 +66,21 @@ test('applying a custom title jumps to act V', async ({ page }) => {
   await page.getByTestId('title-customizer__apply').click();
   await expect(page.getByTestId('title-customizer__dialog')).toHaveCount(0);
   await expect(page.getByText('ACT V', { exact: true })).toBeVisible();
+});
+
+test('spectacle origin picking only responds to the stage', async ({ page }) => {
+  await gotoLive(page);
+  await page.getByTestId('frame-studio__dismiss').click();
+  await page.getByTestId('spectacle-preview__launch').click();
+  await page.getByTestId('spectacle-preview__pick-origin').click();
+  await expect(page.getByTestId('spectacle-preview__pick-hint')).toBeVisible();
+  await page.getByTestId('spectacle-preview__panel').click({ position: { x: 24, y: 18 } });
+  await expect(page.getByTestId('spectacle-preview__pick-hint')).toBeVisible();
+  await page.getByTestId('spectacle-preview__close').click();
+  await expect(page.getByTestId('spectacle-preview__pick-hint')).toBeVisible();
+
+  const viewport = page.viewportSize();
+  if (!viewport) throw new Error('Expected a viewport for the stage click');
+  await page.mouse.click(viewport.width / 2, viewport.height * 0.52);
+  await expect(page.getByTestId('spectacle-preview__pick-hint')).toHaveCount(0);
 });

@@ -54,7 +54,7 @@ export function FrameStudioDock({ studio, hudHidden }: FrameStudioDockProps) {
       ) : (
         <Button
           onClick={studio.reveal}
-          className="absolute right-6 top-28 z-20 sm:right-9"
+          className="absolute right-6 top-48 z-20 sm:right-9 sm:top-28"
           title="Reopen Frame Studio (F)"
           aria-label="Reopen Frame Studio"
           data-testid="frame-studio__reveal"

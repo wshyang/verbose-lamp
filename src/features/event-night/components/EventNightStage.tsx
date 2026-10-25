@@ -35,16 +35,16 @@ export function EventNightStage({ onExit }: EventNightStageProps) {
   return (
     <>
       <StageBackdrop />
-      <div
-        className="relative z-10 flex h-full min-h-0 flex-col"
-        onClick={(e) => preview.onStageClick(e.clientX, e.clientY)}
-      >
+      <div className="relative z-10 flex h-full min-h-0 flex-col">
         <EventNightHeader
           onExit={onExit}
           onOpenDraw={night.openDraw}
           launcher={<SpectaclePreviewLauncher open={preview.open} onToggle={() => preview.setOpen(!preview.open)} />}
         />
-        <main className="relative flex min-h-0 flex-1 items-center justify-center overflow-y-auto px-4 pb-28 pt-2">
+        <main
+          className="relative flex min-h-0 flex-1 items-center justify-center overflow-y-auto px-4 pb-28 pt-2"
+          onClick={(event) => preview.onStageClick(event.clientX, event.clientY)}
+        >
           <TitleMedallion
             lattice={{
               seed: preview.latticeSeed, density: preview.latticeDensity, level: preview.latticeLevel,

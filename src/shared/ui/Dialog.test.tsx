@@ -36,6 +36,20 @@ describe('Dialog', () => {
     expect(frames.size).toBe(0);
   });
 
+  it('closes on a window Escape before focus moves into the dialog', () => {
+    const onClose = vi.fn();
+    render(
+      <Dialog open onClose={onClose} labelledBy="title">
+        <h2 id="title">Title</h2>
+        <button type="button">Inside</button>
+      </Dialog>
+    );
+    fireEvent.keyDown(window, { key: 'Enter' });
+    expect(onClose).not.toHaveBeenCalled();
+    fireEvent.keyDown(window, { key: 'Escape' });
+    expect(onClose).toHaveBeenCalledOnce();
+  });
+
   it('focuses a preferred control, traps every Tab direction, and closes on Escape/backdrop', () => {
     const onClose = vi.fn();
     const parentKey = vi.fn();

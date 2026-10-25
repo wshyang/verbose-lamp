@@ -2,7 +2,10 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: 'e2e',
+  // SwiftShader first-frame and screenshot capture can be slow on cold CI runners.
+  timeout: 120_000,
   expect: {
+    timeout: 30_000,
     toHaveScreenshot: {
       maxDiffPixelRatio: 0.01,
       threshold: 0.2,
@@ -11,6 +14,7 @@ export default defineConfig({
   },
   use: {
     baseURL: 'http://localhost:4173',
+    video: 'on',
     launchOptions: {
       args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
     },

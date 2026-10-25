@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { createPremiereStore } from '@/features/premiere/scene3d/premiereStore';
@@ -35,13 +35,18 @@ function studio(isOpen: boolean) {
 }
 
 describe('CinematicStage', () => {
-  it('publishes frame readiness and switches cinema/orbit and HUD classes', () => {
+  it('publishes frame readiness, forwards stage clicks, and switches cinema/orbit and HUD classes', () => {
     const store = createPremiereStore({ freezeAt: null });
-    const { rerender } = render(<CinematicStage store={store} cameraMode="cinema" hudHidden={false} />);
+    const onStageClick = vi.fn();
+    const { rerender } = render(
+      <CinematicStage store={store} cameraMode="cinema" hudHidden={false} onStageClick={onStageClick} />
+    );
     expect(screen.getByTestId('cinematic-stage__canvas').dataset.frameReady).toBe('false');
+    fireEvent.click(screen.getByTestId('cinematic-stage__canvas'), { clientX: 144, clientY: 90 });
+    expect(onStageClick).toHaveBeenCalledWith(144, 90);
     act(() => store.getState().markFrameReady());
     expect(screen.getByTestId('cinematic-stage__canvas').dataset.frameReady).toBe('true');
-    rerender(<CinematicStage store={store} cameraMode="orbit" hudHidden />);
+    rerender(<CinematicStage store={store} cameraMode="orbit" hudHidden onStageClick={onStageClick} />);
     expect(screen.getByTestId('cinematic-stage__canvas').className).toContain('cursor-grab');
     expect(document.querySelector('.opacity-0')).toBeTruthy();
   });

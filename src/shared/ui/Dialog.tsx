@@ -27,7 +27,7 @@ export function Dialog({
   labelledBy,
   children,
   className = '',
-  backdropClassName = 'fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4',
+  backdropClassName = 'fixed inset-0 z-[80] flex items-center justify-center bg-black/75 backdrop-blur-md p-4',
   testId,
   closeOnBackdrop = true,
 }: DialogProps) {
@@ -45,9 +45,17 @@ export function Dialog({
       const first = getFocusableElements(dialog)[0];
       (preferred ?? first ?? dialog).focus({ preventScroll: true });
     });
+    // Escape must work even before the focus-in frame lands inside the dialog.
+    const onEscape = (event: globalThis.KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      closeRef.current();
+    };
+    window.addEventListener('keydown', onEscape);
 
     return () => {
       window.cancelAnimationFrame(focusFrame);
+      window.removeEventListener('keydown', onEscape);
       if (restoreTarget?.isConnected) restoreTarget.focus({ preventScroll: true });
     };
   }, [open]);

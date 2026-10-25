@@ -35,8 +35,9 @@ r186, Vitest. No backend, database, auth, or persistence.
 - **N/A:** real-database integration tests, session-scoping negative tests, OWASP
   endpoint matrix — there is no server or persisted data. Revisit the moment either
   appears.
-- Playwright e2e with video-on default is **deferred**; see ADDENDUM-001 for the
-  explicit decision and the trigger that un-defers it.
+- Playwright e2e with video-on was **un-deferred by ADDENDUM-022** and scaffolded
+  by ADDENDUM-025 under `e2e/`; likeness baselines must be generated and reviewed
+  with the supported Playwright Chromium build.
 
 ## 3. Test infrastructure defaults
 

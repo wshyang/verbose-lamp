@@ -1,7 +1,7 @@
 # ADDENDUM-025 — R3F testability refactor implemented (ADDENDUM-022), orbs reworked as sparklers, premiere spectacle overlay, literal 100% coverage gate
 
 **Date:** 2026-10-25 · **Relates to:** ADDENDUM-022 (implemented here in full), ADDENDUM-020 §3.9 (premiere preview overlay), ADDENDUM-021 (lattice walks), ADDENDUM-024 (spectacle port); CLAUDE.md §2 (explicitly overridden in part — see §4.1), §3, §6, §7, §9.
-**Status:** Implemented — visual check pending (no browser or GPU in the build sandbox; see §7).
+**Status:** Implemented — fallback-browser flow/visual smoke done; supported-browser likeness baselines pending (see §7).
 
 ## 1. What was decided
 
@@ -38,7 +38,7 @@ Four user-directed changes land together:
 | Premiere overlay | `src/app/GatsbyPremiere.tsx`, `src/app/hooks/usePremiereSpectacle.ts` | hook decides (panel state, origin picking, draw chaining); component renders |
 | Reusable preview helpers | `src/features/spectacle-preview/components/{OriginCrosshair,PickOriginHint,KeepClearSpeaker}.tsx` | lifted out of `event-night`, which now consumes them through the barrel |
 | Coverage gate | `vitest.config.ts` | V8 provider, thresholds 100/100/100/100; `vite.config.ts` untouched per CLAUDE §3 |
-| E2E scaffold | `playwright.config.ts`, `e2e/` | likeness + flow specs over the freeze hook; **not yet run** (§7) |
+| E2E scaffold | `playwright.config.ts`, `e2e/` | likeness + flow specs over the freeze hook; flows pass under a fallback Chromium, likeness baselines pending a supported run (§7) |
 
 ## 2. Why
 
@@ -82,14 +82,17 @@ make regressions fail the build instead of eroding quietly.
    (which §2's geometry-not-pixels snapshot rule still governs). CLAUDE.md itself is
    unchanged; this addendum records the deviation, per §1's addendum-first rule.
 2. **ADDENDUM-022's checkpoint gating was waived by the user, not satisfied.** The
-   likeness gate (frozen-frame screenshots compared before/after) could not run in
-   the sandbox: no browser, no GPU, Chromium download blocked. The Playwright
-   scaffold (frozen shots at 1.0/4.32/6.7/11.28/18.08/24.82/33.8/37.0 s, SwiftShader,
-   `maxDiffPixelRatio 0.01`) is committed but **has no baselines and has never been
-   executed**. First run on a real machine must be `npm run e2e:update` followed by a
-   human review of every baseline; until then the R3F port is verified structurally,
-   not visually. This is the honest state; nothing in the test suite should be read
-   as a likeness pass.
+   likeness gate (frozen-frame screenshots compared before/after) could not run at
+   implementation time: no supported browser, no GPU, and the pinned Chromium
+   download was blocked. A follow-up later executed the **flow** specs under an
+   npm-packaged Chromium 153 headless shell with SwiftShader (§7) and inspected
+   smoke screenshots, but that fallback is not the supported likeness gate. The
+   Playwright scaffold (frozen shots at 1.0/4.32/6.7/11.28/18.08/24.82/33.8/37.0 s,
+   SwiftShader, `maxDiffPixelRatio 0.01`) still **has no baselines**. First
+   supported run must install Playwright's Chromium, run `npm run e2e:update`, and
+   human-review every baseline; until then the R3F port is flow- and
+   structure-verified, not likeness-gated. Nothing in the fallback smoke should be
+   read as a likeness pass.
 3. **Sparkler snapshots changed; orb goldens were re-recorded.** The spectacle
    golden suites (`effects.golden`, `planning.golden`) differ because the effect now
    draws wands and spray instead of orbs and because the catalogue key set changed.
@@ -111,11 +114,23 @@ make regressions fail the build instead of eroding quietly.
    and updates state); `Dialog` reading `event.currentTarget` instead of a ref it
    also owns. Each is behaviour-preserving under its stated invariant, and the
    invariant is written at the site.
-6. **Premiere overlay picks origins on any stage click, including HUD children**
-   (events bubble to the stage container), mirroring Event Night's composition. It
-   is harmless there and kept consistent here; noted for the browser check.
-7. **Bundle growth accepted.** The single-file build is 1,751.55 kB
-   (gzip 572.31 kB), up from 1.34 MB in ADDENDUM-024 — the R3F/drei/zustand
+6. **Origin picking is scoped to the stage surface, not the whole screen.**
+   Follow-up review found that a pending pick would also be consumed by clicks on
+   HUD/panel controls bubbling to the screen container. The premiere now handles
+   stage clicks on `CinematicStage` itself, and Event Night on its `<main>` stage
+   area, so headers, timelines, nav bars and the spectacle panel never move the
+   origin while a pick is pending.
+7. **Fallback-browser follow-up fixed three layering defects.** At 390×844 the
+   wrapped premiere header is 181px tall, but the Frame Studio dock/reveal began
+   at `top-28` (112px) and covered lower header controls, including SPECTACLE.
+   Below `sm` they now start at `top-48`; desktop placement is unchanged. The
+   spectacle panel and modal backdrops now use the existing `z-[80]` modal layer
+   above the dock's `z-[70]` (Research/Customizer were `z-50` outliers and were
+   partly unusable on mobile). Video-on e2e also exposed an Escape race before a
+   dialog's focus-in frame landed; `Dialog` now listens for Escape on `window`
+   while open, in addition to its in-dialog focus trap.
+8. **Bundle growth accepted.** The single-file build is 1,751.92 kB
+   (gzip 572.44 kB), up from 1.34 MB in ADDENDUM-024 — the R3F/drei/zustand
    runtime. No code-splitting was introduced; the delivery format (one tracked
    `dist/index.html`) is unchanged.
 
@@ -163,27 +178,43 @@ ADDENDUM-001/024; this change only added props/tests around them.
 ## 7. Validation actually performed
 
 - `npx tsc --noEmit` — clean.
-- `npm test` — 161 files, **854 tests, all passing** (non-update run; the only
-  snapshot updates ever written were the §4.3/§4.4 goldens, reviewed as diffs).
-- `npm run test:coverage` — **100% lines (5625/5625), 100% statements (6356/6356),
-  100% functions (1460/1460), 100% branches (2325/2325)**; thresholds in
+- `npm run test:coverage` — 161 files, **855 tests, all passing** (non-update
+  run; the only snapshot updates ever written were the §4.3/§4.4 goldens, reviewed
+  as diffs), at **100% lines (5631/5631), 100% statements (6363/6363), 100%
+  functions (1461/1461), 100% branches (2327/2327)**; thresholds in
   `vitest.config.ts` enforce it. Trajectory from the pre-gate baseline:
   66.93% → 85.77% → 97.31% → 99.78% → 100% lines.
-- `npm run build` — single-file bundle 1,751.55 kB │ gzip 572.31 kB.
-- **Not performed:** Playwright e2e/likeness (no browser in the sandbox; Chromium
-  download blocked), and any visual/GPU check of the R3F premiere or the sparkler
-  effect. Three.js prints deprecation warnings (`THREE.Clock`, CJS require) under
-  the headless renderer; both are upstream noise, not failures.
+- `npm run build` — single-file bundle 1,751.92 kB │ gzip 572.44 kB.
+- **Playwright flows (fallback browser):** the pinned Chromium 156 download from
+  `cdn.playwright.dev` still resets in this sandbox, so the 16 desktop/mobile
+  flow tests were executed with an npm-packaged Chromium 153.0.8010.0 headless
+  shell (`@sparticuz/chromium`, held only in `/tmp`) under SwiftShader, with
+  video on: **16 passed**. That includes a new regression flow proving a
+  spectacle-panel click leaves origin picking armed while a later stage-canvas
+  click consumes it (§4.6).
+- **Fallback visual smoke:** screenshots of the frozen Act V frame, the
+  premiere spectacle panel/pick flow, an inward sparkler at its collision point,
+  and Event Night's medallion/searchlights were inspected; the stage renders
+  non-blank and no page errors were captured. Sandbox font requests failed, so
+  these used fallback fonts and are **not** likeness evidence.
+- **Not performed:** supported `npx playwright install chromium`, likeness
+  baseline generation/review, and any real-GPU check. Three.js prints
+  deprecation warnings (`THREE.Clock`, CJS require) under the headless renderer;
+  both are upstream noise, not failures.
 
-**Validation line:** tsc ✓ · vitest ✓ (854 tests, 100% coverage gate) · build ✓ · browser/Playwright ✗ — no browser/GPU available in sandbox; visual check pending.
+**Validation line:** tsc ✓ · vitest ✓ (855 tests, 100% coverage gate) · build ✓ · Playwright flows ✓ 16/16 (fallback Chromium/SwiftShader, video on) · likeness baselines ✗ — supported-browser/real-machine review pending.
 
 ## 8. Follow-ups for the first run on a real machine
 
 1. `npx playwright install chromium`, then `npm run e2e:update`; review every
-   baseline image before committing it — they become the ADDENDUM-022 likeness gate.
-2. Eyeball the premiere overlay: panel docking at `bottom-24 top-16`, width
-   `min(320px, 92vw)`, origin picking over the 3D stage, and HUD click bubbling (§4.6).
-3. Eyeball sparklers in the preview panel and Event Night: wire visibility, burn
-   front travel, crackle density, inward collision flash at 62% of travel.
+   baseline image before committing it — they become the ADDENDUM-022 likeness
+   gate. Do not seed baselines from the fallback screenshots (different Chromium
+   and unavailable webfonts).
+2. Re-eyeball the premiere overlay on a real browser/GPU: panel docking at
+   `bottom-24 top-16`, width `min(320px, 92vw)`, and origin picking over the 3D
+   stage (the §4.6 exclusion is unit- and fallback-e2e-covered).
+3. Re-eyeball sparklers at full quality in the preview panel and Event Night:
+   wire visibility, burn-front travel, crackle density, and the inward collision
+   flash at 62% of travel (the fallback smoke ran at SwiftShader/low tier).
 4. Confirm medallion layers 3–4 now show walk strand bundles and that density still
    reads as the tutorial intends (§5.1 increases level-4 spec count ~2×).
