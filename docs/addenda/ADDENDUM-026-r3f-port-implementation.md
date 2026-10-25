@@ -44,9 +44,9 @@ renderer stays available until the screenshot baselines pass on the user's machi
 - `app/**` jsdom suites and `app/testidCoverage.test.tsx` — every `data-testid` in the
   tree follows `{component-kebab}__{element-role}`.
 
-`@react-three/test-renderer` suites are **not** written: the package is not in the
-lockfile, and installing it here would need a registry round-trip for a renderer
-that cannot be visually verified anyway. Recorded as open work in ADDENDUM-028 §6.
+`@react-three/test-renderer` suites were **not** written in this round: the package
+was not in the lockfile. They now are — see ADDENDUM-029, which also records the
+`PremiereStage` seam that made a headless `PremiereScene` possible without mocking.
 
 ## 4. What changed in the classic renderer
 

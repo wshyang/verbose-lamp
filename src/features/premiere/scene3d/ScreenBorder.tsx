@@ -15,13 +15,15 @@ export function ScreenBorder({ store }: { store: PremiereStoreApi }) {
   const isEnabled = usePremiereStore(store, (state) => state.isBorderEnabled);
   const style = usePremiereStore(store, (state) => state.borderStyle);
 
-  const rig = useMemo(
-    () => createScreenBorderRig(camera, style, aspect),
+  const rig = useMemo(() => {
+    const built = createScreenBorderRig(camera, style, aspect);
+    // The camera-parented proscenium is findable by name from the scene graph.
+    built.root.name = 'screen-border';
+    return built;
     // The rig owns a mesh parented to the camera; it is rebuilt only when the
     // camera object changes, never for a style or viewport tweak.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [camera]
-  );
+  }, [camera]);
 
   useEffect(() => () => rig.dispose(), [rig]);
   useEffect(() => {

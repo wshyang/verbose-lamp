@@ -107,9 +107,8 @@ the branch. `npm run test:coverage` fails otherwise. That is the point.
 
 ## 6. Still open
 
-1. `@react-three/test-renderer` suites for `scene3d/` (ADDENDUM-022 Phase 3) — the
-   package is not in the lockfile; installing it here would be a registry round-trip
-   for a renderer that cannot be seen.
+1. ~~`@react-three/test-renderer` suites for `scene3d/`~~ — **done in ADDENDUM-029**
+   (116 files / 1114 tests). The GL-only children stay outside them by design.
 2. Playwright (`e2e/flows.spec.ts`, `e2e/likeness.spec.ts`, both written and never
    run) — no browser in this sandbox.
 3. The visual check of the Deco Lattice frames against the film stills (specs 123 →

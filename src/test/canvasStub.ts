@@ -42,7 +42,43 @@ function makeContext(): Context2D {
 }
 
 /** Probes once, then patches `HTMLCanvasElement` only if jsdom cannot paint. */
+/**
+ * jsdom has no `Path2D`, and the deco alphabet builds every glyph by tracing one
+ * (`moveTo` / `lineTo` / `arc` / `closePath`). The stub records those calls so a
+ * test can assert a path was traced; it does not rasterise anything.
+ */
+export interface RecordedPath {
+  readonly ops: string[];
+}
+
+export function installPath2d(): void {
+  if (typeof globalThis.Path2D === 'function') return;
+  class RecordingPath2D {
+    readonly ops: string[] = [];
+    moveTo(x: number, y: number): void {
+      this.ops.push(`M${x},${y}`);
+    }
+    lineTo(x: number, y: number): void {
+      this.ops.push(`L${x},${y}`);
+    }
+    quadraticCurveTo(cx: number, cy: number, x: number, y: number): void {
+      this.ops.push(`Q${cx},${cy},${x},${y}`);
+    }
+    bezierCurveTo(c1x: number, c1y: number, c2x: number, c2y: number, x: number, y: number): void {
+      this.ops.push(`C${c1x},${c1y},${c2x},${c2y},${x},${y}`);
+    }
+    arc(x: number, y: number, r: number, from: number, to: number, ccw = false): void {
+      this.ops.push(`A${x},${y},${r},${from},${to},${ccw ? 1 : 0}`);
+    }
+    closePath(): void {
+      this.ops.push('Z');
+    }
+  }
+  globalThis.Path2D = RecordingPath2D as unknown as typeof Path2D;
+}
+
 export function installCanvas2d(): void {
+  installPath2d();
   if (typeof HTMLCanvasElement === 'undefined') return;
   const probe = document.createElement('canvas');
   try {

@@ -22,16 +22,17 @@ interface TitleCardProps {
  * single geometry rebuild, exactly as `scheduleFrameRebuild` did.
  */
 export function TitleCard({ chapter, isFinale, heroConfig, scale, store }: TitleCardProps) {
-  const rig = useMemo(
-    () =>
-      createGatsbyCardRig(chapter, {
-        heroOverride: heroConfig,
-        style: store.getState().frameStyle,
-      }),
+  const rig = useMemo(() => {
+    const built = createGatsbyCardRig(chapter, {
+      heroOverride: heroConfig,
+      style: store.getState().frameStyle,
+    });
+    // Named so the scene graph is readable in devtools and in the headless tests.
+    built.root.name = `card:${chapter.id}`;
+    return built;
     // A new hero config means a new rig, which replaces the manual rebuild the
     // imperative renderer did in `updateHeroTitle`.
-    [chapter, heroConfig, store]
-  );
+  }, [chapter, heroConfig, store]);
   const appliedStyle = useRef<FrameStyle>(store.getState().frameStyle);
 
   useEffect(() => () => rig.dispose(), [rig]);

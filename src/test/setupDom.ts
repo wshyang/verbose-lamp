@@ -43,6 +43,9 @@ function installResizeObserver(): void {
 }
 
 if (hasDom()) {
+  // React Three Fiber's test renderer drives React's `act`; without this flag React
+  // warns that the environment cannot support it (ADDENDUM-029 §2).
+  (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
   installMatchMedia();
   installResizeObserver();
   // Painters (spectacle layers, effects, canvas hooks) need a 2D context.
