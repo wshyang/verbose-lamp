@@ -84,6 +84,7 @@ export default defineConfig({
         'src/features/deco-lattice/model/walk.ts': FULL,
         'src/features/deco-lattice/model/nineSlice.ts': FULL,
         'src/features/deco-lattice/model/motifs.ts': FULL,
+        'src/features/deco-lattice/model/tone.ts': FULL,
       },
     },
   },
