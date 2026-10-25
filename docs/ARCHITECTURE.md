@@ -11,24 +11,35 @@ compose them without taking ownership of the cinema timeline or Three.js scene.
 
 ```text
 src/
-  App.tsx                       # Vite/React entry component
+  App.tsx                       # Vite/React entry component (renders DemoHost)
   app/                          # Compose a complete host experience
+    DemoHost.tsx                # Mounts the premiere or the Event Night demo
+    hooks/                      # useDemoScreen: screen state over the History API
+    model/                      # parseDemoScreen (pure, tested)
     components/                 # Stage, header, timeline, and HUD layout
   features/
     art-deco-frame/             # Frame grammar, glyphs, rails, materials
     avatar-studio/              # Avatar composition, photo session, gold studio UI
     background-removal/         # Matte reading, 128-grid cut-out, soft subject alpha
+    deco-lattice/               # Octilinear line-bundle frame generator (ADDENDUM-021)
     enamel-backdrop/            # Cloisonné pattern fields, gold leaf, panel renderer
+    event-night/                # Dinner & Dance demo screen composing the four below
     face-detection/             # Avatar framing from BlazeFace detections
     frame-studio/               # Frame controls and state adapter
     gilded-portrait/            # Pure CPU image pipeline and optional portrait studio
+    gilded-ui/                  # Gold plaques, glyphs and nav bar from emoji + label
+    lucky-draw/                 # Fair draw rules, spin profile, canvas drum
     premiere/                   # Sequence domain, audio, and WebGL runtime
     qr-generator/               # Encode, render, export, and modal surface
     research/                   # Read-only dossier and content
+    spectacle/                  # Canvas-2D effects: fireworks, orbs, sunburst, confetti…
+    spectacle-preview/          # Docked console that drives the spectacle effects
     title-customizer/           # Presets, normalization, and editor dialog
   shared/
+    hooks/                      # useReducedMotion
     ui/                         # Button, IconButton, RangeInput, Dialog
     lib/                        # Small framework-neutral utilities
+      random.ts                 # Seeded PRNG (mulberry32, hash01) and crypto pick
       raster/                   # RgbaImage/AlphaMask contracts, resample, morphology
 ```
 
@@ -68,6 +79,33 @@ supported import surface; internal files should remain private to that feature.
   without forking the components.
 - Dependencies point from the app composition into features, and from features
   into shared UI or domain modules. Feature code must not import from `app/`.
+
+## Switching Demos
+
+`src/app/DemoHost.tsx` mounts exactly one demo. `GatsbyPremiere` carries a header
+launcher (`EventNightLauncher`); `EventNightScreen` carries a back button. The
+choice lives in the URL hash (`#event-night`) through the History API, so the
+browser's Back button returns to the premiere. Switching unmounts the other demo:
+the premiere's Three.js scene and audio dispose through their existing cleanup,
+and the premiere starts over when it is shown again.
+
+## Spectacle And Event Night
+
+- `features/spectacle` is a typed stage: `play(id, params)` returns an
+  `EffectHandle`; params are declared in `EffectParamsMap`. `engine/layers.ts`
+  owns the lazily created canvases (light layers use CSS `screen` blending, the
+  solid overlay normal blending) and `engine/effectScheduler.ts` owns the frame
+  loop, which runs only while an effect is live. React never reaches into canvases.
+- Pure modules (`model/`, `particles/`, `*Plan.ts`, `show.ts`, `shells.ts`) carry
+  the logic. `testing/recordingCanvas.ts` is a test-only fake 2D context behind
+  the golden recordings that lock each effect's drawing across refactors.
+- `features/lucky-draw` keeps the fairness boundary: `pickWinner` uses crypto
+  entropy, the animation only plays the result out. It renders inside the shared
+  `Dialog` and does not use the spectacle stage; the host chains confetti and the
+  name reveal after it lands.
+- `features/event-night` is the only feature that composes `spectacle`,
+  `spectacle-preview`, `lucky-draw`, `gilded-ui` and `deco-lattice`. They do not
+  import each other except through barrels, and none import `app/`.
 
 ## Reusing The UI
 
