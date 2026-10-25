@@ -31,7 +31,7 @@
 
 | Item | Status | Trigger to un-defer |
 |---|---|---|
-| Playwright e2e with video-on | Deferred | First time a browser is available in CI or a second interactive feature ships |
+| Playwright e2e with video-on | **Un-deferred** (ADDENDUM-043) | A browser became available: `scripts/sandbox-browser.mjs` runs the suite against a Chromium npm tarball. Video-on is still off — captures are stills, not video |
 | Dockerfile / Dockerfile.dev / cloudflared | Deferred | First deployment target is named |
 | SHIP-HATS inert pipeline files | Deferred | Project is slated for a GovTech environment |
 | `data-testid` on pre-existing controls | **Verified complete** (ADDENDUM-042) | Backfill finished; `src/app/testidCoverageStatic.test.ts` now fails on any control without an id, so it cannot regress |

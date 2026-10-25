@@ -153,7 +153,10 @@ header or timeline into another product simply to reuse a button or modal.
 3. Expose only supported components, hooks, and types through the feature barrel.
 4. Reuse shared controls when their interaction contract fits; add a new shared
    primitive only when it is useful to more than one feature.
-5. Record architectural or behavior decisions in the sequential addenda register.
+5. Portal anything that is viewport furniture (a docked panel, a dialog): a
+   `position: fixed` descendant of the HUD inherits its `translate-y` transform
+   and is positioned against the header, not the viewport (ADDENDUM-044).
+6. Record architectural or behavior decisions in the sequential addenda register.
 
 The three.js renderer is deliberately isolated from normal feature UI. A new app
 can reuse the QR generator, title customizer, research dialog, or frame studio
@@ -162,7 +165,8 @@ Art Deco engine through its typed exports.
 
 ## Keeping It Honest
 
-Three gates run in `npx vitest run` and are architectural rather than functional:
+Four gates run in `npx vitest run` and are architectural rather than functional
+(and, since ADDENDUM-043, the Playwright gate in `e2e/` runs for real as well):
 
 - **Coverage** — `vitest.config.ts` requires 100 % on statements, branches,
   functions and lines, over `LOGIC_SURFACE_EXCLUDES`' complement (every logic
@@ -176,8 +180,11 @@ Three gates run in `npx vitest run` and are architectural rather than functional
   ceiling is asserted in `src/discipline.test.ts` itself, so it is never stale
   (ADDENDUM-032, ADDENDUM-040).
 - **E2E contract** — `src/app/e2eContract.test.ts` cross-checks the test ids the
-  Playwright suite names against `src/`, so the e2e suite keeps compiling its
-  promises even when nobody can run a browser (ADDENDUM-030 §5).
+  Playwright suite names against `src/`, so a spec cannot drift away from the markup
+  between runs (ADDENDUM-030 §5).
+- **Test ids** — `src/app/testidCoverageStatic.test.ts` requires a `data-testid` on
+  every control in every component file, with the three prop-forwarding primitives
+  exempted by exact name (ADDENDUM-042).
 
 A refactor that moves code without changing behaviour should still arrive with a
 golden captured **before** the move: `decoTypography.test.ts` and

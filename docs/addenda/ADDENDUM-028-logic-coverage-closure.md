@@ -109,10 +109,13 @@ the branch. `npm run test:coverage` fails otherwise. That is the point.
 
 1. ~~`@react-three/test-renderer` suites for `scene3d/`~~ — **done in ADDENDUM-029**
    (116 files / 1114 tests). The GL-only children stay outside them by design.
-2. Playwright (`e2e/flows.spec.ts`, `e2e/likeness.spec.ts`, both written and never
-   run) — no browser in this sandbox.
+2. ~~Playwright written and never run~~ — **closed in ADDENDUM-043**: both specs execute
+   here via a Chromium npm tarball (20 tests, 24 baselines), and running them found a
+   dialog Escape defect plus three assertions that could only pass vacuously.
 3. The visual check of the Deco Lattice frames against the film stills (specs 123 →
-   243), and of the R3F sequence against the classic renderer.
+   243), and of the R3F sequence against the classic renderer. The baselines now exist
+   (ADDENDUM-043), but *likeness* is a judgement about the film, not about run-to-run
+   stability, and that is still the user's to make.
 4. Deleting `GatsbySceneManager.ts` once that comparison passes (ADDENDUM-022 §2.5).
 5. ~~Phase 1's `FrameStudioControl.test.tsx` missing under that name~~ — **closed in
    ADDENDUM-042 §4**: `src/features/frame-studio/components/FrameStudioControl.test.tsx`

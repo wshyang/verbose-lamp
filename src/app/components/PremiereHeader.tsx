@@ -14,6 +14,9 @@ import { Button, IconButton } from '@/shared/ui';
 import { cn } from '@/shared/lib/cn';
 import { PremiereEffectsDock } from './PremiereEffectsDock';
 
+const HEADER_LAYOUT =
+  'absolute left-0 right-0 top-0 z-20 flex flex-wrap items-center justify-between gap-3 px-6 pt-6 transition-all duration-500 sm:px-9 sm:pt-8';
+
 interface PremiereHeaderProps {
   cameraMode: CameraMode;
   nitrateMode: boolean;
@@ -40,8 +43,8 @@ export function PremiereHeader({
   onToggleSound,
 }: PremiereHeaderProps) {
   return (
-    <header className={cn(
-      'absolute left-0 right-0 top-0 z-20 flex flex-wrap items-center justify-between gap-3 px-6 pt-6 transition-all duration-500 sm:px-9 sm:pt-8',
+    <header data-testid="premiere-header__root" className={cn(
+        HEADER_LAYOUT,
       hudHidden ? 'pointer-events-none -translate-y-3 opacity-0' : 'translate-y-0 opacity-100'
     )}>
       <div className="flex items-center gap-3.5">

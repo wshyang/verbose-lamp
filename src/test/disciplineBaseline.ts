@@ -37,7 +37,6 @@ export interface DebtEntry {
 
 export const DISCIPLINE_DEBT: readonly DebtEntry[] = [
   { file: 'src/app/GatsbyPremiere.tsx', name: 'GatsbyPremiere', maxLines: 68, maxParams: 1, maxDepth: 0, reason: 'component' },
-  { file: 'src/app/components/FrameStudioDock.tsx', name: 'FrameStudioDock', maxLines: 53, maxParams: 1, maxDepth: 0, reason: 'component' },
   { file: 'src/app/components/PremiereHeader.tsx', name: 'PremiereHeader', maxLines: 73, maxParams: 1, maxDepth: 0, reason: 'component' },
   { file: 'src/app/components/PremiereTimeline.tsx', name: 'PremiereTimeline', maxLines: 88, maxParams: 1, maxDepth: 0, reason: 'component' },
   { file: 'src/features/art-deco-frame/engine/frameGrammar/edgeBorder.ts', name: 'arcPoints', maxLines: 7, maxParams: 4, maxDepth: 0, reason: 'geometry-primitive' },
@@ -78,7 +77,7 @@ export const DISCIPLINE_DEBT: readonly DebtEntry[] = [
   { file: 'src/features/qr-generator/geometry.ts', name: 'chamferedSquarePath', maxLines: 9, maxParams: 4, maxDepth: 0, reason: 'logic-orchestrator' },
   { file: 'src/features/spectacle/effects/sparklers/sparklersEffect.ts', name: 'drawTipGlow', maxLines: 14, maxParams: 4, maxDepth: 0, reason: 'logic-orchestrator' },
   { file: 'src/features/spectacle/effects/sparklers/sparklersEffect.ts', name: 'drawWire', maxLines: 10, maxParams: 4, maxDepth: 0, reason: 'logic-orchestrator' },
-  { file: 'src/shared/ui/Dialog.tsx', name: 'Dialog', maxLines: 84, maxParams: 1, maxDepth: 2, reason: 'component' },
+  { file: 'src/shared/ui/Dialog.tsx', name: 'Dialog', maxLines: 72, maxParams: 1, maxDepth: 2, reason: 'component' },
   { file: 'src/test/canvasStub.ts', name: '(anonymous)', maxLines: 1, maxParams: 4, maxDepth: 0, reason: 'logic-orchestrator' },
   { file: 'src/test/canvasStub.ts', name: 'arc', maxLines: 3, maxParams: 6, maxDepth: 0, reason: 'logic-orchestrator' },
   { file: 'src/test/canvasStub.ts', name: 'bezierCurveTo', maxLines: 3, maxParams: 6, maxDepth: 0, reason: 'logic-orchestrator' },
