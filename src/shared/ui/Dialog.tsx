@@ -20,7 +20,7 @@ export function Dialog({
   labelledBy,
   children,
   className = '',
-  backdropClassName = 'fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4',
+  backdropClassName = 'fixed inset-0 z-[80] flex items-center justify-center bg-black/75 backdrop-blur-md p-4',
   testId,
   closeOnBackdrop = true,
 }: DialogProps) {

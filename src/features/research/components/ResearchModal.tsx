@@ -17,7 +17,7 @@ export const ResearchModal: React.FC<ResearchModalProps> = ({ open, onClose }) =
       onClose={onClose}
       labelledBy="research-dialog__title"
       className="relative flex max-h-[88vh] w-full max-w-4xl flex-col overflow-hidden border border-[#d4af37]/45 bg-[#09070c]/95 shadow-[0_0_80px_rgba(212,175,55,0.18)]"
-      backdropClassName="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-md sm:p-6"
+      backdropClassName="fixed inset-0 z-[80] flex items-center justify-center bg-black/80 p-4 backdrop-blur-md sm:p-6"
       testId="research-dialog__backdrop"
     >
         {/* Art Deco Corner Brackets */}

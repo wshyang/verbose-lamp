@@ -17,6 +17,7 @@ import {
 } from '@/features/art-deco-frame';
 import { SIGNATURE_GENOME, clampGenome, withGene, type GeneKey } from '@/features/art-deco-frame';
 import { DESIGN_GALLERY, describeDesign, designAt, findDesignEntry } from '../data/frameDesigns';
+import { panelStartsOpen } from '../model/panelStart';
 import { nextPatternSeed } from '../model/patternSeed';
 
 export interface FrameStudioTarget {
@@ -35,7 +36,8 @@ const defaultFrameFormula = (): FrameFormula => ({
 });
 
 export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
-  const [isOpen, setIsOpen] = useState(true);
+  // Sampled once at mount: a panel that opens over a phone hides the film the user came to watch.
+  const [isOpen, setIsOpen] = useState(() => panelStartsOpen(window.innerWidth));
   const [surface, setSurfaceState] = useState<FrameSurface>('title-cards');
   const [formula, setFormula] = useState<FrameFormula>(defaultFrameFormula);
   const [intricacy, setIntricacy] = useState(DEFAULT_FRAME_STYLE.intricacy);
