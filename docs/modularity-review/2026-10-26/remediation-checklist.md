@@ -12,7 +12,7 @@ The 2026-10-26 modularity review (`docs/modularity-review/2026-10-26/modularity-
 - **Order**: 0 → 1 → 2 → 3 → 4 → 5 → 6. Phase 5 asserts the end state of 1–4, so it comes after them. Phase 6 is independent and may be dropped.
 
 ## Decisions and assumptions (veto at approval)
-- Invalid level (NaN or ±Infinity): the single shared clamp returns **2**. You chose this. It changes premiere (NaN was 1, Infinity was 4) and the Frame Studio (NaN passed through).
+- Level policy (revised): the NaN/Infinity difference between the sites is legitimate, so it is **kept**. `clampFormulaLevel` (requests: infinity pins to an end, NaN → 1) and `resolveGenesisLevel` (grammar drawing: non-finite → 2) live side by side in `styleRules.ts`. Only the Frame Studio's NaN changes (passed through → 1).
 - Phase 4 **moves** the "GOLD UI KIT" and "DECO LATTICE" sections out of the shared console into Event Night. The premiere console loses both. They control nothing there: only the Event Night medallion and nav bar read them.
 - The premiere and Event Night celebrations stay different: sparklers vs none, fixed vs time-based seed. Phase 4 only makes the difference explicit in one place.
 - A `FrameStudioVocabulary` grouping export (from the review) is **deferred**. It is not needed to remove the duplication.
@@ -49,7 +49,7 @@ Goal: `art-deco-frame` owns "what is a legal frame style". Premiere and the Fram
   - `studioActions.ts` and `studioFormula.test.ts`: call `clampFormulaLevel`.
   - Grep `frame-studio/components` for the literal level bounds (`min={1}` / `max={4}` or `[1, 2, 3, 4]`) and use `FORMULA_LEVEL_MIN` and `FORMULA_LEVEL_MAX`.
 - [x] 1.7 `grep -rn "Math.min(4" src/features` shows no frame-formula level clamp left outside `styleRules.ts` (the Deco Lattice's own layer count is a separate contract, noted in the addendum). Golden and snapshot tests must be unchanged; if one moves, explain it in the addendum.
-- [x] 1.8 Addendum 037 + register row. It states the NaN policy (non-finite → 2), the three removed copies and the behaviour deltas listed under Decisions.
+- [x] 1.8 Addendum 037 + register row. It states the two level policies, the removed copies and the one behaviour delta (Frame Studio NaN).
 - [x] 1.9 Gate.
 
 ## [ ] Phase 2 — Finding 5 (Minor): image features stop borrowing from siblings

@@ -25,13 +25,22 @@ function clampUnit(value: number, fallback: number): number {
 }
 
 /**
- * A formula level is a whole number from `GENESIS_LEVEL_MIN` to `GENESIS_LEVEL_MAX`. A value that
- * is not a finite number (NaN, ±Infinity) is invalid input, not a request for an extreme, so it
- * gets the default level.
+ * A formula level asked for by a caller (a slider, a request): a whole number from
+ * `GENESIS_LEVEL_MIN` to `GENESIS_LEVEL_MAX`. An infinity means "as much / as little as possible"
+ * and pins to the nearest end; NaN means nothing was asked and gets the minimum.
  */
 export function clampFormulaLevel(level: number): number {
-  if (!Number.isFinite(level)) return DEFAULT_FRAME_FORMULA.level;
+  if (Number.isNaN(level)) return GENESIS_LEVEL_MIN;
   return Math.min(GENESIS_LEVEL_MAX, Math.max(GENESIS_LEVEL_MIN, Math.round(level)));
+}
+
+/**
+ * The level the grammar draws at. A formula that reaches the renderer with a level that is not a
+ * finite number is unusable, not a request for an extreme, so it draws at the default level
+ * instead of the first or last one.
+ */
+export function resolveGenesisLevel(level: number): number {
+  return Number.isFinite(level) ? clampFormulaLevel(level) : DEFAULT_FRAME_FORMULA.level;
 }
 
 export function clampIntricacy(intricacy: number): number {

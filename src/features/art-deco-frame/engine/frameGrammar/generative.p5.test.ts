@@ -4,7 +4,7 @@ import { FrameArchetype } from '../../model/types';
 import { SIGNATURE_GENOME } from './genome';
 import { FRAME_SOURCES, FrameFormula, FrameSource, PolylineSpec, buildFrame, buildFrameSpecs, buildAuthoredFrame } from './index';
 import { buildGenerativeFrameSpecs } from './generative';
-import { clampFormulaLevel } from './styleRules';
+import { resolveGenesisLevel } from './styleRules';
 
 const ARCHETYPES_p5: FrameArchetype[] = [
   'monogram_gate',
@@ -66,10 +66,10 @@ describe('generative sources', () => {
 });
 describe('genesis level and authored wrapper defaults', () => {
   it('falls back to level 2 for non-finite levels and clamps finite levels', () => {
-    expect([Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY].map(clampFormulaLevel)).toEqual([2, 2, 2]);
-    expect(clampFormulaLevel(0)).toBe(1);
-    expect(clampFormulaLevel(2.6)).toBe(3);
-    expect(clampFormulaLevel(99)).toBe(4);
+    expect([Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY].map(resolveGenesisLevel)).toEqual([2, 2, 2]);
+    expect(resolveGenesisLevel(0)).toBe(1);
+    expect(resolveGenesisLevel(2.6)).toBe(3);
+    expect(resolveGenesisLevel(99)).toBe(4);
   });
 
   it('buildAuthoredFrame defaults to the Film Baseline intricacy', () => {

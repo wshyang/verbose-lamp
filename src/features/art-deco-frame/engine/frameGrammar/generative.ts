@@ -1,7 +1,7 @@
 import { FrameArchetype } from '../../model/types';
 import { buildCoreFrameSpecs } from './archetypes';
 import { buildLatticeSpecs } from './latticeSource';
-import { clampFormulaLevel } from './styleRules';
+import { resolveGenesisLevel } from './styleRules';
 import { FrameFormula, Point2, PolylineSpec, RailKind } from './types';
 
 /* -------------------------------------------------------------------------- */
@@ -251,7 +251,7 @@ export function buildGenerativeFrameSpecs(
   options: { includePrimaryFrame?: boolean; includeMonogram?: boolean } = {}
 ): PolylineSpec[] {
   const box = frameBox(archetype, mainWidth);
-  const level = clampFormulaLevel(formula.level);
+  const level = resolveGenesisLevel(formula.level);
 
   if (formula.source === 'lattice') {
     const lattice = buildLatticeSpecs({

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { FrameArchetype } from '../../model/types';
 import { SIGNATURE_GENOME } from './genome';
 import { FRAME_SOURCES, FrameFormula, FrameSource, PolylineSpec, buildFrame, buildFrameSpecs } from './index';
-import { clampFormulaLevel } from './styleRules';
+import { resolveGenesisLevel } from './styleRules';
 
 const ARCHETYPES_p6: FrameArchetype[] = [
   'monogram_gate',
@@ -63,11 +63,11 @@ describe('generative sources', () => {
     }
   }
 });
-describe('clampFormulaLevel', () => {
+describe('resolveGenesisLevel', () => {
   it('rounds and bounds the level to 1…4', () => {
-    expect(clampFormulaLevel(-3)).toBe(1);
-    expect(clampFormulaLevel(0.4)).toBe(1);
-    expect(clampFormulaLevel(2.6)).toBe(3);
-    expect(clampFormulaLevel(9)).toBe(4);
+    expect(resolveGenesisLevel(-3)).toBe(1);
+    expect(resolveGenesisLevel(0.4)).toBe(1);
+    expect(resolveGenesisLevel(2.6)).toBe(3);
+    expect(resolveGenesisLevel(9)).toBe(4);
   });
 });

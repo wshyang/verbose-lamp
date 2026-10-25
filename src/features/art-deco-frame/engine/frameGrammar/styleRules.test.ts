@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { clampGenome, SIGNATURE_GENOME } from './genome';
-import { clampFormulaLevel, clampIntricacy, normalizeFrameStyle, normalizeScreenBorderStyle } from './styleRules';
+import {
+  clampFormulaLevel,
+  clampIntricacy,
+  normalizeFrameStyle,
+  normalizeScreenBorderStyle,
+  resolveGenesisLevel,
+} from './styleRules';
 import {
   DEFAULT_FRAME_FORMULA,
   DEFAULT_FRAME_STYLE,
@@ -34,10 +40,28 @@ describe('clampFormulaLevel', () => {
     expect(clampFormulaLevel(level)).toBe(expected);
   });
 
+  it('pins an infinity to the nearest end, because it asks for as much or as little as possible', () => {
+    expect(clampFormulaLevel(Number.POSITIVE_INFINITY)).toBe(4);
+    expect(clampFormulaLevel(Number.NEGATIVE_INFINITY)).toBe(1);
+  });
+
+  it('gives NaN the minimum level, because nothing was asked for', () => {
+    expect(clampFormulaLevel(Number.NaN)).toBe(1);
+  });
+});
+
+describe('resolveGenesisLevel', () => {
+  it('draws at the requested level, held to 1..4', () => {
+    expect(resolveGenesisLevel(3)).toBe(3);
+    expect(resolveGenesisLevel(2.6)).toBe(3);
+    expect(resolveGenesisLevel(9)).toBe(4);
+    expect(resolveGenesisLevel(0.2)).toBe(1);
+  });
+
   it.each([Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY])(
-    'answers the default level for the invalid value %s',
+    'draws at the default level when the level is the unusable value %s',
     (level) => {
-      expect(clampFormulaLevel(level)).toBe(DEFAULT_FRAME_FORMULA.level);
+      expect(resolveGenesisLevel(level)).toBe(DEFAULT_FRAME_FORMULA.level);
     },
   );
 });

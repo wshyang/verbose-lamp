@@ -17,6 +17,7 @@ export {
   clampIntricacy,
   normalizeFrameStyle,
   normalizeScreenBorderStyle,
+  resolveGenesisLevel,
 } from './styleRules';
 export { buildCoreFrameSpecs } from './archetypes';
 export {

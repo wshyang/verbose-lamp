@@ -9,7 +9,7 @@ import {
   type GeneKey,
 } from './genome';
 import { buildEdgeBorder as buildEdgeBorderGeometry, buildFrame as buildFrameGeometry } from './index';
-import { clampFormulaLevel } from './styleRules';
+import { resolveGenesisLevel } from './styleRules';
 import { buildAuthoredFrame } from './index';
 
 const GENES = Object.keys(GENE_DEFINITIONS) as GeneKey[];
@@ -53,10 +53,10 @@ describe('gene clamping', () => {
   });
 
   it('keeps the genesis level an integer inside 1..4', () => {
-    expect(clampFormulaLevel(Number.NaN)).toBe(2);
-    expect(clampFormulaLevel(9)).toBe(4);
-    expect(clampFormulaLevel(0.2)).toBe(1);
-    expect(clampFormulaLevel(2.6)).toBe(3);
+    expect(resolveGenesisLevel(Number.NaN)).toBe(2);
+    expect(resolveGenesisLevel(9)).toBe(4);
+    expect(resolveGenesisLevel(0.2)).toBe(1);
+    expect(resolveGenesisLevel(2.6)).toBe(3);
   });
 });
 
