@@ -93,6 +93,7 @@ export default defineConfig({
         'src/features/spectacle/effects/sparklers/sparklerWire.ts': FULL,
         'src/features/spectacle/effects/sparklers/sparklerTransitionEffect.ts': FULL,
         'src/features/spectacle/effects/sparklers/sparklersEffect.ts': FULL,
+        'src/features/spectacle-preview/hooks/useSpeakerDrag.ts': FULL,
         'src/features/spectacle/effects/sparklers/sparklerRenderer.ts': FULL,
         'src/features/spectacle/engine/effectRegistry.ts': FULL,
         'src/shared/lib/svgExport.ts': FULL,
