@@ -2,6 +2,7 @@ import { mulberry32 } from '@/shared/lib/random';
 import type { EffectDefinition, FrameInfo } from '../../engine/types';
 import type { ConfettiParams } from '../../model/types';
 import { flutterX, foilY, type Flutter, type FoilFall } from './confettiPhysics';
+import { DEFAULT_SEED } from '@/shared/lib/random';
 
 interface Piece {
   fall: FoilFall;
@@ -82,7 +83,7 @@ export const confettiEffect: EffectDefinition<ConfettiParams> = {
   id: 'confetti',
   layer: 'solid-overlay',
   create(ctx, params) {
-    const pieces = makePieces(params, params.seed ?? 1925, Math.max(0.5, ctx.quality.shellScale));
+    const pieces = makePieces(params, params.seed ?? DEFAULT_SEED, Math.max(0.5, ctx.quality.shellScale));
     const duration = params.durationMs ?? 4600;
     return {
       update(t, frame) {

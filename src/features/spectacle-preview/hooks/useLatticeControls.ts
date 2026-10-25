@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
+import { DEFAULT_SEED } from '@/shared/lib/random';
 
-const DEFAULT_SEED = 1925;
 const SEED_REROLL_RANGE = 1e6;
 
 /** Live controls for the title medallion's Deco Lattice. */

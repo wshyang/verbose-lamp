@@ -53,6 +53,19 @@ describe('SpectaclePreviewPanel', () => {
     expect(classes).toContain('z-[70]');
   });
 
+  it('renders host-owned sections after its own, inside the panel', () => {
+    render(
+      <SpectaclePreviewPanel preview={stubPreview({ open: true })} onOpenDraw={vi.fn()}>
+        <section data-testid="host__section">Host controls</section>
+      </SpectaclePreviewPanel>,
+    );
+
+    const panel = screen.getByTestId('spectacle-preview__panel');
+    const hostSection = screen.getByTestId('host__section');
+    expect(panel.contains(hostSection)).toBe(true);
+    expect(panel.lastElementChild).toBe(hostSection);
+  });
+
   it('closes from its own header button', () => {
     const setOpen = vi.fn();
     render(<SpectaclePreviewPanel preview={stubPreview({ open: true, setOpen })} onOpenDraw={vi.fn()} />);

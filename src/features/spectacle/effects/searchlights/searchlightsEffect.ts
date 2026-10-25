@@ -1,6 +1,7 @@
 import type { EffectDefinition, FrameInfo } from '../../engine/types';
 import type { NormRect, SearchlightParams } from '../../model/types';
 import { beamAngleAt, planSearchlights, type SearchlightBeam } from './searchlightPlan';
+import { DEFAULT_SEED } from '@/shared/lib/random';
 
 function drawBeam(beam: SearchlightBeam, tSec: number, frame: FrameInfo): void {
   const { ctx, w, h, fade } = frame;
@@ -40,7 +41,7 @@ export const searchlightsEffect: EffectDefinition<SearchlightParams> = {
   id: 'searchlights',
   layer: 'light-backdrop',
   create(ctx, params) {
-    const beams = planSearchlights(params.beams ?? 3, params.seed ?? 1925);
+    const beams = planSearchlights(params.beams ?? 3, params.seed ?? DEFAULT_SEED);
     const keepClear = params.keepClear ?? [];
     const speedScale = ctx.reducedMotion ? 0.25 : 1;
     return {

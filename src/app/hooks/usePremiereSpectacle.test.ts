@@ -9,7 +9,10 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('@/features/spectacle-preview', () => ({ useSpectaclePreview: () => mocks.preview }));
-vi.mock('@/features/spectacle', () => ({ useSpectacle: () => ({ play: mocks.play }) }));
+vi.mock('@/features/spectacle', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/features/spectacle')>()),
+  useSpectacle: () => ({ play: mocks.play }),
+}));
 
 beforeEach(() => {
   mocks.preview.open = false;

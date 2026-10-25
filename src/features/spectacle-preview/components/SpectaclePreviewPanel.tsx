@@ -1,5 +1,6 @@
 import '../spectaclePreview.css';
 import { Dices, X } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import type { SpectaclePreview } from '../hooks/useSpectaclePreview';
 import { BackdropSection } from './BackdropSection';
@@ -12,6 +13,8 @@ import { TransitionsSection } from './TransitionsSection';
 interface PanelProps {
   preview: SpectaclePreview;
   onOpenDraw: () => void;
+  /** Host-owned sections, rendered after the console's own. */
+  children?: ReactNode;
 }
 
 function PanelHeader({ preview: p }: { preview: SpectaclePreview }) {
@@ -44,7 +47,7 @@ function PanelHeader({ preview: p }: { preview: SpectaclePreview }) {
  * It docks on the left so it can be open beside the Frame Studio, which owns the right edge, and
  * stretches across a phone-width screen.
  */
-export function SpectaclePreviewPanel({ preview, onOpenDraw }: PanelProps) {
+export function SpectaclePreviewPanel({ preview, onOpenDraw, children }: PanelProps) {
   if (!preview.open) return null;
   return createPortal(
     <aside
@@ -61,6 +64,7 @@ export function SpectaclePreviewPanel({ preview, onOpenDraw }: PanelProps) {
       <StageSettingsSection preview={preview} />
       <GoldUiSection preview={preview} />
       <LatticeSection preview={preview} />
+      {children}
     </aside>,
     document.body,
   );

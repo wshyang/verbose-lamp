@@ -3,6 +3,7 @@ import { buildDecoLattice, type LatticeSpec } from '@/features/deco-lattice';
 import { brassAngleFor, toneForLayer } from '@/features/deco-lattice/model/tone';
 import { clampFormulaLevel } from './styleRules';
 import type { Point2, PolylineSpec, RailKind } from './types';
+import { DEFAULT_SEED } from '@/shared/lib/random';
 
 /**
  * The Deco Lattice family inside the frame grammar (ADDENDUM-021 §3.5). The
@@ -25,7 +26,7 @@ export interface LatticeSourceRequest {
   includePrimaryFrame?: boolean;
 }
 
-export const LATTICE_DEFAULT_SEED = 1925;
+export const LATTICE_DEFAULT_SEED = DEFAULT_SEED;
 /** The Baroque vertex cap minus head-room for the monogram glyph. */
 const VERTEX_BUDGET = 1000;
 const DEFAULT_DENSITY = 0.62;

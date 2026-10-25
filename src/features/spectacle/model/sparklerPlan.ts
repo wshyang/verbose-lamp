@@ -1,6 +1,7 @@
 import { hash01, mulberry32 } from '@/shared/lib/random';
 import { clamp01 } from './timeline';
 import type { NormPoint } from './types';
+import { DEFAULT_SEED } from '@/shared/lib/random';
 
 /**
  * Party sparklers: a lit wire that throws a dense, crackling spray of sparks.
@@ -11,7 +12,7 @@ import type { NormPoint } from './types';
  * engine emits into the particle pool, so the same plan drives the standalone
  * effect, the orb transition and any future host.
  */
-export const DEFAULT_SPARKLER_SEED = 1925;
+export const DEFAULT_SPARKLER_SEED = DEFAULT_SEED;
 
 /** One spark in the spray, in normalised viewport units per second. */
 export interface SparklerSpark {

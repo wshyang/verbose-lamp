@@ -6,13 +6,14 @@ import { useLuckyDraw } from '../hooks/useLuckyDraw';
 import type { LuckyDrawEntry } from '../model/entries';
 import { LuckyDrawControls } from './LuckyDrawControls';
 import { LuckyDrawResult } from './LuckyDrawResult';
+import { DEFAULT_SEED } from '@/shared/lib/random';
 
 interface LuckyDrawStageProps {
   onClose: () => void;
   onLanded: (winner: LuckyDrawEntry) => void;
 }
 
-const FRAME_REQUEST = { mode: 'frame', hw: 1.6, hh: 1, level: 3, seed: 1925 } as const;
+const FRAME_REQUEST = { mode: 'frame', hw: 1.6, hh: 1, level: 3, seed: DEFAULT_SEED } as const;
 // Below the spectacle canvases (z 40/41) so confetti and the name reveal show on top.
 const BACKDROP_CLASS =
   'fixed inset-0 z-[35] flex items-center justify-center bg-black/70 backdrop-blur-[2px]';

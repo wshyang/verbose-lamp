@@ -1,4 +1,4 @@
-import { hash01, mulberry32 } from '@/shared/lib/random';
+import { DEFAULT_SEED, hash01, mulberry32 } from '@/shared/lib/random';
 import type { EffectDefinition, FrameInfo } from '../../engine/types';
 import { pointInRect } from '../../model/geometry';
 import { easeOutQuad, lerp } from '../../model/timeline';
@@ -108,7 +108,7 @@ function advanceSchedule(s: FwState, t: number, frame: FrameInfo): void {
     s.offsetMs = t + 500;
     s.cursor = 0;
     s.events = planShow({
-      seed: (s.params.seed ?? 1925) + s.cycle, intensity: s.params.intensity,
+      seed: (s.params.seed ?? DEFAULT_SEED) + s.cycle, intensity: s.params.intensity,
       durationMs: s.durationMs, keepClear: s.params.keepClear,
       aspect: frame.w / Math.max(1, frame.h),
     });
@@ -171,11 +171,11 @@ export const fireworksEffect: EffectDefinition<FireworksParams> = {
   create(ctx, params) {
     const duration = params.durationMs ?? (params.finale ? 14000 : 12000);
     const s: FwState = {
-      rng: mulberry32(params.seed ?? 1925),
+      rng: mulberry32(params.seed ?? DEFAULT_SEED),
       pool: createParticlePool(ctx.quality.sparkCap),
       sprites: createSpriteCache(),
       events: planShow({
-        seed: params.seed ?? 1925, intensity: params.intensity, finale: params.finale,
+        seed: params.seed ?? DEFAULT_SEED, intensity: params.intensity, finale: params.finale,
         durationMs: duration, keepClear: params.keepClear,
         aspect: window.innerWidth / Math.max(1, window.innerHeight),
       }),

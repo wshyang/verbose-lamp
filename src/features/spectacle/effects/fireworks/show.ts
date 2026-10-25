@@ -1,4 +1,4 @@
-import { mulberry32 } from '@/shared/lib/random';
+import { DEFAULT_SEED, mulberry32 } from '@/shared/lib/random';
 import { circleOverlapsRect } from '../../model/geometry';
 import type { FireworkShellType, NormRect } from '../../model/types';
 
@@ -49,7 +49,7 @@ function pickPoint(
 export function planShow(opts: ShowOptions): readonly ShellEvent[] {
   const duration = opts.durationMs ?? 12000;
   const intensity = Math.min(1, Math.max(0, opts.intensity ?? 0.5));
-  const rng = mulberry32(opts.seed ?? 1925);
+  const rng = mulberry32(opts.seed ?? DEFAULT_SEED);
   const keepClear = opts.keepClear ?? [];
   const aspect = opts.aspect ?? 16 / 9;
   const events: ShellEvent[] = [];

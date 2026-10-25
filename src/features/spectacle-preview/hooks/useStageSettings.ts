@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import type { NormRect } from '@/features/spectacle';
+import { DEFAULT_SEED } from '@/shared/lib/random';
 
-const DEFAULT_SEED = 1925;
 const SEED_REROLL_RANGE = 1e6;
 const DEFAULT_ORIGIN = { x: 0.5, y: 0.42 } as const;
 const DEFAULT_SPEAKER: NormRect = { x: 0.42, y: 0.28, w: 0.16, h: 0.24 };

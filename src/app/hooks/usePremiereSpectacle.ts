@@ -1,13 +1,10 @@
 import { useCallback, useState } from 'react';
-import { useSpectacle } from '@/features/spectacle';
+import { playWinnerCelebration, useSpectacle, winnerCelebration } from '@/features/spectacle';
 import { useSpectaclePreview } from '@/features/spectacle-preview';
 import type { LuckyDrawEntry } from '@/features/lucky-draw';
+import { DEFAULT_SEED } from '@/shared/lib/random';
 
-const CELEBRATION_ORIGIN = { x: 0.5, y: 0.4 } as const;
-const CELEBRATION_SEED = 1925;
 const FAN_SIZE = 5;
-const FAN_INTENSITY = 0.9;
-const DEFAULT_WINNER_SUBTITLE = 'Lucky draw winner';
 
 /**
  * The premiere's spectacle console: the docked preview panel, the origin
@@ -24,14 +21,7 @@ export function usePremiereSpectacle() {
 
   const handleLanded = useCallback(
     (winner: LuckyDrawEntry) => {
-      play('confetti', { mode: 'burst', origin: CELEBRATION_ORIGIN, seed: CELEBRATION_SEED });
-      play('sparkler', {
-        origin: CELEBRATION_ORIGIN,
-        count: FAN_SIZE,
-        seed: CELEBRATION_SEED,
-        intensity: FAN_INTENSITY,
-      });
-      play('name-reveal', { name: winner.name, subtitle: winner.subtitle ?? DEFAULT_WINNER_SUBTITLE });
+      playWinnerCelebration(play, winnerCelebration({ winner, seed: DEFAULT_SEED, sparklerCount: FAN_SIZE }));
     },
     [play]
   );

@@ -9,7 +9,8 @@ const mocks = vi.hoisted(() => ({
   pointFromElement: vi.fn(() => ({ x: 0.2, y: 2 })),
 }));
 
-vi.mock('@/features/spectacle', () => ({
+vi.mock('@/features/spectacle', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/features/spectacle')>()),
   useSpectacle: () => ({ play: mocks.play }),
   pointFromElement: mocks.pointFromElement,
 }));

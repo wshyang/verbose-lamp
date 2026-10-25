@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { hash01, mulberry32 } from './random';
+import { DEFAULT_SEED, hash01, mulberry32 } from './random';
 
 describe('mulberry32', () => {
   it('is deterministic per seed', () => {
@@ -31,5 +31,11 @@ describe('hash01', () => {
       expect(v).toBeGreaterThanOrEqual(0);
       expect(v).toBeLessThan(1);
     }
+  });
+});
+describe('DEFAULT_SEED', () => {
+  it('is the year the novel was published, and seeds a deterministic stream', () => {
+    expect(DEFAULT_SEED).toBe(1925);
+    expect(mulberry32(DEFAULT_SEED)()).toBe(mulberry32(1925)());
   });
 });

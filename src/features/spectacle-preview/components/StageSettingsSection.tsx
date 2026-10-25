@@ -1,8 +1,7 @@
 import { Crosshair, Shuffle, Square } from 'lucide-react';
 import type { SpectaclePreview } from '../hooks/useSpectaclePreview';
 import { ActionButton, Section, SliderRow, ToggleRow } from './PanelBits';
-
-const DEFAULT_SEED = 1925;
+import { DEFAULT_SEED } from '@/shared/lib/random';
 
 function originLabel(p: SpectaclePreview): string {
   return p.picking ? 'Click the stage…' : `Origin ${p.origin.x.toFixed(2)} · ${p.origin.y.toFixed(2)}`;

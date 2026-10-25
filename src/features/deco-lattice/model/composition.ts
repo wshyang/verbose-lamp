@@ -1,4 +1,4 @@
-import { mulberry32 } from '@/shared/lib/random';
+import { DEFAULT_SEED, mulberry32 } from '@/shared/lib/random';
 import { bundle } from './bundle';
 import type { LatticeSpec, Pt } from './lattice';
 import {
@@ -77,7 +77,7 @@ function layer2({ req, m, heavy }: LayerContext): readonly LatticeSpec[] {
 
 function layer3({ req, m, heavy, density }: LayerContext): readonly LatticeSpec[] {
   const specs: LatticeSpec[] = [];
-  const seed = req.seed ?? 1925;
+  const seed = req.seed ?? DEFAULT_SEED;
   if (req.mode === 'medallion') {
     const walks = traceWalks({
       seed, cell: heavy / 2, inner: 0.58 * m, outer: 0.9 * m,
@@ -125,7 +125,7 @@ function layer4({ req, m, heavy }: LayerContext): readonly LatticeSpec[] {
  * pattern; the 45° segment keeps every strand octilinear.
  */
 function frameBracket(req: DecoLatticeRequest, m: number): readonly Pt[] {
-  const random = mulberry32(req.seed ?? 1925);
+  const random = mulberry32(req.seed ?? DEFAULT_SEED);
   const along = 0.34 + random() * 0.14;
   const arm = 0.07 + random() * 0.04;
   return [

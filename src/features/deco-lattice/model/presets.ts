@@ -1,20 +1,21 @@
 import type { DecoLatticeRequest } from './composition';
+import { DEFAULT_SEED } from '@/shared/lib/random';
 
 /** Reproduces the tutorial's measured proportions (half-extent 1, ±0.03). */
 export const SPOONER_MEDALLION: DecoLatticeRequest = {
-  mode: 'medallion', hw: 1, hh: 1, seed: 1925, density: 0.7, level: 4,
+  mode: 'medallion', hw: 1, hh: 1, seed: DEFAULT_SEED, density: 0.7, level: 4,
 } as const;
 
 export const PREMIERE_FRAME: DecoLatticeRequest = {
-  mode: 'frame', hw: 1.78, hh: 1, seed: 1925, density: 0.6, level: 4,
+  mode: 'frame', hw: 1.78, hh: 1, seed: DEFAULT_SEED, density: 0.6, level: 4,
 } as const;
 
 export const INVITATION_PANEL: DecoLatticeRequest = {
-  mode: 'frame', hw: 1, hh: 1.4, seed: 1925, density: 0.5, level: 3,
+  mode: 'frame', hw: 1, hh: 1.4, seed: DEFAULT_SEED, density: 0.5, level: 3,
 } as const;
 
 export const SCREEN_PROSCENIUM: DecoLatticeRequest = {
-  mode: 'frame', hw: 2.4, hh: 1, seed: 1925, density: 0.5, level: 2,
+  mode: 'frame', hw: 2.4, hh: 1, seed: DEFAULT_SEED, density: 0.5, level: 2,
 } as const;
 
 export const LATTICE_PRESETS = [

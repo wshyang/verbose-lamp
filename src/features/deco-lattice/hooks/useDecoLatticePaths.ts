@@ -2,6 +2,7 @@ import { useId, useMemo } from 'react';
 import { hash01 } from '@/shared/lib/random';
 import { buildDecoLattice, type DecoLatticeRequest } from '../model/composition';
 import { specsToLayerPaths, type LayerPath } from '../model/latticeSvg';
+import { DEFAULT_SEED } from '@/shared/lib/random';
 
 const FULL_CIRCLE_DEG = 360;
 const VIEWBOX_MARGIN = 0.06;
@@ -21,7 +22,7 @@ function resolveRequest(request: Partial<DecoLatticeRequest> | undefined): Requi
     mode: request?.mode ?? 'medallion',
     hw: request?.hw ?? 1,
     hh: request?.hh ?? 1,
-    seed: request?.seed ?? 1925,
+    seed: request?.seed ?? DEFAULT_SEED,
     density: request?.density ?? 0.7,
     level: request?.level ?? 4,
   };

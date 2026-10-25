@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { DEFAULT_WINNER_SUBTITLE } from '@/features/spectacle';
 import type { EffectRunner } from './useEffectRunner';
 
 const COUNTDOWN_FROM = 5;
@@ -26,7 +27,7 @@ export function useCelebrationActions({ runner, origin, seed, onCountdownComplet
   }, [run, onCountdownComplete]);
 
   const playNameReveal = useCallback(() => {
-    run('name-reveal', 'name-reveal', { name: 'Jay Gatsby', subtitle: 'Lucky draw winner' });
+    run('name-reveal', 'name-reveal', { name: 'Jay Gatsby', subtitle: DEFAULT_WINNER_SUBTITLE });
   }, [run]);
 
   const playSparklers = useCallback(

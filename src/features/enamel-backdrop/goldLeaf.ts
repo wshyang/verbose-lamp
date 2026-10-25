@@ -1,3 +1,4 @@
+import { DEFAULT_SEED } from '@/shared/lib/random';
 /**
  * Deterministic gold-leaf flecks: hashed value noise on an integer lattice. The same
  * input always gives the same output on every machine, so renders can be snapshotted.
@@ -25,8 +26,8 @@ export function leafAt(x: number, y: number, seed: number): number {
   return lerp(upper, lower, fy);
 }
 
-/** The 1925 seed is arbitrary but fixed: the year the novel was published. */
-export const LEAF_SEED = 1925;
+/** The gold-leaf pattern uses the shared default seed, so it never changes between renders. */
+export const LEAF_SEED = DEFAULT_SEED;
 
 /**
  * Fleck strength 0–1 at a unit-space point. Two octaves give torn-leaf edges; density

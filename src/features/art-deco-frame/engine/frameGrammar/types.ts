@@ -1,4 +1,5 @@
 import { BaseGenome, SIGNATURE_GENOME } from './genome';
+import { DEFAULT_SEED } from '@/shared/lib/random';
 
 export interface Point2 {
   x: number;
@@ -181,7 +182,7 @@ export interface ScreenBorderStyle {
 export type ScreenBorderPattern = 'poster' | 'lattice';
 
 export const DEFAULT_SCREEN_BORDER_PATTERN: ScreenBorderPattern = 'poster';
-export const DEFAULT_SCREEN_BORDER_SEED = 1925;
+export const DEFAULT_SCREEN_BORDER_SEED = DEFAULT_SEED;
 
 export const DEFAULT_SCREEN_BORDER_STYLE: ScreenBorderStyle = {
   weight: 0.5,

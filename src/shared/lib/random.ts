@@ -3,6 +3,12 @@
  * ADDENDUM-021 §3.3). Pure, framework-neutral, no DOM.
  */
 
+/**
+ * The default seed for every generative module: arbitrary but fixed, the year the novel was
+ * published. Callers that choose a seed pass their own; this is only what "no seed given" means.
+ */
+export const DEFAULT_SEED = 1925;
+
 /** mulberry32: fast 32-bit seeded PRNG returning floats in [0, 1). */
 export function mulberry32(seed: number): () => number {
   let a = seed >>> 0;

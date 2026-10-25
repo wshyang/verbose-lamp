@@ -1,4 +1,4 @@
-import { mulberry32 } from '@/shared/lib/random';
+import { DEFAULT_SEED, mulberry32 } from '@/shared/lib/random';
 import type { EffectDefinition } from '../../engine/types';
 import type { ChampagneParams } from '../../model/types';
 
@@ -15,7 +15,7 @@ export const champagneEffect: EffectDefinition<ChampagneParams> = {
   id: 'champagne',
   layer: 'light-backdrop',
   create(ctx, params) {
-    const rng = mulberry32(params.seed ?? 1925);
+    const rng = mulberry32(params.seed ?? DEFAULT_SEED);
     const rate = ctx.reducedMotion ? 1.5 : (params.rate ?? 7);
     const beads: Bead[] = [];
     let lastSpawn = 0;

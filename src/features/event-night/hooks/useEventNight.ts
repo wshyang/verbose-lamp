@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 import type { LuckyDrawEntry } from '@/features/lucky-draw';
-import { pointFromElement, useSpectacle } from '@/features/spectacle';
+import { playWinnerCelebration, pointFromElement, useSpectacle, winnerCelebration } from '@/features/spectacle';
 import { resolveActiveId, type NavItem } from '@/features/gilded-ui';
 import { OPENING_TAGLINE } from '../data/sectionTaglines';
 import { resolveNavAction, taglineFor } from '../model/navActions';
@@ -8,7 +8,6 @@ import { resolveNavAction, taglineFor } from '../model/navActions';
 const NAV_TRANSITION_MS = 1300;
 const MAX_NAV_ORIGIN_Y = 0.96;
 const FALLBACK_NAV_ORIGIN = { x: 0.5, y: 0.95 } as const;
-const LANDED_CONFETTI_ORIGIN = { x: 0.5, y: 0.4 } as const;
 const SEED_MODULUS = 100000;
 const RAIN_MS = 2600;
 
@@ -22,8 +21,7 @@ export function useEventNight(navItems: readonly NavItem[]) {
 
   const handleLanded = useCallback(
     (winner: LuckyDrawEntry) => {
-      play('confetti', { mode: 'burst', origin: LANDED_CONFETTI_ORIGIN, seed: Date.now() % SEED_MODULUS });
-      play('name-reveal', { name: winner.name, subtitle: winner.subtitle ?? 'Lucky draw winner' });
+      playWinnerCelebration(play, winnerCelebration({ winner, seed: Date.now() % SEED_MODULUS, sparklerCount: 0 }));
     },
     [play],
   );

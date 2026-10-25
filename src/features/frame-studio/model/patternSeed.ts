@@ -1,10 +1,11 @@
+import { DEFAULT_SEED } from '@/shared/lib/random';
 /**
  * Deterministic pattern seeds for the Deco Lattice reroll (ADDENDUM-026).
  * Pure: extracted from `useFrameStudio` so the arithmetic is unit-testable without
  * rendering the hook. Deterministic on purpose: the same current seed always gives
  * the same next one, so a reroll sequence can be replayed and asserted exactly.
  */
-export const LATTICE_DEFAULT_SEED = 1925;
+export const LATTICE_DEFAULT_SEED = DEFAULT_SEED;
 
 const LCG_MULTIPLIER = 9301;
 const LCG_INCREMENT = 49297;

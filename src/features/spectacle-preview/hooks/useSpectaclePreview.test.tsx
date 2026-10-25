@@ -13,7 +13,8 @@ const spectacle = vi.hoisted(() => ({
   setSimulatedReducedMotion: vi.fn(),
 }));
 
-vi.mock('@/features/spectacle', () => ({
+vi.mock('@/features/spectacle', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/features/spectacle')>()),
   useSpectacle: () => ({
     play: spectacle.play,
     stopAll: spectacle.stopAll,
