@@ -19,7 +19,11 @@ test('chapter buttons and the scrubber move the clock', async ({ page }) => {
   await page.getByTestId('timeline__scrubber').fill('30');
   await expect(page.getByTestId('timeline__scrubber')).toHaveValue('30');
   await page.getByTestId('timeline__replay').click();
-  await expect(page.getByTestId('timeline__scrubber')).toHaveValue('0');
+  // Replay resumes playback, so assert the clock restarted near zero rather
+  // than trying to observe the exact first frame on a software renderer.
+  await expect
+    .poll(async () => Number(await page.getByTestId('timeline__scrubber').inputValue()))
+    .toBeLessThan(5);
 });
 
 test('h hides the HUD', async ({ page }) => {

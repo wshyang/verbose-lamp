@@ -2,11 +2,13 @@
  * Sandbox/agent Chromium extraction for the likeness gate (ADDENDUM-030).
  *
  * Where the Playwright CDN is unreachable, @sparticuz/chromium ships a
- * Chromium binary inside its npm tarball. Install it without saving
- * (`npm install --no-save --ignore-scripts @sparticuz/chromium`), run this
- * script, and export the two lines it prints before `npm run e2e`.
- * On a normal machine none of this is needed: `npx playwright install
- * chromium` is the supported path.
+ * Chromium binary inside its npm tarball. Install the pinned browser
+ * without saving it as a project dependency
+ * (`npm install --no-save --ignore-scripts @sparticuz/chromium@153.0.0`),
+ * run this script, and export the two lines it prints before `npm run e2e`.
+ * Version 153.0.0 is pinned because the committed Linux baselines were
+ * captured with Chromium 153.0.8010.0. On a normal machine none of this is
+ * needed: `npx playwright install chromium` is the supported path.
  */
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
@@ -19,7 +21,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const binDir = join(root, 'node_modules', '@sparticuz', 'chromium', 'bin');
 if (!existsSync(binDir)) {
   console.error('Missing @sparticuz/chromium. Install it with:');
-  console.error('  npm install --no-save --ignore-scripts @sparticuz/chromium');
+  console.error('  npm install --no-save --ignore-scripts @sparticuz/chromium@153.0.0');
   process.exit(1);
 }
 
