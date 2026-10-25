@@ -82,3 +82,62 @@ export function cardPhase({ localT, role }: CardPhaseRequest): CardPhase {
     opacity: fadeOpacity(localT, role),
   };
 }
+
+export interface CinemaCameraRequest {
+  readonly chapters: readonly ChapterTiming[];
+  readonly activeIdx: number;
+  /** Time inside the active chapter, clamped to 0..1. */
+  readonly chapterLocal: number;
+  /** Extra framing distance so narrow viewports never clip the side wings. */
+  readonly pullback: number;
+}
+
+/** The hold fills the first 78 % of a chapter; the fly-through takes the rest. */
+const HOLD_END = 0.78;
+const HOLD_START_DISTANCE = 12.2;
+const HOLD_END_DISTANCE = 9.0;
+/** The fly-through lands further back before the finale so the whole crown reads. */
+const FINALE_APPROACH_DISTANCE = 15.2;
+/** Pull-back is only partly applied at the end of a hold. */
+const END_PULLBACK_SHARE = 0.85;
+const HERO_START_DISTANCE = 15.2;
+const HERO_HOLD_DISTANCE = 12.4;
+/** The finale settles into its hold over the first 52 % of its time. */
+const HERO_SETTLE_END = 0.52;
+const HERO_SETTLE_POWER = 2.5;
+const HERO_DRIFT_PER_CHAPTER = 0.75;
+
+/** The cinema camera's Z for this instant: hold, fly-through, or the grand finale. */
+export function cinemaCameraZ(request: CinemaCameraRequest): number {
+  const { chapters, activeIdx, chapterLocal, pullback } = request;
+  const chapter = chapters[activeIdx];
+  if (activeIdx === chapters.length - 1) return finaleCameraZ(chapter.zPosition, chapterLocal, pullback);
+  if (chapterLocal < HOLD_END) return holdCameraZ(chapter.zPosition, chapterLocal, pullback);
+  return flyCameraZ(request);
+}
+
+/** Stately push-in across the hold. */
+function holdCameraZ(chapterZ: number, chapterLocal: number, pullback: number): number {
+  const startDistance = HOLD_START_DISTANCE + pullback;
+  const endDistance = HOLD_END_DISTANCE + pullback * END_PULLBACK_SHARE;
+  return lerp(chapterZ + startDistance, chapterZ + endDistance, chapterLocal / HOLD_END);
+}
+
+/** Exhilarating fly-through portal into the next chamber. */
+function flyCameraZ({ chapters, activeIdx, chapterLocal, pullback }: CinemaCameraRequest): number {
+  const endDistance = HOLD_END_DISTANCE + pullback * END_PULLBACK_SHARE;
+  const flyFraction = (chapterLocal - HOLD_END) / (1 - HOLD_END);
+  const eased = flyFraction * flyFraction * (3 - 2 * flyFraction);
+  const nextIsFinale = activeIdx + 1 === chapters.length - 1;
+  const nextStartDistance = (nextIsFinale ? FINALE_APPROACH_DISTANCE : HOLD_START_DISTANCE) + pullback;
+  const nextZ = chapters[activeIdx + 1].zPosition + nextStartDistance;
+  return lerp(chapters[activeIdx].zPosition + endDistance, nextZ, eased);
+}
+
+/** The finale frames the whole Chrysler crown, then drifts in for the fade. */
+function finaleCameraZ(chapterZ: number, chapterLocal: number, pullback: number): number {
+  const settle = 1 - Math.pow(1 - Math.min(1, chapterLocal / HERO_SETTLE_END), HERO_SETTLE_POWER);
+  const from = chapterZ + HERO_START_DISTANCE + pullback;
+  const to = chapterZ + HERO_HOLD_DISTANCE + pullback;
+  return lerp(from, to, settle) - chapterLocal * HERO_DRIFT_PER_CHAPTER;
+}

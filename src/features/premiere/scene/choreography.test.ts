@@ -6,6 +6,7 @@ import {
   activeChapterIndex,
   cardPhase,
   cardRole,
+  cinemaCameraZ,
   clamp,
   lerp,
   smoothstep,
@@ -154,6 +155,63 @@ describe('cardPhase', () => {
           expect(value).toBeLessThanOrEqual(1);
         }
       }
+    }
+  });
+});
+
+// Expected Z values were computed from the shipped manager's inline camera code
+// (GatsbySceneManager.animate, the cinema branch) over the real SEQUENCE_CHAPTERS.
+describe('cinemaCameraZ', () => {
+  const solve = (t: number, pullback: number): number => {
+    const activeIdx = activeChapterIndex(t, SEQUENCE_CHAPTERS);
+    const chapter = SEQUENCE_CHAPTERS[activeIdx];
+    const chapterLocal = clamp((t - chapter.startTime) / (chapter.endTime - chapter.startTime), 0, 1);
+    return cinemaCameraZ({ chapters: SEQUENCE_CHAPTERS, activeIdx, chapterLocal, pullback });
+  };
+
+  it.each([
+    ['the very first frame', 0, 0, 12.2],
+    ['a quarter of the way into the first hold', 3, 0, 10.49059829059829],
+    ['the end of the first hold (0.78)', 5.616, 0, 9],
+    ['the middle of the first fly-through', 6.5, 0, -4.377429289837461],
+    ['the last instant of the first chapter', 7.1999, 0, -13.799999727398983],
+    ['a narrow viewport pulls back from chapter two’s start', 7.2, 2.4, -11.4],
+    ['inside the second hold', 12, 0, -16.695927601809956],
+    ['a mid pull-back in the second fly-through', 13.5, 1.2, -32.70865704887889],
+    ['inside the third hold', 19, 0, -42.81659125188537],
+    ['the fly-through into the chapter before the finale', 20.7, 0, -65.50799193724372],
+    ['the fourth chapter, flying toward the finale', 27.4, 0, -92.48623627271357],
+    ['the finale’s first frame', 27.5, 0, -92.8],
+    ['the finale’s first frame on a narrow viewport', 27.5, 2.4, -90.4],
+    ['the finale’s ease toward its hold', 30, 0, -95.17266480201275],
+    ['the finale mid-way on a narrow viewport', 33, 2.4, -93.59285714285714],
+    ['the last instant before the end', 37.999, 0, -96.34992857142856],
+  ])('%s', (_label, t, pullback, expected) => {
+    expect(solve(t, pullback)).toBeCloseTo(expected, 9);
+  });
+
+  it('lands the fly-through on the next chapter’s opening framing, without a jump', () => {
+    for (let index = 0; index < SEQUENCE_CHAPTERS.length - 1; index += 1) {
+      const next = SEQUENCE_CHAPTERS[index + 1];
+      const justBefore = solve(next.startTime - 1e-6, 0);
+      const opening = solve(next.startTime, 0);
+
+      expect(Math.abs(opening - justBefore)).toBeLessThan(1e-3);
+    }
+  });
+
+  it('pulls back further on narrow viewports in every chapter', () => {
+    for (const chapter of SEQUENCE_CHAPTERS) {
+      expect(solve(chapter.startTime, 2.4)).toBeGreaterThan(solve(chapter.startTime, 0));
+    }
+  });
+
+  it('only ever moves forward along the corridor (Z never increases)', () => {
+    let previous = Number.POSITIVE_INFINITY;
+    for (let step = 0; step < 3800; step += 1) {
+      const z = solve(step / 100, 0);
+      expect(z).toBeLessThanOrEqual(previous + 1e-9);
+      previous = z;
     }
   });
 });
