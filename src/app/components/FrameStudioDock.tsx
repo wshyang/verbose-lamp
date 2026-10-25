@@ -8,6 +8,28 @@ interface FrameStudioDockProps {
   hudHidden: boolean;
 }
 
+/**
+ * The chip that brings a collapsed panel back.
+ *
+ * On a phone the header wraps to three rows (220 px), so the old `top-28` put this
+ * button on top of the QR and sparkler launchers. It sits below the header on narrow
+ * screens and returns to the stage edge from `sm` up (ADDENDUM-044).
+ */
+function RevealButton({ onReveal }: { onReveal: () => void }) {
+  return (
+    <Button
+      onClick={onReveal}
+      className="absolute right-3 top-60 z-20 sm:right-9 sm:top-28"
+      title="Reopen Frame Studio (F)"
+      aria-label="Reopen Frame Studio"
+      data-testid="frame-studio__reveal"
+    >
+      <Layers className="h-3.5 w-3.5 text-[#f8e29b]" />
+      <span>Frame Studio</span>
+    </Button>
+  );
+}
+
 export function FrameStudioDock({ studio, hudHidden }: FrameStudioDockProps) {
   const visibilityClass = hudHidden ? 'opacity-0 pointer-events-none' : 'opacity-100';
 
@@ -47,16 +69,7 @@ export function FrameStudioDock({ studio, hudHidden }: FrameStudioDockProps) {
           onDismiss={studio.dismiss}
         />
       ) : (
-        <Button
-          onClick={studio.reveal}
-          className="absolute right-6 top-28 z-20 sm:right-9"
-          title="Reopen Frame Studio (F)"
-          aria-label="Reopen Frame Studio"
-          data-testid="frame-studio__reveal"
-        >
-          <Layers className="h-3.5 w-3.5 text-[#f8e29b]" />
-          <span>Frame Studio</span>
-        </Button>
+        <RevealButton onReveal={studio.reveal} />
       )}
     </div>
   );

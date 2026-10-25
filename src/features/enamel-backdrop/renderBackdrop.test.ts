@@ -137,3 +137,19 @@ describe('jewel finishes lifted from implementation B (ADDENDUM-019)', () => {
     expect(spread(0.9)).toBeGreaterThan(spread(0) * 1.05);
   });
 });
+
+describe('degenerate panels', () => {
+  it('renders a single-pixel panel without a neighbour to compare against', () => {
+    // A 1 px panel has no left or right neighbour, so the gradient falls back to 0
+    // instead of reading outside the plane.
+    const panel = renderEnamelPanel({ ...emeraldSunburst.spec, bands: 1 }, 1);
+    expect(panel.image.width).toBe(1);
+    expect(panel.image.data).toHaveLength(4);
+    expect(panel.metal.data).toHaveLength(1);
+  });
+
+  it('renders a single-band panel at the ramp start', () => {
+    const panel = renderEnamelPanel({ ...emeraldSunburst.spec, bands: 1 }, 12);
+    expect(panel.image.data.some((value) => value > 0)).toBe(true);
+  });
+});

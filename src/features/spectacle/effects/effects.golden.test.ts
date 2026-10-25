@@ -34,6 +34,8 @@ const CASES: readonly GoldenCase[] = [
   { name: 'countdown', effect: 'countdown', params: { from: 3 } },
   { name: 'name reveal', effect: 'name-reveal', params: { name: 'Jay Gatsby', subtitle: 'Lucky draw winner' } },
   { name: 'flash', effect: 'flash', params: { origin: ORIGIN } },
+  { name: 'sparklers fan', effect: 'sparklers', params: { count: 3, seed: 1925 } },
+  { name: 'sparklers single', effect: 'sparklers', params: { count: 1, durationMs: 1800, seed: 1925 } },
 ];
 
 interface RunSummary {

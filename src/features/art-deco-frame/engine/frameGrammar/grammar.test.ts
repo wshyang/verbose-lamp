@@ -4,10 +4,14 @@ import {
   INTRICACY_PRESETS,
   PolylineSpec,
   buildCoreFrameSpecs,
+  applyIntricacy,
   buildFrameSpecs,
+  elaborate,
+  annotateRanks,
   elaborationGenerations,
   offsetPolylineOutward,
   rankBudget,
+  reduceByRank,
 } from './index';
 
 const ARCHETYPES: FrameArchetype[] = [
@@ -104,6 +108,78 @@ describe('applyIntricacy', () => {
   });
 });
 
+describe('elaboration productions', () => {
+  const spec = (kind: string, points: Array<{ x: number; y: number }>) =>
+    ({ kind, points, width: 1, delay: 0, seed: 1 }) as never;
+
+  it('adds every generation it can for each rail kind', () => {
+    const three = [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 1, y: 1 }];
+    expect(elaborate([spec('frame', three)], 1).length).toBeGreaterThan(1);
+    expect(elaborate([spec('diamond', three)], 1).length).toBeGreaterThan(1);
+    expect(elaborate([spec('column', three)], 1).length).toBeGreaterThan(1);
+    expect(elaborate([spec('chevron', three)], 1).length).toBeGreaterThan(1);
+  });
+
+  it('declines to produce a rail from the wrong number of points', () => {
+    const three = [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 1, y: 1 }];
+    const two = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
+    expect(elaborate([spec('rule', three)], 1)).toHaveLength(1);
+    expect(elaborate([spec('ray', three)], 1)).toHaveLength(1);
+    expect(elaborate([spec('chevron', two)], 1)).toHaveLength(1);
+    expect(elaborate([spec('rule', two)], 1).length).toBeGreaterThan(1);
+    expect(elaborate([spec('ray', two)], 1).length).toBeGreaterThan(1);
+  });
+
+  it('keeps the core rails untouched at the baseline', () => {
+    const core = [spec('frame', [{ x: 0, y: 0 }, { x: 1, y: 0 }])];
+    expect(applyIntricacy(core, 0.5)).toHaveLength(core.length);
+  });
+});
+
+describe('offsetPolylineOutward edge cases', () => {
+  it('copies a degenerate polyline instead of inventing a normal', () => {
+    expect(offsetPolylineOutward([], 0.1, false)).toEqual([]);
+    const single = [{ x: 0.5, y: 0.5 }];
+    const out = offsetPolylineOutward(single, 0.1, false);
+    expect(out).toEqual(single);
+    expect(out[0]).not.toBe(single[0]);
+  });
+
+  it('takes the end normals when a point has only one neighbour', () => {
+    const open = [
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+      { x: 1, y: 1 },
+    ];
+    const out = offsetPolylineOutward(open, 0.1, false);
+    expect(out).toHaveLength(3);
+    expect(out[1].y).toBeCloseTo(-0.1, 6);
+  });
+
+  it('wraps around when the polyline is closed', () => {
+    const square = [
+      { x: -1, y: -1 },
+      { x: 1, y: -1 },
+      { x: 1, y: 1 },
+      { x: -1, y: 1 },
+    ];
+    const out = offsetPolylineOutward(square, 0.2, true);
+    for (const point of out) expect(Math.max(Math.abs(point.x), Math.abs(point.y))).toBeGreaterThan(1);
+  });
+
+  it('falls back to a straight normal at a hairpin turn instead of exploding', () => {
+    const hairpin = [
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+      { x: 0, y: 0.0000001 },
+    ];
+    const out = offsetPolylineOutward(hairpin, 0.1, false);
+    // The two normals cancel, so the fallback keeps the first segment's normal.
+    expect(out[1].x).toBeCloseTo(1, 6);
+    expect(out[1].y).toBeCloseTo(0.1, 6);
+  });
+});
+
 describe('offsetPolylineOutward', () => {
   it('moves a right half-frame away from the origin and keeps the x = 0 seam', () => {
     const half = [
@@ -118,5 +194,49 @@ describe('offsetPolylineOutward', () => {
     expect(out[1].x).toBeGreaterThan(1);
     expect(out[3].x).toBeCloseTo(0, 6);
     expect(out[3].y).toBeLessThan(-1);
+  });
+});
+
+describe('unannotated specs', () => {
+  it('treats a spec with no kind as a frame and one with no rank as rank 0', () => {
+    const bare = { points: [], width: 0.01, depth: 0, z: 0, delay: 0 } as unknown as PolylineSpec;
+    expect(annotateRanks([bare])[0].rank).toBe(0);
+    expect(reduceByRank([bare], 0)).toEqual([bare]);
+  });
+
+  it('counts frame halves in pairs so only the first pair is primary', () => {
+    const frame = (offset: number) =>
+      ({ points: [{ x: offset, y: 0 }], width: 0.01, depth: 0, z: 0, delay: 0, kind: 'frame' }) as PolylineSpec;
+    expect(annotateRanks([frame(0), frame(1), frame(2), frame(3)]).map((spec) => spec.rank)).toEqual([0, 0, 1, 1]);
+  });
+
+  it('elaborates a spec with no points without dividing by zero', () => {
+    const bare = { points: [], width: 0.01, depth: 0, z: 0, delay: 0, kind: 'diamond' } as unknown as PolylineSpec;
+    const out = elaborate([bare], 1);
+    expect(out.length).toBeGreaterThan(1);
+    for (const spec of out) for (const point of spec.points) expect(Number.isFinite(point.x)).toBe(true);
+  });
+
+  it('falls back to a frame production for a spec with no kind', () => {
+    const rules = {
+      points: [
+        { x: 0, y: 0 },
+        { x: 1, y: 0 },
+        { x: 1, y: 1 },
+        { x: 0, y: 1 },
+        { x: 0, y: 0 },
+      ],
+      width: 0.01,
+      depth: 0,
+      z: 0,
+      delay: 0,
+    } as unknown as PolylineSpec;
+    expect(elaborate([rules], 1).length).toBeGreaterThan(1);
+  });
+
+  it('survives a repeated point when offsetting', () => {
+    const out = offsetPolylineOutward([{ x: 0, y: 0 }, { x: 0, y: 0 }, { x: 1, y: 0 }], 0.1, false);
+    expect(out).toHaveLength(3);
+    for (const point of out) expect(Number.isFinite(point.x) && Number.isFinite(point.y)).toBe(true);
   });
 });

@@ -17,8 +17,14 @@ export const MODEL_URL =
 /** The library default, kept because lower values flood real photos with false faces. */
 export const MIN_CONFIDENCE = 0.5;
 
+/**
+ * The CDN import is never executed by the suite: Vitest cannot fetch jsDelivr from
+ * here, and every caller injects its own loader (ADDENDUM-028 §3).
+ */
+/* v8 ignore start */
 export const loadTasksVision: TasksVisionLoader = () =>
   import(/* @vite-ignore */ TASKS_VISION_URL) as Promise<TasksVisionModule>;
+/* v8 ignore stop */
 
 let pending: Promise<FaceDetector> | null = null;
 

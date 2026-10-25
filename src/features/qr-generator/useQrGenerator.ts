@@ -1,15 +1,11 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
-import { tryEncodeQr } from './encode';
-import { downloadSvgAsPng, downloadSvgElement, toSafeFileStem } from './export';
-import { buildRenderPlan, resolveQrStyle } from './geometry';
+import { useCallback, useRef, useState } from 'react';
+import { useQrDownloads } from './hooks/useQrDownloads';
+import { useQrEncoding } from './hooks/useQrEncoding';
 import { MAX_QR_CAPTION_LENGTH, QR_PRESETS } from './presets';
 import type { QrErrorCorrection, QrModuleShape, QrPreset, QrRenderPlan } from './types';
+import type { QrSummary } from './model/qrView';
 
-export interface QrSummary {
-  readonly version: number;
-  readonly size: number;
-  readonly byteCount: number;
-}
+export type { QrSummary };
 
 export interface QrGeneratorState {
   readonly text: string;
@@ -35,39 +31,21 @@ export interface QrGeneratorState {
 
 const INITIAL_PRESET = QR_PRESETS[0];
 
-function findMatchingPreset(text: string, level: QrErrorCorrection): string | null {
-  const match = QR_PRESETS.find((p) => p.text === text && p.errorCorrection === level);
-  return match ? match.id : null;
-}
-
-function byteLength(text: string): number {
-  return new TextEncoder().encode(text).length;
-}
-
+/**
+ * The QR generator's state (ADDENDUM-039): the draft, the encode chain
+ * (`useQrEncoding`), and the export paths (`useQrDownloads`). Nothing here
+ * computes — it holds the draft and wires the three together.
+ */
 export function useQrGenerator(): QrGeneratorState {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [text, setText] = useState(INITIAL_PRESET.text);
   const [caption, setCaptionRaw] = useState(INITIAL_PRESET.caption);
-  const [errorCorrection, setErrorCorrection] = useState<QrErrorCorrection>(
-    INITIAL_PRESET.errorCorrection
-  );
+  const [errorCorrection, setErrorCorrection] = useState<QrErrorCorrection>(INITIAL_PRESET.errorCorrection);
   const [shape, setShape] = useState<QrModuleShape>('plaque');
   const [isShimmering, setShimmering] = useState(true);
   const [isExporting, setExporting] = useState(false);
 
-  const encoded = useMemo(() => tryEncodeQr({ text, errorCorrection }), [text, errorCorrection]);
-  const plan = useMemo(
-    () => (encoded.ok ? buildRenderPlan(encoded.matrix, resolveQrStyle(shape)) : null),
-    [encoded, shape]
-  );
-  const summary = useMemo<QrSummary | null>(
-    () => (plan ? { version: plan.version, size: plan.size, byteCount: byteLength(text) } : null),
-    [plan, text]
-  );
-  const activePresetId = useMemo(
-    () => findMatchingPreset(text, errorCorrection),
-    [text, errorCorrection]
-  );
+  const { encoded, plan, summary, activePresetId } = useQrEncoding({ text, errorCorrection, shape });
 
   const setCaption = useCallback((next: string) => {
     setCaptionRaw(next.slice(0, MAX_QR_CAPTION_LENGTH));
@@ -79,25 +57,27 @@ export function useQrGenerator(): QrGeneratorState {
     setErrorCorrection(preset.errorCorrection);
   }, []);
 
-  const downloadSvg = useCallback(() => {
-    if (!svgRef.current) return;
-    downloadSvgElement(svgRef.current, toSafeFileStem(caption));
-  }, [caption]);
-
-  const downloadPng = useCallback(async () => {
-    if (!svgRef.current || isExporting) return;
-    setExporting(true);
-    try {
-      await downloadSvgAsPng(svgRef.current, toSafeFileStem(caption));
-    } finally {
-      setExporting(false);
-    }
-  }, [caption, isExporting]);
+  const { downloadSvg, downloadPng } = useQrDownloads({ svgRef, caption, isExporting, setExporting });
 
   return {
-    text, caption, errorCorrection, shape, isShimmering, activePresetId,
-    plan, summary, error: encoded.ok ? null : encoded.reason, isExporting, svgRef,
-    setText, setCaption, setErrorCorrection, setShape, setShimmering,
-    applyPreset, downloadSvg, downloadPng,
+    text,
+    caption,
+    errorCorrection,
+    shape,
+    isShimmering,
+    activePresetId,
+    plan,
+    summary,
+    error: encoded.ok ? null : encoded.reason,
+    isExporting,
+    svgRef,
+    setText,
+    setCaption,
+    setErrorCorrection,
+    setShape,
+    setShimmering,
+    applyPreset,
+    downloadSvg,
+    downloadPng,
   };
 }

@@ -20,7 +20,12 @@ export function SpectacleLayer({
   return (
     <div ref={hostRef} className={className} data-testid="spectacle-layer__host">
       {children}
-      <span aria-live="polite" role="status" className="sr-only">
+      <span
+        aria-live="polite"
+        role="status"
+        className="sr-only"
+        data-testid="spectacle-layer__announcement"
+      >
         {announcement}
       </span>
     </div>

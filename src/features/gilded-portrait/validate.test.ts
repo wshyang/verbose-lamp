@@ -18,3 +18,10 @@ describe('image file validation', () => {
     expect(validateImageFile({ type: 'image/jpeg', size: 0 })).toMatchObject({ ok: false });
   });
 });
+describe('file type that is not a string', () => {
+  it('rejects a metadata object whose type is not text', () => {
+    expect(validateImageFile({ type: 42, size: 10 } as unknown as { type: string; size: number })).toMatchObject({
+      ok: false,
+    });
+  });
+});

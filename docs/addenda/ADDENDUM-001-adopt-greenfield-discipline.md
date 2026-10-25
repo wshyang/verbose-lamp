@@ -31,10 +31,10 @@
 
 | Item | Status | Trigger to un-defer |
 |---|---|---|
-| Playwright e2e with video-on | Deferred | First time a browser is available in CI or a second interactive feature ships |
+| Playwright e2e with video-on | **Un-deferred** (ADDENDUM-043) | A browser became available: `scripts/sandbox-browser.mjs` runs the suite against a Chromium npm tarball. Video-on is still off — captures are stills, not video |
 | Dockerfile / Dockerfile.dev / cloudflared | Deferred | First deployment target is named |
 | SHIP-HATS inert pipeline files | Deferred | Project is slated for a GovTech environment |
-| `data-testid` on pre-existing controls | Partial | Added to every control touched from now on; backfill when the HUD is next split |
+| `data-testid` on pre-existing controls | **Verified complete** (ADDENDUM-042) | Backfill finished; `src/app/testidCoverageStatic.test.ts` now fails on any control without an id, so it cannot regress |
 
 ## 4. Known debt against the function/file limits
 
@@ -46,6 +46,19 @@ Measured at adoption. Do not grow these; split when touched substantively.
 | `src/webgl/GatsbySceneManager.ts` (~600 LOC) | `animate()` is ~150 lines | Split timeline math into a pure `sequenceTiming.ts` on next touch |
 | `src/webgl/decoTypography.ts` (~700 LOC) | `createExtrudedDecoTextMesh` ~300 lines | Split rasteriser / normal-synth / mesh on next touch |
 | `src/App.tsx` (~430 LOC) | Component owns playback logic | Extract `usePlaybackControls` hook on next touch |
+
+### Update (ADDENDUM-032, 2026-10-25) — where those four rows ended up
+
+| File then | Now | Outcome |
+|---|---|---|
+| `src/webgl/decoFrames.ts` (~980 LOC) | `src/features/art-deco-frame/` (grammar split into `engine/frameGrammar/`) | **Resolved** — ADDENDUM-002/014; the largest file in the tree is 729 LOC |
+| `src/webgl/GatsbySceneManager.ts` (~600 LOC) | `src/features/premiere/scene/GatsbySceneManager.ts` (729 LOC) | **Deferred on purpose** — deleted when the R3F screenshot gate passes (ADDENDUM-026 §5) |
+| `src/webgl/decoTypography.ts` (~700 LOC, one ~300-line function) | `src/features/art-deco-frame/render/decoTypography.ts` (381 LOC, six functions) | **Resolved** — split in ADDENDUM-032, guarded by a pre-refactor golden digest |
+| `src/App.tsx` (~430 LOC) | `src/App.tsx` (7 LOC) | **Resolved** — ADDENDUM-014's feature composition |
+
+The limits themselves are now enforced by `src/discipline.test.ts` (ADDENDUM-032)
+rather than by this paragraph: any new function over 50 lines, 3 parameters or 3 levels
+of nesting fails the build unless it is recorded, and the record may only shrink.
 
 ## 5. Practical impact
 

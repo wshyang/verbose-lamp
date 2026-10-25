@@ -242,6 +242,50 @@ exports[`effect golden recordings > searchlights draws identically (reduced moti
 }
 `;
 
+exports[`effect golden recordings > sparklers fan draws identically (full motion) 1`] = `
+{
+  "announced": [
+    "Sparklers lit",
+  ],
+  "calls": 3114,
+  "hash": "577ee9a51dc1ad9215579fff7fadf0e968465d6c",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > sparklers fan draws identically (reduced motion) 1`] = `
+{
+  "announced": [
+    "Sparklers lit",
+  ],
+  "calls": 3114,
+  "hash": "f3e8c97bb9bca6cd82ae42623af5ef156d5ddc16",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > sparklers single draws identically (full motion) 1`] = `
+{
+  "announced": [
+    "Sparklers lit",
+  ],
+  "calls": 531,
+  "hash": "05c505380006e402cfd01d4cee03c98a0b117a5a",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > sparklers single draws identically (reduced motion) 1`] = `
+{
+  "announced": [
+    "Sparklers lit",
+  ],
+  "calls": 531,
+  "hash": "a9deb043283dae73d38952f6b706be223dff2d7b",
+  "status": "done",
+}
+`;
+
 exports[`effect golden recordings > sunburst fan draws identically (full motion) 1`] = `
 {
   "announced": [],

@@ -17,8 +17,11 @@ export const SEGMENTATION_MODEL = 'Xenova/modnet';
  */
 const DEVICE = 'wasm';
 
+/** Untestable here for the same reason as `loadTasksVision`: the suite injects a loader. */
+/* v8 ignore start */
 export const loadTransformers: TransformersLoader = () =>
   import(/* @vite-ignore */ TRANSFORMERS_URL) as Promise<TransformersModule>;
+/* v8 ignore stop */
 
 interface Segmenter {
   readonly run: SegmentationPipeline;

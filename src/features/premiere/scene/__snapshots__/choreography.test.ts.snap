@@ -1,0 +1,8 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`golden choreography > keeps the whole sequence timing 1`] = `
+{
+  "hash": "0c078a92c7279a8e2573bebc69572845a0bc9a59",
+  "length": 94996,
+}
+`;

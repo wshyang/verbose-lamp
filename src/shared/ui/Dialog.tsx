@@ -1,5 +1,7 @@
 import { createPortal } from 'react-dom';
-import { useEffect, useRef, type KeyboardEvent, type MouseEvent, type ReactNode } from 'react';
+import { useRef, type KeyboardEvent, type MouseEvent, type ReactNode } from 'react';
+import { getFocusableElements, useDialogFocus } from '@/shared/hooks/useDialogFocus';
+import { useEscapeKey } from '@/shared/hooks/useEscapeKey';
 
 interface DialogProps {
   open: boolean;
@@ -10,15 +12,6 @@ interface DialogProps {
   backdropClassName?: string;
   testId?: string;
   closeOnBackdrop?: boolean;
-}
-
-const FOCUSABLE_SELECTOR =
-  'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
-
-function getFocusableElements(container: HTMLElement): HTMLElement[] {
-  return Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
-    (element) => !element.hasAttribute('hidden') && element.getAttribute('aria-hidden') !== 'true'
-  );
 }
 
 export function Dialog({
@@ -35,22 +28,10 @@ export function Dialog({
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
 
-  useEffect(() => {
-    if (!open) return;
-    const restoreTarget = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    const focusFrame = window.requestAnimationFrame(() => {
-      const dialog = dialogRef.current;
-      if (!dialog) return;
-      const preferred = dialog.querySelector<HTMLElement>('[autofocus], [data-autofocus="true"]');
-      const first = getFocusableElements(dialog)[0];
-      (preferred ?? first ?? dialog).focus({ preventScroll: true });
-    });
+  useDialogFocus(open, dialogRef);
 
-    return () => {
-      window.cancelAnimationFrame(focusFrame);
-      if (restoreTarget?.isConnected) restoreTarget.focus({ preventScroll: true });
-    };
-  }, [open]);
+  // Escape also works while focus is still outside the dialog (ADDENDUM-043).
+  useEscapeKey(open, () => closeRef.current());
 
   if (!open) return null;
 

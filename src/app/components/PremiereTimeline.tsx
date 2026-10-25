@@ -60,6 +60,7 @@ export function PremiereTimeline({
                 key={chapter.id}
                 onClick={() => onSelectAct(index)}
                 variant={index === activeAct ? 'selected' : 'panel'}
+                aria-current={index === activeAct ? 'true' : undefined}
                 size="small"
                 className="whitespace-nowrap tracking-[0.18em]"
                 data-testid="timeline__chapter"
@@ -97,7 +98,9 @@ export function PremiereTimeline({
             data-testid="timeline__scrubber"
           />
           <div className="shrink-0 font-mono text-[11px] tabular-nums tracking-wider text-[#e6d5b2]/85">
-            {formatSeconds(currentTime)} <span className="text-[#d4af37]/50">/</span> {formatSeconds(duration)}
+            <span data-testid="timeline__clock">
+              {formatSeconds(currentTime)} <span className="text-[#d4af37]/50">/</span> {formatSeconds(duration)}
+            </span>
           </div>
         </div>
       </div>

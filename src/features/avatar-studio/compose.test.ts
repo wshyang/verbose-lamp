@@ -134,3 +134,26 @@ describe('cropBox (ported)', () => {
     expect(photoToBox(onPhoto, shown, frame)).toEqual({ x: 20, y: 10, size: 50 });
   });
 });
+
+describe('compose guards', () => {
+  it('treats a backdrop with no metal plane as ungilded', () => {
+    const subject = cutOutSubject({ ...composition(), size: 64 });
+    const backdrop = renderEnamelPanel(backdropSpec, 64);
+    const withMetal = composeLayers({ subject, backdrop, frame: 'medallion', rampId: backdropSpec.rampId });
+    const withoutMetal = composeLayers({
+      subject,
+      backdrop: { image: backdrop.image },
+      frame: 'medallion',
+      rampId: backdropSpec.rampId,
+    });
+    // Metal falls to zero where the backdrop has none, so the two differ.
+    expect(withoutMetal.metal.data.some((value, index) => value !== withMetal.metal.data[index])).toBe(true);
+  });
+
+  it('composes at the house avatar size when none is given', () => {
+    const { size: _ignored, ...withoutSize } = composition();
+    const image = composeAvatar(withoutSize);
+    expect(image.width).toBe(AVATAR_SIZE);
+    expect(image.height).toBe(AVATAR_SIZE);
+  });
+});

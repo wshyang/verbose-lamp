@@ -19,6 +19,11 @@ describe('sanitizeFlashPlan', () => {
     expect(maxFlashRate(safe)).toBeLessThanOrEqual(3);
   });
 
+  it('leaves a small flash untouched', () => {
+    const plan = sanitizeFlashPlan([{ startMs: 0, attackMs: 90, holdMs: 0, decayMs: 100, peak: 0.4 }]);
+    expect(plan[0].peak).toBe(0.4);
+  });
+
   it('does not throw on empty or unordered input', () => {
     expect(sanitizeFlashPlan([])).toEqual([]);
     const plan = sanitizeFlashPlan([

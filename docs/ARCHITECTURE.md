@@ -29,7 +29,10 @@ src/
     gilded-portrait/            # Pure CPU image pipeline and optional portrait studio
     gilded-ui/                  # Gold plaques, glyphs and nav bar from emoji + label
     lucky-draw/                 # Fair draw rules, spin profile, canvas drum
-    premiere/                   # Sequence domain, audio, and WebGL runtime
+    premiere/                   # Sequence domain, audio, and both renderers
+      model/                    # Timing, choreography, freeze, style clamps (pure)
+      scene/                    # Classic imperative Three.js runtime (being retired)
+      scene3d/                   # React Three Fiber port: store, stage, atoms, camera
     qr-generator/               # Encode, render, export, and modal surface
     research/                   # Read-only dossier and content
     spectacle/                  # Canvas-2D effects: fireworks, orbs, sunburst, confetti…
@@ -54,6 +57,15 @@ supported import surface; internal files should remain private to that feature.
 - `features/premiere` owns the five-act sequence, camera/audio controls, and the
   scene lifecycle. React UI talks to the typed controller rather than reaching
   into Three.js objects.
+- `features/premiere` has **two renderers behind one seam** (ADDENDUM-022 §7,
+  ADDENDUM-026 §5). `scene3d/` is the default: a React Three Fiber tree
+  (`PremiereScene` → `TitleCard`, `Atmosphere`, `LightingRig`,
+  `BallroomEnvironment`, `CinemaCamera`, `ScreenBorder`, `CinemaComposer`) driven
+  by `premiereStore` and `PlaybackClock`. `scene/` is the original imperative
+  `GatsbySceneManager`, reachable with `?renderer=classic` and kept only until the
+  screenshot baselines pass; it is the largest file in the tree and is scheduled
+  for deletion. `PremiereStage` is the GPU-free seam that the headless tests mount,
+  so scene tests need no WebGL context.
 - `features/art-deco-frame` owns reusable frame grammar, genome data, beveled
   rail geometry, typography glyphs, and materials. It has no timeline or HUD.
 - `features/frame-studio` owns editor state and control presentation. Its hook
@@ -74,6 +86,10 @@ supported import surface; internal files should remain private to that feature.
   leaves enamel and skin alone; the PNG export is always the still.
 - `features/title-customizer`, `features/research`, and `features/qr-generator`
   are independently importable product features with their own data and UI.
+- `src/test/` holds test infrastructure — the canvas stub, the jsdom setup, the
+  digest helper — and `src/test/disciplineBaseline.ts`, the debt table the
+  discipline ratchet reads. It is excluded from coverage because it *is* the
+  measuring instrument.
 - `shared/ui` contains interaction primitives, not page layouts. Its Button
   variants and range styling use CSS custom properties, so a host can theme them
   without forking the components.
@@ -137,9 +153,41 @@ header or timeline into another product simply to reuse a button or modal.
 3. Expose only supported components, hooks, and types through the feature barrel.
 4. Reuse shared controls when their interaction contract fits; add a new shared
    primitive only when it is useful to more than one feature.
-5. Record architectural or behavior decisions in the sequential addenda register.
+5. Portal anything that is viewport furniture (a docked panel, a dialog): a
+   `position: fixed` descendant of the HUD inherits its `translate-y` transform
+   and is positioned against the header, not the viewport (ADDENDUM-044).
+6. Record architectural or behavior decisions in the sequential addenda register.
 
 The three.js renderer is deliberately isolated from normal feature UI. A new app
 can reuse the QR generator, title customizer, research dialog, or frame studio
-without mounting `GatsbySceneManager`; a frame-based experience can reuse the
+without mounting either renderer; a frame-based experience can reuse the
 Art Deco engine through its typed exports.
+
+## Keeping It Honest
+
+Four gates run in `npx vitest run` and are architectural rather than functional
+(and, since ADDENDUM-043, the Playwright gate in `e2e/` runs for real as well):
+
+- **Coverage** — `vitest.config.ts` requires 100 % on statements, branches,
+  functions and lines, over `LOGIC_SURFACE_EXCLUDES`' complement (every logic
+  module). The exclude list is written out with a reason per entry instead of
+  being implied, so "we do not test that" is a visible decision (ADDENDUM-028 §3).
+- **Discipline** — `src/discipline.test.ts` parses every non-test source file with
+  the TypeScript compiler and enforces CLAUDE.md §3: no file over 800 lines, and no
+  function over 50 lines / 3 parameters / 3 levels of nesting unless it is recorded
+  in `src/test/disciplineBaseline.ts`. Recorded functions carry a ceiling, may
+  shrink, and may never grow; stale rows fail; the row count may only go down. The
+  ceiling is asserted in `src/discipline.test.ts` itself, so it is never stale
+  (ADDENDUM-032, ADDENDUM-040).
+- **E2E contract** — `src/app/e2eContract.test.ts` cross-checks the test ids the
+  Playwright suite names against `src/`, so a spec cannot drift away from the markup
+  between runs (ADDENDUM-030 §5).
+- **Test ids** — `src/app/testidCoverageStatic.test.ts` requires a `data-testid` on
+  every control in every component file, with the three prop-forwarding primitives
+  exempted by exact name (ADDENDUM-042).
+
+A refactor that moves code without changing behaviour should still arrive with a
+golden captured **before** the move: `decoTypography.test.ts` and
+`railGeometry.test.ts` both record a `stableDigest` of the produced object graph,
+and the addenda that describe those splits (ADDENDUM-032 §3, ADDENDUM-033 §4) cite
+identical before/after digests as the licence to call it pure code motion.

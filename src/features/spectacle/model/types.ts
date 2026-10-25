@@ -76,6 +76,18 @@ export interface ChampagneParams {
   seed?: number;
 }
 
+/** Hand-held party sparklers — the effect the plans used to call "orbs". */
+export interface SparklerParams {
+  /** Where the fan of sparklers is planted. Defaults to the lower middle. */
+  origin?: NormPoint;
+  /** How many sticks, 1..6. */
+  count?: number;
+  durationMs?: number;
+  seed?: number;
+  /** Horizontal spread of the fan, in viewport fractions. */
+  spread?: number;
+}
+
 export interface SearchlightParams {
   beams?: number;
   seed?: number;
@@ -109,6 +121,7 @@ export interface EffectParamsMap {
   countdown: CountdownParams;
   'name-reveal': NameRevealParams;
   flash: FlashParams;
+  sparklers: SparklerParams;
 }
 
 export type EffectId = keyof EffectParamsMap;

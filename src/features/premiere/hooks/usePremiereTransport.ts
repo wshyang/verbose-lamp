@@ -1,10 +1,10 @@
 import { useCallback, type Dispatch, type MutableRefObject, type SetStateAction } from 'react';
 import { CinemaAudioEngine } from '../audio/cinemaAudio';
-import { GatsbySceneManager } from '../scene/GatsbySceneManager';
+import type { PremiereSceneApi } from '../scene/sceneApi';
 import type { CameraMode } from '../model/types';
 
 interface PremiereTransportOptions {
-  managerRef: MutableRefObject<GatsbySceneManager | null>;
+  managerRef: MutableRefObject<PremiereSceneApi | null>;
   audioRef: MutableRefObject<CinemaAudioEngine | null>;
   cameraMode: CameraMode;
   setCameraMode: Dispatch<SetStateAction<CameraMode>>;

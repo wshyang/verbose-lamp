@@ -1,5 +1,6 @@
 import '../spectaclePreview.css';
 import { Dices, X } from 'lucide-react';
+import { createPortal } from 'react-dom';
 import type { SpectaclePreview } from '../hooks/useSpectaclePreview';
 import { BackdropSection } from './BackdropSection';
 import { CelebrationSection } from './CelebrationSection';
@@ -32,13 +33,25 @@ function PanelHeader({ preview: p }: { preview: SpectaclePreview }) {
   );
 }
 
-/** Small docked, non-modal panel — the effect stays visible while you drive it. */
+/**
+ * Small docked, non-modal panel — the effect stays visible while you drive it.
+ *
+ * Rendered in a portal (ADDENDUM-043). It is launched from inside the header, and
+ * the header carries `translate-y-0`/`-translate-y-3` for its hide transition — a
+ * transform, which makes the header the containing block for `position: fixed`
+ * descendants. The panel was therefore 2 px tall inside a 162 px header instead of
+ * a full-height dock, and the Frame Studio (z-70) covered what little showed.
+ * Neither is visible without a browser; Playwright found both on its first run.
+ *
+ * It docks on the left so it can be open at the same time as the Frame Studio,
+ * which owns the right-hand edge.
+ */
 export function SpectaclePreviewPanel({ preview, onOpenDraw }: PanelProps) {
   if (!preview.open) return null;
-  return (
+  return createPortal(
     <aside
       data-testid="spectacle-preview__panel"
-      className="spectacle-preview__panel fixed bottom-24 right-3 top-16 z-[60] w-[min(320px,92vw)] overflow-y-auto border border-[#8a6a2f]/50 bg-[#0d0904]/95 shadow-[0_0_40px_rgba(0,0,0,0.8)] backdrop-blur-sm"
+      className="spectacle-preview__panel fixed bottom-24 left-3 top-16 z-[80] w-[min(320px,92vw)] overflow-y-auto border border-[#8a6a2f]/50 bg-[#0d0904]/95 shadow-[0_0_40px_rgba(0,0,0,0.8)] backdrop-blur-sm max-sm:right-3 max-sm:w-auto"
     >
       <PanelHeader preview={preview} />
       <BackdropSection preview={preview} />
@@ -50,6 +63,7 @@ export function SpectaclePreviewPanel({ preview, onOpenDraw }: PanelProps) {
       <StageSettingsSection preview={preview} />
       <GoldUiSection preview={preview} />
       <LatticeSection preview={preview} />
-    </aside>
+    </aside>,
+    document.body
   );
 }

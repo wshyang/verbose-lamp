@@ -15,17 +15,25 @@ function cellKey(x: number, y: number): string {
   return `${Math.round(x * 1e4)},${Math.round(y * 1e4)}`;
 }
 
-function reserve(occupied: Set<string>, p: Pt, cell: number): void {
+/**
+ * Two sets, because the two rules are different: `taken` holds the cells a walk
+ * actually owns (so walks never overlap), `spaced` holds the 3×3 halo around them
+ * (so a new walk starts clear of the last one). Checking a *step* against the halo
+ * would block the walk's own neighbours and strand every walk at length one
+ * (ADDENDUM-028 §5).
+ */
+function reserve(taken: Set<string>, spaced: Set<string>, p: Pt, cell: number): void {
+  taken.add(cellKey(p.x, p.y));
   for (let dx = -1; dx <= 1; dx += 1) {
     for (let dy = -1; dy <= 1; dy += 1) {
-      occupied.add(cellKey(p.x + dx * cell, p.y + dy * cell));
+      spaced.add(cellKey(p.x + dx * cell, p.y + dy * cell));
     }
   }
 }
 
-function isFree(p: Pt, o: WalkOptions, occupied: Set<string>): boolean {
+function isClear(p: Pt, o: WalkOptions, blocked: Set<string>): boolean {
   const r = Math.hypot(p.x, p.y);
-  return inWedge(p) && r >= o.inner && r <= o.outer && !occupied.has(cellKey(p.x, p.y));
+  return inWedge(p) && r >= o.inner && r <= o.outer && !blocked.has(cellKey(p.x, p.y));
 }
 
 /** Weighted turn choice: straight 0.55, ±45° 0.3, ±90° 0.15. */
@@ -41,14 +49,15 @@ function nextDir(dir: number, rng: () => number): number {
  */
 export function traceWalks(o: WalkOptions): readonly (readonly Pt[])[] {
   const rng = mulberry32(o.seed);
-  const occupied = new Set<string>();
+  const taken = new Set<string>();
+  const spaced = new Set<string>();
   const walks: Pt[][] = [];
   for (let w = 0; w < o.count; w += 1) {
     const startX = o.inner + o.cell * 2 + rng() * (o.outer - o.inner - o.cell * 4);
     let p: Pt = { x: Math.round(startX / o.cell) * o.cell, y: o.cell };
-    if (!isFree(p, o, occupied)) continue;
+    if (!isClear(p, o, spaced)) continue;
     const pts: Pt[] = [p];
-    reserve(occupied, p, o.cell);
+    reserve(taken, spaced, p, o.cell);
     let dir = 2; // into the wedge, along +y
     for (let turn = 0; turn < 6; turn += 1) {
       dir = nextDir(dir, rng);
@@ -56,9 +65,9 @@ export function traceWalks(o: WalkOptions): readonly (readonly Pt[])[] {
       let advanced = 0;
       for (let step = 0; step < run; step += 1) {
         const q = { x: p.x + OCTI_DIRS[dir][0] * o.cell, y: p.y + OCTI_DIRS[dir][1] * o.cell };
-        if (!isFree(q, o, occupied)) break;
+        if (!isClear(q, o, taken)) break;
         p = q;
-        reserve(occupied, p, o.cell);
+        reserve(taken, spaced, p, o.cell);
         advanced += 1;
       }
       if (advanced === 0) break;

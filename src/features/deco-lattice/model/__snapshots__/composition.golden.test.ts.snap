@@ -2,9 +2,9 @@
 
 exports[`buildDecoLattice golden snapshots > default medallion keeps its geometry 1`] = `
 {
-  "hash": "1fd4633e56f22eaa473fda7d36a9d112bffd9e22",
-  "paths": 10,
-  "specs": 123,
+  "hash": "3dc8053fab42f5969dda989f41225753095b5669",
+  "paths": 11,
+  "specs": 243,
 }
 `;
 
@@ -42,17 +42,17 @@ exports[`buildDecoLattice golden snapshots > medallion level 2 keeps its geometr
 
 exports[`buildDecoLattice golden snapshots > medallion level 3 keeps its geometry 1`] = `
 {
-  "hash": "b00eaa8c504812f1aceabb9221fb033b3500f922",
-  "paths": 7,
-  "specs": 27,
+  "hash": "89d8183f090815560570651ae683ed1f23b56f3c",
+  "paths": 8,
+  "specs": 147,
 }
 `;
 
 exports[`buildDecoLattice golden snapshots > medallion level 4 keeps its geometry 1`] = `
 {
-  "hash": "1fd4633e56f22eaa473fda7d36a9d112bffd9e22",
-  "paths": 10,
-  "specs": 123,
+  "hash": "3dc8053fab42f5969dda989f41225753095b5669",
+  "paths": 11,
+  "specs": 243,
 }
 `;
 
@@ -74,8 +74,8 @@ exports[`buildDecoLattice golden snapshots > screen-proscenium preset keeps its 
 
 exports[`buildDecoLattice golden snapshots > spooner-medallion preset keeps its geometry 1`] = `
 {
-  "hash": "1fd4633e56f22eaa473fda7d36a9d112bffd9e22",
-  "paths": 10,
-  "specs": 123,
+  "hash": "3dc8053fab42f5969dda989f41225753095b5669",
+  "paths": 11,
+  "specs": 243,
 }
 `;

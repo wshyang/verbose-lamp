@@ -1,45 +1,53 @@
-import { useEffect, useRef, type MutableRefObject, type RefObject } from 'react';
-import { CinemaAudioEngine } from '../audio/cinemaAudio';
-import { GatsbySceneManager, type PlaybackTelemetry } from '../scene/GatsbySceneManager';
+import { useRef, type MutableRefObject, type RefObject } from 'react';
+import type { CinemaAudioEngine } from '../audio/cinemaAudio';
+import type { RendererMode } from '../model/renderer';
+import type { PlaybackTelemetry, PremiereSceneApi } from '../scene/sceneApi';
+import type { PremiereStoreApi } from '../scene3d/premiereStore';
+import { useRendererMount } from './useRendererMount';
+import { useRendererSelection } from './useRendererSelection';
+import { useSceneCallbacks } from './useSceneCallbacks';
 
 interface PremiereRuntimeOptions {
   mountRef: RefObject<HTMLDivElement | null>;
-  managerRef: MutableRefObject<GatsbySceneManager | null>;
+  managerRef: MutableRefObject<PremiereSceneApi | null>;
   audioRef: MutableRefObject<CinemaAudioEngine | null>;
   onTelemetry: (telemetry: PlaybackTelemetry) => void;
   onChapterChange: (chapterIndex: number) => void;
 }
 
+/** What the view needs to mount the right renderer. */
+export interface PremiereRuntime {
+  renderer: RendererMode;
+  /** Non-null only for the React scene. */
+  store: PremiereStoreApi | null;
+  sceneCallbacks: {
+    onTelemetry: (telemetry: PlaybackTelemetry) => void;
+    onChapterChange: (chapterIndex: number) => void;
+    onFrameReady: () => void;
+  };
+}
+
+/**
+ * Owns the audio engine and whichever renderer the URL selects (ADDENDUM-038).
+ * Composition only: `useRendererSelection` reads the URL and builds the store,
+ * `useSceneCallbacks` keeps the two renderers speaking the same three callbacks,
+ * and `useRendererMount` owns the effect that constructs and disposes them.
+ */
 export function usePremiereRuntime({
   mountRef,
   managerRef,
   audioRef,
   onTelemetry,
   onChapterChange,
-}: PremiereRuntimeOptions) {
-  const callbacksRef = useRef({ onTelemetry, onChapterChange });
-  callbacksRef.current = { onTelemetry, onChapterChange };
+}: PremiereRuntimeOptions): PremiereRuntime {
+  const handlersRef = useRef({ onTelemetry, onChapterChange });
+  handlersRef.current = { onTelemetry, onChapterChange };
 
-  useEffect(() => {
-    const container = mountRef.current;
-    if (!container) return;
+  const { renderer, store } = useRendererSelection();
+  const sceneCallbacks = useSceneCallbacks({ audioRef, mountRef, handlersRef });
+  const live = { onTelemetry: sceneCallbacks.onTelemetry, onChapterChange: sceneCallbacks.onChapterChange };
 
-    const audio = new CinemaAudioEngine();
-    audioRef.current = audio;
-    const manager = new GatsbySceneManager(container, {
-      onTelemetry: (telemetry) => callbacksRef.current.onTelemetry(telemetry),
-      onChapterChange: (chapterIndex) => {
-        callbacksRef.current.onChapterChange(chapterIndex);
-        audio.triggerActShimmer(chapterIndex);
-      },
-    });
-    managerRef.current = manager;
+  useRendererMount({ mountRef, managerRef, audioRef, ...live }, { renderer, store });
 
-    return () => {
-      manager.dispose();
-      audio.dispose();
-      managerRef.current = null;
-      audioRef.current = null;
-    };
-  }, [audioRef, managerRef, mountRef]);
+  return { renderer, store, sceneCallbacks };
 }

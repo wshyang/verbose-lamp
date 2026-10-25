@@ -177,3 +177,10 @@ describe('spec edits', () => {
     expect(ENAMEL_PALETTES).toHaveLength(10);
   });
 });
+
+describe('fieldAt with an unknown pattern', () => {
+  it('throws a named error instead of returning a silent value', () => {
+    const unknown = { kind: 'guilloche' } as unknown as BackdropPattern;
+    expect(() => fieldAt({ x: 1, y: 1 }, { size: 8, bands: 4 }, unknown)).toThrow(/Unhandled backdrop pattern/);
+  });
+});
