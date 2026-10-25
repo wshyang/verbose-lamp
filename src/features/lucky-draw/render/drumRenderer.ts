@@ -58,9 +58,10 @@ function drawPlate(ctx: CanvasRenderingContext2D, plate: PlateDraw): void {
   const x = (w - pw) / 2;
   const lit = 0.35 + facing * 0.65;
   const grad = ctx.createLinearGradient(0, y, 0, y + plateH);
-  grad.addColorStop(0, `rgba(${120 * lit + 40},${88 * lit + 28},${34 * lit + 10},1)`);
-  grad.addColorStop(0.5, `rgba(${196 * lit + 40},${150 * lit + 30},${64 * lit + 14},1)`);
-  grad.addColorStop(1, `rgba(${96 * lit + 30},${70 * lit + 20},${26 * lit + 8},1)`);
+  // Integer channels: every canvas implementation worth supporting parses them.
+  grad.addColorStop(0, `rgba(${Math.round(120 * lit + 40)},${Math.round(88 * lit + 28)},${Math.round(34 * lit + 10)},1)`);
+  grad.addColorStop(0.5, `rgba(${Math.round(196 * lit + 40)},${Math.round(150 * lit + 30)},${Math.round(64 * lit + 14)},1)`);
+  grad.addColorStop(1, `rgba(${Math.round(96 * lit + 30)},${Math.round(70 * lit + 20)},${Math.round(26 * lit + 8)},1)`);
   ctx.save();
   ctx.globalAlpha = Math.pow(facing, 0.6);
   if (isFront && state.landedPlateGlow) {

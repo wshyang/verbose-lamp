@@ -63,6 +63,7 @@ function PremiereScreen({ onOpenEventNight }: GatsbyPremiereProps) {
     <main className="relative h-full w-full select-none overflow-hidden bg-[#050407]">
       <CinematicStage
         mountRef={premiere.stageRef}
+        store={premiere.store}
         cameraMode={premiere.cameraMode}
         hudHidden={hudHidden}
       />

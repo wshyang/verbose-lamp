@@ -1,14 +1,18 @@
 import type { RefObject } from 'react';
 import type { CameraMode } from '@/features/premiere';
+import { detectCoarsePointer } from '@/features/premiere/scene/responsiveLayout';
+import type { PremiereStore } from '@/features/premiere/scene3d/premiereStore';
+import { PremiereCanvas } from '@/features/premiere/scene3d/PremiereCanvas';
 import { cn } from '@/shared/lib/cn';
 
 interface CinematicStageProps {
   mountRef: RefObject<HTMLDivElement | null>;
+  store: PremiereStore;
   cameraMode: CameraMode;
   hudHidden: boolean;
 }
 
-export function CinematicStage({ mountRef, cameraMode, hudHidden }: CinematicStageProps) {
+export function CinematicStage({ mountRef, store, cameraMode, hudHidden }: CinematicStageProps) {
   return (
     <>
       <div
@@ -19,7 +23,9 @@ export function CinematicStage({ mountRef, cameraMode, hudHidden }: CinematicSta
         )}
         aria-label="Interactive WebGL title sequence"
         data-testid="cinematic-stage__canvas"
-      />
+      >
+        <PremiereCanvas store={store} hasCoarsePointer={detectCoarsePointer()} />
+      </div>
       <div
         className={cn(
           'pointer-events-none absolute inset-3 border border-[#d4af37]/20 transition-opacity duration-500 sm:inset-5',

@@ -1,7 +1,7 @@
 import type { CameraMode } from '../model/types';
 
 /**
- * The premiere's timing and staging math, lifted out of `GatsbySceneManager.animate()`
+ * The premiere's timing and staging math, lifted out of the imperative scene manager's `animate()` (ADDENDUM-027)
  * verbatim (ADDENDUM-022 §4.0.7). Nothing here imports `three`: the arithmetic is the
  * same, and the sampled golden test in `choreography.test.ts` pins it down.
  */

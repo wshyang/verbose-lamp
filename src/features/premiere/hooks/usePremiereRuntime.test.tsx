@@ -1,20 +1,15 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import type { MutableRefObject, RefObject } from 'react';
 import type { CinemaAudioEngine } from '../audio/cinemaAudio';
 import type { PremiereSceneApi } from '../scene/sceneApi';
 import { usePremiereRuntime, type PremiereRuntimeOptions } from './usePremiereRuntime';
 
 const env = vi.hoisted(() => ({
-  telemetry: null as null | ((telemetry: unknown) => void),
-  chapter: null as null | ((index: number) => void),
   triggerActShimmer: vi.fn(),
   disposeAudio: vi.fn(),
-  disposeScene: vi.fn(),
   audioConstructed: 0,
-  sceneConstructed: 0,
-  freezeAt: undefined as number | undefined,
 }));
 
 vi.mock('../audio/cinemaAudio', () => ({
@@ -31,45 +26,21 @@ vi.mock('../audio/cinemaAudio', () => ({
   },
 }));
 
-vi.mock('../scene/GatsbySceneManager', () => ({
-  GatsbySceneManager: class {
-    constructor(
-      _host: HTMLElement,
-      options: {
-        onTelemetry: (t: unknown) => void;
-        onChapterChange: (i: number) => void;
-        freezeAt?: number;
-      },
-    ) {
-      env.sceneConstructed += 1;
-      env.telemetry = options.onTelemetry;
-      env.chapter = options.onChapterChange;
-      env.freezeAt = options.freezeAt;
-    }
-    dispose() {
-      env.disposeScene();
-    }
-  },
-}));
-
-// Reset before each test: React Testing Library's global cleanup unmounts the
-// previous test's hook after this file's own hooks have run.
 beforeEach(() => {
   vi.clearAllMocks();
   env.audioConstructed = 0;
-  env.sceneConstructed = 0;
-  env.freezeAt = undefined;
+  window.history.replaceState({}, '', '/');
 });
 
 function options() {
   const host = document.createElement('div');
-  const mountRef = { current: host };
+  const mountRef: RefObject<HTMLDivElement | null> = { current: host };
   const managerRef: MutableRefObject<PremiereSceneApi | null> = { current: null };
   const audioRef: MutableRefObject<CinemaAudioEngine | null> = { current: null };
   const onTelemetry = vi.fn();
   const onChapterChange = vi.fn();
   return {
-    mountRef: mountRef as RefObject<HTMLDivElement | null>,
+    mountRef,
     managerRef,
     audioRef,
     onTelemetry,
@@ -78,62 +49,82 @@ function options() {
 }
 
 describe('usePremiereRuntime', () => {
-  it('builds the scene and the audio engine for the mount host', () => {
+  it('creates the store, the audio engine and the scene port for the host', () => {
     const props = options();
-    renderHook(() => usePremiereRuntime(props));
-    expect(env.sceneConstructed).toBe(1);
+    const { result } = renderHook(() => usePremiereRuntime(props));
     expect(env.audioConstructed).toBe(1);
-    expect(props.managerRef.current).not.toBeNull();
     expect(props.audioRef.current).not.toBeNull();
+    expect(props.managerRef.current).not.toBeNull();
+    expect(result.current.getState().currentTime).toBe(0);
+
+    // The port is the store, so a transport call lands in scene state.
+    act(() => props.managerRef.current?.setTime(11.28));
+    expect(result.current.getState().currentTime).toBeCloseTo(11.28);
   });
 
   it('forwards telemetry and chapter changes to the latest callbacks', () => {
     const first = options();
-    const { rerender } = renderHook((props) => usePremiereRuntime(props), {
+    const { rerender, result } = renderHook((props) => usePremiereRuntime(props), {
       initialProps: first,
     });
     const second = options();
     rerender(second);
 
-    env.telemetry?.({ chapterIndex: 2, elapsed: 4.5 });
+    act(() => result.current.getState().onTelemetry?.({ currentTime: 4, activeChapterIndex: 1, isPlaying: true }));
     expect(first.onTelemetry).not.toHaveBeenCalled();
-    expect(second.onTelemetry).toHaveBeenCalledWith({ chapterIndex: 2, elapsed: 4.5 });
+    expect(second.onTelemetry).toHaveBeenCalledWith({
+      currentTime: 4,
+      activeChapterIndex: 1,
+      isPlaying: true,
+    });
 
-    env.chapter?.(3);
+    act(() => result.current.getState().onChapterChange?.(3));
     expect(second.onChapterChange).toHaveBeenCalledWith(3);
     expect(env.triggerActShimmer).toHaveBeenCalledWith(3);
   });
 
+  it('flags the mount host ready and tolerates a host that has gone away', () => {
+    const props = options();
+    const { result } = renderHook(() => usePremiereRuntime(props));
+
+    act(() => result.current.getState().onFrameReady?.());
+    expect(props.mountRef.current?.dataset.frameReady).toBe('true');
+
+    props.mountRef.current = null;
+    expect(() => result.current.getState().onFrameReady?.()).not.toThrow();
+  });
+
   it('forwards the freeze time from the query string', () => {
     window.history.replaceState({}, '', '/?freezeAt=4.32');
-    try {
-      renderHook(() => usePremiereRuntime(options()));
-      expect(env.freezeAt).toBe(4.32);
-    } finally {
-      window.history.replaceState({}, '', '/');
-    }
+    const { result } = renderHook(() => usePremiereRuntime(options()));
+    expect(result.current.getState().freezeAt).toBe(4.32);
+    expect(result.current.getState().currentTime).toBe(4.32);
+    expect(result.current.getState().isPlaying).toBe(false);
   });
 
-  it('passes no freeze time for a plain visit', () => {
-    renderHook(() => usePremiereRuntime(options()));
-    expect(env.freezeAt).toBeUndefined();
+  it('starts unfrozen and playing for a plain visit', () => {
+    const { result } = renderHook(() => usePremiereRuntime(options()));
+    expect(result.current.getState().freezeAt).toBeNull();
+    expect(result.current.getState().isPlaying).toBe(true);
   });
 
-  it('disposes both engines on unmount', () => {
+  it('disposes the audio engine on unmount and stops the scene', () => {
     const props = options();
-    const { unmount } = renderHook(() => usePremiereRuntime(props));
+    const { unmount, result } = renderHook(() => usePremiereRuntime(props));
     unmount();
-    expect(env.disposeScene).toHaveBeenCalledTimes(1);
     expect(env.disposeAudio).toHaveBeenCalledTimes(1);
     expect(props.managerRef.current).toBeNull();
     expect(props.audioRef.current).toBeNull();
+    expect(result.current.getState().isPlaying).toBe(false);
   });
 
   it('does nothing until the host element exists', () => {
     const props = options();
-    props.mountRef.current = null as unknown as HTMLDivElement;
-    renderHook(() => usePremiereRuntime(props));
-    expect(env.sceneConstructed).toBe(0);
+    props.mountRef.current = null;
+    const { result } = renderHook(() => usePremiereRuntime(props));
     expect(env.audioConstructed).toBe(0);
+    expect(props.managerRef.current).toBeNull();
+    // The store still exists, so the canvas can mount and wait for the host.
+    expect(result.current.getState().isPlaying).toBe(true);
   });
 });

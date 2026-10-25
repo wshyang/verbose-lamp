@@ -4,6 +4,11 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { GatsbyPremiere } from './GatsbyPremiere';
 
+// The R3F canvas needs a real WebGL context; the stage's DOM is what these tests assert.
+vi.mock('@/features/premiere/scene3d/PremiereCanvas', () => ({
+  PremiereCanvas: () => <div data-testid="premiere-canvas" />,
+}));
+
 vi.mock('@/features/premiere', async (importOriginal) => {
   const original = await importOriginal<typeof import('@/features/premiere')>();
   return {

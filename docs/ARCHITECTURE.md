@@ -29,7 +29,7 @@ src/
     gilded-portrait/            # Pure CPU image pipeline and optional portrait studio
     gilded-ui/                  # Gold plaques, glyphs and nav bar from emoji + label
     lucky-draw/                 # Fair draw rules, spin profile, canvas drum
-    premiere/                   # Sequence domain, audio, and WebGL runtime
+    premiere/                   # Sequence domain, audio, store, choreography, R3F scene
     qr-generator/               # Encode, render, export, and modal surface
     research/                   # Read-only dossier and content
     spectacle/                  # Canvas-2D effects: fireworks, orbs, sunburst, confetti…
@@ -52,7 +52,10 @@ supported import surface; internal files should remain private to that feature.
 - `src/App.tsx` is intentionally thin. `src/app/GatsbyPremiere.tsx` composes the
   screen and connects feature APIs; it does not implement playback or geometry.
 - `features/premiere` owns the five-act sequence, camera/audio controls, and the
-  scene lifecycle. React UI talks to the typed controller rather than reaching
+  scene lifecycle. Inside it, `scene/` holds the pure timing and geometry builders
+  (no React) and `scene3d/` holds the React Three Fiber components plus the
+  zustand store they subscribe to. React UI talks to the typed controller
+  (`PremiereSceneApi`, implemented by `storeSceneApi(store)`) rather than reaching
   into Three.js objects.
 - `features/art-deco-frame` owns reusable frame grammar, genome data, beveled
   rail geometry, typography glyphs, and materials. It has no timeline or HUD.
@@ -141,5 +144,5 @@ header or timeline into another product simply to reuse a button or modal.
 
 The three.js renderer is deliberately isolated from normal feature UI. A new app
 can reuse the QR generator, title customizer, research dialog, or frame studio
-without mounting `GatsbySceneManager`; a frame-based experience can reuse the
-Art Deco engine through its typed exports.
+without mounting `PremiereCanvas`; a frame-based experience can reuse the Art
+Deco engine through its typed exports.

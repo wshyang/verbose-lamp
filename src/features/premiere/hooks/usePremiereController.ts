@@ -31,7 +31,13 @@ export function usePremiereController() {
   }, []);
   const onChapterChange = useCallback((chapterIndex: number) => setActiveAct(chapterIndex), []);
 
-  usePremiereRuntime({ mountRef: stageRef, managerRef, audioRef, onTelemetry, onChapterChange });
+  const store = usePremiereRuntime({
+    mountRef: stageRef,
+    managerRef,
+    audioRef,
+    onTelemetry,
+    onChapterChange,
+  });
   const getSceneManager = useCallback(() => managerRef.current, []);
   const frameStudio = useFrameStudio(getSceneManager);
   const transport = usePremiereTransport({
@@ -58,6 +64,8 @@ export function usePremiereController() {
   const currentChapter = SEQUENCE_CHAPTERS[activeAct] ?? SEQUENCE_CHAPTERS[0];
 
   return {
+    /** The scene's state. CinematicStage renders the canvas from it. */
+    store,
     stageRef,
     currentTime,
     activeAct,

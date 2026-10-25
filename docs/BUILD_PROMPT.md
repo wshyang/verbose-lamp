@@ -37,7 +37,7 @@ Deliver a running production build, not a mockup, static image, video, or placeh
 
 ### Recommended module boundaries
 
-- `src/features/premiere/scene/GatsbySceneManager.ts` — renderer, camera, lights, world, post-processing, timeline orchestration, pointer/resize disposal.
+- `src/features/premiere/scene3d/` — React Three Fiber stage: `PremiereCanvas` (renderer settings), `PremiereScene` (cards, atmosphere, camera), `CinemaComposer` (bloom + nitrate pass), and `premiereStore.ts` (the state the HUD talks to). Timing and staging maths live in `src/features/premiere/scene/choreography.ts`.
 - `src/features/premiere/scene/decoCards.ts` — act-specific card rigs and hero-lockup assembly.
 - `src/features/art-deco-frame/engine/frameGrammar/` — pure frame grammar, genome, archetypes, and tests.
 - `src/features/art-deco-frame/render/` — reusable beveled rail geometry, shared materials, and typography rendering.
