@@ -173,7 +173,7 @@ describe('CLAUDE.md hard limits', () => {
   it('records the debt no faster than it is paid', () => {
     // The ceiling: raise it only with an addendum that says why. It is the count recorded when this
     // test was added to the integrated tree (ADDENDUM-034); lower it each time a row is paid off.
-    expect(DISCIPLINE_DEBT.length).toBeLessThanOrEqual(62);
+    expect(DISCIPLINE_DEBT.length).toBeLessThanOrEqual(59);
     const byReason = DISCIPLINE_DEBT.reduce<Record<string, number>>((acc, entry) => {
       acc[entry.reason] = (acc[entry.reason] ?? 0) + 1;
       return acc;
@@ -185,13 +185,10 @@ describe('CLAUDE.md hard limits', () => {
     );
   });
 
-  // Left as a documented, deliberate row rather than quietly dropped: at 371 lines this is the worst
-  // offender in the tree. It is split in T7.4 (goldens before and after); until then it is recorded.
-  it('records the worst offender at its true size, so a split shows as a drop', () => {
-    const entry = DISCIPLINE_DEBT.find((row) => row.name === 'createExtrudedDecoTextMesh');
-    expect(entry?.maxLines).toBeGreaterThan(300);
-    expect(offencesIn().find((offence) => offence.name === 'createExtrudedDecoTextMesh')?.lines).toBeLessThanOrEqual(
-      entry!.maxLines
-    );
+  // The worst offender was a 371-line text-mesh builder; splitting it (ADDENDUM-034) is what retired
+  // three rows and brought the ceiling down. It must not come back.
+  it('keeps the carved-type builder split, its three rows retired', () => {
+    expect(DISCIPLINE_DEBT.some((row) => row.file.endsWith('decoTypography.ts'))).toBe(false);
+    expect(offencesIn().some((offence) => offence.file.endsWith('decoTypography.ts'))).toBe(false);
   });
 });
