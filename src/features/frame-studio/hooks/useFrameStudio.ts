@@ -12,6 +12,7 @@ import {
   FrameStyle,
   FrameSurface,
   INTRICACY_PRESETS,
+  ScreenBorderPattern,
   ScreenBorderStyle,
 } from '@/features/art-deco-frame';
 import { SIGNATURE_GENOME, clampGenome, withGene, type GeneKey } from '@/features/art-deco-frame';
@@ -125,6 +126,21 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
     [border, commitBorder]
   );
 
+  /** Switch the proscenium between the printed poster edge and Deco Lattice. */
+  const setBorderPattern = useCallback(
+    (pattern: ScreenBorderPattern) => {
+      if (pattern === (border.pattern ?? 'poster')) return;
+      commitBorder({ ...border, pattern });
+    },
+    [border, commitBorder]
+  );
+
+  /** A fresh proscenium seed; only the brass angles and ornament move. */
+  const rerollBorder = useCallback(
+    () => commitBorder({ ...border, seed: Math.floor(Math.random() * SEED_REROLL_RANGE) }),
+    [border, commitBorder]
+  );
+
   const setGeneOnBorder = useCallback(
     (key: GeneKey, value: number) => commitBorder({ ...border, genome: withGene(border.genome, key, value) }),
     [border, commitBorder]
@@ -220,6 +236,9 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
     setGene: setGeneForSurface,
     borderEnabled,
     setBorderEnabled,
+    borderPattern: border.pattern ?? 'poster',
+    setBorderPattern,
+    rerollBorder,
     borderWeight: detailPercent(border.weight),
     setBorderWeight,
     resetAll,

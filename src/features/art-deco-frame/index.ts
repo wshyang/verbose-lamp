@@ -6,11 +6,16 @@ export {
 } from './render/railGeometry';
 export {
   createScreenBorderRig,
+  finishFor,
   type ScreenBorderRig,
 } from './render/ScreenBorderRig';
 export {
   createGoldFrameMaterial,
   createGoldFrameUniforms,
+  frameMaterialCacheKey,
+  FRAME_FINISHES,
+  type FrameFinish,
+  type GoldFrameMaterialOptions,
   type GoldFrameUniforms,
 } from './render/frameMaterial';
 export {

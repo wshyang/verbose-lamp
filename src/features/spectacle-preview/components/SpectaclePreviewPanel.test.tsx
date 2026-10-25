@@ -227,6 +227,14 @@ describe('GoldUiSection', () => {
 });
 
 describe('LatticeSection', () => {
+  it('previews the frame live and offers both exports', async () => {
+    render(<LatticeSection preview={stubPreview({ latticeSeed: 4242 })} />);
+
+    expect(screen.getByTestId('deco-lattice-frame__root')).toBeTruthy();
+    expect(screen.getByTestId('spectacle-preview__lattice-export-svg')).toBeTruthy();
+    expect(screen.getByTestId('spectacle-preview__lattice-export-png')).toBeTruthy();
+  });
+
   it('drives density, level and the seed reroll', async () => {
     const setLatticeDensity = vi.fn();
     const setLatticeLevel = vi.fn();

@@ -42,9 +42,13 @@ ADDENDUM-024 ported the Deco Lattice *generator* but never connected it to the f
 - The existing `generative.test.ts` loop now covers `lattice` for all five archetypes with no test edits — that is the acceptance criterion from ADDENDUM-021 §5.
 - `composition.test.ts` gains a default-seed/depth equivalence test.
 
-## 6. Not done — and why
+## 6. Not done here — and why
 
-Two items from ADDENDUM-021 remain open and are **not** claimed as implemented:
+> **Superseded by ADDENDUM-028.** Both items below are now implemented (nine-slice
+> proscenium, brass finish) and the SVG export is wired. This section is kept as
+> the record of why they were deferred at the time.
+
+Two items from ADDENDUM-021 remained open and were **not** claimed as implemented:
 
 1. **`ScreenBorderStyle.pattern: 'poster' | 'lattice'`** (nine-slice proscenium) and the `clip.ts` / `nineSlice.ts` helpers. Reason: `buildEdgeBorder` and `ScreenBorderRig` are on the camera and cannot be judged without a browser; adding a second border geometry blind risks the one surface that is always on screen.
 2. **Brass finish** (`createGoldFrameMaterial({ finish })`, `PolylineSpec.tone` → `aTone`, scratched grain, banded raking light). Reason: it changes the shader for every existing frame. The likeness gate (ADDENDUM-027) must exist before a change of that class is made, so it should be the first thing done once baselines are captured.

@@ -28,6 +28,7 @@ const baseProps = {
   proportionsOpen: false,
   genome: SIGNATURE_GENOME,
   borderEnabled: false,
+  borderPattern: 'poster' as const,
   borderWeight: 50,
   onSurfaceChange: vi.fn(),
   onPatternChange: vi.fn(),
@@ -40,6 +41,8 @@ const baseProps = {
   onProportionsToggle: vi.fn(),
   onGeneChange: vi.fn(),
   onBorderEnabledChange: vi.fn(),
+  onBorderPatternChange: vi.fn(),
+  onRerollBorder: vi.fn(),
   onBorderWeightChange: vi.fn(),
   onReset: vi.fn(),
   onDismiss: vi.fn(),
@@ -146,6 +149,30 @@ describe('FrameStudioControl', () => {
     renderStudio({ onProportionsToggle });
     await userEvent.click(screen.getByTestId('frame-studio__proportions-toggle'));
     expect(onProportionsToggle).toHaveBeenCalledWith(true);
+  });
+
+  it('switches the screen border between poster and lattice', async () => {
+    const onBorderPatternChange = vi.fn();
+    const { rerender } = renderStudio({ surface: 'screen-border', onBorderPatternChange });
+
+    const chips = screen.getAllByTestId('frame-studio__border-pattern');
+    expect(chips).toHaveLength(2);
+    expect(chips[0].getAttribute('aria-pressed')).toBe('true');
+    expect(screen.queryByTestId('frame-studio__border-reroll')).toBeNull();
+
+    await userEvent.click(chips[1]);
+    expect(onBorderPatternChange).toHaveBeenCalledWith('lattice');
+
+    rerender(<FrameStudioControl {...baseProps} surface="screen-border" borderPattern="lattice" />);
+    expect(screen.getAllByTestId('frame-studio__border-pattern')[1].getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByTestId('frame-studio__border-reroll')).toBeTruthy();
+  });
+
+  it('rerolls the proscenium seed', async () => {
+    const onRerollBorder = vi.fn();
+    renderStudio({ surface: 'screen-border', borderPattern: 'lattice', onRerollBorder });
+    await userEvent.click(screen.getByTestId('frame-studio__border-reroll'));
+    expect(onRerollBorder).toHaveBeenCalledTimes(1);
   });
 
   it('toggles and weights the screen border', async () => {

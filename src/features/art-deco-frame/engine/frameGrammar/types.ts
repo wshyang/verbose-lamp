@@ -35,6 +35,14 @@ export interface PolylineSpec {
   kind?: RailKind;
   /** Derived importance 0 (essential) .. 3 (flourish). Computed by annotateRanks(). */
   rank?: number;
+  /**
+   * Brass finish (ADDENDUM-021 §3.6): per-rail tone 0..1, 1 being the brightest
+   * brass and 0 the dark shadow metal. Absent by default, so the gold material
+   * and every existing golden snapshot are unchanged.
+   */
+  tone?: number;
+  /** Brass gradient angle in degrees; absent means the shader's default vertical band. */
+  brassAngle?: number;
 }
 
 /** Intricacy scalar k in [0, 1]. 0.5 is the Film Baseline (identity). */
@@ -161,10 +169,25 @@ export interface ScreenBorderStyle {
   weight: number;
   /** proportion genes shared with the title frame */
   genome: BaseGenome;
+  /**
+   * `'poster'` (default) is the printed one-sheet edge; `'lattice'` is the
+   * Deco Lattice proscenium, which keeps a clear aperture for the picture
+   * (ADDENDUM-021 §3.5, §3.4).
+   */
+  pattern?: ScreenBorderPattern;
+  /** Seed for the lattice proscenium's gradient angles; default 1925. */
+  seed?: number;
 }
+
+export type ScreenBorderPattern = 'poster' | 'lattice';
+
+export const DEFAULT_SCREEN_BORDER_PATTERN: ScreenBorderPattern = 'poster';
+export const DEFAULT_SCREEN_BORDER_SEED = 1925;
 
 export const DEFAULT_SCREEN_BORDER_STYLE: ScreenBorderStyle = {
   weight: 0.5,
   genome: { ...SIGNATURE_GENOME },
+  pattern: DEFAULT_SCREEN_BORDER_PATTERN,
+  seed: DEFAULT_SCREEN_BORDER_SEED,
 };
 
