@@ -1,6 +1,4 @@
 import { vi } from 'vitest';
-import { parseNavLines, validateNavItems } from '@/features/gilded-ui';
-import { DEFAULT_NAV_LINES } from '../data/previewCatalogue';
 import type { SpectaclePreview } from '../hooks/useSpectaclePreview';
 
 /**
@@ -9,7 +7,6 @@ import type { SpectaclePreview } from '../hooks/useSpectaclePreview';
  * asks for without owning the effect engine.
  */
 export function stubPreview(overrides: Partial<SpectaclePreview> = {}): SpectaclePreview {
-  const navItems = parseNavLines(DEFAULT_NAV_LINES);
   const base: SpectaclePreview = {
     open: true,
     setOpen: vi.fn(),
@@ -50,17 +47,7 @@ export function stubPreview(overrides: Partial<SpectaclePreview> = {}): Spectacl
     playNameReveal: vi.fn(),
     playSparklers: vi.fn(),
 
-    navText: DEFAULT_NAV_LINES,
-    setNavText: vi.fn(),
-    navValidation: validateNavItems(navItems),
-    navItems,
 
-    latticeSeed: 1925,
-    latticeDensity: 0.7,
-    setLatticeDensity: vi.fn(),
-    latticeLevel: 4,
-    setLatticeLevel: vi.fn(),
-    rerollLattice: vi.fn(),
   };
   return { ...base, ...overrides };
 }

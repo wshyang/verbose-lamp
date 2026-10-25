@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_NAV_LINES, ORB_DEMOS, SPARKLER_DEMOS, SUNBURST_DEMOS } from './previewCatalogue';
+import { ORB_DEMOS, SPARKLER_DEMOS, SUNBURST_DEMOS } from './previewCatalogue';
 
 describe('previewCatalogue', () => {
   it('offers every orb configuration exactly once', () => {
@@ -27,8 +27,4 @@ describe('previewCatalogue', () => {
     expect(SPARKLER_DEMOS).toHaveLength(2);
   });
 
-  it('seeds the nav with the lucky-draw line', () => {
-    expect(DEFAULT_NAV_LINES.split('\n')).toHaveLength(5);
-    expect(DEFAULT_NAV_LINES).toContain('Lucky Draw');
-  });
 });

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { parseNavLines, validateNavItems } from '@/features/gilded-ui';
-import { DEFAULT_NAV_LINES } from '../data/previewCatalogue';
+import { DEFAULT_NAV_LINES } from '../data/navLines';
 
 /** Editable "emoji,label" lines → validated nav items (falls back to the defaults). */
 export function useGoldUiLines() {

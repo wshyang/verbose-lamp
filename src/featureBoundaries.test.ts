@@ -27,7 +27,7 @@ const ALLOWED_FEATURE_DEPS: Readonly<Record<string, readonly string[]>> = {
   'frame-studio': ['art-deco-frame'],
   'lucky-draw': ['deco-lattice'],
   premiere: ['art-deco-frame'],
-  'spectacle-preview': ['gilded-ui', 'spectacle'],
+  'spectacle-preview': ['spectacle'],
   'title-customizer': ['premiere'],
 };
 

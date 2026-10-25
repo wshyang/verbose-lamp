@@ -10,6 +10,10 @@ setupDomTests();
 const stage = vi.hoisted(() => ({ play: vi.fn(), stopAll: vi.fn(), ready: true }));
 const preview_p6 = vi.hoisted(() => ({ current: null as SpectaclePreview | null }));
 const night = vi.hoisted(() => ({ current: null as Record<string, unknown> | null }));
+const controls = vi.hoisted(() => ({
+  lattice: { latticeSeed: 1925, latticeDensity: 3, latticeLevel: 2 },
+  gold: { navItems: [{ id: 'dinner', label: 'Dinner & Dance' }] },
+}));
 const ambient = vi.hoisted(() => ({ start: null as (() => void) | null, ready: false }));
 vi.mock('@/features/spectacle', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/features/spectacle')>()),
@@ -25,11 +29,17 @@ vi.mock('@/features/spectacle-preview', async (importOriginal) => ({
     <button type="button" data-open={String(open)} onClick={onToggle} data-testid="launcher" />
   ),
   // The real panel needs a live stage; the stage's job is only to mount it.
-  SpectaclePreviewPanel: ({ preview: value }: { preview: SpectaclePreview }) => (
-    <span data-testid="panel" data-open={String(value.open)} />
+  SpectaclePreviewPanel: ({ preview: value, children }: { preview: SpectaclePreview; children?: React.ReactNode }) => (
+    <span data-testid="panel" data-open={String(value.open)}>{children}</span>
   ),
 }));
 vi.mock('../hooks/useEventNight', () => ({ useEventNight: () => night.current }));
+vi.mock('../hooks/useLatticeControls', () => ({ useLatticeControls: () => controls.lattice }));
+vi.mock('../hooks/useGoldUiLines', () => ({ useGoldUiLines: () => controls.gold }));
+vi.mock('./EventNightConsoleSections', () => ({
+  GoldUiSection: () => <div data-testid="gold-section" />,
+  LatticeSection: () => <div data-testid="lattice-section" />,
+}));
 vi.mock('../hooks/useAmbientShow', () => ({
   useAmbientShow: ({ isReady, start }: { isReady: boolean; start: () => void }) => {
     ambient.start = start;
@@ -53,10 +63,8 @@ const buildPreview = (overrides: Record<string, unknown> = {}) =>
   ({
     open: false, setOpen: vi.fn(), marqueeOn: true,
     picking: false, origin: { x: 0.5, y: 0.42 }, setPicking: vi.fn(),
-    navItems: [{ id: 'dinner', label: 'Dinner & Dance' }],
     onStageClick: vi.fn(() => true),
     keepClearOn: false, speaker: { x: 0.4, y: 0.2, w: 0.2, h: 0.2 }, moveSpeaker: vi.fn(),
-    latticeSeed: 1925, latticeDensity: 3, latticeLevel: 2,
     toggleFireworks: vi.fn(), toggleSearchlights: vi.fn(),
     ...overrides,
   }) as unknown as SpectaclePreview;
@@ -80,7 +88,7 @@ const mount = (previewOverrides: Record<string, unknown> = {}, nightOverrides: R
 };
 describe('EventNightStage', () => {
   it('composes the backdrop, medallion, nav and header', () => {
-    const { preview: value } = mount();
+    mount();
 
     expect(screen.getByTestId('backdrop')).toBeTruthy();
     const medallion = screen.getByTestId('medallion');
@@ -92,7 +100,7 @@ describe('EventNightStage', () => {
     expect(screen.getByTestId('event-night__back')).toBeTruthy();
     expect(screen.getByTestId('event-night__open-draw')).toBeTruthy();
     expect(screen.getByTestId('launcher').getAttribute('data-open')).toBe('false');
-    expect(value.navItems).toHaveLength(1);
+    expect(controls.gold.navItems).toHaveLength(1);
   });
 
   it('relays the exit, the draw and the launcher to their owners', () => {

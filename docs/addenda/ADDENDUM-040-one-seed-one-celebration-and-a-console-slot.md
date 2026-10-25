@@ -1,7 +1,7 @@
 # ADDENDUM-040 — One default seed, one winner celebration, and a slot in the spectacle console (modularity review, Finding 4, parts A and B)
 
 **Date:** 2026-10-26 · **Relates to:** BUILD_PROMPT §3, §7; CLAUDE.md §5, §6; `docs/modularity-review/2026-10-26/modularity-review.md` (Issue 4); ADDENDUM-020, ADDENDUM-032.
-**Status:** Implemented for 4A and 4B and the panel slot. **4C (moving the Deco Lattice and Gold UI sections out of the shared console into Event Night) is not done** (§4). Type-checks, tests pass, coverage holds at 100 %; nothing rendered in a browser (none in the sandbox), so visual verification is pending.
+**Status:** Implemented for 4A and 4B and the panel slot. 4C (moving the Deco Lattice and Gold UI sections out of the shared console into Event Night) was left open here and is done in ADDENDUM-042. Type-checks, tests pass, coverage holds at 100 %; nothing rendered in a browser (none in the sandbox), so visual verification is pending.
 
 ## 1. What was decided
 
@@ -21,9 +21,9 @@ The review found the winner moment written three times with different seeds and 
 - To change what a winner celebration looks like, edit `winnerCelebration.ts`; to change which one a screen gets, change its arguments.
 - `DEFAULT_SEED` is for "no seed given". A caller that picks a seed (the premiere's celebration, Event Night's time-based one) still passes its own.
 
-## 4. What is not done: 4C
+## 4. What was left open here: 4C (done in ADDENDUM-042)
 
-The review also found that the console carries the Deco Lattice controls and the gold nav-bar editor, which only Event Night uses. Moving them into Event Night is **not** in this change. Reasons: it removes two visible sections from the premiere's console (a product change that nobody has recorded a decision on), and it touches about 14 test files that build the console's state through `useSpectaclePreview`, `stubPreview` and four different mock styles in Event Night's stage tests, so doing it quickly risks silently dropping coverage. The slot above is the first step; the move itself should be its own change with a decision on the premiere console.
+The review also found that the console carries the Deco Lattice controls and the gold nav-bar editor, which only Event Night uses. This change added only the slot; the move removes two visible sections from the premiere's console and touches about 14 test files, so it was done separately, with the decision recorded: see ADDENDUM-042.
 
 ## 5. Validation actually performed
 

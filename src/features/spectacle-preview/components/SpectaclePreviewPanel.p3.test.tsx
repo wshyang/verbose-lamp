@@ -4,13 +4,10 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { SpectaclePreviewPanel } from './SpectaclePreviewPanel';
 import userEvent from '@testing-library/user-event';
-import { parseNavLines, validateNavItems } from '@/features/gilded-ui';
-import { DEFAULT_NAV_LINES } from '../data/previewCatalogue';
 import { type SpectaclePreview } from '../hooks/useSpectaclePreview';
 import { SpectaclePreviewLauncher } from './SpectaclePreviewLauncher';
 
 function createPreview(overrides: Partial<SpectaclePreview> = {}) {
-  const navItems = validateNavItems(parseNavLines(DEFAULT_NAV_LINES));
   const handlers = {
     setOpen: vi.fn(),
     setMarqueeOn: vi.fn(),
@@ -30,10 +27,6 @@ function createPreview(overrides: Partial<SpectaclePreview> = {}) {
     playConfetti: vi.fn(),
     playCountdown: vi.fn(),
     playNameReveal: vi.fn(),
-    setNavText: vi.fn(),
-    rerollLattice: vi.fn(),
-    setLatticeDensity: vi.fn(),
-    setLatticeLevel: vi.fn(),
   };
   const preview = {
     open: true,
@@ -49,12 +42,6 @@ function createPreview(overrides: Partial<SpectaclePreview> = {}) {
     speaker: { x: 0.42, y: 0.28, w: 0.16, h: 0.24 },
     simulatedReducedMotion: false,
     demoScreen: 'A',
-    navText: DEFAULT_NAV_LINES,
-    navValidation: navItems,
-    navItems: navItems.ok ? navItems.items : [],
-    latticeSeed: 1925,
-    latticeDensity: 0.7,
-    latticeLevel: 4,
     ...handlers,
     ...overrides,
   };
@@ -172,37 +159,6 @@ describe('SpectaclePreviewPanel', () => {
     expect(screen.getByTestId('spectacle-preview__pick-origin').textContent).toContain('Click the stage');
   });
 
-  it('edits the gold nav lines and lists validation issues', async () => {
-    const broken = validateNavItems(parseNavLines('nope'));
-    const { preview, handlers } = createPreview({ navText: 'nope', navValidation: broken });
-    render(<SpectaclePreviewPanel preview={preview} onOpenDraw={onOpenDraw} />);
-
-    expect(screen.getByTestId('spectacle-preview__nav-issues')).toBeDefined();
-    fireEvent.change(screen.getByTestId('spectacle-preview__nav-lines'), {
-      target: { value: '🎷,Program' },
-    });
-    expect(handlers.setNavText).toHaveBeenCalledWith('🎷,Program');
-
-    const navButtons = screen.getAllByTestId('gilded-nav-bar__item');
-    await userEvent.click(navButtons[0]);
-    expect(navButtons[0]).toBeDefined();
-  });
-
-  it('drives the lattice controls', async () => {
-    const { preview, handlers } = createPreview();
-    render(<SpectaclePreviewPanel preview={preview} onOpenDraw={onOpenDraw} />);
-
-    fireEvent.change(screen.getByTestId('spectacle-preview__lattice-density'), {
-      target: { value: '0.4' },
-    });
-    expect(handlers.setLatticeDensity).toHaveBeenCalledWith(0.4);
-
-    fireEvent.change(screen.getByTestId('spectacle-preview__lattice-level'), { target: { value: '2' } });
-    expect(handlers.setLatticeLevel).toHaveBeenCalledWith(2);
-
-    await userEvent.click(screen.getByTestId('spectacle-preview__lattice-reroll'));
-    expect(handlers.rerollLattice).toHaveBeenCalledTimes(1);
-  });
 });
 describe('the console before a stage quality is known', () => {
   it('shows a dash instead of a tier', () => {

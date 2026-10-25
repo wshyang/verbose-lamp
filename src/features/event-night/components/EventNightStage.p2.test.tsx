@@ -20,7 +20,8 @@ const mocks = vi.hoisted(() => {
   };
   return { preview, night, ambient: [] as Array<{ isReady: boolean; start: () => void }> };
 });
-vi.mock('@/features/gilded-ui', () => ({
+vi.mock('@/features/gilded-ui', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/features/gilded-ui')>()),
   GildedGlyphDefs: () => <span>Glyphs</span>,
   GildedNavBar: () => <nav>Nav mock</nav>,
 }));

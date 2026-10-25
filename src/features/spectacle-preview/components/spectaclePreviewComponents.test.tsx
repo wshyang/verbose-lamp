@@ -25,32 +25,22 @@ function fixture(overrides: Record<string, unknown> = {}): SpectaclePreview {
     intensity: 0.6, setIntensity: vi.fn(), seed: 7, setSeed: vi.fn(), rerollSeed: vi.fn(),
     keepClearOn: false, setKeepClearOn: vi.fn(),
     simulatedReducedMotion: false, setSimulatedReducedMotion: vi.fn(), stopAll: vi.fn(),
-    navText: '✦,One\n◆,Two', setNavText: vi.fn(),
-    navValidation: { ok: true, items: [] },
-    navItems: [
-      { id: 'one', emoji: '✦', label: 'One' },
-      { id: 'two', emoji: '◆', label: 'Two' },
-    ],
-    latticeDensity: 0.7, setLatticeDensity: vi.fn(), latticeLevel: 3,
-    setLatticeLevel: vi.fn(), rerollLattice: vi.fn(), latticeSeed: 99,
     ...overrides,
   } as unknown as SpectaclePreview;
 }
 
 describe('SpectaclePreviewPanel', () => {
-  it('defaults right, reports an unknown tier and B screen, and lists nav issues', () => {
+  it('defaults right and reports an unknown tier and B screen', () => {
     const preview = fixture({
       qualityTier: null,
       demoScreen: 'B',
       picking: true,
-      navValidation: { ok: false, issues: ['Too many items'] },
     });
     render(<SpectaclePreviewPanel preview={preview} onOpenDraw={vi.fn()} />);
     expect(screen.getByTestId('spectacle-preview__panel').className).toContain('right-3');
     expect(screen.getByTestId('spectacle-preview__quality').textContent).toContain('— TIER');
     expect(screen.getByTestId('spectacle-preview__pick-origin').textContent).toContain('Click the stage');
     expect(screen.getByTestId('spectacle-preview__demo-screen').textContent).toContain('SCREEN B');
-    expect(screen.getByTestId('spectacle-preview__nav-issues').textContent).toContain('Too many items');
   });
 });
 

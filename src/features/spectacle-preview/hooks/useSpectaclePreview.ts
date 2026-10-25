@@ -3,8 +3,6 @@ import { useSpectacle } from '@/features/spectacle';
 import { useBackdropActions } from './useBackdropActions';
 import { useCelebrationActions } from './useCelebrationActions';
 import { useEffectRunner } from './useEffectRunner';
-import { useGoldUiLines } from './useGoldUiLines';
-import { useLatticeControls } from './useLatticeControls';
 import { useStageSettings } from './useStageSettings';
 import { useTransitionActions } from './useTransitionActions';
 
@@ -26,7 +24,6 @@ export function useSpectaclePreview() {
     playing: runner.playing, stopAll: runner.stopAll,
     qualityTier, simulatedReducedMotion, setSimulatedReducedMotion,
     ...settings, ...backdrop, ...transitions, ...celebration,
-    ...useGoldUiLines(), ...useLatticeControls(),
   };
 }
 

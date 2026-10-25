@@ -2,12 +2,9 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { EffectHandle } from '@/features/spectacle';
-import { DEFAULT_NAV_LINES } from '../data/previewCatalogue';
 import { useBackdropActions } from './useBackdropActions';
 import { useCelebrationActions } from './useCelebrationActions';
 import { useEffectRunner, type EffectRunner } from './useEffectRunner';
-import { useGoldUiLines } from './useGoldUiLines';
-import { useLatticeControls } from './useLatticeControls';
 import { useStageSettings } from './useStageSettings';
 import { useTransitionActions } from './useTransitionActions';
 
@@ -249,47 +246,7 @@ describe('useStageSettings', () => {
   });
 });
 
-describe('useLatticeControls', () => {
-  it('starts at the shared defaults and rerolls the lattice seed', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.25);
-    const { result } = renderHook(() => useLatticeControls());
-    expect(result.current.latticeSeed).toBe(1925);
-    expect(result.current.latticeDensity).toBe(0.7);
-    expect(result.current.latticeLevel).toBe(4);
-    act(() => result.current.setLatticeDensity(0.3));
-    act(() => result.current.setLatticeLevel(6));
-    act(() => result.current.rerollLattice());
-    expect(result.current.latticeDensity).toBe(0.3);
-    expect(result.current.latticeLevel).toBe(6);
-    expect(result.current.latticeSeed).toBe(250_000);
-    vi.restoreAllMocks();
-  });
-});
 
-describe('useGoldUiLines', () => {
-  it('validates the default nav lines', () => {
-    const { result } = renderHook(() => useGoldUiLines());
-    expect(result.current.navText).toBe(DEFAULT_NAV_LINES);
-    expect(result.current.navValidation.ok).toBe(true);
-    expect(result.current.navItems).toHaveLength(5);
-  });
-
-  it('falls back to the defaults when the edited lines do not validate', () => {
-    const { result } = renderHook(() => useGoldUiLines());
-    act(() => result.current.setNavText('no-comma-here'));
-    expect(result.current.navValidation.ok).toBe(false);
-    expect(result.current.navItems).toEqual(
-      expect.arrayContaining([expect.objectContaining({ label: 'Foyer' })])
-    );
-  });
-
-  it('uses edited lines once they validate', () => {
-    const { result } = renderHook(() => useGoldUiLines());
-    act(() => result.current.setNavText('🎩,Bar\n🎷,Jazz'));
-    expect(result.current.navValidation.ok).toBe(true);
-    expect(result.current.navItems.map((item) => item.label)).toEqual(['Bar', 'Jazz']);
-  });
-});
 
 describe('useBackdropActions', () => {
   beforeEach(() => {

@@ -4,8 +4,6 @@ import type { PointerEvent } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useBackdropActions } from './useBackdropActions';
 import { useEffectRunner, type EffectRunner } from './useEffectRunner';
-import { useGoldUiLines } from './useGoldUiLines';
-import { useLatticeControls } from './useLatticeControls';
 import { useSpeakerDrag } from './useSpeakerDrag';
 import { useSpectaclePreview } from './useSpectaclePreview';
 import { useStageSettings, type StageSettings } from './useStageSettings';
@@ -147,21 +145,6 @@ describe('preview action hooks', () => {
     expect(liveRunner.run).toHaveBeenCalledWith('fireworks', 'fireworks', expect.objectContaining({ keepClear: thirdClear }));
   });
 
-  it('validates editable gold UI lines and controls the lattice demo', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.5);
-    const gold = renderHook(() => useGoldUiLines());
-    expect(gold.result.current.navValidation.ok).toBe(true);
-    const defaults = gold.result.current.navItems;
-    act(() => gold.result.current.setNavText('✦'));
-    expect(gold.result.current.navValidation.ok).toBe(false);
-    expect(gold.result.current.navItems).toEqual(defaults);
-
-    const lattice = renderHook(() => useLatticeControls());
-    act(() => lattice.result.current.setLatticeDensity(0.4));
-    act(() => lattice.result.current.setLatticeLevel(2));
-    act(() => lattice.result.current.rerollLattice());
-    expect(lattice.result.current).toMatchObject({ latticeSeed: 500000, latticeDensity: 0.4, latticeLevel: 2 });
-  });
 });
 
 describe('useSpectaclePreview', () => {

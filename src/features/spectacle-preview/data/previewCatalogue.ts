@@ -15,11 +15,3 @@ export const SPARKLER_DEMOS = [
   { key: 'sparkler-1', label: 'Party sparkler', count: 1 },
   { key: 'sparkler-5', label: 'Sparkler fan ×5', count: 5 },
 ] as const;
-
-export const DEFAULT_NAV_LINES = [
-  '🏛️,Foyer',
-  '🎷,Program',
-  '🎰,Lucky Draw',
-  '🥂,Toast',
-  '📸,Gallery',
-].join('\n');

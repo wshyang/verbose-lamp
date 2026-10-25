@@ -10,7 +10,10 @@ const state = vi.hoisted(() => ({
 
 vi.mock('@/features/spectacle', () => ({ useSpectacle: () => ({ isReady: true }) }));
 vi.mock('@/features/lucky-draw', () => ({ LuckyDrawStage: () => <div data-testid="draw-double" /> }));
-vi.mock('@/features/gilded-ui', () => ({ GildedNavBar: () => <nav data-testid="nav-double" /> }));
+vi.mock('@/features/gilded-ui', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/features/gilded-ui')>()),
+  GildedNavBar: () => <nav data-testid="nav-double" />,
+}));
 vi.mock('@/features/spectacle-preview', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/features/spectacle-preview')>()),
   useSpectaclePreview: () => state.preview,

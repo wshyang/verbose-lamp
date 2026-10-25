@@ -1,7 +1,6 @@
 // @vitest-environment jsdom
 import { describe, expect, it, vi } from 'vitest';
 import { act, renderHook, waitFor } from '@testing-library/react';
-import { DEFAULT_NAV_LINES } from '../data/previewCatalogue';
 import { useSpectaclePreview } from './useSpectaclePreview';
 
 const spectacle = vi.hoisted(() => ({
@@ -39,9 +38,6 @@ describe('useSpectaclePreview', () => {
     expect(result.current.origin).toEqual({ x: 0.5, y: 0.42 });
     expect(result.current.seed).toBe(1925);
     expect(result.current.intensity).toBe(0.6);
-    expect(result.current.navText).toBe(DEFAULT_NAV_LINES);
-    expect(result.current.navValidation.ok).toBe(true);
-    expect(result.current.navItems.length).toBeGreaterThan(0);
   });
 
   it('toggles the panel, the marquee and the reduced-motion simulation', () => {
@@ -83,14 +79,11 @@ describe('useSpectaclePreview', () => {
     expect(result.current.speaker.y).toBeCloseTo(0.76);
   });
 
-  it('rerolls the seed and the lattice seed', () => {
+  it('rerolls the seed', () => {
     const { result } = renderHook(() => useSpectaclePreview());
     const before = result.current.seed;
     act(() => result.current.rerollSeed());
     expect(result.current.seed).not.toBe(before);
-    const latticeBefore = result.current.latticeSeed;
-    act(() => result.current.rerollLattice());
-    expect(result.current.latticeSeed).not.toBe(latticeBefore);
   });
 
   it('starts the ambient show with the shared settings and stops it again', () => {
@@ -177,15 +170,6 @@ describe('useSpectaclePreview', () => {
     expect(lastPlay()?.[1]).toMatchObject({ mode: 'rain' });
     act(() => result.current.playNameReveal());
     expect(lastPlay()?.[1]).toMatchObject({ name: 'Jay Gatsby' });
-  });
-
-  it('falls back to the default nav lines when the edited lines are invalid', () => {
-    const { result } = renderHook(() => useSpectaclePreview());
-    act(() => result.current.setNavText('🎷,Program\nnot a line'));
-    expect(result.current.navValidation.ok).toBe(false);
-    expect(result.current.navItems.length).toBe(
-      renderHook(() => useSpectaclePreview()).result.current.navItems.length,
-    );
   });
 
   it('stops everything on demand', () => {

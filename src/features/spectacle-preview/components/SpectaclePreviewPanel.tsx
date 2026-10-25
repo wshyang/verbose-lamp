@@ -6,7 +6,6 @@ import type { SpectaclePreview } from '../hooks/useSpectaclePreview';
 import { BackdropSection } from './BackdropSection';
 import { CelebrationSection } from './CelebrationSection';
 import { ActionButton, Section } from './PanelBits';
-import { GoldUiSection, LatticeSection } from './PanelExtras';
 import { StageSettingsSection } from './StageSettingsSection';
 import { TransitionsSection } from './TransitionsSection';
 
@@ -62,8 +61,6 @@ export function SpectaclePreviewPanel({ preview, onOpenDraw, children }: PanelPr
         <ActionButton label="Open the drum · fair pick, 2–300 guests" icon={Dices} onClick={onOpenDraw} testId="spectacle-preview__lucky-draw" />
       </Section>
       <StageSettingsSection preview={preview} />
-      <GoldUiSection preview={preview} />
-      <LatticeSection preview={preview} />
       {children}
     </aside>,
     document.body,

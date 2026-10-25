@@ -11,7 +11,6 @@ import { CelebrationSection } from './CelebrationSection';
 import { BackdropSection } from './BackdropSection';
 import { StageSettingsSection } from './StageSettingsSection';
 import { TransitionsSection } from './TransitionsSection';
-import { GoldUiSection, LatticeSection } from './PanelExtras';
 
 setupDomTests();
 describe('SpectaclePreviewPanel', () => {
@@ -23,9 +22,17 @@ describe('SpectaclePreviewPanel', () => {
     expect(panel.textContent).toContain('CELEBRATION');
     expect(panel.textContent).toContain('LUCKY DRAW');
     expect(panel.textContent).toContain('STAGE SETTINGS');
-    expect(panel.textContent).toContain('GOLD UI KIT');
-    expect(panel.textContent).toContain('DECO LATTICE');
     expect(screen.getByTestId('spectacle-preview__quality').textContent).toContain('HIGH');
+  });
+
+  // The gold nav editor and the lattice controls drive only the Event Night medallion and bar, so
+  // Event Night adds them through the panel's children slot (ADDENDUM-042); the console itself
+  // does not carry them, on the premiere or anywhere else.
+  it('does not carry the Event Night sections', () => {
+    render(<SpectaclePreviewPanel preview={stubPreview()} onOpenDraw={() => {}} />);
+    const panel = screen.getByTestId('spectacle-preview__panel');
+    expect(panel.textContent).not.toContain('GOLD UI KIT');
+    expect(panel.textContent).not.toContain('DECO LATTICE');
   });
 
   it('shows an em dash when the tier is not resolved yet', () => {
@@ -170,52 +177,5 @@ describe('StageSettingsSection', () => {
     render(<StageSettingsSection preview={stubPreview({ rerollSeed })} />);
     await userEvent.click(screen.getByTestId('spectacle-preview__reroll'));
     expect(rerollSeed).toHaveBeenCalledTimes(1);
-  });
-});
-describe('GoldUiSection', () => {
-  it('edits the nav lines and renders the live bar', async () => {
-    const setNavText = vi.fn();
-    render(<GoldUiSection preview={stubPreview({ setNavText })} />);
-
-    const textarea = screen.getByTestId('spectacle-preview__nav-lines') as HTMLTextAreaElement;
-    expect(textarea.value).toContain('Lucky Draw');
-    expect(screen.getByLabelText('Gold UI sample')).toBeTruthy();
-    expect(screen.queryByTestId('spectacle-preview__nav-issues')).toBeNull();
-
-    fireEvent.change(textarea, { target: { value: '🥂,Toast' } });
-    expect(setNavText).toHaveBeenCalledWith('🥂,Toast');
-  });
-
-  it('lists validation issues when the lines are unusable', () => {
-    const preview = stubPreview();
-    render(
-      <GoldUiSection
-        preview={{ ...preview, navValidation: { ok: false, issues: ['line 1 has no label'] } }}
-      />,
-    );
-
-    const issues = screen.getByTestId('spectacle-preview__nav-issues');
-    expect(issues.textContent).toContain('line 1 has no label');
-  });
-});
-describe('LatticeSection', () => {
-  it('drives density, level and the seed reroll', async () => {
-    const setLatticeDensity = vi.fn();
-    const setLatticeLevel = vi.fn();
-    const rerollLattice = vi.fn();
-    render(
-      <LatticeSection preview={stubPreview({ latticeSeed: 4242, setLatticeDensity, setLatticeLevel, rerollLattice })} />,
-    );
-
-    fireEvent.change(screen.getByTestId('spectacle-preview__lattice-density'), { target: { value: '0.25' } });
-    expect(setLatticeDensity).toHaveBeenCalledWith(0.25);
-
-    fireEvent.change(screen.getByTestId('spectacle-preview__lattice-level'), { target: { value: '2' } });
-    expect(setLatticeLevel).toHaveBeenCalledWith(2);
-
-    const reroll = screen.getByTestId('spectacle-preview__lattice-reroll');
-    expect(reroll.textContent).toContain('seed 4242');
-    await userEvent.click(reroll);
-    expect(rerollLattice).toHaveBeenCalledTimes(1);
   });
 });

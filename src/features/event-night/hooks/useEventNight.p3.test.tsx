@@ -6,7 +6,7 @@ import { act, renderHook } from '@testing-library/react';
 
 import { parseNavLines } from '@/features/gilded-ui';
 
-import { DEFAULT_NAV_LINES } from '@/features/spectacle-preview/data/previewCatalogue';
+import { DEFAULT_NAV_LINES } from '../data/navLines';
 
 import { OPENING_TAGLINE, SECTION_TAGLINES } from '../data/sectionTaglines';
 

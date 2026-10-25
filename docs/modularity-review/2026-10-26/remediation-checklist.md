@@ -85,10 +85,8 @@ Goal: `premiere` no longer imports `frame-studio`, and there is one port type, n
 - [x] 3.6 Verify with `grep -rn "frame-studio" src/features/premiere` (non-test). Expect no hits.
 - [x] 3.7 Addendum 039 + register row. Gate. The Frame Studio must still drive the scene: the `getTarget` getter is lazy, so timing is unchanged.
 
-## [~] Phase 4 — Finding 4 (Significant): 4A and 4B done, 4C open
-> **Status:** 4A and 4B done and committed. 4C (moving the two sections) **not started**: it removes two visible sections from the premiere console and rewrites ~14 test files that build the console state through `useSpectaclePreview`, `stubPreview` and four mock styles. Needs a decision on the premiere console first. See ADDENDUM-040 §4.
- — Finding 4 (Significant): console cohesion, one celebration recipe, one seed
-Three independent sub-tasks, in this order.
+## [x] Phase 4 — Finding 4 (Significant): console cohesion, one celebration recipe, one seed
+> **Status:** all of Phase 4 done (4A, 4B: ADDENDUM-040; 4C: ADDENDUM-042). 4C changes what the premiere console shows: it no longer carries GOLD UI KIT or DECO LATTICE. Reverse in ADDENDUM-042 §2 if that was wrong. `EventNightStage` and `stubPreview` came off the discipline debt (50 → 48).
 
 **4A. One default seed**
 - [x] 4A.1 Add `DEFAULT_SEED = 1925` (with the existing "year of the novel" note from `enamel-backdrop/goldLeaf.ts`) to `shared/lib/random.ts`, with a test.
@@ -103,16 +101,16 @@ Three independent sub-tasks, in this order.
 - [x] 4B.4 Do not edit the existing hook tests. They assert the `play` calls and now guard behaviour preservation.
 
 **4C. Move host-only sections out of the console**
-- [ ] 4C.1 `spectacle-preview`: export `Section`, `SliderRow` and `ActionButton` from the barrel (they are in `components/PanelBits.tsx`). Event Night needs them to build its sections.
+- [x] 4C.1 `spectacle-preview`: export `Section`, `SliderRow` and `ActionButton` from the barrel (they are in `components/PanelBits.tsx`). Event Night needs them to build its sections.
 - [x] 4C.2a (done) `SpectaclePreviewPanel` accepts `children`, rendered after its own sections, with a test.
-- [ ] 4C.2 Remove the sections from the panel. Remove `<GoldUiSection>` and `<LatticeSection>` (`:62-63`), `PanelExtras.tsx`, `useLatticeControls`, `useGoldUiLines`, their fields in `useSpectaclePreview`, the stub fields in `testing/stubPreview.ts`, and the `gilded-ui` import.
-- [ ] 4C.3 `event-night`:
+- [x] 4C.2 Remove the sections from the panel (and `PanelExtras.tsx`). Remove `<GoldUiSection>` and `<LatticeSection>` (`:62-63`), `PanelExtras.tsx`, `useLatticeControls`, `useGoldUiLines`, their fields in `useSpectaclePreview`, the stub fields in `testing/stubPreview.ts`, and the `gilded-ui` import.
+- [x] 4C.3 `event-night`:
   - Add `hooks/useLatticeControls.ts` and `hooks/useGoldUiLines.ts` (moved), and `components/EventNightConsoleSections.tsx` (the two sections moved).
   - Move `DEFAULT_NAV_LINES` from `spectacle-preview/data/previewCatalogue.ts` to `event-night/data/`.
   - `EventNightStage.tsx` owns the controls (lines 48 and 53 read `latticeSeed`, `navItems` etc. from the console today). It passes the sections as `children` to `<SpectaclePreviewPanel>`.
   - Rename testids to `event-night__nav-lines`, `event-night__lattice-*` (CLAUDE.md §5). Update the unit tests and `src/test/e2eContract.test.ts` expectations. `e2e/` has no selector on the old ids.
-- [ ] 4C.4 Move the tests with their code. The panel's own tests keep only what the panel still renders. Add one test that `children` render inside the panel.
-- [x] 4D (partial) Addendum 040 + register row written for 4A, 4B and the slot. It must be extended when 4C is done to record that the premiere console no longer shows the two sections and the testid renames.
+- [x] 4C.4 Move the tests with their code. The panel's own tests keep only what the panel still renders. Add one test that `children` render inside the panel.
+- [x] 4D Addendum 040 (4A, 4B, slot) and 042 (4C: the premiere console no longer shows the two sections; the testid renames) + register rows.
 
 ## [x] Phase 5 — Finding 2 (Significant): enforced entry points and a dependency table
 Goal: the "barrel is the only door" rule becomes a test. Run after Phases 1–4 so few exceptions remain.
@@ -172,7 +170,7 @@ Do this when the next premiere setting is added, or drop it. It is the largest c
 ## Phase 7 — Close-out
 - [ ] 7.1 Run the code-reviewer over the full diff and fix CRITICAL and HIGH findings. (Not run: left for you to request.)
 - [x] 7.2 Greps re-run: no formula-level clamp outside `styleRules` (the Deco Lattice's own layer count is noted in ADDENDUM-037); `1925` only in `DEFAULT_SEED`, the two hash/offset literals and two comments; 0 deep imports in source; 0 `frame-studio` references in `premiere`; 0 sibling imports in the four image features; `managerRef` still 31 (Phase 6 not done).
-- [x] 7.3 Checklist ticked. Deferred and open: Phase 4C (move the lattice and gold-nav sections out of the console; needs a decision on the premiere console, see ADDENDUM-040 §4), Phase 6 (single source of truth for premiere state; needs a browser), the `FrameStudioVocabulary` grouping export, and the Deco Lattice's own 1-4 layer count.
+- [x] 7.3 Checklist ticked. Deferred and open: Phase 6 (single source of truth for premiere state; needs a browser), the `FrameStudioVocabulary` grouping export, and the Deco Lattice's own 1-4 layer count.
 - [x] 7.4 Browser caveat: type-checks, tests pass, builds; visual verification pending until `npm run e2e` is run on darwin.
 
 ## Critical files
