@@ -24,6 +24,14 @@ export type RailKind =
   | 'lattice'
   | 'reed';
 
+export type FrameFinish = 'gold' | 'brass';
+
+/** Per-rail brass tone (ADDENDUM-021 §3.6): base 0 (light #ba9c72) .. 1 (dark #775320), gradient angle in radians. */
+export interface RailTone {
+  base: number;
+  angle: number;
+}
+
 export interface PolylineSpec {
   points: Point2[];
   closed?: boolean;
@@ -35,6 +43,8 @@ export interface PolylineSpec {
   kind?: RailKind;
   /** Derived importance 0 (essential) .. 3 (flourish). Computed by annotateRanks(). */
   rank?: number;
+  /** Brass gradient tone for the movie finish. Absent = untinted light brass. */
+  tone?: RailTone;
 }
 
 /** Intricacy scalar k in [0, 1]. 0.5 is the Film Baseline (identity). */

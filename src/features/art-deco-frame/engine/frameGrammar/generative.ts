@@ -269,6 +269,7 @@ export function buildLattice(box: Box, level: number, seed: number): PolylineSpe
   return latticeToRails(geometry, {
     coordScale: box.hh,
     widthScale: box.hh * LATTICE_WIDTH_FACTOR,
+    seed,
   });
 }
 

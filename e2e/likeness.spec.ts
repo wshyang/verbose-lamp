@@ -40,3 +40,17 @@ test('act5-screen-border', async ({ page }) => {
   await page.keyboard.press('h');
   await expect(page).toHaveScreenshot('act5-screen-border.png', { fullPage: true, timeout: 120_000 });
 });
+
+/** The brass finish (ADDENDUM-021 §3.6): lattice title + lattice proscenium. */
+test('act5-lattice-brass', async ({ page }) => {
+  await page.goto('/?freezeAt=33.8');
+  await page.waitForSelector('[data-testid="cinematic-stage__canvas"][data-frame-ready="true"]');
+  const reveal = page.getByTestId('frame-studio__reveal');
+  if (await reveal.count()) await reveal.click();
+  await page.getByTestId('frame-studio__pattern').filter({ hasText: /lattice/i }).click();
+  await page.getByTestId('frame-studio__surface-border').click();
+  await page.getByTestId('frame-studio__border-enable').check();
+  await page.getByTestId('frame-studio__border-pattern-lattice').click();
+  await page.keyboard.press('h');
+  await expect(page).toHaveScreenshot('act5-lattice-brass.png', { fullPage: true, timeout: 120_000 });
+});

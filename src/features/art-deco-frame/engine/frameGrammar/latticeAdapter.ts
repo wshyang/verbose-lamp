@@ -1,4 +1,5 @@
 import type { DecoLatticeGeometry, LatticeSpec } from '@/features/deco-lattice';
+import { latticeRailTone } from './railTone';
 import type { PolylineSpec, RailKind } from './types';
 
 /**
@@ -6,7 +7,8 @@ import type { PolylineSpec, RailKind } from './types';
  * stays in its own feature with its own spec type; this adapter is the one
  * place that knows how a tutorial layer maps onto the frame grammar's
  * kinds, z-steps and draw-on delays, so both the title cards and the screen
- * border can consume it through the existing rail renderer.
+ * border can consume it through the existing rail renderer. It also stamps
+ * each rail's brass tone (ADDENDUM-021 §3.6) from its tutorial layer.
  */
 
 export interface LatticeRailScale {
@@ -14,6 +16,8 @@ export interface LatticeRailScale {
   coordScale: number;
   /** Multiplier for lattice stroke widths. */
   widthScale: number;
+  /** Composition seed; drives the brass gradient angles. Default 1925. */
+  seed?: number;
 }
 
 const LAYER_Z = -0.02;
@@ -36,6 +40,7 @@ export function latticeToRails(
   geometry: DecoLatticeGeometry,
   scale: LatticeRailScale,
 ): PolylineSpec[] {
+  const seed = scale.seed ?? 1925;
   return geometry.specs.map((spec) => ({
     points: spec.points.map((point) => ({
       x: point.x * scale.coordScale,
@@ -50,5 +55,6 @@ export function latticeToRails(
     partDir: 0,
     kind: railKindFor(spec),
     rank: spec.rank,
+    tone: latticeRailTone(spec.layer, seed),
   }));
 }

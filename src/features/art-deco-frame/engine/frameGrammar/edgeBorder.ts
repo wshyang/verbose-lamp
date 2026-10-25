@@ -275,7 +275,7 @@ function buildLatticeBorder(aspect: number, density: number, seed: number): Poly
     level: 1 + Math.round(density * 2),
     aperture: apertureForLayout(layout, { hw: aspect, hh: 1 }),
   });
-  return latticeToRails(geometry, { coordScale: 1, widthScale: LATTICE_BORDER_WIDTH_FACTOR });
+  return latticeToRails(geometry, { coordScale: 1, widthScale: LATTICE_BORDER_WIDTH_FACTOR, seed });
 }
 
 export function buildEdgeBorder(request: EdgeBorderRequest): EdgeBorderGeometry {

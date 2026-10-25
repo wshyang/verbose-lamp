@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { buildEdgeBorder, viewportScaleAtDistance, type ScreenBorderStyle } from '../engine/frameGrammar';
+import { buildEdgeBorder, viewportScaleAtDistance, type FrameFinish, type ScreenBorderStyle } from '../engine/frameGrammar';
 import { clampGenome } from '../engine/frameGrammar/genome';
 import { createChamferedFrameGeometry } from './railGeometry';
 import { createGoldFrameMaterial, createGoldFrameUniforms } from './frameMaterial';
@@ -31,9 +31,15 @@ export function createScreenBorderRig(
   let style: ScreenBorderStyle = { ...initialStyle, genome: clampGenome(initialStyle.genome) };
   let aspectRatio = aspect;
   const uniforms = createGoldFrameUniforms(1, 1);
-  const material = createGoldFrameMaterial(uniforms);
-  material.depthTest = false;
-  material.depthWrite = false;
+  // The lattice proscenium wears the tutorial's brass; the poster border stays gold.
+  const finishFor = (s: ScreenBorderStyle): FrameFinish => (s.pattern === 'lattice' ? 'brass' : 'gold');
+  const makeMaterial = (s: ScreenBorderStyle) => {
+    const mat = createGoldFrameMaterial(uniforms, finishFor(s));
+    mat.depthTest = false;
+    mat.depthWrite = false;
+    return mat;
+  };
+  let material = makeMaterial(style);
 
   const buildGeometry = () => {
     const { specs } = buildEdgeBorder({
@@ -77,7 +83,14 @@ export function createScreenBorderRig(
         next.seed === style.seed &&
         JSON.stringify(genome) === JSON.stringify(style.genome);
       if (isUnchanged) return;
+      const prevFinish = finishFor(style);
       style = { weight, genome, pattern: next.pattern, seed: next.seed };
+      if (finishFor(style) !== prevFinish) {
+        const oldMaterial = material;
+        material = makeMaterial(style);
+        mesh.material = material;
+        oldMaterial.dispose();
+      }
       rebuild();
     },
     setEnabled: (enabled) => {

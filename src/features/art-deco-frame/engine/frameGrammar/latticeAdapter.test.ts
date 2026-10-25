@@ -35,6 +35,14 @@ describe('latticeToRails', () => {
     const rails = latticeToRails(GEOMETRY, { coordScale: 1, widthScale: 0.01 });
     expect(Math.min(...rails.map((r) => r.width))).toBe(0.004);
   });
+
+  it('stamps brass tones per tutorial layer with seeded angles (ADDENDUM-021 §3.6)', () => {
+    const rails = latticeToRails(GEOMETRY, { coordScale: 1, widthScale: 1 });
+    expect(rails.map((r) => r.tone?.base)).toEqual([0.25, 0.25, 0.75, 0.25, 0.75, 0.75]);
+    expect(rails.every((r) => r.tone !== undefined && r.tone.angle < Math.PI)).toBe(true);
+    const rerolled = latticeToRails(GEOMETRY, { coordScale: 1, widthScale: 1, seed: 7 });
+    expect(rerolled[0].tone?.angle).not.toBeCloseTo(rails[0].tone?.angle ?? 0, 6);
+  });
 });
 
 describe('lattice grammar kinds', () => {
