@@ -3,14 +3,14 @@ import { useFrameStudio } from '@/features/frame-studio';
 import type { CinemaAudioEngine } from '../audio/cinemaAudio';
 import { SEQUENCE_CHAPTERS, DEFAULT_HERO_TITLE } from '../data/sequence';
 import type { CameraMode, HeroTitleConfig } from '../model/types';
-import type { GatsbySceneManager } from '../scene/GatsbySceneManager';
+import type { PremiereSceneApi } from '../scene/sceneApi';
 import { usePremiereRuntime } from './usePremiereRuntime';
 import { usePremiereSceneOptions } from './usePremiereSceneOptions';
 import { usePremiereTransport } from './usePremiereTransport';
 
 export function usePremiereController() {
   const stageRef = useRef<HTMLDivElement | null>(null);
-  const managerRef = useRef<GatsbySceneManager | null>(null);
+  const managerRef = useRef<PremiereSceneApi | null>(null);
   const audioRef = useRef<CinemaAudioEngine | null>(null);
   const lastUiSyncRef = useRef(0);
 
