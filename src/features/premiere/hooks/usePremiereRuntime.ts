@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useRef, useState, type MutableRefObject, type RefObject } from 'react';
-import { CinemaAudioEngine } from '../audio/cinemaAudio';
+import { useState, type MutableRefObject, type RefObject } from 'react';
+import type { CinemaAudioEngine } from '../audio/cinemaAudio';
 import { parseFreezeAt } from '../model/freeze';
 import type { PlaybackTelemetry, PremiereSceneApi } from '../scene/sceneApi';
 import { createPremiereStore, type PremiereStoreApi } from '../scene3d/premiereStore';
-import { storeSceneApi } from '../scene3d/storeSceneApi';
+import { usePremiereCallbacks } from './usePremiereCallbacks';
+import { useSceneLifecycle } from './useSceneLifecycle';
 
 interface PremiereRuntimeOptions {
   mountRef: RefObject<HTMLDivElement | null>;
@@ -36,51 +37,11 @@ export function usePremiereRuntime({
   onTelemetry,
   onChapterChange,
 }: PremiereRuntimeOptions): PremiereRuntime {
-  const callbacksRef = useRef({ onTelemetry, onChapterChange });
-  callbacksRef.current = { onTelemetry, onChapterChange };
-
   const [store] = useState<PremiereStoreApi>(() =>
     createPremiereStore({ freezeAt: parseFreezeAt(window.location.search) }),
   );
+  const callbacks = usePremiereCallbacks({ mountRef, audioRef, onTelemetry, onChapterChange });
+  useSceneLifecycle({ mountRef, managerRef, audioRef, store });
 
-  /** Chapter hand-overs also shimmer the audio. */
-  const handleChapterChange = useCallback(
-    (chapterIndex: number) => {
-      callbacksRef.current.onChapterChange(chapterIndex);
-      audioRef.current?.triggerActShimmer(chapterIndex);
-    },
-    [audioRef],
-  );
-  const handleTelemetry = useCallback(
-    (telemetry: PlaybackTelemetry) => callbacksRef.current.onTelemetry(telemetry),
-    [],
-  );
-  const handleFrameReady = useCallback(() => {
-    const host = mountRef.current;
-    if (host) host.dataset.frameReady = 'true';
-  }, [mountRef]);
-
-  useEffect(() => {
-    const container = mountRef.current;
-    if (!container) return;
-
-    const audio = new CinemaAudioEngine();
-    audioRef.current = audio;
-
-    const scene = storeSceneApi(store);
-    managerRef.current = scene;
-    return () => {
-      scene.dispose();
-      audio.dispose();
-      managerRef.current = null;
-      audioRef.current = null;
-    };
-  }, [audioRef, managerRef, mountRef, store]);
-
-  return {
-    store,
-    onSceneTelemetry: handleTelemetry,
-    onSceneChapterChange: handleChapterChange,
-    onSceneFrameReady: handleFrameReady,
-  };
+  return { store, ...callbacks };
 }

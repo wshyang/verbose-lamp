@@ -1,79 +1,39 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef } from 'react';
 import { useFrameStudio } from '@/features/frame-studio';
 import type { CinemaAudioEngine } from '../audio/cinemaAudio';
-import { SEQUENCE_CHAPTERS, DEFAULT_HERO_TITLE } from '../data/sequence';
-import type { CameraMode, HeroTitleConfig } from '../model/types';
+import { SEQUENCE_CHAPTERS } from '../data/sequence';
 import type { PremiereSceneApi } from '../scene/sceneApi';
+import { usePlaybackDisplay } from './usePlaybackDisplay';
 import { usePremiereRuntime } from './usePremiereRuntime';
 import { usePremiereSceneOptions } from './usePremiereSceneOptions';
+import { usePremiereSettings } from './usePremiereSettings';
 import { usePremiereTransport } from './usePremiereTransport';
 
 export function usePremiereController() {
   const stageRef = useRef<HTMLDivElement | null>(null);
   const managerRef = useRef<PremiereSceneApi | null>(null);
   const audioRef = useRef<CinemaAudioEngine | null>(null);
-  const lastUiSyncRef = useRef(0);
 
-  const [currentTime, setCurrentTime] = useState(0);
-  const [activeAct, setActiveAct] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [cameraMode, setCameraMode] = useState<CameraMode>('cinema');
-  const [nitrateMode, setNitrateMode] = useState(false);
-  const [soundOn, setSoundOn] = useState(false);
-  const [heroConfig, setHeroConfig] = useState<HeroTitleConfig>({ ...DEFAULT_HERO_TITLE });
+  const display = usePlaybackDisplay();
+  const settings = usePremiereSettings();
+  const { onTelemetry, onChapterChange } = display;
 
-  const onTelemetry = useCallback((telemetry: { currentTime: number; isPlaying: boolean }) => {
-    const now = performance.now();
-    if (now - lastUiSyncRef.current <= 48) return;
-    lastUiSyncRef.current = now;
-    setCurrentTime(telemetry.currentTime);
-    setIsPlaying(telemetry.isPlaying);
-  }, []);
-  const onChapterChange = useCallback((chapterIndex: number) => setActiveAct(chapterIndex), []);
-
-  const runtime = usePremiereRuntime({
-    mountRef: stageRef,
-    managerRef,
-    audioRef,
-    onTelemetry,
-    onChapterChange,
-  });
-  const getSceneManager = useCallback(() => managerRef.current, []);
-  const frameStudio = useFrameStudio(getSceneManager);
-  const transport = usePremiereTransport({
-    managerRef,
-    audioRef,
-    cameraMode,
-    setCameraMode,
-    setCurrentTime,
-    setActiveAct,
-    setIsPlaying,
-  });
-  const sceneOptions = usePremiereSceneOptions({
-    managerRef,
-    audioRef,
-    cameraMode,
-    nitrateMode,
-    setCameraMode,
-    setNitrateMode,
-    setSoundOn,
-    setHeroConfig,
-    setActiveAct,
-    setIsPlaying,
-  });
-  const currentChapter = SEQUENCE_CHAPTERS[activeAct] ?? SEQUENCE_CHAPTERS[0];
+  const runtime = usePremiereRuntime({ mountRef: stageRef, managerRef, audioRef, onTelemetry, onChapterChange });
+  const frameStudio = useFrameStudio(useCallback(() => managerRef.current, []));
+  const transport = usePremiereTransport({ managerRef, audioRef, ...display, ...settings });
+  const sceneOptions = usePremiereSceneOptions({ managerRef, audioRef, ...display, ...settings });
 
   return {
     stageRef,
     runtime,
-    currentTime,
-    activeAct,
-    isPlaying,
-    cameraMode,
-    nitrateMode,
-    soundOn,
-    heroConfig,
-    currentChapter,
+    currentTime: display.currentTime,
+    activeAct: display.activeAct,
+    isPlaying: display.isPlaying,
+    cameraMode: settings.cameraMode,
+    nitrateMode: settings.nitrateMode,
+    soundOn: settings.soundOn,
+    heroConfig: settings.heroConfig,
+    currentChapter: SEQUENCE_CHAPTERS[display.activeAct] ?? SEQUENCE_CHAPTERS[0],
     frameStudio,
     ...transport,
     ...sceneOptions,

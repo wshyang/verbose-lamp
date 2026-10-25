@@ -1,15 +1,11 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { tryEncodeQr } from './encode';
-import { downloadSvgAsPng, downloadSvgElement, toSafeFileStem } from './export';
-import { buildRenderPlan, resolveQrStyle } from './geometry';
 import { MAX_QR_CAPTION_LENGTH, QR_PRESETS } from './presets';
+import { findMatchingPreset, planOf, summaryOf, type QrSummary } from './qrView';
 import type { QrErrorCorrection, QrModuleShape, QrPreset, QrRenderPlan } from './types';
+import { useQrExport } from './useQrExport';
 
-export interface QrSummary {
-  readonly version: number;
-  readonly size: number;
-  readonly byteCount: number;
-}
+export type { QrSummary } from './qrView';
 
 export interface QrGeneratorState {
   readonly text: string;
@@ -37,40 +33,18 @@ export interface QrGeneratorState {
 
 const INITIAL_PRESET = QR_PRESETS[0];
 
-function findMatchingPreset(text: string, level: QrErrorCorrection): string | null {
-  const match = QR_PRESETS.find((p) => p.text === text && p.errorCorrection === level);
-  return match ? match.id : null;
-}
-
-function byteLength(text: string): number {
-  return new TextEncoder().encode(text).length;
-}
-
 export function useQrGenerator(): QrGeneratorState {
-  const svgRef = useRef<SVGSVGElement | null>(null);
   const [text, setText] = useState(INITIAL_PRESET.text);
   const [caption, setCaptionRaw] = useState(INITIAL_PRESET.caption);
-  const [errorCorrection, setErrorCorrection] = useState<QrErrorCorrection>(
-    INITIAL_PRESET.errorCorrection
-  );
+  const [errorCorrection, setErrorCorrection] = useState<QrErrorCorrection>(INITIAL_PRESET.errorCorrection);
   const [shape, setShape] = useState<QrModuleShape>('plaque');
   const [isShimmering, setShimmering] = useState(true);
-  const [isExporting, setExporting] = useState(false);
-  const [exportError, setExportError] = useState<string | null>(null);
+  const exporter = useQrExport(caption);
 
   const encoded = useMemo(() => tryEncodeQr({ text, errorCorrection }), [text, errorCorrection]);
-  const plan = useMemo(
-    () => (encoded.ok ? buildRenderPlan(encoded.matrix, resolveQrStyle(shape)) : null),
-    [encoded, shape]
-  );
-  const summary = useMemo<QrSummary | null>(
-    () => (plan ? { version: plan.version, size: plan.size, byteCount: byteLength(text) } : null),
-    [plan, text]
-  );
-  const activePresetId = useMemo(
-    () => findMatchingPreset(text, errorCorrection),
-    [text, errorCorrection]
-  );
+  const plan = useMemo(() => planOf(encoded, shape), [encoded, shape]);
+  const summary = useMemo(() => summaryOf(plan, text), [plan, text]);
+  const activePresetId = useMemo(() => findMatchingPreset(text, errorCorrection), [text, errorCorrection]);
 
   const setCaption = useCallback((next: string) => {
     setCaptionRaw(next.slice(0, MAX_QR_CAPTION_LENGTH));
@@ -82,28 +56,10 @@ export function useQrGenerator(): QrGeneratorState {
     setErrorCorrection(preset.errorCorrection);
   }, []);
 
-  const downloadSvg = useCallback(() => {
-    if (!svgRef.current) return;
-    downloadSvgElement(svgRef.current, toSafeFileStem(caption));
-  }, [caption]);
-
-  const downloadPng = useCallback(async () => {
-    if (!svgRef.current || isExporting) return;
-    setExporting(true);
-    setExportError(null);
-    try {
-      await downloadSvgAsPng(svgRef.current, toSafeFileStem(caption));
-    } catch (error) {
-      setExportError(error instanceof Error ? error.message : 'The PNG could not be made.');
-    } finally {
-      setExporting(false);
-    }
-  }, [caption, isExporting]);
-
   return {
     text, caption, errorCorrection, shape, isShimmering, activePresetId,
-    plan, summary, error: encoded.ok ? null : encoded.reason, isExporting, exportError, svgRef,
-    setText, setCaption, setErrorCorrection, setShape, setShimmering,
-    applyPreset, downloadSvg, downloadPng,
+    plan, summary, error: encoded.ok ? null : encoded.reason,
+    ...exporter,
+    setText, setCaption, setErrorCorrection, setShape, setShimmering, applyPreset,
   };
 }
