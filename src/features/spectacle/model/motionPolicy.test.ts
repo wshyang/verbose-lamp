@@ -29,6 +29,16 @@ describe('sanitizeFlashPlan', () => {
   });
 });
 
+describe('sanitizeFlashPlan small flashes', () => {
+  it('lets a sub-threshold flash through without spending the large-flash budget', () => {
+    const seg = (startMs: number, peak: number) => ({
+      startMs, attackMs: 80, holdMs: 0, decayMs: 100, peak,
+    });
+    const plan = sanitizeFlashPlan([seg(0, 0.6), seg(100, 1), seg(200, 1), seg(300, 1), seg(400, 1)]);
+    expect(plan.map((segment) => segment.peak)).toEqual([0.6, 1, 1, 1, 0.3]);
+  });
+});
+
 describe('flashIntensityAt', () => {
   it('ramps, holds and decays', () => {
     const seg = [{ startMs: 100, attackMs: 100, holdMs: 100, decayMs: 100, peak: 1 }];
