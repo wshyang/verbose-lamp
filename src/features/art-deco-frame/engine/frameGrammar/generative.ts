@@ -1,6 +1,7 @@
 import { FrameArchetype } from '../../model/types';
 import { buildCoreFrameSpecs } from './archetypes';
 import { buildLatticeSpecs } from './latticeSource';
+import { clampFormulaLevel } from './styleRules';
 import { FrameFormula, Point2, PolylineSpec, RailKind } from './types';
 
 /* -------------------------------------------------------------------------- */
@@ -13,11 +14,6 @@ interface Box {
 }
 
 const PHI = (1 + Math.sqrt(5)) / 2;
-
-export function clampGenesisLevel(level: number): number {
-  if (!Number.isFinite(level)) return 2;
-  return Math.min(4, Math.max(1, Math.round(level)));
-}
 
 /** Half-extents shared with the authored frames, so typography clearance is stable. */
 export function frameBox(archetype: FrameArchetype, mainWidth: number): Box {
@@ -255,7 +251,7 @@ export function buildGenerativeFrameSpecs(
   options: { includePrimaryFrame?: boolean; includeMonogram?: boolean } = {}
 ): PolylineSpec[] {
   const box = frameBox(archetype, mainWidth);
-  const level = clampGenesisLevel(formula.level);
+  const level = clampFormulaLevel(formula.level);
 
   if (formula.source === 'lattice') {
     const lattice = buildLatticeSpecs({

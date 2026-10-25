@@ -1,4 +1,5 @@
 import {
+  DEFAULT_FRAME_FORMULA,
   DEFAULT_FRAME_LAYERS,
   DEFAULT_FRAME_STYLE,
   DEFAULT_SCREEN_BORDER_STYLE,
@@ -17,15 +18,8 @@ import {
  * Pure transforms behind the Frame Studio controls. The hooks decide when to commit; these decide
  * what the committed value is, so every rule here can be tested without rendering anything.
  */
-const MIN_LAYER_LEVEL = 1;
-const MAX_LAYER_LEVEL = 4;
-const FALLBACK_LAYER_LEVEL = 2;
-
 export const detailPercent = (value: number): number => Math.round(value * 100);
 export const detailValue = (percent: number): number => Math.min(1, Math.max(0, percent / 100));
-
-export const clampLayerLevel = (level: number): number =>
-  Math.min(MAX_LAYER_LEVEL, Math.max(MIN_LAYER_LEVEL, Math.round(level)));
 
 export const defaultFrameFormula = (): FrameFormula => ({
   ...DEFAULT_FRAME_STYLE.formula,
@@ -74,7 +68,7 @@ export function layerOptionsFor(formula: FrameFormula): LayerOption[] {
       label: pattern.label,
       blurb: pattern.blurb,
       enabled: layer?.enabled ?? false,
-      level: layer?.level ?? FALLBACK_LAYER_LEVEL,
+      level: layer?.level ?? DEFAULT_FRAME_FORMULA.level,
     };
   });
 }

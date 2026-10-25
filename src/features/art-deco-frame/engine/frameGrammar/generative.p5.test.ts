@@ -3,7 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { FrameArchetype } from '../../model/types';
 import { SIGNATURE_GENOME } from './genome';
 import { FRAME_SOURCES, FrameFormula, FrameSource, PolylineSpec, buildFrame, buildFrameSpecs, buildAuthoredFrame } from './index';
-import { clampGenesisLevel, buildGenerativeFrameSpecs } from './generative';
+import { buildGenerativeFrameSpecs } from './generative';
+import { clampFormulaLevel } from './styleRules';
 
 const ARCHETYPES_p5: FrameArchetype[] = [
   'monogram_gate',
@@ -65,10 +66,10 @@ describe('generative sources', () => {
 });
 describe('genesis level and authored wrapper defaults', () => {
   it('falls back to level 2 for non-finite levels and clamps finite levels', () => {
-    expect([Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY].map(clampGenesisLevel)).toEqual([2, 2, 2]);
-    expect(clampGenesisLevel(0)).toBe(1);
-    expect(clampGenesisLevel(2.6)).toBe(3);
-    expect(clampGenesisLevel(99)).toBe(4);
+    expect([Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY].map(clampFormulaLevel)).toEqual([2, 2, 2]);
+    expect(clampFormulaLevel(0)).toBe(1);
+    expect(clampFormulaLevel(2.6)).toBe(3);
+    expect(clampFormulaLevel(99)).toBe(4);
   });
 
   it('buildAuthoredFrame defaults to the Film Baseline intricacy', () => {

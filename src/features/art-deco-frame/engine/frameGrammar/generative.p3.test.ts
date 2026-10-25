@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { FrameArchetype } from '../../model/types';
 import { SIGNATURE_GENOME } from './genome';
 import { FRAME_SOURCES, FrameFormula, FrameSource, PolylineSpec, buildFrame, buildFrameSpecs } from './index';
-import { clampGenesisLevel } from './generative';
+import { clampFormulaLevel } from './styleRules';
 
 const ARCHETYPES_p3: FrameArchetype[] = [
   'monogram_gate',
@@ -63,9 +63,9 @@ describe('generative sources', () => {
     }
   }
 });
-describe('clampGenesisLevel', () => {
+describe('clampFormulaLevel', () => {
   it('falls back to level two for a non-finite level', () => {
-    expect(clampGenesisLevel(Number.NaN)).toBe(2);
-    expect(clampGenesisLevel(Number.POSITIVE_INFINITY)).toBe(2);
+    expect(clampFormulaLevel(Number.NaN)).toBe(2);
+    expect(clampFormulaLevel(Number.POSITIVE_INFINITY)).toBe(2);
   });
 });

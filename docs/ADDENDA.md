@@ -41,3 +41,4 @@ numbers so the base spec stays stable. See `CLAUDE.md` §1 for the discipline.
 | [ADDENDUM-034](addenda/ADDENDUM-034-discipline-ratchet-and-splits.md) | 2026-10-26 | The discipline ratchet, the splits it forced, and the standing-rule updates (Phase 7) | §2, §9 | Implemented — nothing rendered in a browser |
 | [ADDENDUM-035](addenda/ADDENDUM-035-browser-gates.md) | 2026-10-26 | The browser gates: interaction flows, likeness shots, avatar spec (Phase 8) | §3, §7 | Implemented — SwiftShader and macOS only, no real GPU |
 | [ADDENDUM-036](addenda/ADDENDUM-036-test-merge-record.md) | 2026-10-26 | The test merge: kept, dropped and ported from the five PRs; the coverage gate at 100 % (Phase T) | §2, §7 | Implemented — assertion strength not reviewed |
+| [ADDENDUM-037](addenda/ADDENDUM-037-frame-style-rules-one-owner.md) | 2026-10-26 | Frame-style rules have one owner: `art-deco-frame` (modularity review, Finding 1) | §3, §6 | Implemented — nothing rendered in a browser |

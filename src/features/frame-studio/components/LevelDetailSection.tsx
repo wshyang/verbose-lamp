@@ -1,3 +1,4 @@
+import { GENESIS_LEVEL_MAX, GENESIS_LEVEL_MIN } from '@/features/art-deco-frame';
 import { RangeInput } from '@/shared/ui';
 import type { FrameStudioControlProps } from './studioProps';
 import { FOCUS_RING, chip } from './chip';
@@ -28,7 +29,7 @@ export function BaseLevelSlider({ level, isDesignPattern, onLevelChange }: Pick<
       </div>
       <RangeInput
         id="frame-studio-level"
-        min={1} max={4} step={1} value={level}
+        min={GENESIS_LEVEL_MIN} max={GENESIS_LEVEL_MAX} step={1} value={level}
         disabled={isDesignPattern}
         onChange={(event) => onLevelChange(Number(event.target.value))}
         className={`${FOCUS_RING} disabled:cursor-not-allowed`}

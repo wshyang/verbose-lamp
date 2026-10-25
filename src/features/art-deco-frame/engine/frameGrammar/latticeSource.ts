@@ -1,6 +1,7 @@
 import { buildDecoLattice, type LatticeSpec } from '@/features/deco-lattice';
 // Deep import: the pure engine must not load the deco-lattice barrel's React component.
 import { brassAngleFor, toneForLayer } from '@/features/deco-lattice/model/tone';
+import { clampFormulaLevel } from './styleRules';
 import type { Point2, PolylineSpec, RailKind } from './types';
 
 /**
@@ -76,7 +77,7 @@ export function fitVertexBudget(specs: readonly PolylineSpec[], budget = VERTEX_
 
 /** Lattice rails for one frame extent, ready for `applyIntricacy`. */
 export function buildLatticeSpecs(request: LatticeSourceRequest): PolylineSpec[] {
-  const level = Math.min(4, Math.max(1, Math.round(request.level)));
+  const level = clampFormulaLevel(request.level);
   const seed = request.seed ?? LATTICE_DEFAULT_SEED;
   const geometry = buildDecoLattice({
     mode: 'frame',

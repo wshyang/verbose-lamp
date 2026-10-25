@@ -3,7 +3,7 @@ import { clampGene, SIGNATURE_GENOME } from './genome';
 import {
   annotateRanks, elaborate, offsetPolylineOutward, reduceByRank,
 } from './grammar';
-import { clampGenesisLevel } from './generative';
+import { clampFormulaLevel } from './styleRules';
 import { buildAuthoredFrame } from './index';
 import type { PolylineSpec } from './types';
 
@@ -78,8 +78,8 @@ describe('genome/genesis clamps and lattice filtering', () => {
   it('falls back to signature values for non-finite genes and levels', () => {
     expect(clampGene('cornerScale', Number.NaN)).toBe(SIGNATURE_GENOME.cornerScale);
     expect(clampGene('rayReach', Number.POSITIVE_INFINITY)).toBe(SIGNATURE_GENOME.rayReach);
-    expect(clampGenesisLevel(Number.NaN)).toBe(2);
-    expect(clampGenesisLevel(Number.NEGATIVE_INFINITY)).toBe(2);
+    expect(clampFormulaLevel(Number.NaN)).toBe(2);
+    expect(clampFormulaLevel(Number.NEGATIVE_INFINITY)).toBe(2);
   });
 
   it('builds authored frames with default and explicit intricacy', () => {

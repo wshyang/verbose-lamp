@@ -3,6 +3,8 @@ import { createStore, type StoreApi } from 'zustand/vanilla';
 import {
   DEFAULT_FRAME_STYLE,
   DEFAULT_SCREEN_BORDER_STYLE,
+  normalizeFrameStyle,
+  normalizeScreenBorderStyle,
   type FrameStyle,
   type ScreenBorderStyle,
 } from '@/features/art-deco-frame';
@@ -11,12 +13,7 @@ import type { CameraMode, HeroTitleConfig } from '../model/types';
 import { activeChapterIndex } from '../scene/choreography';
 import { orbitFocusPlan } from '../scene/orbitFocus';
 import { advanceClock, advanceElapsed } from '../scene/playback';
-import {
-  chapterJumpTarget,
-  clampFrameStyle,
-  clampScreenBorderStyle,
-  clampSequenceTime,
-} from '../scene/styleClamp';
+import { chapterJumpTarget, clampSequenceTime } from '../scene/styleClamp';
 
 export interface OrbitFocusRequest {
   chapterIndex: number;
@@ -94,8 +91,8 @@ export function initialPremiereState(options: PremiereStoreOptions = {}): Premie
     cameraMode: 'cinema',
     isNitrateForced: false,
     heroConfig: { ...(options.heroConfig ?? DEFAULT_HERO_TITLE) },
-    frameStyle: clampFrameStyle(options.frameStyle ?? DEFAULT_FRAME_STYLE),
-    borderStyle: clampScreenBorderStyle(options.screenBorderStyle ?? DEFAULT_SCREEN_BORDER_STYLE),
+    frameStyle: normalizeFrameStyle(options.frameStyle ?? DEFAULT_FRAME_STYLE),
+    borderStyle: normalizeScreenBorderStyle(options.screenBorderStyle ?? DEFAULT_SCREEN_BORDER_STYLE),
     isBorderEnabled: options.isBorderEnabled ?? false,
     freezeAt,
     activeChapterIndex: activeChapterIndex(currentTime, SEQUENCE_CHAPTERS),
@@ -158,11 +155,11 @@ export function styleActions(set: StoreWrite) {
     setHeroConfig: (config: HeroTitleConfig) => set({ heroConfig: { ...config } }),
     setSequenceFrameStyle: (style: FrameStyle) =>
       set((state) => ({
-        frameStyle: clampFrameStyle(style),
+        frameStyle: normalizeFrameStyle(style),
         frameStyleVersion: state.frameStyleVersion + 1,
       })),
     setScreenBorderStyle: (style: ScreenBorderStyle) =>
-      set({ borderStyle: clampScreenBorderStyle(style) }),
+      set({ borderStyle: normalizeScreenBorderStyle(style) }),
     setScreenBorderEnabled: (enabled: boolean) => set({ isBorderEnabled: enabled }),
   };
 }

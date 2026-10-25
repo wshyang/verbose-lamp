@@ -12,6 +12,12 @@ import {
 import type { BaseGenome } from './genome';
 
 export * from './types';
+export {
+  clampFormulaLevel,
+  clampIntricacy,
+  normalizeFrameStyle,
+  normalizeScreenBorderStyle,
+} from './styleRules';
 export { buildCoreFrameSpecs } from './archetypes';
 export {
   buildGenerativeFrameSpecs,

@@ -8,7 +8,6 @@ import {
   SIGNATURE_GENOME,
 } from '@/features/art-deco-frame';
 import {
-  clampLayerLevel,
   defaultBorderStyle,
   defaultFrameFormula,
   detailPercent,
@@ -37,20 +36,6 @@ describe('detail conversion', () => {
     [400, 1],
   ])('turns %s percent into %s, held to the unit range', (percent, value) => {
     expect(detailValue(percent)).toBe(value);
-  });
-});
-
-describe('clampLayerLevel', () => {
-  it.each([
-    [-3, 1],
-    [0, 1],
-    [1, 1],
-    [2.4, 2],
-    [2.6, 3],
-    [4, 4],
-    [9, 4],
-  ])('holds %s to %s', (level, expected) => {
-    expect(clampLayerLevel(level)).toBe(expected);
   });
 });
 

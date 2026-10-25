@@ -1,4 +1,5 @@
 import {
+  clampFormulaLevel,
   clampGenome,
   withGene,
   type FrameFormula,
@@ -10,7 +11,7 @@ import {
 } from '@/features/art-deco-frame';
 import { designAt } from '../data/frameDesigns';
 import { nextPatternSeed } from './patternSeed';
-import { clampLayerLevel, detailValue, withFoundation, withLayerChanges } from './studioFormula';
+import { detailValue, withFoundation, withLayerChanges } from './studioFormula';
 
 /**
  * The edits each control makes, as closures over the current state. A hook memoises them per
@@ -27,7 +28,7 @@ export function sequenceActions(formula: FrameFormula, intricacy: number, commit
     setLayerEnabled: (source: FrameLayerSource, enabled: boolean) =>
       edit(withLayerChanges(formula, source, { enabled })),
     setLayerLevel: (source: FrameLayerSource, level: number) =>
-      edit(withLayerChanges(formula, source, { level: clampLayerLevel(level) })),
+      edit(withLayerChanges(formula, source, { level: clampFormulaLevel(level) })),
     setLevel: (level: number) => edit({ ...formula, level }),
     setDetail: (percent: number) => commit(formula, detailValue(percent)),
     /** A fresh lattice pattern from the next seed; the choreography is unchanged. */

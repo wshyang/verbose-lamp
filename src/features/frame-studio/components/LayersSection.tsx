@@ -1,3 +1,4 @@
+import { GENESIS_LEVEL_MAX, GENESIS_LEVEL_MIN } from '@/features/art-deco-frame';
 import { RangeInput } from '@/shared/ui';
 import type { FrameStudioControlProps } from './studioProps';
 import { FOCUS_RING } from './chip';
@@ -14,7 +15,7 @@ function LayerLevel({ layer, onLayerLevelChange }: Pick<LayerRowProps, 'layer' |
         <span className="text-[9px] font-mono text-[#f5e7c6]">{layer.level}</span>
       </div>
       <RangeInput
-        min={1} max={4} step={1} value={layer.level}
+        min={GENESIS_LEVEL_MIN} max={GENESIS_LEVEL_MAX} step={1} value={layer.level}
         onChange={(event) => onLayerLevelChange(layer.source, Number(event.target.value))}
         className={FOCUS_RING}
         aria-label={`${layer.label} layer level`}
