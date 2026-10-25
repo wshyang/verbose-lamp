@@ -161,7 +161,7 @@ dismisses; applying a custom title jumps to the finale and relabels act V.
   (so the specs are type-checked, not just transpiled).
 - `npm test` → 137 files, **1134 tests** green; statements/branches/functions/lines 100%
   (`choreography.ts` 53/53 statements, 14/14 branches, 15/15 functions; `freeze.ts` 9/9, 5/5, 1/1).
-- `npm run build` → clean (`dist/index.html` 1,328.46 kB, gzip 446.51 kB).
+- `npm run build` → clean (`dist/index.html` 1,328.36 kB, gzip 446.49 kB).
 - `npx playwright test --list` → 40 tests in 2 files across the two projects (config and specs
   parse and type-check).
 - **Not run:** the screenshots themselves. `npx playwright test` fails with
