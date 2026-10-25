@@ -30,8 +30,9 @@ r186, Vitest. No backend, database, auth, or persistence.
   **before or with** the code. Tests live beside the module: `foo.ts` + `foo.test.ts`.
 - Golden behaviour is protected by snapshot tests on **geometry data, not pixels**.
   A refactor that changes a snapshot must explain the change in its addendum.
-- Rendering code (Three.js, DOM) is kept thin and is not unit-tested; keep logic out of
-  it so the pure layer is where correctness lives.
+- Rendering code (Three.js, DOM) is kept thin, and it is unit-tested too: jsdom suites
+  assert the DOM it writes and the canvas calls it makes, but never its pixels. Logic
+  still lives in the pure layer. Coverage is gated at 100% — see ADDENDUM-025.
 - **N/A:** real-database integration tests, session-scoping negative tests, OWASP
   endpoint matrix — there is no server or persisted data. Revisit the moment either
   appears.
@@ -40,8 +41,10 @@ r186, Vitest. No backend, database, auth, or persistence.
 
 ## 3. Test infrastructure defaults
 
-- `npm test` runs `vitest run` with `vitest.config.ts` (node environment). Keep
-  `vite.config.ts` untouched; Vitest has its own config file on purpose.
+- `npm test` runs `vitest run --coverage` with `vitest.config.ts` (node environment) and
+  fails below 100% on statements, branches, functions or lines; `npm run test:watch` is
+  the plain watcher. Keep `vite.config.ts` untouched; Vitest has its own config file on
+  purpose. DOM suites opt in per file with `// @vitest-environment jsdom`.
 - Fixture data is deterministic and domain-realistic (named acts, real archetype
   names), never `item-1`.
 - Layout by type: unit tests beside modules; any future e2e under `e2e/`.

@@ -41,14 +41,18 @@ function nextDir(dir: number, rng: () => number): number {
  */
 export function traceWalks(o: WalkOptions): readonly (readonly Pt[])[] {
   const rng = mulberry32(o.seed);
+  // `occupied` is the one-cell margin other walks must keep out of. A walk reserves
+  // its margin only once it is finished, so its own body can never block its next step
+  // (that is what `own` is for). ADDENDUM-025 records the fix.
   const occupied = new Set<string>();
   const walks: Pt[][] = [];
   for (let w = 0; w < o.count; w += 1) {
     const startX = o.inner + o.cell * 2 + rng() * (o.outer - o.inner - o.cell * 4);
     let p: Pt = { x: Math.round(startX / o.cell) * o.cell, y: o.cell };
-    if (!isFree(p, o, occupied)) continue;
+    const own = new Set<string>();
+    if (!isFree(p, o, occupied) || own.has(cellKey(p.x, p.y))) continue;
     const pts: Pt[] = [p];
-    reserve(occupied, p, o.cell);
+    own.add(cellKey(p.x, p.y));
     let dir = 2; // into the wedge, along +y
     for (let turn = 0; turn < 6; turn += 1) {
       dir = nextDir(dir, rng);
@@ -56,15 +60,19 @@ export function traceWalks(o: WalkOptions): readonly (readonly Pt[])[] {
       let advanced = 0;
       for (let step = 0; step < run; step += 1) {
         const q = { x: p.x + OCTI_DIRS[dir][0] * o.cell, y: p.y + OCTI_DIRS[dir][1] * o.cell };
-        if (!isFree(q, o, occupied)) break;
+        if (!isFree(q, o, occupied) || own.has(cellKey(q.x, q.y))) break;
         p = q;
-        reserve(occupied, p, o.cell);
+        own.add(cellKey(p.x, p.y));
         advanced += 1;
       }
       if (advanced === 0) break;
       pts.push(p);
     }
     if (pts.length >= 2) walks.push(pts);
+    for (const point of own) {
+      const [x, y] = point.split(',').map((value) => Number(value) / 1e4);
+      reserve(occupied, { x, y }, o.cell);
+    }
   }
   return walks;
 }

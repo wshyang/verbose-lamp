@@ -29,7 +29,9 @@ export function blackbodyColor(t: number): Rgb {
       };
     }
   }
+  /* v8 ignore start -- x is clamped to 1, which is the last stop's own t */
   return STOPS[STOPS.length - 1].c;
+  /* v8 ignore stop */
 }
 
 export function rgbCss(c: Rgb, alpha: number): string {

@@ -41,6 +41,19 @@ describe('cropFromDetection', () => {
     expect(box.x + box.size).toBeLessThanOrEqual(640);
   });
 
+  it('returns null when the eyes land outside the coordinate space', () => {
+    const runaway: FaceDetection = {
+      boundingBox: { originX: 0, originY: 0, width: 10, height: 10 },
+      keypoints: [{ x: 1e308, y: 0.4 }, { x: 1e308, y: 0.9 }],
+    };
+    expect(cropFromDetection(runaway, SQUARE_FRAME)).toBeNull();
+  });
+
+  it('measures from the eyes alone when the detector gave no box', () => {
+    const box = cropFromDetection({ keypoints: [{ x: 0.45, y: 0.4 }, { x: 0.55, y: 0.4 }] }, SQUARE_FRAME)!;
+    expect(box.size).toBeCloseTo(100 * CROP_PER_INTER_OCULAR, 6);
+  });
+
   it('returns null when the eyes are missing or degenerate', () => {
     expect(cropFromDetection({ keypoints: [] }, SQUARE_FRAME)).toBeNull();
     expect(cropFromDetection({}, SQUARE_FRAME)).toBeNull();
@@ -53,6 +66,9 @@ describe('largestFace', () => {
     const faces = [guest(0.1, 40), guest(0.1, 120), guest(0.1, 80)];
     expect(largestFace(faces)).toBe(faces[1]);
     expect(largestFace([])).toBeNull();
+    expect(largestFace([guest(0.1, 120), guest(0.1, 40)])?.boundingBox?.width).toBe(120);
+    expect(largestFace([{}, guest(0.1, 90)])?.boundingBox?.width).toBe(90);
+    expect(largestFace([guest(0.1, 90), {}])?.boundingBox?.width).toBe(90);
   });
 });
 
@@ -85,6 +101,11 @@ describe('locateFace', () => {
     expect(await locateFace(photo, { load: broken, toSource })).toBeNull();
     const working = async () => fakeTasksVision(() => ({ detections: [guest(0.08)] }));
     expect(await locateFace(photo, { load: working, toSource })).not.toBeNull();
+  });
+
+  it('treats a detector that returns no detections list as an empty photo', async () => {
+    const load = async () => fakeTasksVision(() => ({}) as { detections: FaceDetection[] });
+    expect(await locateFace(photo, { load, toSource })).toBeNull();
   });
 
   it('returns null when no image source can be built', async () => {

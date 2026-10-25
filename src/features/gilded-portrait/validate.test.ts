@@ -17,4 +17,9 @@ describe('image file validation', () => {
     if (!heicResult.ok) expect(heicResult.reason).toMatch(/JPEG|PNG/i);
     expect(validateImageFile({ type: 'image/jpeg', size: 0 })).toMatchObject({ ok: false });
   });
+
+  it('rejects metadata whose type is not a string', () => {
+    const result = validateImageFile({ type: 42 as unknown as string, size: 1024 });
+    expect(result).toEqual({ ok: false, reason: 'Choose an image file such as a JPEG, PNG, or WebP.' });
+  });
 });

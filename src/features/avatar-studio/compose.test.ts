@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_TUNING, HAWKER_CROP, SECOND_HEAD, buildHawkerFrame, buildHawkerMatte } from '@/features/background-removal';
 import { DEFAULT_BACKDROPS, renderEnamelPanel } from '@/features/enamel-backdrop';
 import { GILDING_PRESETS } from '@/features/gilded-portrait';
-import { AVATAR_SIZE, composeAvatar, composeLayers, cutOutSubject, outlineRing } from './compose';
+import { AVATAR_SIZE, composeAvatar, composeLayers, cutOutSubject, emptySubject, outlineRing } from './compose';
 import { boxToPhoto, clampBox, moveBox, photoToBox, resizeBox, startingBox } from './cropBox';
-import { STAGE_HINTS, nextStage } from './stage';
+import { STAGE_HINTS, isStageBusy, nextStage } from './stage';
 import type { AvatarComposition, StageFacts } from './types';
 
 const photo = buildHawkerFrame();
@@ -132,5 +132,44 @@ describe('cropBox (ported)', () => {
     const onPhoto = boxToPhoto({ x: 20, y: 10, size: 50 }, shown, frame);
     expect(onPhoto).toEqual({ x: 40, y: 20, size: 100 });
     expect(photoToBox(onPhoto, shown, frame)).toEqual({ x: 20, y: 10, size: 50 });
+  });
+});
+
+describe('avatar composition guards', () => {
+  it('offers a transparent subject before a photo is chosen', () => {
+    const subject = emptySubject(8);
+    expect(subject.pixels.width).toBe(8);
+    expect(subject.pixels.data.every((value) => value === 0)).toBe(true);
+    expect(subject.alpha.data.every((value) => value === 0)).toBe(true);
+    expect(subject.shine).toBe(0);
+  });
+
+  it('defaults the avatar to its 512 px square', () => {
+    const avatar = composeAvatar(composition({ size: undefined }));
+    expect([avatar.width, avatar.height]).toEqual([AVATAR_SIZE, AVATAR_SIZE]);
+  });
+
+  it('refuses layers of different sizes', () => {
+    const subject = cutOutSubject({ ...composition(), size: 32 });
+    const backdrop = renderEnamelPanel(backdropSpec, 64);
+    expect(() => composeLayers({ subject, backdrop, frame: 'medallion', rampId: 'bright' })).toThrow(
+      RangeError,
+    );
+  });
+
+  it('composites a backdrop with no metal layer', () => {
+    const subject = cutOutSubject({ ...composition(), size: 32 });
+    const backdrop = { ...renderEnamelPanel(backdropSpec, 32), metal: undefined } as never;
+    const avatar = composeLayers({ subject, backdrop, frame: 'medallion', rampId: 'bright' });
+    expect(avatar.image.data.length).toBe(32 * 32 * 4);
+  });
+});
+
+describe('isStageBusy', () => {
+  it('is true only while background work runs', () => {
+    expect(isStageBusy('working')).toBe(true);
+    expect(isStageBusy('refining')).toBe(true);
+    expect(isStageBusy('idle')).toBe(false);
+    expect(isStageBusy('ready')).toBe(false);
   });
 });

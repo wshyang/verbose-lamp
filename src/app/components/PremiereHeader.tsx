@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import {
   BookOpen,
   Film,
@@ -14,6 +15,8 @@ import { Button, IconButton } from '@/shared/ui';
 import { cn } from '@/shared/lib/cn';
 
 interface PremiereHeaderProps {
+  /** Host-supplied launcher (the spectacle console) keeps this header presentational. */
+  launcher?: ReactNode;
   cameraMode: CameraMode;
   nitrateMode: boolean;
   soundOn: boolean;
@@ -27,6 +30,7 @@ interface PremiereHeaderProps {
 }
 
 export function PremiereHeader({
+  launcher,
   cameraMode,
   nitrateMode,
   soundOn,
@@ -65,6 +69,7 @@ export function PremiereHeader({
         </Button>
         <QrGeneratorLauncher />
         <AvatarStudioLauncher />
+        {launcher}
         <EventNightLauncher onOpen={onOpenEventNight} />
         <Button
           onClick={onToggleCameraMode}

@@ -18,6 +18,7 @@ export function CinematicStage({ mountRef, cameraMode, hudHidden }: CinematicSta
           cameraMode === 'orbit' && 'cursor-grab active:cursor-grabbing'
         )}
         aria-label="Interactive WebGL title sequence"
+        data-testid="cinematic-stage__canvas"
       />
       <div
         className={cn(

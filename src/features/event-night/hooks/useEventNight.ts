@@ -1,15 +1,13 @@
 import { useCallback, useRef, useState } from 'react';
-import type { LuckyDrawEntry } from '@/features/lucky-draw';
-import { pointFromElement, useSpectacle } from '@/features/spectacle';
 import { resolveActiveId, type NavItem } from '@/features/gilded-ui';
+import { pointFromElement, useSpectacle } from '@/features/spectacle';
+import { useLuckyDrawStage } from '@/features/spectacle-preview';
 import { OPENING_TAGLINE } from '../data/sectionTaglines';
 import { resolveNavAction, taglineFor } from '../model/navActions';
 
 const NAV_TRANSITION_MS = 1300;
 const MAX_NAV_ORIGIN_Y = 0.96;
 const FALLBACK_NAV_ORIGIN = { x: 0.5, y: 0.95 } as const;
-const LANDED_CONFETTI_ORIGIN = { x: 0.5, y: 0.4 } as const;
-const SEED_MODULUS = 100000;
 const RAIN_MS = 2600;
 
 /** Decides what the nav bar and the lucky draw do on the Event Night screen. */
@@ -18,15 +16,7 @@ export function useEventNight(navItems: readonly NavItem[]) {
   const navRef = useRef<HTMLDivElement | null>(null);
   const [activeNav, setActiveNav] = useState('');
   const [tagline, setTagline] = useState(OPENING_TAGLINE);
-  const [isDrawOpen, setDrawOpen] = useState(false);
-
-  const handleLanded = useCallback(
-    (winner: LuckyDrawEntry) => {
-      play('confetti', { mode: 'burst', origin: LANDED_CONFETTI_ORIGIN, seed: Date.now() % SEED_MODULUS });
-      play('name-reveal', { name: winner.name, subtitle: winner.subtitle ?? 'Lucky draw winner' });
-    },
-    [play],
-  );
+  const { open: openDraw, isOpen: isDrawOpen, close: closeDraw, handleLanded } = useLuckyDrawStage();
 
   const selectNav = useCallback(
     (id: string) => {
@@ -35,7 +25,7 @@ export function useEventNight(navItems: readonly NavItem[]) {
       setActiveNav(id);
       const action = resolveNavAction(item.label);
       if (action.kind === 'open-draw') {
-        setDrawOpen(true);
+        openDraw();
         return;
       }
       const from = navRef.current ? pointFromElement(navRef.current) : FALLBACK_NAV_ORIGIN;
@@ -50,11 +40,17 @@ export function useEventNight(navItems: readonly NavItem[]) {
         },
       });
     },
-    [navItems, play],
+    [navItems, play, openDraw],
   );
 
   return {
-    navRef, tagline, isDrawOpen, openDraw: () => setDrawOpen(true), closeDraw: () => setDrawOpen(false),
-    activeId: resolveActiveId(navItems, activeNav), selectNav, handleLanded,
+    navRef,
+    tagline,
+    activeId: resolveActiveId(navItems, activeNav),
+    selectNav,
+    isDrawOpen,
+    openDraw,
+    closeDraw,
+    handleLanded,
   };
 }

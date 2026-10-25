@@ -1,10 +1,11 @@
 import { useEffect, useRef, type MutableRefObject, type RefObject } from 'react';
 import { CinemaAudioEngine } from '../audio/cinemaAudio';
-import { GatsbySceneManager, type PlaybackTelemetry } from '../scene/GatsbySceneManager';
+import { GatsbySceneManager } from '../scene/GatsbySceneManager';
+import type { PlaybackTelemetry, PremiereSceneApi } from '../scene/sceneApi';
 
-interface PremiereRuntimeOptions {
+export interface PremiereRuntimeOptions {
   mountRef: RefObject<HTMLDivElement | null>;
-  managerRef: MutableRefObject<GatsbySceneManager | null>;
+  managerRef: MutableRefObject<PremiereSceneApi | null>;
   audioRef: MutableRefObject<CinemaAudioEngine | null>;
   onTelemetry: (telemetry: PlaybackTelemetry) => void;
   onChapterChange: (chapterIndex: number) => void;

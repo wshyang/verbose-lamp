@@ -22,6 +22,10 @@ import {
 } from '@/features/art-deco-frame';
 import { SIGNATURE_GENOME, clampGenome } from '@/features/art-deco-frame';
 import { createScreenBorderRig, type ScreenBorderRig } from '@/features/art-deco-frame';
+import { mulberry32 } from '@/shared/lib/random';
+import type { PlaybackTelemetry, PremiereSceneApi, SceneManagerOptions } from './sceneApi';
+
+export type { PlaybackTelemetry };
 import { getCinemaCameraPose, resolveViewportFit, ViewportFit } from './responsiveLayout';
 
 const CinemaNitrateShader = {
@@ -87,13 +91,10 @@ const CinemaNitrateShader = {
   `,
 };
 
-export interface PlaybackTelemetry {
-  currentTime: number;
-  activeChapterIndex: number;
-  isPlaying: boolean;
-}
+/** Fixed seed for the atmosphere: the dust used to be random on every load. */
+const DUST_SEED = 1920;
 
-export class GatsbySceneManager {
+export class GatsbySceneManager implements PremiereSceneApi {
   private container: HTMLElement;
   private renderer: THREE.WebGLRenderer;
   private scene: THREE.Scene;
@@ -150,13 +151,8 @@ export class GatsbySceneManager {
   private onTelemetry?: (telemetry: PlaybackTelemetry) => void;
   private onChapterChange?: (chapterIdx: number) => void;
 
-  constructor(
-    container: HTMLElement,
-    callbacks?: {
-      onTelemetry?: (t: PlaybackTelemetry) => void;
-      onChapterChange?: (idx: number) => void;
-    }
-  ) {
+  constructor(container: HTMLElement, options?: SceneManagerOptions) {
+    const callbacks = options;
     this.container = container;
     this.hasCoarsePointer =
       window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
@@ -354,16 +350,17 @@ export class GatsbySceneManager {
 
     // 4. Stereoscopic 3D Champagne Gold Dust & Diamond Confetti Field
     const count = 950;
+    const random = mulberry32(DUST_SEED);
     const positions = new Float32Array(count * 3);
     const scales = new Float32Array(count);
     const phases = new Float32Array(count);
 
     for (let i = 0; i < count; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 24;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 14;
-      positions[i * 3 + 2] = 12 - Math.random() * 136; // spans entire theatrical Z corridor
-      scales[i] = 0.4 + Math.random() * 1.8;
-      phases[i] = Math.random() * Math.PI * 2;
+      positions[i * 3] = (random() - 0.5) * 24;
+      positions[i * 3 + 1] = (random() - 0.5) * 14;
+      positions[i * 3 + 2] = 12 - random() * 136; // spans entire theatrical Z corridor
+      scales[i] = 0.4 + random() * 1.8;
+      phases[i] = random() * Math.PI * 2;
     }
 
     const dustGeo = new THREE.BufferGeometry();
@@ -743,6 +740,7 @@ export class GatsbySceneManager {
   public dispose() {
     if (this.rafId !== null) {
       cancelAnimationFrame(this.rafId);
+      this.rafId = null;
     }
     if (this.frameApplyHandle !== null) {
       cancelAnimationFrame(this.frameApplyHandle);

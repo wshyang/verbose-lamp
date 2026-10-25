@@ -82,7 +82,9 @@ function unitNormal(a: Point2, b: Point2): Point2 {
 function miterAt(prev: Point2 | null, curr: Point2, next: Point2 | null): Point2 {
   if (!prev && next) return unitNormal(curr, next);
   if (!next && prev) return unitNormal(prev, curr);
+  /* v8 ignore start -- offsetPolylineOutward returns early below two points */
   if (!prev || !next) return { x: 0, y: 1 };
+  /* v8 ignore stop */
   const n1 = unitNormal(prev, curr);
   const n2 = unitNormal(curr, next);
   const mx = n1.x + n2.x;

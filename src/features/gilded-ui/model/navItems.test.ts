@@ -32,3 +32,39 @@ describe('resolveActiveId', () => {
     expect(resolveActiveId([], 'anything')).toBe('');
   });
 });
+describe('validateNavItems rejects broken rows', () => {
+  it('flags empty ids, duplicates and unlabelled items', () => {
+    const result = validateNavItems([
+      { id: '', emoji: '✦', label: 'Lobby' },
+      { id: 'nav-a', emoji: '✦', label: 'Lobby' },
+      { id: 'nav-a', emoji: '✦', label: 'Lobby' },
+      { id: 'nav-b', emoji: '✦', label: '   ' },
+    ]);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.issues).toEqual(
+        expect.arrayContaining([
+          'Duplicate or empty id "".',
+          'Duplicate or empty id "nav-a".',
+          'Item "nav-b" needs a label.',
+        ]),
+      );
+    }
+  });
+});
+
+describe('parseNavLines without a comma', () => {
+  it('keeps the whole line as the glyph and leaves the label empty', () => {
+    const [item] = parseNavLines('🥂');
+    expect(item.emoji).toBe('🥂');
+    expect(item.label).toBe('');
+    expect(item.id).toBe('nav-0-item');
+  });
+
+  it('falls back to a diamond for an empty glyph', () => {
+    const [item] = parseNavLines(', Ballroom');
+    expect(item.emoji).toBe('✦');
+    expect(item.label).toBe('Ballroom');
+    expect(item.id).toBe('nav-0-ballroom');
+  });
+});

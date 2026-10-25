@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { FrameArchetype } from '../../model/types';
 import { SIGNATURE_GENOME } from './genome';
+import { clampGenesisLevel } from './generative';
 import {
   FRAME_SOURCES,
   FrameFormula,
@@ -126,4 +127,11 @@ describe('math helpers', () => {
   });
 
 
+});
+
+describe('clampGenesisLevel', () => {
+  it('falls back to level two for a non-finite level', () => {
+    expect(clampGenesisLevel(Number.NaN)).toBe(2);
+    expect(clampGenesisLevel(Number.POSITIVE_INFINITY)).toBe(2);
+  });
 });
