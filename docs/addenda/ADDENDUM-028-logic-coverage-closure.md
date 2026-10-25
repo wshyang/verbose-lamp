@@ -93,7 +93,7 @@ the branch. `npm run test:coverage` fails otherwise. That is the point.
   composite clips it; the test asserts a bounded overshoot rather than containment
   for the gene extremes (`Jazz Fan` 3.01×, `Variation 5` 4.53× on a 0.5 aspect). Do
   not "fix" this by widening the bound silently — it is a visual decision.
-- **`deco-lattice/model/walk.ts` halo bug (fixed).** The clearance halo used to be
+- **`deco-lattice/model/walk.ts` halo bug (fixed — full record in ADDENDUM-031).** The clearance halo used to be
   written into the same set consulted for *step* collisions, so every walk blocked
   its own neighbours and stranded at length one. `taken` (owned cells) and `spaced`
   (the 3×3 halo) are now separate sets; the geometry goldens were regenerated once,
