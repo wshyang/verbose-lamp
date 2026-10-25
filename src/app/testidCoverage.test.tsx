@@ -36,6 +36,11 @@ vi.mock('@/features/premiere', async (importOriginal) => {
         toggleNitrateMode: noop,
         toggleSound: noop,
         applyHeroTitle: noop,
+        runtime: {
+          renderer: 'classic' as const,
+          store: null,
+          sceneCallbacks: { onTelemetry: noop, onChapterChange: noop, onFrameReady: noop },
+        },
       };
     },
   };

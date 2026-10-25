@@ -31,7 +31,13 @@ export function usePremiereController() {
   }, []);
   const onChapterChange = useCallback((chapterIndex: number) => setActiveAct(chapterIndex), []);
 
-  usePremiereRuntime({ mountRef: stageRef, managerRef, audioRef, onTelemetry, onChapterChange });
+  const runtime = usePremiereRuntime({
+    mountRef: stageRef,
+    managerRef,
+    audioRef,
+    onTelemetry,
+    onChapterChange,
+  });
   const getSceneManager = useCallback(() => managerRef.current, []);
   const frameStudio = useFrameStudio(getSceneManager);
   const transport = usePremiereTransport({
@@ -59,6 +65,7 @@ export function usePremiereController() {
 
   return {
     stageRef,
+    runtime,
     currentTime,
     activeAct,
     isPlaying,
