@@ -172,8 +172,9 @@ Three gates run in `npx vitest run` and are architectural rather than functional
   the TypeScript compiler and enforces CLAUDE.md §3: no file over 800 lines, and no
   function over 50 lines / 3 parameters / 3 levels of nesting unless it is recorded
   in `src/test/disciplineBaseline.ts`. Recorded functions carry a ceiling, may
-  shrink, and may never grow; stale rows fail; the row count may only go down
-  (ADDENDUM-032, currently 56).
+  shrink, and may never grow; stale rows fail; the row count may only go down. The
+  ceiling is asserted in `src/discipline.test.ts` itself, so it is never stale
+  (ADDENDUM-032, ADDENDUM-040).
 - **E2E contract** — `src/app/e2eContract.test.ts` cross-checks the test ids the
   Playwright suite names against `src/`, so the e2e suite keeps compiling its
   promises even when nobody can run a browser (ADDENDUM-030 §5).

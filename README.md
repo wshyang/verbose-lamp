@@ -94,8 +94,9 @@ the React Three Fiber `scene3d/` port), `art-deco-frame`, `frame-studio`, `title
 `background-removal`, `enamel-backdrop`, `deco-lattice`, `spectacle`,
 `spectacle-preview`, `lucky-draw`, `gilded-ui`, `event-night`.
 
-`docs/ADDENDA.md` is the decision log: **33 addenda** covering everything from the frame
-grammar to the sparkler renderer. Read it before changing a behaviour; the numbering is
+`docs/ADDENDA.md` is the decision log — one row and one file per decision, from the frame
+grammar to the sparkler renderer — and a test keeps the two in step, so the register is
+always the complete list. Read it before changing a behaviour; the numbering is
 append-only.
 
 Import a feature through its barrel (`@/features/<name>`), never from its internals. Features
@@ -108,8 +109,9 @@ Unit tests sit beside the module they cover (`foo.ts` + `foo.test.ts`) and run i
 node environment (`vitest.config.ts`, deliberately separate from `vite.config.ts`). Suites
 that need a DOM opt in with a file-level `// @vitest-environment jsdom`.
 
-The current suite is **122 files / 1144 tests** and holds the coverage gate at **100 %
-statements, branches, functions and lines** over every logic module. Geometry is protected
+The suite holds the coverage gate at **100 % statements, branches, functions and lines**
+over every logic module — `npm test` prints the current file and test count, and this
+document deliberately does not pin it (ADDENDUM-040). Geometry is protected
 by golden snapshots on data, not pixels (`src/test/digest.ts` quantises before hashing so
 a snapshot from macOS still passes on Linux). The three.js scene graph is exercised headlessly
 through `@react-three/test-renderer` in `scene3d/` and through the pure planners it consumes.
@@ -131,7 +133,8 @@ Standing rules live in [CLAUDE.md](CLAUDE.md). The short version:
 - Tests first for pure modules. Functions at most 50 lines, files at most 800 lines — and
   this one is enforced: `src/discipline.test.ts` parses `src/` and fails on any function over
   a limit that is not in `src/test/disciplineBaseline.ts`. The table is a ratchet: a recorded
-  function may shrink but never grow, and the total may only go down (currently **56**).
+  function may shrink but never grow, and the total may only go down. The current ceiling
+  lives in `src/discipline.test.ts`, next to the assertion that enforces it.
 - `data-testid` on interactive elements, named `{component-kebab}__{element-role}`.
 - Commit messages end with a validation line, for example
   `Validation: tsc ✓ vitest ✓ build ✓ — browser not available in sandbox`.
