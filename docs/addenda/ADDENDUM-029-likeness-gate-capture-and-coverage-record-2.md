@@ -33,7 +33,7 @@ LD_LIBRARY_PATH=/tmp/lib PLAYWRIGHT_CHROMIUM_EXECUTABLE=/tmp/chromium npm run e2
 
 ## 2. Baselines
 
-Nine shots per project, written by the first real run:
+Twelve shots per project, matching ADDENDUM-022 §4's table: the eight act frames (`act1-nitrate-opening` … `act5-finale-bookend` at the plan's freeze times), the three camera/filter variants (`act5-nitrate-forced`, `act5-orbit`, `act5-screen-border`) and `hud-overlay`, the one shot where the DOM is the subject.
 
 ```
 npm run e2e:update                       # writes all projects
@@ -42,16 +42,23 @@ npx playwright test e2e/likeness.spec.ts --project=desktop-chromium --update-sna
 
 They land as `e2e/likeness.spec.ts-snapshots/<shot>-<project>-<platform>.png` — `…-desktop-chromium-linux.png` here. **The suffix is the contract:** a comparison is only meaningful on the same OS, browser version and GL stack, so a macOS run writes `-darwin` baselines alongside instead of failing forever against Linux pixels. The Linux set is committed as the reference implementation of the current look; it is the set CI can hold.
 
-Measured cost of the gate on this stack: desktop 9.4 min for 9 shots (40 s–1.2 min each), mobile about half that. On a real GPU the same suite is seconds.
+Measured cost of the gate on this stack: desktop ≈17 min for 12 shots (40 s–1.4 min each), mobile about a third of that. On a real GPU the same suite is seconds.
 
-## 3. Four defects the first real runs found
+`event-night-screen` was attempted and **dropped**: the Event Night medallion's lattice frame animates on a JS timer, so two consecutive screenshots never match and no stable baseline exists. The screen is still covered by `flows.spec.ts` (opens, shows the medallion, returns); a moving surface belongs in a flow, not a likeness baseline — the same reason `hud-overlay` dismisses the Frame Studio before capturing.
+
+## 3. Six defects the first real runs found
 
 1. **`expect.timeout` was 20 s and the capture never stabilised.** Playwright takes two consecutive screenshots to prove stability, and one software-rendered 1440×900 canvas capture can take longer than that on its own. Raised to 60 s, with a comment naming the cause.
 2. **The nitrate likeness shot could not work as written.** It called `gotoFrame` (which hides the HUD, `pointer-events-none`) and then clicked `premiere-header__nitrate` — a button inside the hidden HUD. It now goes through `gotoFrozen(page, 30.5, { nitrate: true, hud: false })`, which toggles *then* hides. HUD toggles click with `force: true` for the same software-GL reason.
-3. **The mobile flow suite could not reach the HUD at all.** On a 390×844 viewport the Frame Studio docks *over* the header and transport: `elementFromPoint` on `event-night__launch`, `timeline__replay` and `spectacle-preview__launch` all returned `frame-studio__panel`, so every click hung until timeout. This was a test-harness bug with a real lesson — the flows now call `dismissFrameStudio(page)` first. It is not a product bug: the dock is dismissible and dismisses correctly.
-4. **`timeline__chapter` has no `aria-current`.** The flow asserted it; the component exposes selection as `aria-pressed` (the Button `selected` variant). The assertion was corrected to the contract the component actually promises, including the `false` it writes on the chapters that are *not* active. Separately, leaving Event Night remounts the whole premiere scene, which costs ~36 s under SwiftShader — that one test is now `test.slow()` with a 60 s click and a 120 s readiness wait.
+3. **`hud-overlay` is the one shot with a moving subject.** Captured with the Frame Studio docked, it timed out on stability: the studio's lattice preview animates continuously. The shot now dismisses the studio first, so the overlay it records is the header and transport over a still film — and the studio's own look stays covered by the flow test.
+4. **The mobile flow suite could not reach the HUD at all.** On a 390×844 viewport the Frame Studio docks *over* the header and transport: `elementFromPoint` on `event-night__launch`, `timeline__replay` and `spectacle-preview__launch` all returned `frame-studio__panel`, so every click hung until timeout. This was a test-harness bug with a real lesson — the flows now call `dismissFrameStudio(page)` first. It is not a product bug: the dock is dismissible and dismisses correctly.
+5. **`timeline__chapter` has no `aria-current`.** The flow asserted it; the component exposes selection as `aria-pressed` (the Button `selected` variant). The assertion was corrected to the contract the component actually promises, including the `false` it writes on the chapters that are *not* active. Separately, leaving Event Night remounts the whole premiere scene, which costs ~36 s under SwiftShader — that one test is now `test.slow()` with a 60 s click and a 120 s readiness wait.
 
-Result: `e2e/likeness.spec.ts` **9/9 green** against the committed baselines; `e2e/flows.spec.ts` **4/4 green on desktop** (and green on mobile once the studio is dismissed).
+6. **The HUD flow asserted opacity on the wrong element.** `hudHidden` puts `opacity-0` on the `<header>` wrapper; the `<nav aria-label="Premiere tools">` inside it keeps `opacity: 1`, because CSS `opacity` is not inherited into computed style. The flow waited a full 60 s on the nav and failed even though the HUD really had hidden. It now locates the header *by* its nav.
+
+Result: `e2e/likeness.spec.ts` **12/12 green on both projects** against the committed baselines; `e2e/flows.spec.ts` **8/8 green** (8 flows × 2 projects), including new coverage for the QR plaque, the avatar studio, the title customizer and the play/pause label.
+
+The full suite is 40 tests (12 likeness + 8 flows, × 2 projects) and takes roughly half an hour on SwiftShader; the desktop likeness project alone is ~17 minutes, which is why the flows use `force: true` clicks and `test.slow()` instead of widening every timeout.
 
 ## 4. Accessibility fix found by the QR tests
 
@@ -61,29 +68,38 @@ Result: `e2e/likeness.spec.ts` **9/9 green** against the committed baselines; `e
 
 Bar: ADDENDUM-027 §5 — strict global 100 %, staged. Suite after this push:
 
-| Metric | At `8346fb3` | Now |
-|---|---|---|
-| Statements | 89.57 % | **97.09 %** (6249/6436) |
-| Branches | 77.94 % | **89.78 %** (2137/2380) |
-| Functions | 81.35 % | **95.44 %** (1341/1405) |
-| Lines | 90.42 % | **97.79 %** (5598/5724) |
-| Files / tests | 111 / 970 | **137 / 1204** |
+| Metric | At `8346fb3` | At `104c121` | Now |
+|---|---|---|---|
+| Statements | 89.57 % | 97.09 % | **98.16 %** (6322/6440) |
+| Branches | 77.94 % | 89.78 % | **91.68 %** (2182/2380) |
+| Functions | 81.35 % | 95.44 % | **96.72 %** (1360/1406) |
+| Lines | 90.42 % | 97.79 % | **98.63 %** (5650/5728) |
+| Files / tests | 111 / 970 | 137 / 1204 | **149 / 1283** |
 
-New this addendum (all green, no `skip`s): `QrGeneratorModal` (10), `useQrGenerator` (12), `GoldenQrCode` (6), `useEffectRunner` (7), `useStageSettings` (6), `locateFace` (11), `frameDesigns` (12), `EventNightStage` (7), `enamel-backdrop/spec` (17), `edgeBorder` ornament (12), plus the earlier wave in the same branch (lucky-draw hooks and drum, avatar-studio controls, gilded-portrait modal, spectacle stage and marquee).
+The method did not change: one focused suite per module, reading the module first and asserting its real contract — no global canvas/WebGL mocking net, no `skip`s, no snapshot padding.
 
-187 statements remain across 72 files, and only nine files are more than five statements short: `decoTypography` (11/209), `fireworksEffect` (10/86), `frameGrammar/grammar` (6/111), `GeneSlider` (6/7), `gilded-portrait/curve` (6/72), `spectacle/model/geometry` (6/19), `usePremiereSpectacle` (5/15), `frameGrammar/primitives` (5/66), `SubjectControls` (5/7). Everything else is one or two lines in a branch guard. Each of the nine is a canvas, WebGL or arm's-length-border surface; the honest way to close them is one focused suite per module, not a global mocking net.
+New this addendum, in the order they landed: the likeness spec rewritten to the plan's twelve shots and re-captured on both projects; the eight-flow interaction suite; `QrGeneratorModal` (10), `useQrGenerator` (12), `GoldenQrCode` (6), `useEffectRunner` (7), `useStageSettings` (6), `locateFace` (11), `frameDesigns` (12), `EventNightStage` (7), `enamel-backdrop/spec` (17), `edgeBorder` ornament (12) — then the second wave written against measured gaps: `GoldenQrDefs` (4), `GeneSlider` (7), `usePremiereSpectacle` (4), `spectacle/model/geometry` (12), `SubjectControls` (4), `GildedPortraitLauncher` (3), `gilded-portrait/curveEdges` (12), `decoTypography` chamfer (5), `fireworksEffect` sub-shells (6), `frameGrammar/grammarBranches` (11), `cutOctagonProfile` (4), `deco-lattice/walk` (7).
+
+Two of those waves needed a test seam rather than a mock. `decoTypography`'s chamfer pass reads pixels back, so `src/test/canvas2d.ts` grew one option — `opaqueReadback`, which fills alpha 255 on `getImageData` — instead of a test spying on `HTMLCanvasElement.prototype.getContext` (that spy recursed into `RangeError`). `deco-lattice/walk` grew an exported `stepRun` because the seeded walker's step loop is the only part worth asserting; see §6 for what that exposed.
+
+**Remaining: 118 statements across 64 files**, with nothing above five: `GatsbySceneManager` (5/320), `searchlightsEffect` (5/37), `edgeBorder` (4/164), `AvatarStudioModal` (4/7), `cutOut` (4/107), `background-removal/segmentSubject` (4/23), `LuckyDrawControls` (4/8), `CustomTitleModal` (4/20), then 3s and 2s in `PremiereSurfaces`, `railGeometry`, `walk`'s dead guard, `FrameStudioControl`, `LuckyDrawStage` (jsdom cannot mount it), `spectacle/model/quality`, `sparkRenderer`, and guards scattered through the feature tree. Every one of them is a canvas, WebGL, `document.createElement('canvas')` or modal-open-path surface; closing them is the same per-module work, not a net.
 
 ## 6. What is still open
 
 - **ADDENDUM-022 Phase 2 (the React Three Fiber port) is not started.** Its precondition is now satisfied — Phase 0 is complete *and* baselines exist — so the gate that was supposed to protect the port is finally in place. Phases 1 (DOM tests) are effectively done by this coverage work.
+- **Deco Lattice walk strands are dead code (product defect, found by the coverage work).** `traceWalks` reserves a 3×3 cell footprint around its start point *before* the first turn, so `isFree` rejects every neighbouring cell: `advanced === 0` on the very first turn for every seed, the `pts.length >= 2` guard never passes, and medallion mode's layer-3 walk bundles are never emitted. The step engine is now its own exported function (`walk.ts: stepRun`) and `walk.test.ts` pins both the engine's real behaviour (one cell per run, then walled in by its own reservation) and the empty `traceWalks` output, so the defect is documented rather than hidden. The fix — reserve only when a walk ends, or exclude the walker's own footprint — changes medallion geometry, the composition goldens and the Event Night title medallion, so it belongs in its own addendum.
 - Regenerating baselines on a real GPU will produce different pixels; that is expected and needs no addendum, only the platform suffix.
 - The addenda that say "visual check pending" can now be checked by hand through the same browser recipe: the premiere reads correctly at 1440×900 and 390×844, the QR plaque is scannable in the preview, and the avatar studio's tool download is the only step that needs real network access.
 
 ## 7. Validation
 
 ```
-npx tsc --noEmit                      # clean
-npm test                              # 133 files / 1180+ tests
-npx playwright test e2e/likeness.spec.ts --project=desktop-chromium   # 9 passed
-npx playwright test e2e/flows.spec.ts --project=desktop-chromium      # 4 passed
+npx tsc --noEmit                                              # clean
+npm test                                                      # 149 files / 1283 tests
+npx playwright test e2e/likeness.spec.ts                      # 24 passed (12 shots × 2 projects)
+npx playwright test e2e/flows.spec.ts                         # 16 passed (8 flows × 2 projects, 10.7 min)
 ```
+
+The likeness run above is the `--update-snapshots`-free comparison against the committed baselines; the flows run is a clean pass, not just a capture.
+
+`npm test` also carries ~30 per-file coverage thresholds in `vitest.config.ts` — floors under the modules this work rewrote, so a regression in any of them fails the suite rather than quietly dropping the global average.

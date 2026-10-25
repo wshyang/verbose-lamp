@@ -36,6 +36,30 @@ function nextDir(dir: number, rng: () => number): number {
 }
 
 /**
+ * One straight run of up to `run` steps along `dir`, stopping at the first cell that
+ * is outside the wedge annulus or already reserved. Returns the cells it moved into;
+ * an empty array means the walker is walled in.
+ */
+export function stepRun(
+  from: Pt,
+  dir: number,
+  run: number,
+  o: WalkOptions,
+  occupied: Set<string>
+): Pt[] {
+  const path: Pt[] = [];
+  let p = from;
+  for (let step = 0; step < run; step += 1) {
+    const q = { x: p.x + OCTI_DIRS[dir][0] * o.cell, y: p.y + OCTI_DIRS[dir][1] * o.cell };
+    if (!isFree(q, o, occupied)) break;
+    p = q;
+    reserve(occupied, p, o.cell);
+    path.push(p);
+  }
+  return path;
+}
+
+/**
  * Seeded constrained walks in the wedge annulus — the tutorial's "random
  * directions", reproducible. Stops on obstacles; never throws.
  */
@@ -53,15 +77,9 @@ export function traceWalks(o: WalkOptions): readonly (readonly Pt[])[] {
     for (let turn = 0; turn < 6; turn += 1) {
       dir = nextDir(dir, rng);
       const run = o.minRun + Math.floor(rng() * 3);
-      let advanced = 0;
-      for (let step = 0; step < run; step += 1) {
-        const q = { x: p.x + OCTI_DIRS[dir][0] * o.cell, y: p.y + OCTI_DIRS[dir][1] * o.cell };
-        if (!isFree(q, o, occupied)) break;
-        p = q;
-        reserve(occupied, p, o.cell);
-        advanced += 1;
-      }
-      if (advanced === 0) break;
+      const advanced = stepRun(p, dir, run, o, occupied);
+      if (advanced.length === 0) break;
+      p = advanced[advanced.length - 1];
       pts.push(p);
     }
     if (pts.length >= 2) walks.push(pts);

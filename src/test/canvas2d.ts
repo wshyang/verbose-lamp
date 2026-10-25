@@ -20,6 +20,17 @@ export interface Canvas2d {
 
 let current: Canvas2d | null = null;
 
+/** Options for the recorder. */
+export interface Canvas2dOptions {
+  /**
+   * Fill the alpha channel of every `getImageData` read with 255. Texture
+   * builders that derive a mask from their own drawing see "ink everywhere"
+   * instead of the empty default, which is the only way to exercise their
+   * chamfer and plateau branches without a real rasteriser.
+   */
+  readonly opaqueReadback?: boolean;
+}
+
 function createGradient(calls: string[], id: number) {
   return {
     __gradient: id,
@@ -28,7 +39,11 @@ function createGradient(calls: string[], id: number) {
   };
 }
 
-function createContext(calls: string[], images: ImageData[]): CanvasRenderingContext2D {
+function createContext(
+  calls: string[],
+  images: ImageData[],
+  options: Canvas2dOptions
+): CanvasRenderingContext2D {
   const state: Record<string, unknown> = {};
   const noop =
     (name: string) =>
@@ -50,7 +65,11 @@ function createContext(calls: string[], images: ImageData[]): CanvasRenderingCon
     createPattern: () => ({ __pattern: true }),
     getImageData: (_x: number, _y: number, w: number, h: number) => {
       calls.push(`getImageData(${w}x${h})`);
-      return { data: new Uint8ClampedArray(w * h * 4), width: w, height: h } as ImageData;
+      const data = new Uint8ClampedArray(w * h * 4);
+      if (options.opaqueReadback === true) {
+        for (let index = 3; index < data.length; index += 4) data[index] = 255;
+      }
+      return { data, width: w, height: h } as ImageData;
     },
     createImageData: (w: number, h: number) => {
       calls.push(`createImageData(${w}x${h})`);
@@ -90,11 +109,11 @@ function createContext(calls: string[], images: ImageData[]): CanvasRenderingCon
  * recorder. Call from `beforeEach`; `getContext` is restored by
  * `vi.restoreAllMocks()`.
  */
-export function installCanvas2d(): Canvas2d {
+export function installCanvas2d(options: Canvas2dOptions = {}): Canvas2d {
   const recorder: Canvas2d = { calls: [], contexts: [], images: [] };
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(((kind: string) => {
     if (kind !== '2d') return null;
-    const ctx = createContext(recorder.calls, recorder.images);
+    const ctx = createContext(recorder.calls, recorder.images, options);
     recorder.contexts.push(ctx);
     return ctx;
   }) as HTMLCanvasElement['getContext']);
