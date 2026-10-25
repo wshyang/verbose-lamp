@@ -62,7 +62,9 @@ supported import surface; internal files should remain private to that feature.
   rail geometry, typography glyphs, and materials. It has no timeline or HUD.
 - `features/frame-studio` owns editor state and control presentation. Its hook
   talks to a small `FrameStudioTarget` port, so an editor can bind to another
-  renderer that implements the same operations.
+  renderer that implements the same operations. The host binds it: `PremiereSurfaces`
+  calls `useFrameStudio(premiere.getSceneApi)`; `features/premiere` does not import it
+  (ADDENDUM-039).
 - `features/gilded-portrait` owns the tested RGBA-to-gold pipeline, local image
   adapters, and an opt-in modal/launcher. It is not mounted by the Gatsby host.
 - `shared/lib/raster` owns the pixel contracts every image feature speaks, plus the box blur,

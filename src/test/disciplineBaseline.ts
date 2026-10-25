@@ -35,7 +35,7 @@ export interface DebtEntry {
 
 export const DISCIPLINE_DEBT: readonly DebtEntry[] = [
   { file: 'src/app/components/PremiereHeader.tsx', name: 'PremiereHeader', maxLines: 74, maxParams: 1, maxDepth: 0, reason: 'component' },
-  { file: 'src/app/components/PremiereSurfaces.tsx', name: 'PremiereSurfaces', maxLines: 75, maxParams: 1, maxDepth: 0, reason: 'component' },
+  { file: 'src/app/components/PremiereSurfaces.tsx', name: 'PremiereSurfaces', maxLines: 72, maxParams: 1, maxDepth: 0, reason: 'component' },
   { file: 'src/app/components/PremiereTimeline.tsx', name: 'PremiereTimeline', maxLines: 85, maxParams: 1, maxDepth: 0, reason: 'component' },
   { file: 'src/features/art-deco-frame/engine/frameGrammar/edgeBorder.ts', name: 'arcPoints', maxLines: 7, maxParams: 4, maxDepth: 0, reason: 'geometry-primitive' },
   { file: 'src/features/art-deco-frame/engine/frameGrammar/edgeBorder.ts', name: 'rail', maxLines: 11, maxParams: 7, maxDepth: 0, reason: 'geometry-primitive' },

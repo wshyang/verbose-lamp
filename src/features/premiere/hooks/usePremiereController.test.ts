@@ -98,7 +98,7 @@ describe('usePremiereController', () => {
       'toggleNitrateMode',
       'toggleSound',
       'applyHeroTitle',
-      'frameStudio',
+      'getSceneApi',
     ]) {
       expect(result.current, key).toHaveProperty(key);
     }

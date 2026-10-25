@@ -1,4 +1,5 @@
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
+import { useFrameStudio } from '@/features/frame-studio';
 import { CustomTitleModal } from '@/features/title-customizer';
 import { ResearchModal } from '@/features/research';
 import {
@@ -8,6 +9,7 @@ import {
   usePremiereShortcuts,
 } from '@/features/premiere';
 import { SpectaclePreviewLauncher } from '@/features/spectacle-preview';
+import { usePremiereChrome } from '../hooks/usePremiereChrome';
 import { usePremiereSpectacle } from '../hooks/usePremiereSpectacle';
 import { CinematicStage } from './CinematicStage';
 import { FloatingHudToggle } from './FloatingHudToggle';
@@ -29,13 +31,10 @@ interface PremiereSurfacesProps {
  */
 export function PremiereSurfaces({ onOpenEventNight }: PremiereSurfacesProps) {
   const premiere = usePremiereController();
+  const frameStudio = useFrameStudio(premiere.getSceneApi);
   const spectacle = usePremiereSpectacle();
-  const [hudHidden, setHudHidden] = useState(false);
-  const [showResearch, setShowResearch] = useState(false);
-  const [showCustomizer, setShowCustomizer] = useState(false);
-  const toggleHud = useCallback(() => setHudHidden((hidden) => !hidden), []);
-  const closeResearch = useCallback(() => setShowResearch(false), []);
-  const closeCustomizer = useCallback(() => setShowCustomizer(false), []);
+  const chrome = usePremiereChrome();
+  const { hudHidden, toggleHud, showResearch, showCustomizer } = chrome;
   const { open: isConsoleOpen, setOpen: setConsoleOpen, onStageClick } = spectacle.preview;
   const toggleSpectacle = useCallback(() => setConsoleOpen(!isConsoleOpen), [isConsoleOpen, setConsoleOpen]);
 
@@ -66,15 +65,15 @@ export function PremiereSurfaces({ onOpenEventNight }: PremiereSurfacesProps) {
         nitrateMode={premiere.nitrateMode}
         soundOn={premiere.soundOn}
         hudHidden={hudHidden}
-        onOpenResearch={() => setShowResearch(true)}
-        onOpenCustomizer={() => setShowCustomizer(true)}
+        onOpenResearch={chrome.openResearch}
+        onOpenCustomizer={chrome.openCustomizer}
         onOpenEventNight={onOpenEventNight}
         launcher={<SpectaclePreviewLauncher open={isConsoleOpen} onToggle={toggleSpectacle} />}
         onToggleCameraMode={premiere.toggleCameraMode}
         onToggleNitrate={premiere.toggleNitrateMode}
         onToggleSound={premiere.toggleSound}
       />
-      <FrameStudioDock studio={premiere.frameStudio} hudHidden={hudHidden} />
+      <FrameStudioDock studio={frameStudio} hudHidden={hudHidden} />
       <OrbitHint isVisible={premiere.cameraMode === 'orbit' && !hudHidden} />
       <PremiereTimeline
         chapters={SEQUENCE_CHAPTERS}
@@ -91,12 +90,12 @@ export function PremiereSurfaces({ onOpenEventNight }: PremiereSurfacesProps) {
         onScrub={premiere.scrub}
       />
       <FloatingHudToggle isHidden={hudHidden} onToggle={toggleHud} />
-      <ResearchModal open={showResearch} onClose={closeResearch} />
+      <ResearchModal open={showResearch} onClose={chrome.closeResearch} />
       <CustomTitleModal
         open={showCustomizer}
         config={premiere.heroConfig}
         onApply={premiere.applyHeroTitle}
-        onClose={closeCustomizer}
+        onClose={chrome.closeCustomizer}
       />
       <PremiereSpectacleOverlay spectacle={spectacle} />
     </main>

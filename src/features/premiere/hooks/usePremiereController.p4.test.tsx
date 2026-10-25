@@ -8,7 +8,6 @@ import { type PlaybackTelemetry } from '../scene/sceneApi';
 
 const runtimeArgs = vi.hoisted(() => ({
   calls: [] as Array<Record<string, unknown>>,
-  sceneTargets: [] as Array<() => unknown>,
 }));
 vi.mock('./usePremiereRuntime', () => ({
   usePremiereRuntime: (options: Record<string, unknown>) => {
@@ -16,16 +15,9 @@ vi.mock('./usePremiereRuntime', () => ({
     return { renderer: 'r3f' as const, store: null, sceneCallbacks: {} };
   },
 }));
-vi.mock('@/features/frame-studio', () => ({
-  useFrameStudio: (getTarget: () => unknown) => {
-    runtimeArgs.sceneTargets.push(getTarget);
-    return { isOpen: true, close: vi.fn() };
-  },
-}));
 describe('usePremiereController', () => {
   beforeEach(() => {
     runtimeArgs.calls = [];
-    runtimeArgs.sceneTargets = [];
   });
 
   afterEach(() => {
@@ -41,7 +33,7 @@ describe('usePremiereController', () => {
     expect(result.current.nitrateMode).toBe(false);
     expect(result.current.soundOn).toBe(false);
     expect(result.current.currentChapter).toBe(SEQUENCE_CHAPTERS[0]);
-    expect(result.current.frameStudio).toEqual({ isOpen: true, close: expect.any(Function) });
+    expect(typeof result.current.getSceneApi).toBe('function');
     expect(result.current.stageRef.current).toBeNull();
     // The transport and scene-option callbacks are all surfaced to the view.
     for (const key of ['togglePlayback', 'replay', 'scrub', 'selectAct', 'toggleCameraMode', 'toggleNitrateMode', 'toggleSound', 'applyHeroTitle']) {
@@ -69,13 +61,15 @@ describe('usePremiereController', () => {
     expect(result.current.isPlaying).toBe(false);
   });
 
-  it('gives the frame studio a getter for the live scene manager', () => {
-    renderHook(() => usePremiereController());
-    const getTarget = runtimeArgs.sceneTargets[0];
+  it('offers the host a getter for the live scene API', () => {
+    const { result, rerender } = renderHook(() => usePremiereController());
+    const getSceneApi = result.current.getSceneApi;
     // Nothing is mounted in this test, so the getter reports honestly that there
-    // is no scene to style yet, rather than handing out a stale manager.
-    expect(getTarget()).toBeNull();
-    expect(getTarget).toBeTypeOf('function');
+    // is no scene yet, rather than handing out a stale one.
+    expect(getSceneApi()).toBeNull();
+    expect(getSceneApi).toBeTypeOf('function');
+    rerender();
+    expect(result.current.getSceneApi).toBe(getSceneApi);
   });
 
   it('hands the runtime live refs and stable callbacks', () => {

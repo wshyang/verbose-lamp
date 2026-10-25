@@ -74,16 +74,16 @@ Goal: `background-removal`, `enamel-backdrop` and `gilded-portrait` import no ot
 - [x] 2.4 Verify with `grep -rn "@/features/" src/features/{background-removal,enamel-backdrop,gilded-portrait,face-detection}` (non-test). Expect no hits.
 - [x] 2.5 Addendum 038 + register row, and fix the `docs/ARCHITECTURE.md` shared-lib map (`raster/blur`, `gold/`). Gate.
 
-## [ ] Phase 3 — Finding 3 (Significant): the host composes the Frame Studio
+## [x] Phase 3 — Finding 3 (Significant): the host composes the Frame Studio
 Goal: `premiere` no longer imports `frame-studio`, and there is one port type, not two.
 
-- [ ] 3.1 **RED**: add a compile-time test in `app` (for example `src/app/sceneBinding.test.ts`): `expectTypeOf<PremiereSceneApi>().toExtend<FrameStudioTarget>()`. It replaces `sceneApi.test.ts:33-49`.
-- [ ] 3.2 `premiere/hooks/usePremiereController.ts`: remove the `useFrameStudio` import and call (`:22`) and the `frameStudio` field. Return a stable `getSceneApi = useCallback(() => managerRef.current, [])`.
-- [ ] 3.3 `app/components/PremiereSurfaces.tsx`: `const frameStudio = useFrameStudio(premiere.getSceneApi)`, imported from `@/features/frame-studio`. Pass `studio={frameStudio}` to `FrameStudioDock` (`:77`). The call itself is the compile-time check that the types agree.
-- [ ] 3.4 `premiere/scene/sceneApi.ts`: delete `FrameStudioScenePort` (`:29`) and its doc comment. Delete the `FrameStudioScenePort` describe block and the `FrameStudioTarget` import in `sceneApi.test.ts`.
-- [ ] 3.5 Update the tests that read `premiere.frameStudio`: `premiere/hooks/usePremiereController{,.p3,.p4}.test.tsx`, `usePremiereController.test.ts`, `app/components/PremiereSurfaces.test.tsx`, `app/testidCoverage.p4.test.tsx`.
-- [ ] 3.6 Verify with `grep -rn "frame-studio" src/features/premiere` (non-test). Expect no hits.
-- [ ] 3.7 Addendum 039 + register row. Gate. The Frame Studio must still drive the scene: the `getTarget` getter is lazy, so timing is unchanged.
+- [x] 3.1 **RED**: add a compile-time test in `app` (for example `src/app/sceneBinding.test.ts`): `expectTypeOf<PremiereSceneApi>().toExtend<FrameStudioTarget>()`. It replaces `sceneApi.test.ts:33-49`.
+- [x] 3.2 `premiere/hooks/usePremiereController.ts`: remove the `useFrameStudio` import and call (`:22`) and the `frameStudio` field. Return a stable `getSceneApi = useCallback(() => managerRef.current, [])`.
+- [x] 3.3 `app/components/PremiereSurfaces.tsx`: `const frameStudio = useFrameStudio(premiere.getSceneApi)`, imported from `@/features/frame-studio`. Pass `studio={frameStudio}` to `FrameStudioDock` (`:77`). The call itself is the compile-time check that the types agree.
+- [x] 3.4 `premiere/scene/sceneApi.ts`: delete `FrameStudioScenePort` (`:29`) and its doc comment. Delete the `FrameStudioScenePort` describe block and the `FrameStudioTarget` import in `sceneApi.test.ts`.
+- [x] 3.5 Update the tests that read `premiere.frameStudio` (their studio behaviour moved to `src/app/frameStudioBinding.test.tsx`; `PremiereSurfaces` outgrew its debt row, so its chrome state moved to `app/hooks/usePremiereChrome.ts` and the row is lowered 75 → 72): `premiere/hooks/usePremiereController{,.p3,.p4}.test.tsx`, `usePremiereController.test.ts`, `app/components/PremiereSurfaces.test.tsx`, `app/testidCoverage.p4.test.tsx`.
+- [x] 3.6 Verify with `grep -rn "frame-studio" src/features/premiere` (non-test). Expect no hits.
+- [x] 3.7 Addendum 039 + register row. Gate. The Frame Studio must still drive the scene: the `getTarget` getter is lazy, so timing is unchanged.
 
 ## [ ] Phase 4 — Finding 4 (Significant): console cohesion, one celebration recipe, one seed
 Three independent sub-tasks, in this order.

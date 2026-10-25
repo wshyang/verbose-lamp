@@ -1,5 +1,4 @@
 import { useCallback, useRef } from 'react';
-import { useFrameStudio } from '@/features/frame-studio';
 import type { CinemaAudioEngine } from '../audio/cinemaAudio';
 import { SEQUENCE_CHAPTERS } from '../data/sequence';
 import type { PremiereSceneApi } from '../scene/sceneApi';
@@ -19,7 +18,7 @@ export function usePremiereController() {
   const { onTelemetry, onChapterChange } = display;
 
   const runtime = usePremiereRuntime({ mountRef: stageRef, managerRef, audioRef, onTelemetry, onChapterChange });
-  const frameStudio = useFrameStudio(useCallback(() => managerRef.current, []));
+  const getSceneApi = useCallback(() => managerRef.current, []);
   const transport = usePremiereTransport({ managerRef, audioRef, ...display, ...settings });
   const sceneOptions = usePremiereSceneOptions({ managerRef, audioRef, ...display, ...settings });
 
@@ -34,7 +33,7 @@ export function usePremiereController() {
     soundOn: settings.soundOn,
     heroConfig: settings.heroConfig,
     currentChapter: SEQUENCE_CHAPTERS[display.activeAct] ?? SEQUENCE_CHAPTERS[0],
-    frameStudio,
+    getSceneApi,
     ...transport,
     ...sceneOptions,
   };

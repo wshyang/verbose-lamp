@@ -21,16 +21,6 @@ export interface PremiereSceneApi {
   dispose(): void;
 }
 
-/**
- * The three surface-style operations Frame Studio binds to. A `Pick`, not an inheritance
- * from the frame-studio feature's own target type (PR #3), so the premiere stays free of
- * that import. `sceneApi.test.ts` keeps the two structurally identical.
- */
-export type FrameStudioScenePort = Pick<
-  PremiereSceneApi,
-  'setSequenceFrameStyle' | 'setScreenBorderStyle' | 'setScreenBorderEnabled'
->;
-
 export interface PlaybackTelemetry {
   currentTime: number;
   activeChapterIndex: number;

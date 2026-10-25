@@ -72,10 +72,10 @@ describe('usePremiereController: opening state', () => {
     expect(result.current.currentChapter).toBe(SEQUENCE_CHAPTERS[0]);
   });
 
-  it('exposes the frame studio and the runtime the stage mounts', () => {
+  it('exposes the scene getter and the runtime the stage mounts', () => {
     const { result } = setup();
 
-    expect(result.current.frameStudio.surface).toBe('title-cards');
+    expect(result.current.getSceneApi()).not.toBeNull();
     expect(typeof result.current.runtime.onSceneTelemetry).toBe('function');
     expect(result.current.stageRef).toBeDefined();
   });

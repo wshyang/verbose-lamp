@@ -142,7 +142,7 @@ describe('usePremiereController', () => {
     expect(scene.setCameraMode).toHaveBeenLastCalledWith('cinema');
   });
 
-  it('toggles nitrate and routes the frame studio to the scene', () => {
+  it('toggles nitrate through the scene', () => {
     const { result } = renderHook(() => usePremiereController());
     const scene = createScene();
     attachScene(scene as unknown as PremiereSceneApi);
@@ -150,12 +150,6 @@ describe('usePremiereController', () => {
     act(() => result.current.toggleNitrateMode());
     expect(result.current.nitrateMode).toBe(true);
     expect(scene.setNitrateMode).toHaveBeenCalledWith(true);
-
-    act(() => result.current.frameStudio.setSurface('screen-border'));
-    expect(scene.setScreenBorderEnabled).toHaveBeenCalledWith(true);
-
-    act(() => result.current.frameStudio.setDetail(40));
-    expect(scene.setSequenceFrameStyle).toHaveBeenCalled();
   });
 
   it('applies a custom hero title and jumps to the hero act', () => {
@@ -209,7 +203,6 @@ describe('usePremiereController', () => {
       act(() => result.current.toggleNitrateMode());
       act(() => result.current.toggleSound());
       act(() => result.current.applyHeroTitle(DEFAULT_HERO_TITLE));
-      act(() => result.current.frameStudio.dismiss());
     }).not.toThrow();
     expect(result.current.currentTime).toBe(0);
   });

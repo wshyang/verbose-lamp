@@ -35,7 +35,7 @@ vi.mock('@/features/premiere', async (importOriginal) => {
       soundOn: false,
       heroConfig: actual.DEFAULT_HERO_TITLE,
       currentChapter: actual.SEQUENCE_CHAPTERS[1] ?? actual.SEQUENCE_CHAPTERS[0],
-      frameStudio: {},
+      getSceneApi: () => null,
       togglePlayback: vi.fn(),
       replay: vi.fn(),
       scrub: vi.fn(),

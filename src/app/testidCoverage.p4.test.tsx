@@ -14,13 +14,11 @@ const SLOW_TEST_MS = 30_000;
  */
 vi.mock('@/features/premiere', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/features/premiere')>();
-  const { useFrameStudio } = await import('@/features/frame-studio');
   const noop = () => undefined;
   return {
     ...actual,
     usePremiereShortcuts: noop,
     usePremiereController: () => {
-      const frameStudio = useFrameStudio(() => null);
       return {
         stageRef: { current: null },
         currentTime: 4.32,
@@ -31,7 +29,7 @@ vi.mock('@/features/premiere', async (importOriginal) => {
         soundOn: false,
         heroConfig: actual.DEFAULT_HERO_TITLE,
         currentChapter: actual.SEQUENCE_CHAPTERS[0],
-        frameStudio,
+        getSceneApi: () => null,
         togglePlayback: noop,
         replay: noop,
         scrub: noop,

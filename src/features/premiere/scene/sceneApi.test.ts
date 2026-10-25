@@ -1,9 +1,7 @@
 import { describe, expectTypeOf, it } from 'vitest';
-import type { FrameStudioTarget } from '@/features/frame-studio';
 import type { FrameStyle, ScreenBorderStyle } from '@/features/art-deco-frame';
 import type { CameraMode, HeroTitleConfig } from '../model/types';
 import type {
-  FrameStudioScenePort,
   PlaybackTelemetry,
   PremiereSceneApi,
   SceneCallbacks,
@@ -27,26 +25,6 @@ describe('PremiereSceneApi', () => {
 
   it('reports the state a toggle just applied', () => {
     expectTypeOf<PremiereSceneApi['togglePlaying']>().toEqualTypeOf<() => boolean>();
-  });
-});
-
-describe('FrameStudioScenePort', () => {
-  it('is exactly the three surface-style operations, nothing else', () => {
-    expectTypeOf<keyof FrameStudioScenePort>().toEqualTypeOf<
-      'setSequenceFrameStyle' | 'setScreenBorderStyle' | 'setScreenBorderEnabled'
-    >();
-  });
-
-  it('is satisfied by the whole scene API', () => {
-    expectTypeOf<PremiereSceneApi>().toExtend<FrameStudioScenePort>();
-  });
-
-  // The frame-studio feature declares its own target type. The premiere must not import
-  // it (features depend on each other only through barrels, never circularly), so the two
-  // are kept structurally identical, and this is the test that notices if they drift.
-  it('is mutually assignable with the frame-studio feature’s own target type', () => {
-    expectTypeOf<FrameStudioScenePort>().toExtend<FrameStudioTarget>();
-    expectTypeOf<FrameStudioTarget>().toExtend<FrameStudioScenePort>();
   });
 });
 
