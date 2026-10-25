@@ -46,6 +46,19 @@ function platePath(ctx: CanvasRenderingContext2D, rect: Rect): void {
   ctx.closePath();
 }
 
+type Rgb = readonly [number, number, number];
+
+/**
+ * A gold colour stop at light level `lit`: `base * lit + lift` per channel, as whole numbers.
+ * `rgba()` channels are integers; a float is accepted by today's browsers but only by courtesy, and
+ * a parser that rejects one drops the stop with no error, leaving the plate the wrong colour.
+ * `lit` runs 0.35 to 1, which keeps every channel between 17 and 236, so no clamp is needed.
+ */
+function litGold(ramp: { base: Rgb; lift: Rgb }, lit: number): string {
+  const [r, g, b] = ramp.base.map((channel, i) => Math.round(channel * lit + ramp.lift[i]));
+  return `rgba(${r},${g},${b},1)`;
+}
+
 function drawPlate(ctx: CanvasRenderingContext2D, plate: PlateDraw): void {
   const { state, theta, isFront, viewport } = plate;
   const { w, h } = viewport;
@@ -58,9 +71,9 @@ function drawPlate(ctx: CanvasRenderingContext2D, plate: PlateDraw): void {
   const x = (w - pw) / 2;
   const lit = 0.35 + facing * 0.65;
   const grad = ctx.createLinearGradient(0, y, 0, y + plateH);
-  grad.addColorStop(0, `rgba(${120 * lit + 40},${88 * lit + 28},${34 * lit + 10},1)`);
-  grad.addColorStop(0.5, `rgba(${196 * lit + 40},${150 * lit + 30},${64 * lit + 14},1)`);
-  grad.addColorStop(1, `rgba(${96 * lit + 30},${70 * lit + 20},${26 * lit + 8},1)`);
+  grad.addColorStop(0, litGold({ base: [120, 88, 34], lift: [40, 28, 10] }, lit));
+  grad.addColorStop(0.5, litGold({ base: [196, 150, 64], lift: [40, 30, 14] }, lit));
+  grad.addColorStop(1, litGold({ base: [96, 70, 26], lift: [30, 20, 8] }, lit));
   ctx.save();
   ctx.globalAlpha = Math.pow(facing, 0.6);
   if (isFront && state.landedPlateGlow) {

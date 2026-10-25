@@ -23,3 +23,40 @@ describe('drawDrum golden recordings', () => {
     });
   }
 });
+
+// `rgba()` takes channels as integers. The panel shading computed them as `120 * lit + 40` and
+// passed the raw float, e.g. `rgba(128.53,95.2,...)`. Browsers accept that today, but the 2D context
+// spec only guarantees integers, and a stricter parser (or a future one) drops the stop silently,
+// leaving a drum panel the wrong colour with no error to find.
+describe('drawDrum colour stops', () => {
+  const stops = (testCase: (typeof CASES)[number]) => {
+    const { ctx, log } = createRecordingContext();
+    drawDrum(ctx, { ...testCase, entries: ENTRIES }, { w: WIDTH, h: HEIGHT });
+    return log
+      .filter((line) => line.includes('addColorStop'))
+      .map((line) => /,(rgba?\([^)]*\))/.exec(line)?.[1])
+      .filter((colour): colour is string => colour !== undefined);
+  };
+
+  it('draws at least some colour stops, so the check below is not vacuous', () => {
+    expect(stops(CASES[0]).length).toBeGreaterThan(10);
+  });
+
+  it.each(CASES)('emits only whole-number rgb channels ($name)', (testCase) => {
+    const offenders = stops(testCase).filter((colour) => {
+      const [r, g, b] = colour.slice(colour.indexOf('(') + 1, -1).split(',').slice(0, 3);
+      return [r, g, b].some((channel) => !/^\d+$/.test(channel.trim()));
+    });
+
+    expect(offenders).toEqual([]);
+  });
+
+  it('keeps every channel inside 0 to 255', () => {
+    for (const colour of stops(CASES[1])) {
+      for (const channel of colour.slice(colour.indexOf('(') + 1, -1).split(',').slice(0, 3)) {
+        expect(Number(channel)).toBeGreaterThanOrEqual(0);
+        expect(Number(channel)).toBeLessThanOrEqual(255);
+      }
+    }
+  });
+});
