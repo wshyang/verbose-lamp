@@ -8,153 +8,192 @@ interface GeometryAccumulator {
   indices: number[];
 }
 
+type Point = PolylineSpec['points'][number];
+
+interface RailPlan {
+  acc: GeometryAccumulator;
+  spec: PolylineSpec;
+  points: Point[];
+  /** Cumulative arc length at each point, plus `totalLen` at the end. */
+  cumLen: number[];
+  totalLen: number;
+  closed: boolean;
+  ringCount: number;
+  baseVertex: number;
+  /** Mean x of the polyline, deciding the side of centre-straddling vertices. */
+  centerX: number;
+}
+
+/** Cross-section in (lateralOffset, zOffset, normalLateral, normalZ). */
+type ProfileEntry = readonly [number, number, number, number];
+
+/** Six vertices across the front + bevels + sides — the ring size. */
+const PROFILE_SIZE = 6;
+const INV_SQRT2 = 0.70710678;
+
+/** Cross-section half-extents, resolved per spec. */
+interface RailSection {
+  halfWidth: number;
+  crestHalfWidth: number;
+  frontZ: number;
+  backZ: number;
+}
+
+function sectionOf(spec: PolylineSpec): RailSection {
+  const halfWidth = spec.width * 0.5;
+  return {
+    halfWidth,
+    crestHalfWidth: spec.width * 0.26,
+    frontZ: spec.depth * 0.5,
+    backZ: -spec.depth * 0.5,
+  };
+}
+
+/**
+ * The cross-section for one spec: a flat inner crest, two 45-degree chamfer
+ * facets and two side walls, so light catches every 45° and 90° turn.
+ */
+function profileOf(section: RailSection): ProfileEntry[] {
+  const { halfWidth: hw, crestHalfWidth: cw, frontZ: fz, backZ: bz } = section;
+  return [
+    [-hw, bz, -1, 0], // 0: outer left back
+    [-hw, fz * 0.25, -INV_SQRT2, INV_SQRT2], // 1: left chamfer outer
+    [-cw, fz, -0.25, 0.968], // 2: crest left edge
+    [cw, fz, 0.25, 0.968], // 3: crest right edge
+    [hw, fz * 0.25, INV_SQRT2, INV_SQRT2], // 4: right chamfer outer
+    [hw, bz, 1, 0], // 5: outer right back
+  ];
+}
+
+/** Cumulative arc length across the polyline, or `null` when it is too short. */
+function measureRail(spec: PolylineSpec): { cumLen: number[]; totalLen: number; closed: boolean } | null {
+  const points = spec.points;
+  if (points.length < 2) return null;
+
+  const closed = Boolean(spec.closed);
+  const count = points.length;
+  const segmentCount = closed ? count : count - 1;
+  const cumLen: number[] = [0];
+  let totalLen = 0;
+
+  for (let i = 0; i < segmentCount; i++) {
+    const a = points[i];
+    const b = points[(i + 1) % count];
+    totalLen += Math.max(1e-4, Math.hypot(b.x - a.x, b.y - a.y));
+    cumLen.push(totalLen);
+  }
+
+  if (totalLen < 1e-4) return null;
+  return { cumLen, totalLen, closed };
+}
+
+/** Unit segment direction from `a` to `b`, with a zero guard. */
+function direction(a: Point, b: Point): [number, number] {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const length = Math.hypot(dx, dy) || 1;
+  return [dx / length, dy / length];
+}
+
+/** Mitred lateral direction at one ring, clamped so tight corners do not spike. */
+function miterAt(plan: RailPlan, ring: number): [number, number] {
+  const { points, closed, ringCount } = plan;
+  const count = points.length;
+  const index = ring % count;
+
+  if (closed || (ring > 0 && ring < ringCount - 1)) {
+    const previous = points[(index - 1 + count) % count];
+    const next = points[(index + 1) % count];
+    const [d1x, d1y] = direction(previous, points[index]);
+    const [d2x, d2y] = direction(points[index], next);
+    const n1x = -d1y;
+    const n1y = d1x;
+    const n2x = -d2y;
+    const n2y = d2x;
+    let mx = n1x + n2x;
+    let my = n1y + n2y;
+    const miterLength = Math.hypot(mx, my);
+    if (miterLength < 1e-3) return [n1x, n1y];
+    mx /= miterLength;
+    my /= miterLength;
+    const dot = Math.max(0.38, mx * n1x + my * n1y);
+    const miterScale = Math.min(2.3, 1 / dot);
+    return [mx * miterScale, my * miterScale];
+  }
+
+  // Open polyline: the two end rings take the single adjacent segment.
+  const [dx, dy] = ring === 0 ? direction(points[0], points[1]) : direction(points[count - 2], points[count - 1]);
+  return [-dy, dx];
+}
+
+/**
+ * Which half of the gate this vertex belongs to, so the two halves can part.
+ * An explicit `partDir` wins; otherwise the side of the frame's centre.
+ */
+function partingSide(point: Point, spec: PolylineSpec, centerX: number): number {
+  if (spec.partDir !== undefined && spec.partDir !== 0) return spec.partDir;
+  if (point.x < -0.02) return -1;
+  if (point.x > 0.02) return 1;
+  return centerX < 0 ? -1 : 1;
+}
+
+/** Pushes one ring of cross-section vertices at `ring`. */
+function pushRing(plan: RailPlan, ring: number) {
+  const { acc, spec, points, cumLen, totalLen, centerX } = plan;
+  const index = ring % points.length;
+  const current = points[index];
+  const [tx, ty] = miterAt(plan, ring);
+  const normalLength = Math.hypot(tx, ty) || 1;
+  const unitX = tx / normalLength;
+  const unitY = ty / normalLength;
+  const side = partingSide(current, spec, centerX);
+  const u = cumLen[ring] / totalLen;
+
+  for (const entry of profileOf(sectionOf(spec))) {
+    const [lateral, zOff, normalLateral, normalZ] = entry;
+    acc.positions.push(current.x + tx * lateral, current.y + ty * lateral, spec.z + zOff);
+    acc.normals.push(unitX * normalLateral, unitY * normalLateral, normalZ);
+    acc.pathData.push(u, spec.delay, side);
+  }
+}
+
+/** Stitches consecutive rings into quads, split into triangles. */
+function emitSeams(plan: RailPlan) {
+  const { acc, ringCount, baseVertex } = plan;
+  for (let ring = 0; ring < ringCount - 1; ring++) {
+    const rowA = baseVertex + ring * PROFILE_SIZE;
+    const rowB = rowA + PROFILE_SIZE;
+    for (let entry = 0; entry < PROFILE_SIZE - 1; entry++) {
+      const a = rowA + entry;
+      const b = a + 1;
+      acc.indices.push(a, rowB + entry, rowB + entry + 1, a, rowB + entry + 1, b);
+    }
+  }
+}
+
 /**
  * Appends a 3D chamfered 24k gold bar along a 2D polyline at plane `z`.
  * Cross-section has a flat gleaming crest + two 45-degree angled bevel facets + side walls
  * with clean mitered corner joins so light catches every 45° and 90° Art Deco turn.
  */
 function appendChamferedPolyline(acc: GeometryAccumulator, spec: PolylineSpec) {
-  const pts = spec.points;
-  if (pts.length < 2) return;
+  const measured = measureRail(spec);
+  if (!measured) return;
 
-  const isClosed = Boolean(spec.closed);
-  const count = pts.length;
+  const plan: RailPlan = {
+    acc,
+    spec,
+    points: spec.points,
+    cumLen: measured.cumLen,
+    totalLen: measured.totalLen,
+    closed: measured.closed,
+    ringCount: measured.closed ? spec.points.length + 1 : spec.points.length,
+    baseVertex: acc.positions.length / 3,
+    centerX: spec.points.reduce((sum, point) => sum + point.x, 0) / spec.points.length,
+  };
 
-  // Compute cumulative arc length for normalized uProgress [0..1]
-  const cumLen: number[] = [0];
-  let totalLen = 0;
-  const segCount = isClosed ? count : count - 1;
-
-  for (let i = 0; i < segCount; i++) {
-    const a = pts[i];
-    const b = pts[(i + 1) % count];
-    const d = Math.hypot(b.x - a.x, b.y - a.y);
-    totalLen += Math.max(1e-4, d);
-    cumLen.push(totalLen);
-  }
-
-  if (totalLen < 1e-4) return;
-
-  // Cross-section profile in (lateralOffset, zOffset, normalLateral, normalZ)
-  // 6 vertices across the front + bevels + sides for crisp jewelry-grade facets:
-  const hw = spec.width * 0.5;
-  const cw = spec.width * 0.26; // flat inner crest half-width
-  const fz = spec.depth * 0.5;
-  const bz = -spec.depth * 0.5;
-  const invSqrt2 = 0.70710678;
-
-  const profile: Array<[number, number, number, number]> = [
-    [-hw, bz, -1, 0],                   // 0: outer left back
-    [-hw, fz * 0.25, -invSqrt2, invSqrt2], // 1: left chamfer outer
-    [-cw, fz, -0.25, 0.968],            // 2: crest left edge
-    [cw, fz, 0.25, 0.968],              // 3: crest right edge
-    [hw, fz * 0.25, invSqrt2, invSqrt2],   // 4: right chamfer outer
-    [hw, bz, 1, 0],                     // 5: outer right back
-  ];
-  const profN = profile.length;
-
-  const ringCount = isClosed ? count + 1 : count;
-  const baseVertex = acc.positions.length / 3;
-
-  // Determine parting direction for theatrical gate opening
-  let centerX = 0;
-  for (const p of pts) centerX += p.x;
-  centerX /= pts.length;
-
-  for (let r = 0; r < ringCount; r++) {
-    const idx = r % count;
-    const curr = pts[idx];
-
-    // Compute miter normal in XY plane
-    let tx = 0;
-    let ty = 0;
-
-    if (isClosed || (r > 0 && r < ringCount - 1)) {
-      const prev = pts[(idx - 1 + count) % count];
-      const next = pts[(idx + 1) % count];
-      let d1x = curr.x - prev.x;
-      let d1y = curr.y - prev.y;
-      const l1 = Math.hypot(d1x, d1y) || 1;
-      d1x /= l1;
-      d1y /= l1;
-
-      let d2x = next.x - curr.x;
-      let d2y = next.y - curr.y;
-      const l2 = Math.hypot(d2x, d2y) || 1;
-      d2x /= l2;
-      d2y /= l2;
-
-      const n1x = -d1y;
-      const n1y = d1x;
-      const n2x = -d2y;
-      const n2y = d2x;
-
-      let mx = n1x + n2x;
-      let my = n1y + n2y;
-      const ml = Math.hypot(mx, my);
-      if (ml < 1e-3) {
-        tx = n1x;
-        ty = n1y;
-      } else {
-        mx /= ml;
-        my /= ml;
-        const dot = Math.max(0.38, mx * n1x + my * n1y);
-        const miterScale = Math.min(2.3, 1.0 / dot);
-        tx = mx * miterScale;
-        ty = my * miterScale;
-      }
-    } else if (r === 0) {
-      const next = pts[1];
-      const dx = next.x - curr.x;
-      const dy = next.y - curr.y;
-      const l = Math.hypot(dx, dy) || 1;
-      tx = -dy / l;
-      ty = dx / l;
-    } else {
-      const prev = pts[count - 2];
-      const dx = curr.x - prev.x;
-      const dy = curr.y - prev.y;
-      const l = Math.hypot(dx, dy) || 1;
-      tx = -dy / l;
-      ty = dx / l;
-    }
-
-    const uNorm = cumLen[r] / totalLen;
-    const partSide =
-      spec.partDir !== undefined && spec.partDir !== 0
-        ? spec.partDir
-        : curr.x < -0.02
-          ? -1
-          : curr.x > 0.02
-            ? 1
-            : centerX < 0
-              ? -1
-              : 1;
-
-    // Normalize lateral direction for accurate normals
-    const nLen = Math.hypot(tx, ty) || 1;
-    const unx = tx / nLen;
-    const uny = ty / nLen;
-
-    for (let p = 0; p < profN; p++) {
-      const [lat, zOff, nLat, nZ] = profile[p];
-      acc.positions.push(curr.x + tx * lat, curr.y + ty * lat, spec.z + zOff);
-      acc.normals.push(unx * nLat, uny * nLat, nZ);
-      acc.pathData.push(uNorm, spec.delay, partSide);
-    }
-  }
-
-  for (let r = 0; r < ringCount - 1; r++) {
-    const rowA = baseVertex + r * profN;
-    const rowB = baseVertex + (r + 1) * profN;
-    for (let p = 0; p < profN - 1; p++) {
-      const a = rowA + p;
-      const b = rowA + p + 1;
-      const c = rowB + p + 1;
-      const d = rowB + p;
-      acc.indices.push(a, d, c, a, c, b);
-    }
-  }
+  for (let ring = 0; ring < plan.ringCount; ring++) pushRing(plan, ring);
+  emitSeams(plan);
 }
 
 /** Shared rail extrusion for title cards and camera-attached poster borders. */
