@@ -3,6 +3,7 @@ import { renderHook } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { setupDomTests } from '@/test/dom';
 import type { PremiereSceneApi } from '../scene/sceneApi';
+import { createPremiereStore } from '../scene3d/premiereStore';
 import { usePremiereRuntime } from './usePremiereRuntime';
 
 setupDomTests();
@@ -133,5 +134,28 @@ describe('usePremiereRuntime', () => {
 
     expect(state.scenes).toHaveLength(0);
     expect(state.audios).toHaveLength(0);
+  });
+  it('hands the store-backed scene API out instead of building a manager', () => {
+    const store = createPremiereStore({ freezeAt: 6 });
+    const container = document.createElement('div');
+    const mountRef = { current: container };
+    const managerRef = { current: null as PremiereSceneApi | null };
+    const audioRef = { current: null as unknown as import('../audio/cinemaAudio').CinemaAudioEngine | null };
+
+    const { unmount } = renderHook(() =>
+      usePremiereRuntime({ mountRef, managerRef, audioRef, onTelemetry: vi.fn(), onChapterChange: vi.fn(), store }),
+    );
+
+    expect(state.scenes).toHaveLength(0);
+    expect(state.audios).toHaveLength(1);
+    expect(managerRef.current).toBeTruthy();
+    managerRef.current?.setTime(9.5);
+    expect(store.getState().currentTime).toBeCloseTo(9.5, 9);
+
+    unmount();
+
+    expect(state.audios[0].dispose).toHaveBeenCalledTimes(1);
+    expect(managerRef.current).toBeNull();
+    expect(audioRef.current).toBeNull();
   });
 });

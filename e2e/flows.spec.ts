@@ -128,7 +128,13 @@ test.describe('premiere flows', () => {
     await dismissFrameStudio(page);
     await launch(page, 'event-night__launch');
     await expect(page.getByTestId('event-night__back')).toBeVisible();
-    await page.getByTestId('event-night__back').click({ timeout: 60_000 });
+    // The click hands the main thread to the premiere's scene build; on SwiftShader that
+    // can occupy it for over a minute, so the action itself needs the long timeout, not
+    // just the assertion after it. `noWaitAfter` keeps Playwright from waiting on the
+    // navigation it will never see.
+    await page
+      .getByTestId('event-night__back')
+      .click({ timeout: 180_000, noWaitAfter: true });
     await expect(page.getByTestId('cinematic-stage__canvas')).toBeVisible({ timeout: 120_000 });
   });
 });

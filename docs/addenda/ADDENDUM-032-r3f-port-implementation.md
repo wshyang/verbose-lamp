@@ -1,7 +1,7 @@
 # ADDENDUM-032 — The React Three Fiber port: Phase 2 of 022 implemented, and the one number that was missing
 
 **Date:** 2026-10-25 · **Relates to:** ADDENDUM-022 (§6 Phase 2 steps 2.1–2.5, §7 Phase 3, §9 impact), ADDENDUM-029 (gate), ADDENDUM-031 (Phase 0.7 choreography extraction). CLAUDE.md §2, §4, §7; BUILD_PROMPT §2.
-**Status:** Phase 2 complete. The port is mounted behind `?renderer=r3f`, the **likeness gate is green on the port** (12/12 desktop-chromium shots against the *unchanged* baselines, and 12/12 on the manager), `tsc` is clean, **1481 tests in 180 files** pass. The default path is still `GatsbySceneManager`.
+**Status:** Phase 2 complete. The port is mounted behind `?renderer=r3f`, the **likeness gate is green on the port** (12/12 desktop-chromium shots against the *unchanged* baselines, and 12/12 on the manager), `tsc` is clean, **1516 tests in 187 files** pass, and coverage is **99.28 % statements / 93.78 % branches / 98.98 % functions / 99.59 % lines**. The default path is still `GatsbySceneManager`.
 
 ADDENDUM-022 §6 called Phase 2 "the port": rebuild the premiere as declarative components over a
 `zustand` store, one concern per file, so that the sequence can be tested with
@@ -107,6 +107,10 @@ Two testing notes worth keeping:
   SwiftShader baselines (`PREMIERE_RENDERER=r3f`, 13.0 min).
 - **Likeness gate, default renderer:** **12/12** again with `PREMIERE_RENDERER` unset (16.2 min),
   so the port did not disturb the manager it was copied from.
+- **Flows:** 14/16 on the first sweep, both failures timing rather than behaviour. The title
+  customizer passed on a re-run; event night needed the *click itself* to carry the long timeout,
+  because leaving the demo hands the main thread to the premiere's scene build for over a minute
+  on SwiftShader (`noWaitAfter`, 180 s). It passes in 1.2 min after that change.
 - **Bundle:** `dist/index.html` grows 1 352 533 → 1 777 905 bytes (gzip 579.56 kB). `three`'s
   post-processing modules and `@react-three/fiber` are now reachable from the default path; the
   manager is still what renders.

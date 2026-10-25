@@ -453,12 +453,17 @@ export class GatsbySceneManager implements PremiereSceneApi {
     this.scene.add(this.dustPoints);
   }
 
-  private buildAllCards() {
+  /** Detaches and disposes every card rig, leaving the list empty. */
+  private releaseCards() {
     for (const rig of this.cardRigs) {
       this.scene.remove(rig.root);
       rig.dispose();
     }
     this.cardRigs = [];
+  }
+
+  private buildAllCards() {
+    this.releaseCards();
 
     for (const chapter of SEQUENCE_CHAPTERS) {
       const rig = createGatsbyCardRig(chapter, {
@@ -698,9 +703,7 @@ export class GatsbySceneManager implements PremiereSceneApi {
     window.removeEventListener('resize', this.handleResize);
     window.removeEventListener('pointermove', this.handlePointerMove);
 
-    for (const rig of this.cardRigs) {
-      rig.dispose();
-    }
+    this.releaseCards();
     this.screenBorderRig.dispose();
     this.controls.dispose();
     this.envTex.dispose();

@@ -62,6 +62,22 @@ vi.mock('../scene/environment', () => ({
   createBallroomEnvironment: () => new THREE.Texture(),
 }));
 
+const optional = vi.hoisted(() => ({ environment: 0, composer: 0 }));
+
+vi.mock('./BallroomEnvironment', () => ({
+  BallroomEnvironment: () => {
+    optional.environment += 1;
+    return null;
+  },
+}));
+
+vi.mock('./CinemaComposer', () => ({
+  CinemaComposer: () => {
+    optional.composer += 1;
+    return null;
+  },
+}));
+
 import { PremiereScene } from './PremiereScene';
 
 const fit = resolveViewportFit(1440, 900, false);
@@ -134,6 +150,20 @@ describe('PremiereScene', () => {
     );
 
     await renderer.unmount();
+  });
+
+  it('mounts the environment and the composer only when they are switched on', async () => {
+    optional.environment = 0;
+    optional.composer = 0;
+    const quiet = await mount();
+
+    expect([optional.environment, optional.composer]).toEqual([0, 0]);
+    await quiet.unmount();
+
+    const full = await ReactThreeTestRenderer.create(<PremiereScene store={createPremiereStore()} fit={fit} />);
+
+    expect([optional.environment, optional.composer]).toEqual([1, 1]);
+    await full.unmount();
   });
 
   it('scales every card to the viewport fit', async () => {

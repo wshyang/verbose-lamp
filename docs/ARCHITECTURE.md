@@ -54,21 +54,25 @@ supported import surface; internal files should remain private to that feature.
 - `features/premiere` owns the five-act sequence, camera/audio controls, and the
   scene lifecycle. React UI talks to the typed controller rather than reaching
   into Three.js objects.
-- `features/premiere` has **two renderers behind one controller**. The default is
-  `scene/GatsbySceneManager.ts`, imperative Three.js inside a single canvas, and
-  it is still the fidelity reference. `scene3d/` is the React Three Fiber port:
-  a `zustand` store (`premiereStore.ts`) presented to the hooks through
-  `storeSceneApi.ts`, one small component per concern (`PlaybackClock`,
-  `TitleCard`, `DecoWall`, `Searchlights`, `GreenLight`, `GoldDust`,
-  `LightingRig`, `BallroomEnvironment`, `CinemaCamera`, `ScreenBorder`) and a
-  hand-built composer (`CinemaComposer`) that keeps the manager's bloom →
-  silver-nitrate → output order. `?renderer=r3f` selects it; `?freezeAt=` pins
-  either renderer to a moment. `usePremiereRuntime` installs whichever one is
-  active behind the same scene API, so no hook or surface changes. Both are held
-  to the same screenshot baselines by `e2e/likeness.spec.ts`, which takes the
-  renderer from `PREMIERE_RENDERER`.
 - `features/art-deco-frame` owns reusable frame grammar, genome data, beveled
   rail geometry, typography glyphs, and materials. It has no timeline or HUD.
+- `features/premiere/scene3d` is the React Three Fiber port (ADDENDUM-022 Phase 2,
+  ADDENDUM-032). It is mounted only when the URL asks for it — `?renderer=r3f` — and
+  the default remains `scene/GatsbySceneManager.ts`, which stays the fidelity
+  reference. The port's pure layer (`scene/styleClamp`, `scene/orbitFocus`,
+  `scene/rendererMode`, `scene3d/playback`) holds the timing and clamping rules;
+  `scene3d/premiereStore.ts` is the single zustand store, and `storeSceneApi.ts`
+  presents that store behind the *same* scene API the manager implements, so no
+  hook, surface or keyboard shortcut had to learn about the second renderer.
+  Components are one concern each (`PlaybackClock`, `TitleCard`, `DecoWall`,
+  `Searchlights`, `GreenLight`, `GoldDust`, `LightingRig`, `BallroomEnvironment`,
+  `CinemaCamera`, `ScreenBorder`), composed by `PremiereScene` and mounted by
+  `PremiereCanvas`; `CinemaComposer` keeps the manager's exact post order (bloom →
+  silver nitrate → output) rather than adopting a different post-processing stack.
+  `usePremiereRuntime` installs whichever renderer is active behind the same scene
+  API, so no hook or surface changes; `?freezeAt=` pins either one to a moment for
+  the screenshot gate. Both are held to the same baselines: `e2e/likeness.spec.ts`
+  reads `PREMIERE_RENDERER` and appends it to every frozen-frame URL.
 - `features/frame-studio` owns editor state and control presentation. Its hook
   talks to a small `FrameStudioTarget` port, so an editor can bind to another
   renderer that implements the same operations.
