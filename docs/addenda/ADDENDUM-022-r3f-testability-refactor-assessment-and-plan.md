@@ -202,7 +202,8 @@ border is parented to it). Keep R3F's default colour management, which matches t
   keyed by `JSON.stringify(heroConfig)`, which replaces `updateHeroTitle`'s manual remove/rebuild.
 - `Atmosphere.tsx` → `DecoWall.tsx` (`createDecoWallpaperTextures`, material values copied), `Searchlights.tsx`
   (beam canvas texture moved verbatim to `scene/searchlightTexture.ts`), `GreenLight.tsx`, `GoldDust.tsx` (`createPrng(DUST_SEED)`).
-  GLSL strings move verbatim to `scene3d/shaders/{greenLight,goldDust,cinemaNitrate}.glsl.ts`.
+  The GLSL is already in `.vert` / `.frag` files under `premiere/scene/shaders/` (ADDENDUM-025/026); the R3F
+  components import those files and the uniform factories from that barrel instead of creating `*.glsl.ts` copies.
 - `LightingRig.tsx`: ambient `#ffe8b3` 0.35 + the three point lights; positions from `lightRig()`.
 - `BallroomEnvironment.tsx`: `useThree(gl)` → `createBallroomEnvironment(gl)` → `scene.environment`; disposed on unmount.
 - `CinemaCamera.tsx`: in cinema mode, `cinemaCameraZ` + `getCinemaCameraPose`. Orbit mode uses drei `<OrbitControls enableDamping

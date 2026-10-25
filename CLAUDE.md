@@ -63,6 +63,11 @@ r186, Vitest. No backend, database, auth, or persistence.
   reaches into Three.js objects.
 - User-facing copy never exposes internals (shader uniform names, file paths, class
   names). Design rationale lives in comments and addenda.
+- Shaders: a full shader program (`ShaderMaterial` / `ShaderPass`) lives in `.vert` /
+  `.frag` files beside its feature, imported with Vite's `?raw`, with a pure uniform
+  factory and a contract test that its declared uniforms match the factory's keys
+  (ADDENDUM-025/026). `onBeforeCompile` chunk patches stay inline next to their material.
+  No runtime `fetch()` of shaders (breaks single-file delivery).
 
 ## 6. Function and module design
 
