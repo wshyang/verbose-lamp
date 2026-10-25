@@ -5,6 +5,7 @@ import { SEQUENCE_CHAPTERS, DEFAULT_HERO_TITLE } from '../data/sequence';
 import type { CameraMode, HeroTitleConfig } from '../model/types';
 import type { PremiereSceneApi } from '../scene/sceneApi';
 import { usePremiereRuntime } from './usePremiereRuntime';
+import { useTelemetryBridge } from './useTelemetryBridge';
 import { usePremiereSceneOptions } from './usePremiereSceneOptions';
 import { usePremiereTransport } from './usePremiereTransport';
 
@@ -12,24 +13,11 @@ export function usePremiereController() {
   const stageRef = useRef<HTMLDivElement | null>(null);
   const managerRef = useRef<PremiereSceneApi | null>(null);
   const audioRef = useRef<CinemaAudioEngine | null>(null);
-  const lastUiSyncRef = useRef(0);
-
-  const [currentTime, setCurrentTime] = useState(0);
-  const [activeAct, setActiveAct] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
+  const { currentTime, setCurrentTime, activeAct, setActiveAct, isPlaying, setIsPlaying, onTelemetry, onChapterChange } = useTelemetryBridge();
   const [cameraMode, setCameraMode] = useState<CameraMode>('cinema');
   const [nitrateMode, setNitrateMode] = useState(false);
   const [soundOn, setSoundOn] = useState(false);
   const [heroConfig, setHeroConfig] = useState<HeroTitleConfig>({ ...DEFAULT_HERO_TITLE });
-
-  const onTelemetry = useCallback((telemetry: { currentTime: number; isPlaying: boolean }) => {
-    const now = performance.now();
-    if (now - lastUiSyncRef.current <= 48) return;
-    lastUiSyncRef.current = now;
-    setCurrentTime(telemetry.currentTime);
-    setIsPlaying(telemetry.isPlaying);
-  }, []);
-  const onChapterChange = useCallback((chapterIndex: number) => setActiveAct(chapterIndex), []);
 
   const runtime = usePremiereRuntime({
     mountRef: stageRef,

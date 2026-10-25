@@ -69,7 +69,6 @@ export const DISCIPLINE_DEBT: readonly DebtEntry[] = [
   { file: 'src/features/gilded-portrait/mask.ts', name: 'roundedRectDistance', maxLines: 10, maxParams: 4, maxDepth: 0, reason: 'logic-orchestrator' },
   { file: 'src/features/party-sparklers/components/PartySparklerOverlay.tsx', name: 'PartySparklerOverlay', maxLines: 65, maxParams: 1, maxDepth: 0, reason: 'component' },
   { file: 'src/features/premiere/hooks/usePremiereController.ts', name: 'usePremiereController', maxLines: 71, maxParams: 0, maxDepth: 1, reason: 'feature-hook' },
-  { file: 'src/features/premiere/hooks/usePremiereRuntime.ts', name: 'usePremiereRuntime', maxLines: 70, maxParams: 1, maxDepth: 1, reason: 'feature-hook' },
   { file: 'src/features/premiere/scene/GatsbySceneManager.ts', name: 'buildAtmosphericWorld', maxLines: 171, maxParams: 0, maxDepth: 1, reason: 'render-rig' },
   { file: 'src/features/premiere/scene/decoCards.ts', name: 'createGatsbyCardRig', maxLines: 178, maxParams: 2, maxDepth: 2, reason: 'render-rig' },
   { file: 'src/features/premiere/scene/environment.ts', name: 'createBallroomEnvironment', maxLines: 84, maxParams: 1, maxDepth: 3, reason: 'render-rig' },
