@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import {
   BookOpen,
   Film,
@@ -21,6 +22,8 @@ interface PremiereHeaderProps {
   onOpenResearch: () => void;
   onOpenCustomizer: () => void;
   onOpenEventNight: () => void;
+  /** Extra header launcher supplied by the host (the spectacle console). */
+  launcher?: ReactNode;
   onToggleCameraMode: () => void;
   onToggleNitrate: () => void;
   onToggleSound: () => void;
@@ -34,6 +37,7 @@ export function PremiereHeader({
   onOpenResearch,
   onOpenCustomizer,
   onOpenEventNight,
+  launcher,
   onToggleCameraMode,
   onToggleNitrate,
   onToggleSound,
@@ -66,6 +70,7 @@ export function PremiereHeader({
         <QrGeneratorLauncher />
         <AvatarStudioLauncher />
         <EventNightLauncher onOpen={onOpenEventNight} />
+        {launcher}
         <Button
           onClick={onToggleCameraMode}
           variant={cameraMode === 'orbit' ? 'selected' : 'panel'}
