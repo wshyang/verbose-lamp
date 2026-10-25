@@ -1,0 +1,130 @@
+/**
+ * Self-hosted typefaces (ADDENDUM-030).
+ *
+ * Every face is the latin subset of the same OFL family the page used to fetch
+ * from Google Fonts. Self-hosting matters for three reasons and they are all
+ * practical:
+ *
+ * 1. The title sequence rasterises text on a canvas (`Cinzel` in the lucky-drum
+ *    renderer, `Cinzel Decorative` in the countdown and name reveal). A remote face
+ *    that has not arrived yet renders as Georgia, and the difference is visible.
+ * 2. The Playwright likeness baselines must not depend on a third party being up,
+ *    fast, or serving the same version it served last week.
+ * 3. Offline, the app keeps its typography instead of falling back.
+ *
+ * The single-file build inlines these as data URLs (`vite-plugin-singlefile` sets
+ * `assetsInlineLimit` to always inline), so they cost no extra requests at runtime.
+ * Licences sit beside the files: `*-OFL.txt`.
+ */
+
+@font-face {
+  font-family: 'Cinzel';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('../assets/fonts/cinzel-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Cinzel';
+  font-style: normal;
+  font-weight: 600;
+  font-display: block;
+  src: url('../assets/fonts/cinzel-latin-600-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Cinzel';
+  font-style: normal;
+  font-weight: 700;
+  font-display: block;
+  src: url('../assets/fonts/cinzel-latin-700-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Cinzel Decorative';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('../assets/fonts/cinzel-decorative-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Cinzel Decorative';
+  font-style: normal;
+  font-weight: 700;
+  font-display: block;
+  src: url('../assets/fonts/cinzel-decorative-latin-700-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('../assets/fonts/cormorant-garamond-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: italic;
+  font-weight: 400;
+  font-display: block;
+  src: url('../assets/fonts/cormorant-garamond-latin-400-italic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 600;
+  font-display: block;
+  src: url('../assets/fonts/cormorant-garamond-latin-600-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Jost';
+  font-style: normal;
+  font-weight: 300;
+  font-display: block;
+  src: url('../assets/fonts/jost-latin-300-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Jost';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('../assets/fonts/jost-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Jost';
+  font-style: normal;
+  font-weight: 500;
+  font-display: block;
+  src: url('../assets/fonts/jost-latin-500-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Jost';
+  font-style: normal;
+  font-weight: 600;
+  font-display: block;
+  src: url('../assets/fonts/jost-latin-600-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Marcellus';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('../assets/fonts/marcellus-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Poiret One';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('../assets/fonts/poiret-one-latin-400-normal.woff2') format('woff2');
+}

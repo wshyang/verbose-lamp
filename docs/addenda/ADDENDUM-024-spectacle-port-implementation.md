@@ -74,3 +74,9 @@ An AST scan of the checkout found 37 units over a limit: functions over 50 lines
 ## 9. Deferred
 
 Playwright e2e stays deferred, but its un-defer trigger in ADDENDUM-001 ("a second interactive feature ships") is now met. Flagged for the next round. Self-hosting the fonts is also still open; offline, the drum and name reveal fall back to Georgia.
+
+**Update (ADDENDUM-030):** the fonts are now self-hosted — 14 latin-subset faces in
+`src/assets/fonts/`, declared in `src/styles/fonts.css`, inlined into the single file,
+and gated behind `waitForFonts()` before React mounts. The Playwright specs are now
+validated statically (42 tests enumerated, test ids checked by
+`src/app/e2eContract.test.ts`); running them still needs a browser.
