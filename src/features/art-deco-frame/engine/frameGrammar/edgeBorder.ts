@@ -7,8 +7,10 @@
  * Pure and deterministic. Adapted to our PolylineSpec/RailKind so it renders through
  * the same chamfered gold geometry and trim shader as the title cards.
  */
+import { apertureForLayout, buildDecoLattice, nineSliceLayout } from '@/features/deco-lattice';
 import { BaseGenome, clampGenome } from './genome';
-import { PolylineSpec, Point2, RailKind } from './types';
+import { latticeToRails } from './latticeAdapter';
+import { PolylineSpec, Point2, RailKind, ScreenBorderPattern } from './types';
 
 export interface EdgeBorderRequest {
   /** width / height of the viewport */
@@ -16,6 +18,10 @@ export interface EdgeBorderRequest {
   genome?: BaseGenome;
   /** 0..1 — how many nested rules and how dense the reeding */
   density: number;
+  /** Border family; 'poster' (default) is the delivered geometry. */
+  pattern?: ScreenBorderPattern;
+  /** Seed for the lattice border's walks. Default 1925. */
+  seed?: number;
 }
 
 export interface EdgeBorderGeometry {
@@ -252,22 +258,52 @@ function innerHairline(aspect: number, density: number): PolylineSpec[] {
   ];
 }
 
+function extentsOf(specs: PolylineSpec[]): { extentX: number; extentY: number } {
+  return {
+    extentX: Math.max(...specs.flatMap((spec) => spec.points.map((point) => Math.abs(point.x)))),
+    extentY: Math.max(...specs.flatMap((spec) => spec.points.map((point) => Math.abs(point.y)))),
+  };
+}
+
+const LATTICE_BORDER_INSET = 0.97;
+const LATTICE_BORDER_WIDTH_FACTOR = 0.35;
+
+/**
+ * The lattice proscenium (ADDENDUM-021 §3.5): a nine-slice frame whose
+ * interior aperture stays clear, so the viewport still reads.
+ */
+function buildLatticeBorder(aspect: number, density: number, seed: number): PolylineSpec[] {
+  const layout = nineSliceLayout({ hw: aspect, hh: 1 });
+  const geometry = buildDecoLattice({
+    mode: 'frame',
+    hw: aspect * LATTICE_BORDER_INSET,
+    hh: LATTICE_BORDER_INSET,
+    seed,
+    density,
+    level: 1 + Math.round(density * 2),
+    aperture: apertureForLayout(layout, { hw: aspect, hh: 1 }),
+  });
+  return latticeToRails(geometry, { coordScale: 1, widthScale: LATTICE_BORDER_WIDTH_FACTOR });
+}
+
 export function buildEdgeBorder(request: EdgeBorderRequest): EdgeBorderGeometry {
   const aspect = Math.min(3.2, Math.max(0.5, request.aspect));
   const genome = clampGenome(request.genome);
   const density = Math.min(1, Math.max(0, request.density));
-  const nestedCount = Math.min(MAX_NESTED_RULES, 1 + Math.round(density * 3));
 
+  if (request.pattern === 'lattice') {
+    const specs = buildLatticeBorder(aspect, density, request.seed ?? 1925);
+    return { specs, ...extentsOf(specs) };
+  }
+
+  const nestedCount = Math.min(MAX_NESTED_RULES, 1 + Math.round(density * 3));
   const specs = [
     ...nestedRules(aspect, nestedCount, genome),
     ...allCornerFans(aspect, genome, density),
     ...reeding(aspect, genome, density),
     ...innerHairline(aspect, density),
   ];
-
-  const extentX = Math.max(...specs.flatMap((spec) => spec.points.map((point) => Math.abs(point.x))));
-  const extentY = Math.max(...specs.flatMap((spec) => spec.points.map((point) => Math.abs(point.y))));
-  return { specs, extentX, extentY };
+  return { specs, ...extentsOf(specs) };
 }
 
 /** Camera-space scale that makes unit viewport coordinates fill the frustum exactly. */

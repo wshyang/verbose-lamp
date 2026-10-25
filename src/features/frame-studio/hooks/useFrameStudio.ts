@@ -12,6 +12,7 @@ import {
   FrameStyle,
   FrameSurface,
   INTRICACY_PRESETS,
+  ScreenBorderPattern,
   ScreenBorderStyle,
 } from '@/features/art-deco-frame';
 import { SIGNATURE_GENOME, clampGenome, withGene, type GeneKey } from '@/features/art-deco-frame';
@@ -21,6 +22,13 @@ export interface FrameStudioTarget {
   setSequenceFrameStyle: (style: FrameStyle) => void;
   setScreenBorderStyle: (style: ScreenBorderStyle) => void;
   setScreenBorderEnabled: (enabled: boolean) => void;
+}
+
+const LATTICE_DEFAULT_SEED = 1925;
+
+/** Deterministic next seed for the pattern reroll (no Math.random). */
+export function nextPatternSeed(seed: number | undefined): number {
+  return ((seed ?? LATTICE_DEFAULT_SEED) * 9301 + 49297) % 233280;
 }
 
 const detailPercent = (value: number) => Math.round(value * 100);
@@ -108,6 +116,11 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
     [commitSequence, formula, intricacy]
   );
 
+  const rerollPattern = useCallback(
+    () => commitSequence({ ...formula, seed: nextPatternSeed(formula.seed) }, intricacy),
+    [commitSequence, formula, intricacy]
+  );
+
   const setDetail = useCallback(
     (percent: number) => commitSequence(formula, detailValue(percent)),
     [commitSequence, formula]
@@ -115,6 +128,11 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
 
   const setBorderWeight = useCallback(
     (weight: number) => commitBorder({ ...border, weight: detailValue(weight) }),
+    [border, commitBorder]
+  );
+
+  const setBorderPattern = useCallback(
+    (pattern: ScreenBorderPattern) => commitBorder({ ...border, pattern }),
     [border, commitBorder]
   );
 
@@ -183,8 +201,14 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, []);
 
+  const isLatticeActive =
+    formula.source === 'lattice' ||
+    layerOptions.some((layer) => layer.source === 'lattice' && layer.enabled);
+
   return {
     isOpen,
+    isLatticeActive,
+    rerollPattern,
     selectPattern,
     selectDesign,
     setLevel,
@@ -212,6 +236,8 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
     setGene: setGeneForSurface,
     borderEnabled,
     setBorderEnabled,
+    borderPattern: border.pattern ?? 'poster',
+    setBorderPattern,
     borderWeight: detailPercent(border.weight),
     setBorderWeight,
     resetAll,

@@ -54,6 +54,36 @@ describe('buildDecoLattice', () => {
   });
 });
 
+describe('aperture and text slots', () => {
+  it('clips every rail clear of an explicit aperture, segment by segment', () => {
+    const aperture = { hw: 0.9, hh: 0.5 };
+    const geo = buildDecoLattice({ mode: 'medallion', hw: 2, hh: 1, seed: 1925, aperture });
+    for (const spec of geo.specs) {
+      const pts = spec.closed ? [...spec.points, spec.points[0]] : spec.points;
+      for (let i = 1; i < pts.length; i++) {
+        for (const t of [0, 0.25, 0.5, 0.75, 1]) {
+          const x = pts[i - 1].x + (pts[i].x - pts[i - 1].x) * t;
+          const y = pts[i - 1].y + (pts[i].y - pts[i - 1].y) * t;
+          const inside = Math.abs(x) < aperture.hw - 1e-6 && Math.abs(y) < aperture.hh - 1e-6;
+          expect(inside).toBe(false);
+        }
+      }
+    }
+  });
+
+  it('keeps a text slot clear as well', () => {
+    const slot = { minX: -0.4, minY: -0.2, maxX: 0.4, maxY: 0.2 };
+    const geo = buildDecoLattice({ mode: 'medallion', hw: 1, hh: 1, seed: 7, textSlots: [slot] });
+    for (const spec of geo.specs) {
+      for (const p of spec.points) {
+        const inside = p.x > slot.minX + 1e-6 && p.x < slot.maxX - 1e-6
+          && p.y > slot.minY + 1e-6 && p.y < slot.maxY - 1e-6;
+        expect(inside).toBe(false);
+      }
+    }
+  });
+});
+
 describe('traceWalks', () => {
   it('is deterministic and stays inside the wedge annulus', () => {
     const opts = { seed: 1925, cell: 0.015, inner: 0.58, outer: 0.9, count: 10, minRun: 2 };

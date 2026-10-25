@@ -15,10 +15,12 @@ export * from './types';
 export { buildCoreFrameSpecs } from './archetypes';
 export {
   buildGenerativeFrameSpecs,
+  buildLattice,
   cantorSegments,
   frameBox,
   mirrorHalves,
 } from './generative';
+export { latticeToRails, type LatticeRailScale } from './latticeAdapter';
 export { buildEdgeBorder, viewportScaleAtDistance } from './edgeBorder';
 export {
   annotateRanks,

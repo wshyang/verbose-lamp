@@ -518,6 +518,10 @@ export class GatsbySceneManager {
       formula: {
         source: style.formula.source,
         level: THREE.MathUtils.clamp(Math.round(style.formula.level), 1, 4),
+        seed:
+          style.formula.seed === undefined
+            ? undefined
+            : Math.max(0, Math.round(style.formula.seed)),
         genome: clampGenome(style.formula.genome),
         layers: style.formula.layers?.map((layer) => ({
           source: layer.source,
@@ -533,6 +537,8 @@ export class GatsbySceneManager {
     this.screenBorderStyle = {
       weight: THREE.MathUtils.clamp(style.weight, 0, 1),
       genome: clampGenome(style.genome),
+      pattern: style.pattern ?? 'poster',
+      seed: style.seed === undefined ? undefined : Math.max(0, Math.round(style.seed)),
     };
     this.screenBorderRig.setStyle(this.screenBorderStyle);
   }
