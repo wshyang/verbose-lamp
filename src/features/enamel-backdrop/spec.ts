@@ -70,7 +70,9 @@ export function paletteStops(palette: EnamelPalette): string[] {
 /** True when the spec's enamels match a palette, so its chip can show as selected. */
 export function isPaletteActive(spec: BackdropSpec, palette: EnamelPalette): boolean {
   const accents = (spec.accents ?? []).join().toLowerCase();
-  return spec.colourOne.toLowerCase() === palette.colourOne
-    && spec.colourTwo.toLowerCase() === palette.colourTwo
-    && accents === (palette.accents ?? []).join();
+  return (
+    spec.colourOne.toLowerCase() === palette.colourOne.toLowerCase() &&
+    spec.colourTwo.toLowerCase() === palette.colourTwo.toLowerCase() &&
+    accents === (palette.accents ?? []).join().toLowerCase()
+  );
 }
