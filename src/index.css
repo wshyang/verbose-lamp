@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+/*
+ * Reference checkouts and scratch trees live in the repo root, and Tailwind's automatic
+ * source detection scans everything that is not git-ignored — so a 32 MB `tmp/special-fiesta`
+ * checkout was silently adding its utility classes to the shipped stylesheet (+10 kB in the
+ * single-file bundle). `dist/` matters for the same reason: the build output inlines the
+ * stylesheet, so leaving it in scope makes the bundle depend on the bundle before it.
+ * `docs/` and `e2e/` are excluded for the same reason: the stylesheet should depend on the
+ * application (`src/` and `index.html`) and nothing else. Left in, every addendum that quotes
+ * a class name would nudge the bundle.
+ */
+@source not "../tmp";
+@source not "../reference";
+@source not "../dist";
+@source not "../docs";
+@source not "../e2e";
+
 @theme {
   --font-display: "Cinzel Decorative", "Cinzel", Georgia, serif;
   --font-body: "Jost", "Segoe UI", sans-serif;
