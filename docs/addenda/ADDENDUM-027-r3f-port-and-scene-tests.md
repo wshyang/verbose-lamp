@@ -10,11 +10,11 @@ ADDENDUM-022 §6 and §7 are implemented. `GatsbySceneManager.ts` (721 lines of 
 | Layer | File(s) | Role |
 |---|---|---|
 | State | `scene3d/premiereStore.ts` (161) | `createPremiereStore()` + `storeSceneApi(store)`, the `PremiereSceneApi` adapter the existing hooks already spoke |
-| Pure | `scene/styleClamp.ts` (49), `scene/orbitFocus.ts` (45), `scene/searchlightTexture.ts` (33) | clamping, orbit framing, the beam texture — moved out of the manager verbatim |
+| Pure | `scene/styleClamp.ts` (49), `scene/orbitFocus.ts` (45), `scene/searchlightTexture.ts` (31) | clamping, orbit framing, the beam texture — moved out of the manager verbatim |
 | Pure | `scene/choreography.ts` (208, from ADDENDUM-026) | timing/staging math; unchanged by this phase |
 | Shaders | `scene3d/shaders/{cinemaNitrate,goldDust,greenLight}.ts` | GLSL moved verbatim, no edits |
 | GPU | `scene3d/composer.ts` (64) | three's EffectComposer chain: RenderPass → UnrealBloomPass(0.56, 0.64, 0.78) → nitrate ShaderPass → OutputPass |
-| Components | `scene3d/*.tsx` (10 files, 50–97 lines each) | `PremiereCanvas`, `PremiereScene`, `PlaybackClock`, `TitleCard`, `DecoWall`, `Searchlights`, `GreenLight`, `GoldDust`, `LightingRig`, `BallroomEnvironment`, `CinemaCamera`, `ScreenBorder`, `CinemaComposer` |
+| Components | `scene3d/*.tsx` (13 files, 23–85 lines each) | `PremiereCanvas`, `PremiereScene`, `PlaybackClock`, `TitleCard`, `DecoWall`, `Searchlights`, `GreenLight`, `GoldDust`, `LightingRig`, `BallroomEnvironment`, `CinemaCamera`, `ScreenBorder`, `CinemaComposer` |
 | Wiring | `app/components/CinematicStage.tsx`, `hooks/usePremiereRuntime.ts`, `hooks/usePremiereController.ts` | stage renders `<PremiereCanvas store>`; runtime creates the store and owns only `CinemaAudioEngine` |
 
 Every builder is a direct call into the existing code: `createGatsbyCardRig`, `createBallroomEnvironment`, `createDecoWallpaperTextures`, `createScreenBorderRig`, `createExtrudedDecoTextMesh`, `resolveViewportFit`, `getCinemaCameraPose`, `smoothstep`-family choreography. Nothing was re-authored, which is what made a 1:1 port feasible without a browser.
