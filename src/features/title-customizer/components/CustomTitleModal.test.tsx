@@ -71,6 +71,33 @@ describe('CustomTitleModal', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
+  it('uppercases the keystone, frieze line and credit as they are typed', () => {
+    renderModal();
+
+    for (const [testId, value] of [
+      ['title-customizer__keystone', 'great'],
+      ['title-customizer__pre-title', 'the'],
+      ['title-customizer__credit', 'from the novel'],
+    ] as const) {
+      const field = screen.getByTestId(testId) as HTMLInputElement;
+      fireEvent.change(field, { target: { value } });
+      expect(field.value).toBe(value.toUpperCase());
+    }
+  });
+
+  it('resets the draft to the delivered title, without applying it', async () => {
+    const onApply = vi.fn();
+    renderModal({ onApply });
+    fireEvent.change(screen.getByTestId('title-customizer__main-title'), { target: { value: 'caraway' } });
+
+    await userEvent.click(screen.getByTestId('title-customizer__reset'));
+
+    expect((screen.getByTestId('title-customizer__main-title') as HTMLInputElement).value).toBe(
+      DEFAULT_HERO_TITLE.mainTitle
+    );
+    expect(onApply).not.toHaveBeenCalled();
+  });
+
   it('toggles the pinstripe alternation in the draft', () => {
     renderModal();
     const toggle = screen.getByTestId('title-customizer__pinstripe') as HTMLInputElement;

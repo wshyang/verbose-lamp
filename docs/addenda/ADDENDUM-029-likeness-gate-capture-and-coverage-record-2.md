@@ -70,19 +70,19 @@ Bar: ADDENDUM-027 §5 — strict global 100 %, staged. Suite after this push:
 
 | Metric | At `8346fb3` | At `104c121` | Now |
 |---|---|---|---|
-| Statements | 89.57 % | 97.09 % | **98.47 %** (6342/6440) |
-| Branches | 77.94 % | 89.78 % | **92.10 %** (2192/2380) |
-| Functions | 81.35 % | 95.44 % | **97.43 %** (1370/1406) |
-| Lines | 90.42 % | 97.79 % | **98.90 %** (5665/5728) |
-| Files / tests | 111 / 970 | 137 / 1204 | **151 / 1301** |
+| Statements | 89.57 % | 97.09 % | **98.74 %** (6359/6440) |
+| Branches | 77.94 % | 89.78 % | **92.43 %** (2200/2380) |
+| Functions | 81.35 % | 95.44 % | **98.07 %** (1379/1406) |
+| Lines | 90.42 % | 97.79 % | **99.17 %** (5681/5728) |
+| Files / tests | 111 / 970 | 137 / 1204 | **154 / 1317** |
 
 The method did not change: one focused suite per module, reading the module first and asserting its real contract — no global canvas/WebGL mocking net, no `skip`s, no snapshot padding.
 
-New this addendum, in the order they landed: the likeness spec rewritten to the plan's twelve shots and re-captured on both projects; the eight-flow interaction suite; `QrGeneratorModal` (10), `useQrGenerator` (12), `GoldenQrCode` (6), `useEffectRunner` (7), `useStageSettings` (6), `locateFace` (11), `frameDesigns` (12), `EventNightStage` (7), `enamel-backdrop/spec` (17), `edgeBorder` ornament (12) — then the second wave written against measured gaps: `GoldenQrDefs` (4), `GeneSlider` (7), `usePremiereSpectacle` (4), `spectacle/model/geometry` (12), `SubjectControls` (4), `GildedPortraitLauncher` (3), `gilded-portrait/curveEdges` (12), `decoTypography` chamfer (5), `fireworksEffect` sub-shells (6), `frameGrammar/grammarBranches` (11), `cutOctagonProfile` (4), `deco-lattice/walk` (7) — and a third sweep that filled the ordinary gaps the first two left behind: `GildedGlyphDefs` (5), `AvatarStudioLauncher` (3), the research and customizer open/close paths in `PremiereSurfaces`, `detectQualityEnv` (3), the exhaustive-switch guard in `enamel-backdrop/patterns`, `gildImage`'s shape assertions (2), `planeOf`/`alphaOf`'s "not a matte" answers, `emptySubject` and the layer-size guard in `avatar-studio/compose`, and the design-gallery path in `useFrameStudio`.
+New this addendum, in the order they landed: the likeness spec rewritten to the plan's twelve shots and re-captured on both projects; the eight-flow interaction suite; `QrGeneratorModal` (10), `useQrGenerator` (12), `GoldenQrCode` (6), `useEffectRunner` (7), `useStageSettings` (6), `locateFace` (11), `frameDesigns` (12), `EventNightStage` (7), `enamel-backdrop/spec` (17), `edgeBorder` ornament (12) — then the second wave written against measured gaps: `GoldenQrDefs` (4), `GeneSlider` (7), `usePremiereSpectacle` (4), `spectacle/model/geometry` (12), `SubjectControls` (4), `GildedPortraitLauncher` (3), `gilded-portrait/curveEdges` (12), `decoTypography` chamfer (5), `fireworksEffect` sub-shells (6), `frameGrammar/grammarBranches` (11), `cutOctagonProfile` (4), `deco-lattice/walk` (7) — and a third sweep that filled the ordinary gaps the first two left behind: `GildedGlyphDefs` (5), `AvatarStudioLauncher` (3), the research and customizer open/close paths in `PremiereSurfaces`, `detectQualityEnv` (3), the exhaustive-switch guard in `enamel-backdrop/patterns`, `gildImage`'s shape assertions (2), `planeOf`/`alphaOf`'s "not a matte" answers, `emptySubject` and the layer-size guard in `avatar-studio/compose`, and the design-gallery path in `useFrameStudio` — then a fourth sweep on the four remaining modules with four or more gaps: `CustomTitleModal`'s keystone/frieze/credit fields and its reset, `LuckyDrawControls` (guest-count menu, spin/redraw/reset gating), `AvatarStudioModal`'s shell (dialog chrome, corner brackets, close), and the searchlights keep-clear pass, which no shipment reaches because every caller passes an empty rect list.
 
 Two of those waves needed a test seam rather than a mock. `decoTypography`'s chamfer pass reads pixels back, so `src/test/canvas2d.ts` grew one option — `opaqueReadback`, which fills alpha 255 on `getImageData` — instead of a test spying on `HTMLCanvasElement.prototype.getContext` (that spy recursed into `RangeError`). `deco-lattice/walk` grew an exported `stepRun` because the seeded walker's step loop is the only part worth asserting; see §6 for what that exposed.
 
-**Remaining: 98 statements across 55 files**, with nothing above five: `GatsbySceneManager` (5/320), `searchlightsEffect` (5/37), `edgeBorder` (4/164), `AvatarStudioModal` (4/7), `cutOut` (4/107), `segmentSubject` (4/23), `LuckyDrawControls` (4/8), `CustomTitleModal` (4/20), then 3s and 2s in `railGeometry`, `walk`'s dead guard, `FrameStudioControl`, `LuckyDrawStage` (jsdom cannot mount it), `sparkRenderer`, and guards scattered through the feature tree. Every one of them is a canvas, WebGL, `document.createElement('canvas')` or modal-open-path surface; closing them is the same per-module work, not a net.
+**Remaining: 81 statements across 51 files**, with nothing above five: `GatsbySceneManager` (5/320, the Three.js rig teardown and the coalesced frame-cancel handle), `edgeBorder` (4/164, minimum-length guards on ribs, refinement rays and ticks), `cutOut` (4/107), `segmentSubject` (4/23, the model loader's failure path), then 3s and 2s from `railGeometry`, `walk`'s dead guard, `FrameStudioControl`, `LuckyDrawStage` (jsdom cannot mount it), `sparkRenderer`, `LuckyDrawResult`, and single guards scattered through the feature tree. The rest is WebGL teardown, GPU-timing and loader-failure code: it needs a GPU-attached test harness, not more mocks, and that harness is the open half of ADDENDUM-027 §5. Every one of them is a canvas, WebGL, `document.createElement('canvas')` or modal-open-path surface; closing them is the same per-module work, not a net.
 
 ## 6. What is still open
 
@@ -96,7 +96,7 @@ Two of those waves needed a test seam rather than a mock. `decoTypography`'s cha
 ```
 npx tsc --noEmit                                              # clean
 npm test                                                      # 149 files / 1283 tests
-npx playwright test e2e/likeness.spec.ts                      # 24 passed (12 shots × 2 projects)
+npx playwright test e2e/likeness.spec.ts                      # 24 passed (12 shots × 2 projects, 20.2 min)
 npx playwright test e2e/flows.spec.ts                         # 16 passed (8 flows × 2 projects, 10.7 min)
 ```
 
