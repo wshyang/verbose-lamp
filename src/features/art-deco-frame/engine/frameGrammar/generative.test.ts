@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { FrameArchetype } from '../../model/types';
 import { SIGNATURE_GENOME } from './genome';
+import { buildGenerativeFrameSpecs, clampGenesisLevel } from './generative';
 import {
   FRAME_SOURCES,
   FrameFormula,
   FrameSource,
   PolylineSpec,
+  buildAuthoredFrame,
   buildFrame,
   buildFrameSpecs,
   cantorSegments,
@@ -126,4 +128,29 @@ describe('math helpers', () => {
   });
 
 
+});
+
+describe('genesis level and authored wrapper defaults', () => {
+  it('falls back to level 2 for non-finite levels and clamps finite levels', () => {
+    expect([Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY].map(clampGenesisLevel)).toEqual([2, 2, 2]);
+    expect(clampGenesisLevel(0)).toBe(1);
+    expect(clampGenesisLevel(2.6)).toBe(3);
+    expect(clampGenesisLevel(99)).toBe(4);
+  });
+
+  it('buildAuthoredFrame defaults to the Film Baseline intricacy', () => {
+    expect(buildAuthoredFrame('gatsby_hero', WIDTH, SIGNATURE_GENOME).map(geometryOf)).toEqual(
+      buildAuthoredFrame('gatsby_hero', WIDTH, SIGNATURE_GENOME, 0.5).map(geometryOf)
+    );
+  });
+
+  it('can omit the primary lattice frame for layered composition', () => {
+    const full = buildGenerativeFrameSpecs('gatsby_hero', WIDTH, formula('lattice', 2));
+    const patternOnly = buildGenerativeFrameSpecs('gatsby_hero', WIDTH, formula('lattice', 2), {
+      includePrimaryFrame: false,
+    });
+    expect(full.some((spec) => spec.kind === 'frame')).toBe(true);
+    expect(patternOnly.every((spec) => spec.kind !== 'frame')).toBe(true);
+    expect(patternOnly.length).toBeLessThan(full.length);
+  });
 });

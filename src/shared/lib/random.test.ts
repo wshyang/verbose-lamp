@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createPrng, hash01, mulberry32 } from './random';
+import { createPrng, hash01, mulberry32, randomIndex } from './random';
 
 describe('mulberry32', () => {
   it('is deterministic per seed', () => {
@@ -54,3 +54,25 @@ describe('createPrng (ADDENDUM-022 §0.1)', () => {
 });
 
 const GOLDEN_1920: readonly number[] = [0.932266, 0.617307, 0.579805, 0.077896, 0.762659];
+
+describe('randomIndex', () => {
+  const fillWith = (value: number) => (buf: Uint32Array) => {
+    buf[0] = value;
+    return buf;
+  };
+
+  it('reduces the drawn word into [0, n)', () => {
+    expect(randomIndex(4, fillWith(7))).toBe(3);
+    expect(randomIndex(10, fillWith(0))).toBe(0);
+    expect(randomIndex(6, fillWith(4294967295))).toBe(4294967295 % 6);
+  });
+
+  it('draws exactly one 32-bit word', () => {
+    const lengths: number[] = [];
+    randomIndex(3, (buf) => {
+      lengths.push(buf.length);
+      return buf;
+    });
+    expect(lengths).toEqual([1]);
+  });
+});

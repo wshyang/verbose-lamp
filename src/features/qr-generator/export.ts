@@ -1,21 +1,12 @@
 /**
- * Export helpers. `toSafeFileStem` is pure and tested; the download functions are
- * thin DOM wrappers and intentionally hold no logic beyond serialisation.
+ * Thin DOM download wrappers; intentionally no logic beyond serialisation.
+ * The pure filename stemming lives in `fileStem.ts` (ADDENDUM-029) and is
+ * re-exported here for compatibility.
  */
+export { toSafeFileStem } from './fileStem';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const DEFAULT_PNG_SIZE = 1024;
-
-export function toSafeFileStem(label: string, fallback = 'golden-qr'): string {
-  const stem = label
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 48);
-  return stem.length > 0 ? stem : fallback;
-}
 
 export function serializeSvg(svg: SVGSVGElement): string {
   const clone = svg.cloneNode(true) as SVGSVGElement;

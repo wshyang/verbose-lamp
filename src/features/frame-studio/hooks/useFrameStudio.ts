@@ -17,6 +17,9 @@ import {
 } from '@/features/art-deco-frame';
 import { SIGNATURE_GENOME, clampGenome, withGene, type GeneKey } from '@/features/art-deco-frame';
 import { DESIGN_GALLERY, describeDesign, designAt, findDesignEntry } from '../data/frameDesigns';
+import { nextPatternSeed } from '../model/patternSeed';
+
+export { nextPatternSeed } from '../model/patternSeed';
 
 export interface FrameStudioTarget {
   setSequenceFrameStyle: (style: FrameStyle) => void;
@@ -24,12 +27,6 @@ export interface FrameStudioTarget {
   setScreenBorderEnabled: (enabled: boolean) => void;
 }
 
-const LATTICE_DEFAULT_SEED = 1925;
-
-/** Deterministic next seed for the pattern reroll (no Math.random). */
-export function nextPatternSeed(seed: number | undefined): number {
-  return ((seed ?? LATTICE_DEFAULT_SEED) * 9301 + 49297) % 233280;
-}
 
 const detailPercent = (value: number) => Math.round(value * 100);
 const detailValue = (percent: number) => Math.min(1, Math.max(0, percent / 100));

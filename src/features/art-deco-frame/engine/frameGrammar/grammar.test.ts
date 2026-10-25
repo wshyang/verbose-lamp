@@ -4,10 +4,13 @@ import {
   INTRICACY_PRESETS,
   PolylineSpec,
   buildCoreFrameSpecs,
+  annotateRanks,
   buildFrameSpecs,
+  elaborate,
   elaborationGenerations,
   offsetPolylineOutward,
   rankBudget,
+  reduceByRank,
 } from './index';
 
 const ARCHETYPES: FrameArchetype[] = [
@@ -118,5 +121,94 @@ describe('offsetPolylineOutward', () => {
     expect(out[1].x).toBeGreaterThan(1);
     expect(out[3].x).toBeCloseTo(0, 6);
     expect(out[3].y).toBeLessThan(-1);
+  });
+});
+
+describe('grammar defaults and malformed rails', () => {
+  const spec = (overrides: Partial<PolylineSpec> = {}): PolylineSpec => ({
+    points: [
+      { x: 0, y: 1 },
+      { x: 1, y: 1 },
+      { x: 1, y: -1 },
+    ],
+    width: 0.03,
+    depth: 0.08,
+    z: 0,
+    delay: 0.1,
+    ...overrides,
+  });
+
+  it('treats an untagged rail as a frame half when deriving ranks', () => {
+    const untagged = [spec(), spec(), spec()];
+    expect(annotateRanks(untagged).map((entry) => entry.rank)).toEqual([0, 0, 1]);
+    expect(untagged.every((entry) => entry.rank === undefined)).toBe(true);
+  });
+
+  it('keeps unranked rails at the lowest budget', () => {
+    const unranked = spec();
+    const ranked = spec({ rank: 3 });
+    expect(reduceByRank([unranked, ranked], 0)).toEqual([unranked]);
+  });
+
+  it('rejects chevron and ray productions with the wrong vertex count', () => {
+    const chevron = spec({ kind: 'chevron', points: [{ x: 0, y: 1 }, { x: 1, y: 1 }] });
+    const ray = spec({ kind: 'ray' });
+    expect(elaborate([chevron], 1)).toEqual([chevron]);
+    expect(elaborate([ray], 1)).toEqual([ray]);
+  });
+
+  it('defaults a missing kind to the frame echo and missing parting to the right', () => {
+    expect(elaborate([spec()], 1).length).toBeGreaterThan(1);
+
+    const column = spec({
+      kind: 'column',
+      points: [
+        { x: 1, y: 1 },
+        { x: 1, y: -1 },
+      ],
+    });
+    const columns = elaborate([column], 1);
+    expect(columns.length).toBeGreaterThan(1);
+    expect(columns[1].points[0].x).toBeGreaterThan(column.points[0].x);
+  });
+
+  it('elaborates a diamond with no vertices without inventing geometry', () => {
+    const empty = spec({ kind: 'diamond', points: [] });
+    const out = elaborate([empty], 1);
+    expect(out.length).toBeGreaterThan(1);
+    expect(out.every((entry) => entry.points.length === 0)).toBe(true);
+  });
+});
+
+describe('offsetPolylineOutward edge cases', () => {
+  it('copies a lone point instead of offsetting it', () => {
+    const only = [{ x: 2, y: 3 }];
+    const out = offsetPolylineOutward(only, 0.1, false);
+    expect(out).toEqual(only);
+    expect(out[0]).not.toBe(only[0]);
+  });
+
+  it('stays finite through duplicate vertices and a reversing vertex', () => {
+    const duplicate = offsetPolylineOutward(
+      [
+        { x: 1, y: 1 },
+        { x: 1, y: 1 },
+        { x: 2, y: 1 },
+      ],
+      0.1,
+      false
+    );
+    expect(duplicate.every((point) => Number.isFinite(point.x) && Number.isFinite(point.y))).toBe(true);
+
+    const reversing = offsetPolylineOutward(
+      [
+        { x: 0, y: 0 },
+        { x: 1, y: 0 },
+        { x: 0, y: 0 },
+      ],
+      0.1,
+      false
+    );
+    expect(reversing[1].y).toBeGreaterThan(0);
   });
 });

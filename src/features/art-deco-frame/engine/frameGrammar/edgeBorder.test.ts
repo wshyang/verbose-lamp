@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { buildEdgeBorder, buildFrame, viewportScaleAtDistance } from './index';
 import {
   SIGNATURE_GENOME,
+  clampGene,
   clampGenome,
   genomeForVariant,
   isSignatureGenome,
@@ -125,5 +126,46 @@ describe('viewport edge border', () => {
   it('is deterministic and scales to the frustum', () => {
     expect(border(1.78)).toEqual(border(1.78));
     expect(viewportScaleAtDistance(3, Math.PI / 3)).toBeCloseTo(3 * Math.tan(Math.PI / 6), 10);
+  });
+});
+
+describe('genome and border edge cases', () => {
+  it('falls back to the signature gene for non-finite values', () => {
+    expect(clampGene('rayDensity', Number.NaN)).toBe(SIGNATURE_GENOME.rayDensity);
+    expect(clampGene('wingDelta', Number.POSITIVE_INFINITY)).toBe(SIGNATURE_GENOME.wingDelta);
+  });
+
+  it('refines corner fans and reeding when the fractal genes are engaged', () => {
+    const fractal = withGene(
+      withGene(withGene(SIGNATURE_GENOME, 'fractalDepth', 3), 'fractalRatio', 0.3),
+      'rayDensity',
+      1.6
+    );
+    const plain = buildEdgeBorder({ aspect: 1.78, genome: SIGNATURE_GENOME, density: 1 });
+    const refined = buildEdgeBorder({ aspect: 1.78, genome: fractal, density: 1 });
+    expect(refined.specs.length).toBeGreaterThan(plain.specs.length);
+    expect(
+      refined.specs.every((spec) => spec.points.every((point) => Number.isFinite(point.x) && Number.isFinite(point.y)))
+    ).toBe(true);
+  });
+
+  it('uses the 1925 lattice seed by default and changes walks with an explicit seed', () => {
+    const byDefault = buildEdgeBorder({ aspect: 1.78, density: 0.5, pattern: 'lattice' });
+    const explicit = buildEdgeBorder({ aspect: 1.78, density: 0.5, pattern: 'lattice', seed: 1925 });
+    const other = buildEdgeBorder({ aspect: 1.78, density: 0.5, pattern: 'lattice', seed: 7 });
+    expect(byDefault).toEqual(explicit);
+    expect(other.specs).not.toEqual(byDefault.specs);
+    expect(byDefault.specs.length).toBeGreaterThan(0);
+  });
+});
+
+describe('viewport edge border seam snapping', () => {
+  it('snaps a corner-fan arc that lands on the seam to exact zero', () => {
+    // reach (0.42 * rayReach) equals the fan origin x (aspect - 0.02 = 0.48),
+    // so the base-arc endpoint falls on x = 0 within float error.
+    const genome = withGene(SIGNATURE_GENOME, 'rayReach', 0.48 / 0.42);
+    const { specs } = buildEdgeBorder({ aspect: 0.5, genome, density: 0.5 });
+    const seam = specs.flatMap((spec) => spec.points).filter((point) => point.x === 0 && Math.abs(point.y) > 0.97);
+    expect(seam.length).toBeGreaterThan(0);
   });
 });

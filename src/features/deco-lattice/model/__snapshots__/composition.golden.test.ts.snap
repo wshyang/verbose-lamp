@@ -10,17 +10,17 @@ exports[`buildDecoLattice golden snapshots > default medallion keeps its geometr
 
 exports[`buildDecoLattice golden snapshots > invitation-panel preset keeps its geometry 1`] = `
 {
-  "hash": "8afeb59f64e0a9da4a4d475d663c56f8a59e2249",
+  "hash": "e54ef02d5a03b926a16a56c97db05f712bb34a45",
   "paths": 5,
-  "specs": 24,
+  "specs": 28,
 }
 `;
 
 exports[`buildDecoLattice golden snapshots > lucky-draw frame keeps its geometry 1`] = `
 {
-  "hash": "3d2f8166295a89b9f35db1f28fff757735bb4ab7",
+  "hash": "8f8d3296f875cc207314537e87620b7de4589ac1",
   "paths": 5,
-  "specs": 24,
+  "specs": 28,
 }
 `;
 
@@ -58,17 +58,17 @@ exports[`buildDecoLattice golden snapshots > medallion level 4 keeps its geometr
 
 exports[`buildDecoLattice golden snapshots > premiere-frame preset keeps its geometry 1`] = `
 {
-  "hash": "dd4de1faec2c16597ae15c218107388d0cd2ff61",
+  "hash": "32d850b6f8ede9cd756eff6c3e4c9240b0cd9faa",
   "paths": 8,
-  "specs": 194,
+  "specs": 198,
 }
 `;
 
 exports[`buildDecoLattice golden snapshots > screen-proscenium preset keeps its geometry 1`] = `
 {
-  "hash": "05243574e80e01fbcdbe167263d83919564f7a47",
-  "paths": 4,
-  "specs": 12,
+  "hash": "7be650182c41d2ef154564eeb3749b90d3a8af9b",
+  "paths": 5,
+  "specs": 28,
 }
 `;
 

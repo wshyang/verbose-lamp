@@ -100,3 +100,13 @@ describe('traceWalks', () => {
     }
   });
 });
+describe('frame mode seed', () => {
+  it('reworks the corner brackets when the seed changes (the Studio reroll)', () => {
+    const base = buildDecoLattice({ mode: 'frame', hw: 1.78, hh: 1, seed: 1925, level: 2 });
+    const rerolled = buildDecoLattice({ mode: 'frame', hw: 1.78, hh: 1, seed: 224442, level: 2 });
+    expect(rerolled.specs).not.toEqual(base.specs);
+    // The architectural frame rails themselves never move.
+    const frames = (geo: typeof base) => geo.specs.filter((spec) => spec.layer === 0);
+    expect(frames(rerolled)).toEqual(frames(base));
+  });
+});

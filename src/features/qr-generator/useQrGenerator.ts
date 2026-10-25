@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { tryEncodeQr } from './encode';
-import { downloadSvgAsPng, downloadSvgElement, toSafeFileStem } from './export';
+import { downloadSvgAsPng, downloadSvgElement } from './export';
+import { toSafeFileStem } from './fileStem';
 import { buildRenderPlan, resolveQrStyle } from './geometry';
 import { MAX_QR_CAPTION_LENGTH, QR_PRESETS } from './presets';
 import type { QrErrorCorrection, QrModuleShape, QrPreset, QrRenderPlan } from './types';
