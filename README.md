@@ -31,8 +31,11 @@ WebGL support. No `.env` or secrets are needed.
 | `npm test` | Run the Vitest unit tests once (`vitest run`, node environment) |
 | `npm run test:coverage` | Run the tests under the coverage gate — the pure layer must stay at 100 % (see ADDENDUM-029) |
 | `npx tsc --noEmit` | Type-check the whole project |
+| `npm run e2e` | Run the Playwright likeness gate against the committed screenshot baselines |
+| `npm run e2e:update` | Recapture the likeness baselines (review every diff before committing) |
 
-Before calling a change done, run `npx tsc --noEmit`, `npm test`, and `npm run build`.
+Before calling a change done, run `npx tsc --noEmit`, `npm test`, and `npm run build`;
+if the change is visual, also `npm run e2e`.
 
 ## Using the app
 
@@ -90,8 +93,10 @@ node environment (`vitest.config.ts`, deliberately separate from `vite.config.ts
 pure layer — frame grammar, timing math, image pipelines, effect choreography — is held at
 **100 % lines/branches/functions/statements** by `npm run test:coverage` (ADDENDUM-029);
 geometry is protected by snapshot tests on data, not pixels. DOM components have jsdom
-suites beside them (ADDENDUM-028), and a Playwright likeness gate is scaffolded awaiting
-browser-captured baselines (ADDENDUM-027). Three.js rendering code stays thin by design:
+suites beside them (ADDENDUM-028), and a Playwright likeness gate (`npm run e2e`) holds
+the premiere's frozen frames against committed screenshot baselines — 12 shots on
+desktop and mobile viewports (ADDENDUM-027 foundations; baselines captured by
+ADDENDUM-030, Linux/Chromium set committed; recapture per-OS with `e2e:update`). Three.js rendering code stays thin by design:
 the scene shells out to the tested pure modules.
 
 ## Contributing conventions

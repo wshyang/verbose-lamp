@@ -31,6 +31,13 @@ export interface FrameStudioTarget {
 const detailPercent = (value: number) => Math.round(value * 100);
 const detailValue = (percent: number) => Math.min(1, Math.max(0, percent / 100));
 
+/**
+ * Below the `sm` breakpoint the open panel covers the timeline transport
+ * (found by the likeness gate, ADDENDUM-030), so small screens start with
+ * the studio tucked behind its reveal button. Sampled once at mount.
+ */
+const startsOpen = () => window.innerWidth >= 640;
+
 const defaultFrameFormula = (): FrameFormula => ({
   ...DEFAULT_FRAME_STYLE.formula,
   genome: { ...SIGNATURE_GENOME },
@@ -38,7 +45,7 @@ const defaultFrameFormula = (): FrameFormula => ({
 });
 
 export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(startsOpen);
   const [surface, setSurfaceState] = useState<FrameSurface>('title-cards');
   const [formula, setFormula] = useState<FrameFormula>(defaultFrameFormula);
   const [intricacy, setIntricacy] = useState(DEFAULT_FRAME_STYLE.intricacy);

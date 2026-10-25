@@ -9,7 +9,7 @@ interface FrameStudioDockProps {
 }
 
 export function FrameStudioDock({ studio, hudHidden }: FrameStudioDockProps) {
-  const visibilityClass = hudHidden ? 'opacity-0 pointer-events-none' : 'opacity-100';
+  const visibilityClass = hudHidden ? 'invisible opacity-0 pointer-events-none' : 'visible opacity-100';
 
   return (
     <div className={cn('relative z-[70] transition-all duration-300', visibilityClass)}>

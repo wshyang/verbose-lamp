@@ -24,15 +24,19 @@ const SHOTS: readonly Shot[] = [
 for (const shot of SHOTS) {
   test(shot.name, async ({ page }) => {
     await gotoFrozen(page, shot.at, shot.options);
-    await expect(page).toHaveScreenshot(`${shot.name}.png`, { fullPage: true });
+    // SwiftShader needs two slow software captures to confirm stability.
+    await expect(page).toHaveScreenshot(`${shot.name}.png`, { fullPage: true, timeout: 120_000 });
   });
 }
 
 test('act5-screen-border', async ({ page }) => {
   await page.goto('/?freezeAt=33.8');
   await page.waitForSelector('[data-testid="cinematic-stage__canvas"][data-frame-ready="true"]');
+  // On small screens the studio starts tucked away (ADDENDUM-030); open it.
+  const reveal = page.getByTestId('frame-studio__reveal');
+  if (await reveal.count()) await reveal.click();
   await page.getByTestId('frame-studio__surface-border').click();
   await page.getByTestId('frame-studio__border-enable').check();
   await page.keyboard.press('h');
-  await expect(page).toHaveScreenshot('act5-screen-border.png', { fullPage: true });
+  await expect(page).toHaveScreenshot('act5-screen-border.png', { fullPage: true, timeout: 120_000 });
 });
