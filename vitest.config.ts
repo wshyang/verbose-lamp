@@ -8,12 +8,15 @@ const root = path.dirname(fileURLToPath(import.meta.url));
 // irrelevant to node unit tests, and the project rule forbids editing vite.config.ts.
 // The `@` alias mirrors vite.config.ts so pure modules can import feature barrels
 // (CLAUDE.md §6) and still run under Vitest (ADDENDUM-018).
+// DOM suites opt in per file with `// @vitest-environment jsdom`; `setupDom.ts` is a no-op
+// in the node environment.
 export default defineConfig({
   resolve: {
     alias: { '@': path.resolve(root, 'src') },
   },
   test: {
     environment: 'node',
-    include: ['src/**/*.test.ts'],
+    include: ['src/**/*.test.{ts,tsx}'],
+    setupFiles: ['src/test/setupDom.ts'],
   },
 });
