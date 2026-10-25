@@ -13,7 +13,9 @@ export default defineConfig({
     alias: { '@': path.resolve(root, 'src') },
   },
   test: {
+    // Node by default; DOM suites opt in per-file (`// @vitest-environment jsdom`).
     environment: 'node',
-    include: ['src/**/*.test.ts'],
+    include: ['src/**/*.test.{ts,tsx}'],
+    setupFiles: ['src/test/setupDom.ts'],
   },
 });
