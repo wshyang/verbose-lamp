@@ -92,7 +92,7 @@ describe('uniform factories', () => {
 });
 
 describe('gold dust vertex attributes', () => {
-  // GatsbySceneManager sets exactly these per-point attributes on the dust geometry.
+  // The former manager set exactly these per-point attributes on the dust geometry.
   test('declares the attributes the dust geometry supplies', () => {
     expect(parseAttributeNames(goldDustVert).sort()).toEqual(['aPhase', 'aScale']);
   });

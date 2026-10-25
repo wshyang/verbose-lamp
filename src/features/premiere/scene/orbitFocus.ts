@@ -1,7 +1,7 @@
 import type { ChapterTiming, Vec3 } from './choreography';
 
 /**
- * Orbit-mode framing, extracted from `GatsbySceneManager.focusOrbitOnChapter`
+ * Orbit-mode framing, extracted from the former `GatsbySceneManager.focusOrbitOnChapter`
  * (ADDENDUM-022 §2.3) so the React Three Fiber camera reuses the exact numbers and the
  * "advance into the hold" rule can be tested without a canvas.
  *

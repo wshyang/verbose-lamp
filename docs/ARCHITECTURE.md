@@ -141,5 +141,5 @@ header or timeline into another product simply to reuse a button or modal.
 
 The three.js renderer is deliberately isolated from normal feature UI. A new app
 can reuse the QR generator, title customizer, research dialog, or frame studio
-without mounting `GatsbySceneManager`; a frame-based experience can reuse the
+without mounting the premiere canvas; a frame-based experience can reuse the
 Art Deco engine through its typed exports.

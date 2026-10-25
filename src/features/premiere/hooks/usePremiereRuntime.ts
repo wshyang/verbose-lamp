@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type MutableRefObject, type RefObject } from 'react';
 import { CinemaAudioEngine } from '../audio/cinemaAudio';
 import { parseFreezeAt } from '../model/freeze';
-import { parseRenderer, type RendererMode } from '../model/renderer';
-import { GatsbySceneManager } from '../scene/GatsbySceneManager';
 import type { PlaybackTelemetry, PremiereSceneApi } from '../scene/sceneApi';
 import { createPremiereStore, type PremiereStoreApi } from '../scene3d/premiereStore';
 import { storeSceneApi } from '../scene3d/storeSceneApi';
@@ -16,9 +14,8 @@ interface PremiereRuntimeOptions {
 }
 
 export interface PremiereRuntime {
-  renderer: RendererMode;
-  /** The scene's store, present only when the React Three Fiber port is the renderer. */
-  store: PremiereStoreApi | null;
+  /** The scene's store, created once so it survives StrictMode's mount, dispose, remount. */
+  store: PremiereStoreApi;
   /** The callbacks the React scene reports through. */
   onSceneTelemetry: (telemetry: PlaybackTelemetry) => void;
   onSceneChapterChange: (chapterIndex: number) => void;
@@ -26,14 +23,11 @@ export interface PremiereRuntime {
 }
 
 /**
- * The runtime seam. Both renderers need the same two side effects, the audio engine and an
- * imperative `PremiereSceneApi`, so both are set up here and the hooks above never learn
- * which renderer is behind the ref (ADDENDUM-022 §2.4).
+ * The runtime seam: the audio engine plus an imperative `PremiereSceneApi` backed by the
+ * scene's store, so the hooks above never reach into Three.js (ADDENDUM-022 §2.4).
  *
- * The default is the imperative manager; `?renderer=r3f` mounts the port, whose store is
- * created once here and survives StrictMode's mount, dispose, remount. Nothing in the
- * port's `dispose()` touches that store, so a live premiere keeps playing and a frozen
- * one stays frozen.
+ * The store is created once here. Nothing in `dispose()` touches it, so a live premiere keeps
+ * playing and a frozen one stays frozen through StrictMode's mount, dispose, remount.
  */
 export function usePremiereRuntime({
   mountRef,
@@ -45,14 +39,11 @@ export function usePremiereRuntime({
   const callbacksRef = useRef({ onTelemetry, onChapterChange });
   callbacksRef.current = { onTelemetry, onChapterChange };
 
-  const [renderer] = useState<RendererMode>(() => parseRenderer(window.location.search));
-  const [store] = useState<PremiereStoreApi | null>(() =>
-    renderer === 'r3f'
-      ? createPremiereStore({ freezeAt: parseFreezeAt(window.location.search) })
-      : null,
+  const [store] = useState<PremiereStoreApi>(() =>
+    createPremiereStore({ freezeAt: parseFreezeAt(window.location.search) }),
   );
 
-  /** Chapter hand-overs also shimmer the audio, whichever renderer reported them. */
+  /** Chapter hand-overs also shimmer the audio. */
   const handleChapterChange = useCallback(
     (chapterIndex: number) => {
       callbacksRef.current.onChapterChange(chapterIndex);
@@ -76,33 +67,17 @@ export function usePremiereRuntime({
     const audio = new CinemaAudioEngine();
     audioRef.current = audio;
 
-    if (store) {
-      const scene = storeSceneApi(store);
-      managerRef.current = scene;
-      return () => {
-        scene.dispose();
-        audio.dispose();
-        managerRef.current = null;
-        audioRef.current = null;
-      };
-    }
-
-    const manager = new GatsbySceneManager(container, {
-      freezeAt: parseFreezeAt(window.location.search) ?? undefined,
-      onTelemetry: handleTelemetry,
-      onChapterChange: handleChapterChange,
-    });
-    managerRef.current = manager;
+    const scene = storeSceneApi(store);
+    managerRef.current = scene;
     return () => {
-      manager.dispose();
+      scene.dispose();
       audio.dispose();
       managerRef.current = null;
       audioRef.current = null;
     };
-  }, [audioRef, handleChapterChange, handleTelemetry, managerRef, mountRef, store]);
+  }, [audioRef, managerRef, mountRef, store]);
 
   return {
-    renderer,
     store,
     onSceneTelemetry: handleTelemetry,
     onSceneChapterChange: handleChapterChange,

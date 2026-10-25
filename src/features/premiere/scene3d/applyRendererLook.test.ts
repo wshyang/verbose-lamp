@@ -9,7 +9,7 @@ function targets() {
   return { gl, scene, camera };
 }
 
-// Every number here is what GatsbySceneManager's constructor set by hand.
+// Every number here is what the former imperative manager's constructor set by hand.
 describe('PREMIERE_CANVAS', () => {
   it('keeps the manager’s lens, renderer and atmosphere settings', () => {
     expect(PREMIERE_CANVAS.camera).toEqual({ fov: 42, near: 0.1, far: 180, position: [0, 0, 10.5] });

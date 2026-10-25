@@ -1,7 +1,7 @@
 # ADDENDUM-029 — The React Three Fiber premiere port (Phase 2)
 
 **Date:** 2026-10-25 · **Relates to:** BUILD_PROMPT §3, §5, §7; CLAUDE.md §2, §5, §6, §7. Implements ADDENDUM-022 Phase 2 as integrated by ADDENDUM-027; builds on ADDENDUM-028 (the pure seams) and ADDENDUM-026 (shader files).
-**Status:** Implemented, opt-in. `?renderer=r3f` mounts the port; the imperative manager is still the default and is deleted only after Phase 3's measured parity. **The port has been smoke-tested in a real browser but has not passed a parity check; see §5.**
+**Status:** Implemented. Written as opt-in; **ADDENDUM-030 measured parity, made the port the only renderer and deleted the manager and `?renderer=`.** The statements below about the manager and `?renderer=` describe the state at the end of Phase 2.
 
 ## 1. What was decided / done
 

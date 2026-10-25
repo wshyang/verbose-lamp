@@ -104,7 +104,7 @@ describe('cardRole', () => {
 });
 
 // Expected values were computed from the shipped manager's inline arithmetic
-// (GatsbySceneManager.animate, `THREE.MathUtils.smoothstep`), not from this module.
+// (the former manager (`animate`), `THREE.MathUtils.smoothstep`), not from this module.
 describe('cardPhase', () => {
   it('stays dark outside the staging window, whatever the role', () => {
     expect(cardPhase({ localT: -CARD_WINDOW - 0.01, role: 'standard' })).toEqual(OFF_STAGE);
@@ -171,7 +171,7 @@ describe('cardPhase', () => {
 });
 
 // Expected Z values were computed from the shipped manager's inline camera code
-// (GatsbySceneManager.animate, the cinema branch) over the real SEQUENCE_CHAPTERS.
+// (the former manager (`animate`), the cinema branch) over the real SEQUENCE_CHAPTERS.
 describe('cinemaCameraZ', () => {
   const solve = (t: number, pullback: number): number => {
     const activeIdx = activeChapterIndex(t, SEQUENCE_CHAPTERS);
@@ -228,7 +228,7 @@ describe('cinemaCameraZ', () => {
 });
 
 // Expected values below come from the shipped manager's inline arithmetic
-// (GatsbySceneManager.animate), evaluated with THREE.MathUtils.smoothstep.
+// (the former manager (`animate`)), evaluated with THREE.MathUtils.smoothstep.
 describe('greenLight', () => {
   const heroZ = SEQUENCE_CHAPTERS[SEQUENCE_CHAPTERS.length - 1].zPosition;
 

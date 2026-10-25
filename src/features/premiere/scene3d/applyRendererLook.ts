@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 /**
  * The renderer, scene and camera settings the premiere has always used
- * (ADDENDUM-022 §2.2). `GatsbySceneManager` set these by hand; the Canvas sets them once on
+ * (ADDENDUM-022 §2.2). the deleted imperative manager set these by hand; the Canvas sets them once on
  * creation, and the likeness gate is what proves they still match.
  */
 export const PREMIERE_CANVAS = {

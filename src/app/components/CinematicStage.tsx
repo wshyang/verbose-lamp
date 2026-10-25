@@ -1,7 +1,6 @@
 import type { RefObject } from 'react';
 import type { CameraMode } from '@/features/premiere';
 import type { PlaybackTelemetry } from '@/features/premiere/scene/sceneApi';
-import type { RendererMode } from '@/features/premiere/model/renderer';
 import type { PremiereStoreApi } from '@/features/premiere/scene3d/premiereStore';
 import { PremiereCanvas } from '@/features/premiere/scene3d/PremiereCanvas';
 import { cn } from '@/shared/lib/cn';
@@ -10,10 +9,7 @@ interface CinematicStageProps {
   mountRef: RefObject<HTMLDivElement | null>;
   cameraMode: CameraMode;
   hudHidden: boolean;
-  /** `'r3f'` mounts the React Three Fiber port inside the same container. */
-  renderer?: RendererMode;
-  /** Present only for the port; the manager draws into the container itself. */
-  store?: PremiereStoreApi | null;
+  store: PremiereStoreApi;
   onSceneTelemetry?: (telemetry: PlaybackTelemetry) => void;
   onSceneChapterChange?: (chapterIndex: number) => void;
   onSceneFrameReady?: () => void;
@@ -21,16 +17,13 @@ interface CinematicStageProps {
 
 /**
  * The stage. The container is the contract: it carries the test id, the orbit cursor, the
- * accessible name and the `data-frame-ready` flag the screenshot gate waits on. Both
- * renderers live inside it (the manager appends its canvas imperatively, the port renders
- * one), so the gate cannot tell them apart.
+ * accessible name and the `data-frame-ready` flag the screenshot gate waits on.
  */
 export function CinematicStage({
   mountRef,
   cameraMode,
   hudHidden,
-  renderer = 'manager',
-  store = null,
+  store,
   onSceneTelemetry,
   onSceneChapterChange,
   onSceneFrameReady,
@@ -46,15 +39,13 @@ export function CinematicStage({
         )}
         aria-label="Interactive WebGL title sequence"
       >
-        {renderer === 'r3f' && store ? (
-          <PremiereCanvas
-            store={store}
-            className="absolute inset-0 h-full w-full"
-            onTelemetry={onSceneTelemetry}
-            onChapterChange={onSceneChapterChange}
-            onFrameReady={onSceneFrameReady}
-          />
-        ) : null}
+        <PremiereCanvas
+          store={store}
+          className="absolute inset-0 h-full w-full"
+          onTelemetry={onSceneTelemetry}
+          onChapterChange={onSceneChapterChange}
+          onFrameReady={onSceneFrameReady}
+        />
       </div>
       <div
         className={cn(

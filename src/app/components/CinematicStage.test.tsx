@@ -4,7 +4,7 @@ import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 // The canvas needs WebGL, so it is doubled at its module seam. What is under test is the
-// stage: what it mounts for each renderer, and the contract its container keeps.
+// stage: what it mounts, and the contract its container keeps.
 const mounted = vi.hoisted(() => ({ props: [] as Array<Record<string, unknown>> }));
 
 vi.mock('@/features/premiere/scene3d/PremiereCanvas', () => ({
@@ -21,7 +21,7 @@ function stage(overrides: Partial<Parameters<typeof CinematicStage>[0]> = {}) {
   mounted.props.length = 0;
   const mountRef = createRef<HTMLDivElement>();
   const view = render(
-    <CinematicStage mountRef={mountRef} cameraMode="cinema" hudHidden={false} {...overrides} />,
+    <CinematicStage mountRef={mountRef} cameraMode="cinema" hudHidden={false} store={createPremiereStore()} {...overrides} />,
   );
   return { ...view, mountRef };
 }
@@ -63,21 +63,9 @@ describe('CinematicStage container contract', () => {
   });
 });
 
-describe('CinematicStage renderers', () => {
-  it('mounts nothing itself for the imperative manager, which draws into the container', () => {
-    stage({ renderer: 'manager', store: null });
-
-    expect(screen.queryByTestId('premiere-canvas-double')).toBeNull();
-  });
-
-  it('defaults to the manager', () => {
-    stage();
-
-    expect(screen.queryByTestId('premiere-canvas-double')).toBeNull();
-  });
-
-  it('mounts the R3F canvas inside the stage container for the port', () => {
-    stage({ renderer: 'r3f', store: createPremiereStore() });
+describe('CinematicStage canvas', () => {
+  it('mounts the R3F canvas inside the stage container', () => {
+    stage({ store: createPremiereStore() });
 
     const host = screen.getByTestId('cinematic-stage__canvas');
     expect(host.contains(screen.getByTestId('premiere-canvas-double'))).toBe(true);
@@ -88,17 +76,11 @@ describe('CinematicStage renderers', () => {
     const onSceneTelemetry = vi.fn();
     const onSceneChapterChange = vi.fn();
     const onSceneFrameReady = vi.fn();
-    stage({ renderer: 'r3f', store, onSceneTelemetry, onSceneChapterChange, onSceneFrameReady });
+    stage({ store, onSceneTelemetry, onSceneChapterChange, onSceneFrameReady });
 
     expect(mounted.props[0].store).toBe(store);
     expect(mounted.props[0].onTelemetry).toBe(onSceneTelemetry);
     expect(mounted.props[0].onChapterChange).toBe(onSceneChapterChange);
     expect(mounted.props[0].onFrameReady).toBe(onSceneFrameReady);
-  });
-
-  it('mounts nothing for the port until it has a store', () => {
-    stage({ renderer: 'r3f', store: null });
-
-    expect(screen.queryByTestId('premiere-canvas-double')).toBeNull();
   });
 });

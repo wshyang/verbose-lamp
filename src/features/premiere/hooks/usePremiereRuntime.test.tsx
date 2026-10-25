@@ -1,14 +1,13 @@
 // @vitest-environment jsdom
 import { act, render, renderHook } from '@testing-library/react';
-import { StrictMode, type ReactNode } from 'react';
+import { StrictMode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-// The audio engine and the imperative manager need browser audio and WebGL. They are doubled
-// at their module seams: what is under test is the wiring, which scene API ends up behind
-// the ref, and what is created and released when.
+// The audio engine needs browser audio, so it is doubled at its module seam. What is under
+// test is the wiring: which scene API ends up behind the ref, what the store is seeded with,
+// and what is created and released when.
 const doubles = vi.hoisted(() => ({
   audio: [] as Array<{ disposed: number; shimmers: number[] }>,
-  managers: [] as Array<{ options: unknown; disposed: number }>,
 }));
 
 vi.mock('../audio/cinemaAudio', () => ({
@@ -29,49 +28,63 @@ vi.mock('../audio/cinemaAudio', () => ({
   },
 }));
 
-vi.mock('../scene/GatsbySceneManager', () => ({
-  GatsbySceneManager: class {
-    record: { options: unknown; disposed: number };
-    constructor(_container: unknown, options: unknown) {
-      this.record = { options, disposed: 0 };
-      doubles.managers.push(this.record);
-    }
-    dispose() {
-      this.record.disposed += 1;
-    }
-  },
-}));
-
 import type { CinemaAudioEngine } from '../audio/cinemaAudio';
 import type { PremiereSceneApi } from '../scene/sceneApi';
 import { usePremiereRuntime, type PremiereRuntime } from './usePremiereRuntime';
 
 afterEach(() => {
   doubles.audio.length = 0;
-  doubles.managers.length = 0;
   window.history.replaceState(null, '', '/');
 });
 
-function run(search = '', wrapper?: (props: { children: ReactNode }) => ReactNode) {
-  window.history.replaceState(null, '', `/${search}`);
-  const mountRef = { current: document.createElement('div') };
-  const managerRef = { current: null as PremiereSceneApi | null };
-  const audioRef = { current: null as CinemaAudioEngine | null };
-  const onTelemetry = vi.fn();
-  const onChapterChange = vi.fn();
-  const view = renderHook(
-    () => usePremiereRuntime({ mountRef, managerRef, audioRef, onTelemetry, onChapterChange }),
-    wrapper ? { wrapper: wrapper as never } : undefined,
-  );
-  return { ...view, mountRef, managerRef, audioRef, onTelemetry, onChapterChange };
+function options(hasMount = true) {
+  return {
+    mountRef: { current: hasMount ? document.createElement('div') : null },
+    managerRef: { current: null as PremiereSceneApi | null },
+    audioRef: { current: null as CinemaAudioEngine | null },
+    onTelemetry: vi.fn(),
+    onChapterChange: vi.fn(),
+  };
 }
 
-describe('usePremiereRuntime with the default renderer', () => {
-  it('builds the imperative manager on the mount element and hands the hooks its API', () => {
-    const { managerRef } = run();
+function run(search = '', hasMount = true) {
+  window.history.replaceState(null, '', `/${search}`);
+  const opts = options(hasMount);
+  const view = renderHook(() => usePremiereRuntime(opts));
+  return { ...view, ...opts };
+}
 
-    expect(doubles.managers).toHaveLength(1);
-    expect(managerRef.current).not.toBeNull();
+describe('usePremiereRuntime', () => {
+  it('backs the scene API with the store', () => {
+    const { managerRef, result } = run();
+
+    managerRef.current!.setTime(6);
+    managerRef.current!.setNitrateMode(true);
+
+    expect(result.current.store.getState().currentTime).toBe(6);
+    expect(result.current.store.getState().isNitrateForced).toBe(true);
+  });
+
+  it('starts a plain visit playing from the top', () => {
+    const { result } = run();
+
+    expect(result.current.store.getState().isPlaying).toBe(true);
+    expect(result.current.store.getState().currentTime).toBe(0);
+    expect(result.current.store.getState().freezeAt).toBeNull();
+  });
+
+  it('seeds a frozen store from ?freezeAt=', () => {
+    const { result } = run('?freezeAt=12.5');
+
+    expect(result.current.store.getState().currentTime).toBe(12.5);
+    expect(result.current.store.getState().isPlaying).toBe(false);
+  });
+
+  it('ignores a malformed ?freezeAt= and plays', () => {
+    const { result } = run('?freezeAt=abc');
+
+    expect(result.current.store.getState().freezeAt).toBeNull();
+    expect(result.current.store.getState().isPlaying).toBe(true);
   });
 
   it('creates the audio engine and exposes it', () => {
@@ -81,135 +94,77 @@ describe('usePremiereRuntime with the default renderer', () => {
     expect(audioRef.current).not.toBeNull();
   });
 
-  it('shimmers the audio when the manager announces a chapter, and tells React', () => {
-    const { onChapterChange } = run();
-    const options = doubles.managers[0].options as { onChapterChange: (index: number) => void };
+  it('builds nothing until there is a mount element', () => {
+    const { managerRef, audioRef } = run('', false);
 
-    options.onChapterChange(3);
-
-    expect(onChapterChange).toHaveBeenCalledWith(3);
-    expect(doubles.audio[0].shimmers).toEqual([3]);
+    expect(doubles.audio).toHaveLength(0);
+    expect(managerRef.current).toBeNull();
+    expect(audioRef.current).toBeNull();
   });
 
-  it('passes the manager’s telemetry to React', () => {
-    const { onTelemetry } = run();
-    const options = doubles.managers[0].options as {
-      onTelemetry: (telemetry: { currentTime: number }) => void;
-    };
-
-    options.onTelemetry({ currentTime: 4 });
-
-    expect(onTelemetry).toHaveBeenCalledWith({ currentTime: 4 });
-  });
-
-  it('tears down the manager and the audio, and clears both refs, on unmount', () => {
+  it('releases the audio and clears both refs on unmount', () => {
     const { unmount, managerRef, audioRef } = run();
 
     unmount();
 
-    expect(doubles.managers[0].disposed).toBe(1);
     expect(doubles.audio[0].disposed).toBe(1);
     expect(managerRef.current).toBeNull();
     expect(audioRef.current).toBeNull();
   });
 
-  it('builds nothing when there is no mount element yet', () => {
-    const managerRef = { current: null as PremiereSceneApi | null };
-    const audioRef = { current: null as CinemaAudioEngine | null };
-
-    renderHook(() =>
-      usePremiereRuntime({
-        mountRef: { current: null },
-        managerRef,
-        audioRef,
-        onTelemetry: vi.fn(),
-        onChapterChange: vi.fn(),
-      }),
-    );
-
-    expect(doubles.managers).toHaveLength(0);
-    expect(doubles.audio).toHaveLength(0);
-  });
-});
-
-describe('usePremiereRuntime freezing the default renderer', () => {
-  it('passes ?freezeAt= to the manager, so both renderers freeze the same way', () => {
-    run('?freezeAt=12.5');
-
-    expect((doubles.managers[0].options as { freezeAt?: number }).freezeAt).toBe(12.5);
-  });
-
-  it('passes no freeze for a plain visit', () => {
-    run();
-
-    expect((doubles.managers[0].options as { freezeAt?: number }).freezeAt).toBeUndefined();
-  });
-
-  it('passes no freeze for a malformed value', () => {
-    run('?freezeAt=abc');
-
-    expect((doubles.managers[0].options as { freezeAt?: number }).freezeAt).toBeUndefined();
-  });
-});
-
-describe('usePremiereRuntime with the R3F port', () => {
-  it('opts in with ?renderer=r3f: no manager is built, the store backs the scene API', () => {
-    const { managerRef, result } = run('?renderer=r3f');
-
-    expect(doubles.managers).toHaveLength(0);
-    expect(managerRef.current).not.toBeNull();
-    expect(result.current.renderer).toBe('r3f');
-    expect(result.current.store).not.toBeNull();
-  });
-
-  it('keeps the default as the manager, with no store', () => {
-    const { result } = run();
-
-    expect(result.current.renderer).toBe('manager');
-    expect(result.current.store).toBeNull();
-  });
-
-  it('drives the store through the scene API the hooks call', () => {
-    const { managerRef, result } = run('?renderer=r3f');
-
-    managerRef.current!.setTime(6);
-    managerRef.current!.setNitrateMode(true);
-
-    expect(result.current.store!.getState().currentTime).toBe(6);
-    expect(result.current.store!.getState().isNitrateForced).toBe(true);
-  });
-
-  it('seeds a frozen store from ?freezeAt=', () => {
-    const { result } = run('?renderer=r3f&freezeAt=12.5');
-
-    expect(result.current.store!.getState().currentTime).toBe(12.5);
-    expect(result.current.store!.getState().isPlaying).toBe(false);
-  });
-
-  it('shimmers the audio and tells React through the scene callbacks', () => {
-    const { result, onChapterChange, onTelemetry } = run('?renderer=r3f');
+  it('shimmers the audio and tells React on a chapter change', () => {
+    const { result, onChapterChange } = run();
 
     result.current.onSceneChapterChange(2);
-    result.current.onSceneTelemetry({ currentTime: 1, activeChapterIndex: 0, isPlaying: true });
 
     expect(onChapterChange).toHaveBeenCalledWith(2);
     expect(doubles.audio[0].shimmers).toEqual([2]);
-    expect(onTelemetry).toHaveBeenCalledTimes(1);
+  });
+
+  it('passes telemetry to React', () => {
+    const { result, onTelemetry } = run();
+
+    result.current.onSceneTelemetry({ currentTime: 1, activeChapterIndex: 0, isPlaying: true });
+
+    expect(onTelemetry).toHaveBeenCalledWith({ currentTime: 1, activeChapterIndex: 0, isPlaying: true });
   });
 
   it('sets the frame-ready flag on the mount element', () => {
-    const { result, mountRef } = run('?renderer=r3f');
+    const { result, mountRef } = run();
 
     result.current.onSceneFrameReady();
 
-    expect(mountRef.current.dataset.frameReady).toBe('true');
+    expect(mountRef.current!.dataset.frameReady).toBe('true');
+  });
+
+  it('does nothing when frame-ready fires before there is a mount element', () => {
+    const { result } = run('', false);
+
+    expect(() => result.current.onSceneFrameReady()).not.toThrow();
+  });
+
+  it('keeps the latest React callbacks without re-subscribing', () => {
+    window.history.replaceState(null, '', '/');
+    const opts = options();
+    const first = vi.fn();
+    const second = vi.fn();
+    const { result, rerender } = renderHook(
+      ({ onTelemetry }) => usePremiereRuntime({ ...opts, onTelemetry }),
+      { initialProps: { onTelemetry: first } },
+    );
+
+    rerender({ onTelemetry: second });
+    result.current.onSceneTelemetry({ currentTime: 2, activeChapterIndex: 0, isPlaying: true });
+
+    expect(first).not.toHaveBeenCalled();
+    expect(second).toHaveBeenCalledTimes(1);
   });
 });
 
 // The bug only PR #3 found, in a real browser: React StrictMode mounts, disposes and
 // remounts every effect in development, and a scene whose dispose() paused the clock came
 // back loaded but paused. dispose() here never touches the store, so a live premiere keeps
-// playing and a frozen one stays frozen, whichever renderer is behind the ref.
+// playing and a frozen one stays frozen.
 //
 // `renderHook`'s wrapper does not double-invoke effects, so these mount a real component
 // inside <StrictMode> with `render`, which does (mount, cleanup, mount).
@@ -217,17 +172,9 @@ describe('usePremiereRuntime under StrictMode', () => {
   function mountStrict(search: string) {
     window.history.replaceState(null, '', `/${search}`);
     const captured: { runtime: PremiereRuntime | null } = { runtime: null };
-    const mountRef = { current: document.createElement('div') };
-    const managerRef = { current: null as PremiereSceneApi | null };
-    const audioRef = { current: null as CinemaAudioEngine | null };
+    const opts = options();
     function Host() {
-      captured.runtime = usePremiereRuntime({
-        mountRef,
-        managerRef,
-        audioRef,
-        onTelemetry: vi.fn(),
-        onChapterChange: vi.fn(),
-      });
+      captured.runtime = usePremiereRuntime(opts);
       return null;
     }
     act(() => {
@@ -237,60 +184,53 @@ describe('usePremiereRuntime under StrictMode', () => {
         </StrictMode>,
       );
     });
-    return { runtime: captured.runtime!, managerRef };
+    return { runtime: captured.runtime!, managerRef: opts.managerRef };
   }
 
   it('runs the effect through mount, cleanup, mount (the harness really is strict)', () => {
-    mountStrict('?renderer=r3f');
+    mountStrict('');
 
     expect(doubles.audio).toHaveLength(2);
     expect(doubles.audio.filter((audio) => audio.disposed === 1)).toHaveLength(1);
   });
 
-  it('keeps a live R3F premiere playing through the cycle', () => {
-    const { runtime } = mountStrict('?renderer=r3f');
+  it('keeps a live premiere playing through the cycle', () => {
+    const { runtime } = mountStrict('');
 
-    expect(runtime.store!.getState().isPlaying).toBe(true);
+    expect(runtime.store.getState().isPlaying).toBe(true);
   });
 
-  it('keeps a frozen R3F premiere frozen through the same cycle', () => {
-    const { runtime } = mountStrict('?renderer=r3f&freezeAt=7');
+  it('keeps a frozen premiere frozen through the same cycle', () => {
+    const { runtime } = mountStrict('?freezeAt=7');
 
-    expect(runtime.store!.getState().isPlaying).toBe(false);
-    expect(runtime.store!.getState().currentTime).toBe(7);
+    expect(runtime.store.getState().isPlaying).toBe(false);
+    expect(runtime.store.getState().currentTime).toBe(7);
   });
 
   it('keeps the user’s settings through the cycle', () => {
-    const { runtime, managerRef } = mountStrict('?renderer=r3f');
+    const { runtime, managerRef } = mountStrict('');
 
     managerRef.current!.setNitrateMode(true);
     managerRef.current!.dispose();
 
-    expect(runtime.store!.getState().isNitrateForced).toBe(true);
+    expect(runtime.store.getState().isNitrateForced).toBe(true);
   });
 
   it('leaves exactly one live audio engine after the cycle', () => {
-    mountStrict('?renderer=r3f');
+    mountStrict('');
 
     expect(doubles.audio.filter((audio) => audio.disposed === 0)).toHaveLength(1);
   });
 
-  it('leaves exactly one live manager after the cycle on the default renderer', () => {
-    mountStrict('');
-
-    expect(doubles.managers).toHaveLength(2);
-    expect(doubles.managers.filter((manager) => manager.disposed === 0)).toHaveLength(1);
-  });
-
   it('creates the store once, so the cycle cannot reset playback', () => {
-    const { runtime } = mountStrict('?renderer=r3f');
-    runtime.store!.getState().setTime(20);
+    const { runtime } = mountStrict('');
+    runtime.store.getState().setTime(20);
 
-    expect(runtime.store!.getState().currentTime).toBe(20);
+    expect(runtime.store.getState().currentTime).toBe(20);
   });
 
   it('leaves the scene API pointing at a live scene after the cycle', () => {
-    const { managerRef } = mountStrict('?renderer=r3f');
+    const { managerRef } = mountStrict('');
 
     expect(managerRef.current).not.toBeNull();
   });
