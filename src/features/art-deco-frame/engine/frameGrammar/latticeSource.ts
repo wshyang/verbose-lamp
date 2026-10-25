@@ -1,6 +1,5 @@
-import { buildDecoLattice, type LatticeSpec } from '@/features/deco-lattice';
-// Deep import: the pure engine must not load the deco-lattice barrel's React component.
-import { brassAngleFor, toneForLayer } from '@/features/deco-lattice/model/tone';
+// The pure entry: the engine must not load the deco-lattice barrel's React component.
+import { brassAngleFor, buildDecoLattice, toneForLayer, type LatticeSpec } from '@/features/deco-lattice/model';
 import { clampFormulaLevel } from './styleRules';
 import type { Point2, PolylineSpec, RailKind } from './types';
 import { DEFAULT_SEED } from '@/shared/lib/random';

@@ -2,8 +2,8 @@
 import { act, renderHook } from '@testing-library/react';
 import type { FormEvent } from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { DEFAULT_HERO_TITLE } from '@/features/premiere/data/sequence';
-import type { HeroTitleConfig } from '@/features/premiere/model/types';
+import { DEFAULT_HERO_TITLE } from '@/features/premiere/model';
+import type { HeroTitleConfig } from '@/features/premiere/model';
 import { HERO_TITLE_PRESETS } from '../data/titlePresets';
 import { normalizeHeroTitle } from '../model/normalizeHeroTitle';
 import { useTitleDraft } from './useTitleDraft';

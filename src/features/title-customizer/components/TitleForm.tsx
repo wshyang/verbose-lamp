@@ -1,6 +1,6 @@
 import type { FormEvent } from 'react';
 import { RotateCcw, Wand2 } from 'lucide-react';
-import type { HeroTitleConfig } from '@/features/premiere/model/types';
+import type { HeroTitleConfig } from '@/features/premiere/model';
 import { Button } from '@/shared/ui';
 import { TitleField } from './TitleField';
 

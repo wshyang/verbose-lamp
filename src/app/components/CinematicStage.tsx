@@ -1,8 +1,10 @@
 import type { RefObject } from 'react';
-import type { CameraMode } from '@/features/premiere';
-import type { PlaybackTelemetry } from '@/features/premiere/scene/sceneApi';
-import type { PremiereStoreApi } from '@/features/premiere/scene3d/premiereStore';
-import { PremiereCanvas } from '@/features/premiere/scene3d/PremiereCanvas';
+import {
+  PremiereCanvas,
+  type CameraMode,
+  type PlaybackTelemetry,
+  type PremiereStoreApi,
+} from '@/features/premiere';
 import { cn } from '@/shared/lib/cn';
 
 interface CinematicStageProps {

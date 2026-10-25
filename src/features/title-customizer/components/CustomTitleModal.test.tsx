@@ -2,7 +2,7 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { DEFAULT_HERO_TITLE } from '@/features/premiere/data/sequence';
+import { DEFAULT_HERO_TITLE } from '@/features/premiere/model';
 import { HERO_TITLE_PRESETS } from '../data/titlePresets';
 import { normalizeHeroTitle } from '../model/normalizeHeroTitle';
 import { CustomTitleModal } from './CustomTitleModal';

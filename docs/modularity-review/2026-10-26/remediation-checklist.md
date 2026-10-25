@@ -114,19 +114,19 @@ Three independent sub-tasks, in this order.
 - [ ] 4C.4 Move the tests with their code. The panel's own tests keep only what the panel still renders. Add one test that `children` render inside the panel.
 - [x] 4D (partial) Addendum 040 + register row written for 4A, 4B and the slot. It must be extended when 4C is done to record that the premiere console no longer shows the two sections and the testid renames.
 
-## [ ] Phase 5 — Finding 2 (Significant): enforced entry points and a dependency table
+## [x] Phase 5 — Finding 2 (Significant): enforced entry points and a dependency table
 Goal: the "barrel is the only door" rule becomes a test. Run after Phases 1–4 so few exceptions remain.
 
-- [ ] 5.1 **Pure entries.**
+- [x] 5.1 **Pure entries.**
   - `deco-lattice/model/index.ts` exports `buildDecoLattice`, `specsToLayerPaths`, `isOctilinear`, `buildNineSlice`, `planBand`, `LAYER_TONES`, `toneForLayer`, `brassAngleFor`, the presets and their types. The main barrel does `export * from './model'` plus the components and hooks.
   - `premiere/model/index.ts` exports the model types and the data constants (`DEFAULT_HERO_TITLE`, `SEQUENCE_CHAPTERS`, `TOTAL_SEQUENCE_DURATION`). The main barrel re-exports it.
   - Entries import only `./` modules, `@/shared`, and `import type` from other barrels.
-- [ ] 5.2 **Fix the importers.**
+- [x] 5.2 **Fix the importers.**
   - `art-deco-frame/engine/frameGrammar/{latticeSource,edgeBorder}.ts` → `@/features/deco-lattice/model`. Today `latticeSource.ts:1` imports the full barrel while its comment claims purity; fix both together.
   - `title-customizer/*` (`data/titlePresets`, `hooks/useTitleDraft`, `model/normalizeHeroTitle`, `components/{CustomTitleModal,TitleForm}`) → `@/features/premiere/model`.
   - `frame-studio/data/frameDesigns.ts` uses a relative `../../art-deco-frame`; switch to `@/features/art-deco-frame`.
-- [ ] 5.3 **Premiere runtime exports.** Add `PremiereCanvas`, `type PremiereStoreApi` and `type PlaybackTelemetry` to the `premiere` barrel. `app/components/CinematicStage.tsx` imports them from there (it uses deep paths at `:3-5`).
-- [ ] 5.4 **RED then GREEN**: new `src/featureBoundaries.test.ts` over non-test source files (skip `*.test.*` and `/testing/`):
+- [x] 5.3 **Premiere runtime exports.** Add `PremiereCanvas`, `type PremiereStoreApi` and `type PlaybackTelemetry` to the `premiere` barrel (`PremiereSceneApi` was added in Phase 3). `app/components/CinematicStage.tsx` imports them from there (it uses deep paths at `:3-5`).
+- [x] 5.4 (verified to fail: a planted deep import and a planted undeclared edge each failed the matching assertion, then were restored) **RED then GREEN**: new `src/featureBoundaries.test.ts` over non-test source files (skip `*.test.*` and `/testing/`):
   - Allowed import specifiers are `@/features/<f>` and `@/features/<f>/model` (the file must exist). Relative specifiers that leave a feature directory are resolved and checked the same way.
   - Dependency table `ALLOWED_FEATURE_DEPS`; any undeclared edge fails:
     - `app` → all
@@ -142,8 +142,8 @@ Goal: the "barrel is the only door" rule becomes a test. Run after Phases 1–4 
   - `shared/**` imports no feature, and `features/**` imports nothing from `app/`.
   - `model/index.ts` entries import neither `react` nor `three` nor `@react-three`.
   - A `KNOWN_EXCEPTIONS` list exists for anything not yet migrated: each row has a reason, and it may only shrink. The target is empty.
-- [ ] 5.5 `premiere/model/types.ts` and `premiere/scene/sceneApi.ts`: use `import type … from '@/features/art-deco-frame'` (type-only).
-- [ ] 5.6 Docs: `docs/ARCHITECTURE.md` (the `model` entry, the dependency table, premiere/frame-studio ownership and spectacle-preview scope as they now are), CLAUDE.md §6 ("through a feature barrel **or its `model` entry**"). Addendum 041 + register row. Gate.
+- [x] 5.5 `premiere/model/types.ts` and `premiere/scene/sceneApi.ts`: use `import type … from '@/features/art-deco-frame'` (type-only). (Both were already type-only; the review's "loads Three" claim for this edge was wrong.)
+- [x] 5.6 Docs: `docs/ARCHITECTURE.md` (the `model` entry, the dependency table, premiere/frame-studio ownership and spectacle-preview scope as they now are), CLAUDE.md §6 ("through a feature barrel **or its `model` entry**"). Addendum 041 + register row. Gate.
 
 ## [ ] Phase 6 — Finding 6 (Minor, optional): one source of truth for premiere state
 Do this when the next premiere setting is added, or drop it. It is the largest change and the one with HUD re-render risk.

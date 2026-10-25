@@ -1,6 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
-import type { HeroTitleConfig } from '@/features/premiere/model/types';
+import type { HeroTitleConfig } from '@/features/premiere/model';
 import { CornerBrackets, Dialog, IconButton } from '@/shared/ui';
 import { useTitleDraft } from '../hooks/useTitleDraft';
 import { PresetBar } from './PresetBar';

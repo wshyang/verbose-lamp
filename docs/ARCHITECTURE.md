@@ -55,11 +55,13 @@ supported import surface; internal files should remain private to that feature.
   screen and connects feature APIs; it does not implement playback or geometry.
 - `features/premiere` owns the five-act sequence, camera/audio controls, and the
   scene lifecycle. The scene is a React Three Fiber tree (`scene3d/`) driven by a
-  zustand store; pure seams (`scene/`: choreography, orbit focus, style clamps, the
+  zustand store; pure seams (`scene/`: choreography, orbit focus, playback and chapter clamps, the
   playback clock) hold the maths. React UI talks to the typed controller and the
   `PremiereSceneApi` port, never to Three.js objects.
 - `features/art-deco-frame` owns reusable frame grammar, genome data, beveled
-  rail geometry, typography glyphs, and materials. It has no timeline or HUD.
+  rail geometry, typography glyphs, and materials. It has no timeline or HUD. It also
+  owns what a legal frame style is (`styleRules.ts`: level, intricacy, border weight),
+  which the premiere scene and the Frame Studio both call (ADDENDUM-037).
 - `features/frame-studio` owns editor state and control presentation. Its hook
   talks to a small `FrameStudioTarget` port, so an editor can bind to another
   renderer that implements the same operations. The host binds it: `PremiereSurfaces`
@@ -140,7 +142,12 @@ header or timeline into another product simply to reuse a button or modal.
 1. Put product state, validation, and pure computations in the feature's
    `model` or `hooks`; add adjacent tests for pure modules.
 2. Keep React components focused on markup, accessible state, and event wiring.
-3. Expose only supported components, hooks, and types through the feature barrel.
+3. Expose only supported components, hooks, and types through the feature barrel. If a
+   pure consumer needs the feature without its React or Three.js parts, give it a
+   `model/index.ts` entry (`deco-lattice` and `premiere` have one) and keep that entry
+   free of those imports.
+   `src/featureBoundaries.test.ts` rejects any deeper import path and any feature
+   dependency not listed in its `ALLOWED_FEATURE_DEPS` table (ADDENDUM-041).
 4. Reuse shared controls when their interaction contract fits; add a new shared
    primitive only when it is useful to more than one feature.
 5. Record architectural or behavior decisions in the sequential addenda register.

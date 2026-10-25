@@ -7,11 +7,9 @@
  * Pure and deterministic. Adapted to our PolylineSpec/RailKind so it renders through
  * the same chamfered gold geometry and trim shader as the title cards.
  */
-// Deep imports on purpose: the engine must not pull the deco-lattice barrel, which exports a
+// The pure entry on purpose: the engine must not pull the deco-lattice barrel, which exports a
 // React component, into a pure module (CLAUDE.md §2).
-import { buildNineSlice } from '@/features/deco-lattice/model/nineSlice';
-import { brassAngleFor, toneForLayer } from '@/features/deco-lattice/model/tone';
-import type { LatticeSpec } from '@/features/deco-lattice/model/lattice';
+import { brassAngleFor, buildNineSlice, toneForLayer, type LatticeSpec } from '@/features/deco-lattice/model';
 import { BaseGenome, clampGenome } from './genome';
 import { DEFAULT_SCREEN_BORDER_SEED, PolylineSpec, Point2, RailKind, ScreenBorderPattern } from './types';
 

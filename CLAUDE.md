@@ -93,8 +93,9 @@ r186, Vitest. No backend, database, auth, or persistence.
   or pure module. No `.filter/.reduce/.sort/.find` inside JSX.
 - Feature-first hierarchy: `src/app/` composes the host experience, `src/features/<name>/`
   owns product behavior, and `src/shared/ui/` owns reusable interaction primitives.
-  Cross-feature imports go through a feature barrel; feature modules never import
-  from `src/app/`. See `docs/ARCHITECTURE.md` before adding a new surface.
+  Cross-feature imports go through a feature barrel, or its pure `model` entry where it
+  has one (`src/featureBoundaries.test.ts` enforces it, ADDENDUM-041); feature modules
+  never import from `src/app/`. See `docs/ARCHITECTURE.md` before adding a new surface.
 - The limits are enforced by `src/discipline.test.ts` as a ratchet over the whole tree;
   the recorded debt is `src/test/disciplineBaseline.ts` (ADDENDUM-034). Do not add a row:
   split the function. A split that introduces a new offender is not finished. Delete the

@@ -1,4 +1,4 @@
-import type { HeroTitleConfig } from '@/features/premiere/model/types';
+import type { HeroTitleConfig } from '@/features/premiere/model';
 
 export function normalizeHeroTitle(config: HeroTitleConfig): HeroTitleConfig {
   return {

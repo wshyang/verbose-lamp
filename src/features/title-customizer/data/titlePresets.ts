@@ -1,5 +1,5 @@
-import { DEFAULT_HERO_TITLE } from '@/features/premiere/data/sequence';
-import type { HeroTitleConfig } from '@/features/premiere/model/types';
+import { DEFAULT_HERO_TITLE } from '@/features/premiere/model';
+import type { HeroTitleConfig } from '@/features/premiere/model';
 
 export interface HeroTitlePreset {
   id: string;

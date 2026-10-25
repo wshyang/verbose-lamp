@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
-import { DEFAULT_HERO_TITLE } from '@/features/premiere/data/sequence';
-import type { HeroTitleConfig } from '@/features/premiere/model/types';
+import { DEFAULT_HERO_TITLE } from '@/features/premiere/model';
+import type { HeroTitleConfig } from '@/features/premiere/model';
 import type { HeroTitlePreset } from '../data/titlePresets';
 import { normalizeHeroTitle } from '../model/normalizeHeroTitle';
 

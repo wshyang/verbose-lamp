@@ -1,4 +1,4 @@
-import type { FrameArchetype } from '@/features/art-deco-frame/model/types';
+import type { FrameArchetype } from '@/features/art-deco-frame';
 
 export type CameraMode = 'cinema' | 'orbit';
 

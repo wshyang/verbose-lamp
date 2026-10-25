@@ -1,4 +1,4 @@
-import { GENE_DEFINITIONS, SIGNATURE_GENOME, clampGenome, genomeForVariant, isSignatureGenome, type BaseGenome, type GeneKey } from '../../art-deco-frame';
+import { GENE_DEFINITIONS, SIGNATURE_GENOME, clampGenome, genomeForVariant, isSignatureGenome, type BaseGenome, type GeneKey } from '@/features/art-deco-frame';
 
 export interface GeneUi {
   key: GeneKey;
