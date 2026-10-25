@@ -40,6 +40,22 @@ const browser = await chromium.launch({
   headless: true,
 });
 
+/**
+ * The HUD fades out over a CSS transition that runs slowly on a software-GL page, so a fixed
+ * delay can capture it mid-fade (that made one "manager versus itself" figure 10 when the
+ * scene was identical). Wait until the header's computed opacity has actually reached zero.
+ */
+async function waitForHudHidden(page) {
+  await page.waitForFunction(
+    () => {
+      const header = document.querySelector('header');
+      return header !== null && Number(getComputedStyle(header).opacity) === 0;
+    },
+    null,
+    { timeout: 30_000 },
+  );
+}
+
 /** One frozen capture. Throws, rather than comparing garbage, if the renderer never became ready. */
 async function capture(renderer, freezeAt) {
   const page = await browser.newPage({ viewport: VIEWPORT });
@@ -51,6 +67,7 @@ async function capture(renderer, freezeAt) {
       { timeout: READY_TIMEOUT_MS },
     );
     await page.keyboard.press('h'); // hide the HUD so only the scene is compared
+    await waitForHudHidden(page);
     await page.waitForTimeout(SETTLE_MS);
     return await page.screenshot();
   } catch (error) {
