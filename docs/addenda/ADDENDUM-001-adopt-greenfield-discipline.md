@@ -34,7 +34,7 @@
 | Playwright e2e with video-on | Deferred | First time a browser is available in CI or a second interactive feature ships |
 | Dockerfile / Dockerfile.dev / cloudflared | Deferred | First deployment target is named |
 | SHIP-HATS inert pipeline files | Deferred | Project is slated for a GovTech environment |
-| `data-testid` on pre-existing controls | Partial | Added to every control touched from now on; backfill when the HUD is next split |
+| `data-testid` on pre-existing controls | **Verified complete** (ADDENDUM-042) | Backfill finished; `src/app/testidCoverageStatic.test.ts` now fails on any control without an id, so it cannot regress |
 
 ## 4. Known debt against the function/file limits
 

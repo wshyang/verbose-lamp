@@ -46,3 +46,4 @@ numbers so the base spec stays stable. See `CLAUDE.md` §1 for the discipline.
 | [ADDENDUM-039](addenda/ADDENDUM-039-store-photo-qr-splits.md) | 2026-10-25 | Scene store actions grouped; photo session load/analyse/view separated; QR encode chain and downloads extracted | §2, §3, §7 | Implemented — recorded debt 51 → 47 |
 | [ADDENDUM-040](addenda/ADDENDUM-040-prose-without-counts.md) | 2026-10-25 | README and ARCHITECTURE stop carrying volatile counts and point at what cannot go stale | §4, §7 | Implemented — documentation only |
 | [ADDENDUM-041](addenda/ADDENDUM-041-citation-subjects.md) | 2026-10-25 | Four source citations of the ratchet corrected from 031 to 032; erratum added | §4, §7 | Implemented — comments only |
+| [ADDENDUM-042](addenda/ADDENDUM-042-testid-coverage.md) | 2026-10-25 | Test id coverage checked statically across every component file; ADDENDUM-001 §3 backfill verified complete | §4, §5 | Implemented — 4 new tests |

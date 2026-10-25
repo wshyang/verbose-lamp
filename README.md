@@ -121,6 +121,8 @@ Three test-only guards are worth knowing about:
 - `src/discipline.test.ts` — CLAUDE.md §3 as an executable ratchet (see below).
 - `src/app/e2eContract.test.ts` — every test id the Playwright suite names must exist in
   `src/`, so the e2e suite cannot rot while it is not being run.
+- `src/app/testidCoverageStatic.test.ts` — every control in every component file carries a
+  `data-testid`, with the three prop-forwarding primitives exempted by exact name.
 - `e2e/` — 42 Playwright tests in 2 files, written against `?freezeAt` and never executed in
   this sandbox (no Chromium download, no browser); they still need baselines (ADDENDUM-001).
 

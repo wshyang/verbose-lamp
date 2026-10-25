@@ -114,8 +114,10 @@ the branch. `npm run test:coverage` fails otherwise. That is the point.
 3. The visual check of the Deco Lattice frames against the film stills (specs 123 →
    243), and of the R3F sequence against the classic renderer.
 4. Deleting `GatsbySceneManager.ts` once that comparison passes (ADDENDUM-022 §2.5).
-5. Phase 1's `FrameStudioControl.test.tsx` exists as `FrameStudioDock.test.tsx`; the
-   assertions the plan listed are all there, the file name is not (ADDENDUM-026 §5).
+5. ~~Phase 1's `FrameStudioControl.test.tsx` missing under that name~~ — **closed in
+   ADDENDUM-042 §4**: `src/features/frame-studio/components/FrameStudioControl.test.tsx`
+   exists and holds the plan's assertions (surface swap, detail presets, close/collapse)
+   plus a pre-split golden.
 
 **No browser in this sandbox; visual verification pending.** Every number in this
 record is honest as a *test* number, and says nothing about how the result looks.
