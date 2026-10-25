@@ -10,6 +10,8 @@
  * tests. Assertions stay plain `expect` — jest-dom is deliberately not a
  * dependency (ADDENDUM-022 §1.1).
  */
+import { installCanvas2d } from './canvasStub';
+
 export function hasDom(): boolean {
   return typeof document !== 'undefined';
 }
@@ -43,6 +45,8 @@ function installResizeObserver(): void {
 if (hasDom()) {
   installMatchMedia();
   installResizeObserver();
+  // Painters (spectacle layers, effects, canvas hooks) need a 2D context.
+  installCanvas2d();
   const { cleanup } = await import('@testing-library/react');
   const { afterEach } = await import('vitest');
   afterEach(() => cleanup());
