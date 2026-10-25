@@ -1,0 +1,23 @@
+/* 8 s sheen — the same period as the gold QR vocabulary. */
+.gilded-sheen {
+  background: linear-gradient(115deg, transparent 32%, rgba(255, 248, 220, 0.55) 50%, transparent 68%);
+  background-size: 260% 100%;
+  animation: gilded-sheen 8s linear infinite;
+  mix-blend-mode: screen;
+}
+
+@keyframes gilded-sheen {
+  from {
+    background-position: 220% 0;
+  }
+  to {
+    background-position: -120% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gilded-sheen {
+    animation: none;
+    background-position: 50% 0;
+  }
+}

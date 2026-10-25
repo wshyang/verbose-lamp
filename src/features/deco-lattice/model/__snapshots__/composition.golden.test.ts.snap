@@ -1,0 +1,81 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`buildDecoLattice golden snapshots > default medallion keeps its geometry 1`] = `
+{
+  "hash": "1fd4633e56f22eaa473fda7d36a9d112bffd9e22",
+  "paths": 10,
+  "specs": 123,
+}
+`;
+
+exports[`buildDecoLattice golden snapshots > invitation-panel preset keeps its geometry 1`] = `
+{
+  "hash": "8afeb59f64e0a9da4a4d475d663c56f8a59e2249",
+  "paths": 5,
+  "specs": 24,
+}
+`;
+
+exports[`buildDecoLattice golden snapshots > lucky-draw frame keeps its geometry 1`] = `
+{
+  "hash": "3d2f8166295a89b9f35db1f28fff757735bb4ab7",
+  "paths": 5,
+  "specs": 24,
+}
+`;
+
+exports[`buildDecoLattice golden snapshots > medallion level 1 keeps its geometry 1`] = `
+{
+  "hash": "73ed5d4447c8b405e6a18a4fba1c82210cf97d86",
+  "paths": 4,
+  "specs": 16,
+}
+`;
+
+exports[`buildDecoLattice golden snapshots > medallion level 2 keeps its geometry 1`] = `
+{
+  "hash": "3f74e062b61801eaf17695d24455a77eab333d5e",
+  "paths": 6,
+  "specs": 19,
+}
+`;
+
+exports[`buildDecoLattice golden snapshots > medallion level 3 keeps its geometry 1`] = `
+{
+  "hash": "b00eaa8c504812f1aceabb9221fb033b3500f922",
+  "paths": 7,
+  "specs": 27,
+}
+`;
+
+exports[`buildDecoLattice golden snapshots > medallion level 4 keeps its geometry 1`] = `
+{
+  "hash": "1fd4633e56f22eaa473fda7d36a9d112bffd9e22",
+  "paths": 10,
+  "specs": 123,
+}
+`;
+
+exports[`buildDecoLattice golden snapshots > premiere-frame preset keeps its geometry 1`] = `
+{
+  "hash": "dd4de1faec2c16597ae15c218107388d0cd2ff61",
+  "paths": 8,
+  "specs": 194,
+}
+`;
+
+exports[`buildDecoLattice golden snapshots > screen-proscenium preset keeps its geometry 1`] = `
+{
+  "hash": "05243574e80e01fbcdbe167263d83919564f7a47",
+  "paths": 4,
+  "specs": 12,
+}
+`;
+
+exports[`buildDecoLattice golden snapshots > spooner-medallion preset keeps its geometry 1`] = `
+{
+  "hash": "1fd4633e56f22eaa473fda7d36a9d112bffd9e22",
+  "paths": 10,
+  "specs": 123,
+}
+`;

@@ -1,0 +1,100 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`planSpin golden snapshots > full motion, 2 guests keeps its profile 1`] = `
+{
+  "durationMs": 5366,
+  "endP": 29,
+  "samples": [
+    {
+      "position": 0.1005,
+      "velocity": 0.1202,
+    },
+    {
+      "position": 8.3108,
+      "velocity": 13,
+    },
+    {
+      "position": 23.9999,
+      "velocity": 7.5637,
+    },
+    {
+      "position": 28.8307,
+      "velocity": 0.7916,
+    },
+    {
+      "position": 29.1252,
+      "velocity": 0,
+    },
+    {
+      "position": 29,
+      "velocity": 0,
+    },
+  ],
+}
+`;
+
+exports[`planSpin golden snapshots > full motion, 300 guests keeps its profile 1`] = `
+{
+  "durationMs": 14089,
+  "endP": 142,
+  "samples": [
+    {
+      "position": 1.1268,
+      "velocity": 6.4202,
+    },
+    {
+      "position": 36.2608,
+      "velocity": 13,
+    },
+    {
+      "position": 82.0517,
+      "velocity": 13,
+    },
+    {
+      "position": 127.8425,
+      "velocity": 13,
+    },
+    {
+      "position": 142,
+      "velocity": 0,
+    },
+    {
+      "position": 142,
+      "velocity": 0,
+    },
+  ],
+}
+`;
+
+exports[`planSpin golden snapshots > reduced motion keeps its profile 1`] = `
+{
+  "durationMs": 3771,
+  "endP": 37,
+  "samples": [
+    {
+      "position": -0.2445,
+      "velocity": -1.3798,
+    },
+    {
+      "position": 6.3004,
+      "velocity": 13,
+    },
+    {
+      "position": 18.5558,
+      "velocity": 13,
+    },
+    {
+      "position": 30.8113,
+      "velocity": 13,
+    },
+    {
+      "position": 36.9407,
+      "velocity": 0.9431,
+    },
+    {
+      "position": 37,
+      "velocity": 0,
+    },
+  ],
+}
+`;

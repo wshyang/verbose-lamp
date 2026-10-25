@@ -1,0 +1,197 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`planning golden snapshots > planOrbTransition corners/inward keeps its timeline 1`] = `
+{
+  "hash": "6e5a98de666807e245bc769cdbf520a654671d1b",
+  "length": 547,
+}
+`;
+
+exports[`planning golden snapshots > planOrbTransition corners/inward keeps its timeline 2`] = `
+{
+  "hash": "93bd94adec73181264bc3888ce2f0003a23d008f",
+  "length": 545,
+}
+`;
+
+exports[`planning golden snapshots > planOrbTransition corners/outward keeps its timeline 1`] = `
+{
+  "hash": "660edd8adee7960600770ba1981eafdd73d4b182",
+  "length": 549,
+}
+`;
+
+exports[`planning golden snapshots > planOrbTransition corners/outward keeps its timeline 2`] = `
+{
+  "hash": "f0515ce08122b5c7211d08996a56da9a6e853212",
+  "length": 546,
+}
+`;
+
+exports[`planning golden snapshots > planOrbTransition sides/inward keeps its timeline 1`] = `
+{
+  "hash": "769b6ba95446eae471a370a2bfbdcfea589d6506",
+  "length": 371,
+}
+`;
+
+exports[`planning golden snapshots > planOrbTransition sides/inward keeps its timeline 2`] = `
+{
+  "hash": "b2e36c3011628eabd04db415d553ce30c116b716",
+  "length": 369,
+}
+`;
+
+exports[`planning golden snapshots > planOrbTransition sides/outward keeps its timeline 1`] = `
+{
+  "hash": "5f86dab3efca3596137855b7683dc3e107b6ada9",
+  "length": 373,
+}
+`;
+
+exports[`planning golden snapshots > planOrbTransition sides/outward keeps its timeline 2`] = `
+{
+  "hash": "7c2677c95d0c442379a199cae6dc365a5f9450cc",
+  "length": 370,
+}
+`;
+
+exports[`planning golden snapshots > planShow seed 1925 keeps its schedule 1`] = `
+{
+  "hash": "f05786dcf8ac5d03b2534ba5cd8591837761d7bb",
+  "length": 2120,
+}
+`;
+
+exports[`planning golden snapshots > planShow seed 1925 keeps its schedule 2`] = `
+{
+  "hash": "7404a956817e413a3de38b4a736d3b051c8a8d06",
+  "length": 3527,
+}
+`;
+
+exports[`planning golden snapshots > shellSparks chrysanthemum keeps its recipe 1`] = `
+{
+  "hash": "e6febb27f145011d6b2fdbd368ec15a22b512594",
+  "length": 27875,
+}
+`;
+
+exports[`planning golden snapshots > shellSparks chrysanthemum keeps its recipe 2`] = `
+{
+  "hash": "04f22f66f9afe4b6859ca1ee54fb96c248bc4fd9",
+  "length": 13937,
+}
+`;
+
+exports[`planning golden snapshots > shellSparks crossette keeps its recipe 1`] = `
+{
+  "hash": "98ebdd590b0bc2d6426f6949c6ee875fb8cd5589",
+  "length": 1874,
+}
+`;
+
+exports[`planning golden snapshots > shellSparks crossette keeps its recipe 2`] = `
+{
+  "hash": "2199f850f35fc0a76bc62ef19a723f42df51ff62",
+  "length": 1121,
+}
+`;
+
+exports[`planning golden snapshots > shellSparks double-break keeps its recipe 1`] = `
+{
+  "hash": "b73607ffd77b9a8e30f5957d981fba429f6add82",
+  "length": 28433,
+}
+`;
+
+exports[`planning golden snapshots > shellSparks double-break keeps its recipe 2`] = `
+{
+  "hash": "b962709e84c99f8d1aa99db5ba8b31d2dbd4d8e0",
+  "length": 14312,
+}
+`;
+
+exports[`planning golden snapshots > shellSparks kamuro keeps its recipe 1`] = `
+{
+  "hash": "0f33784145b89380cf5abbe029f1607e1d90e64d",
+  "length": 22582,
+}
+`;
+
+exports[`planning golden snapshots > shellSparks kamuro keeps its recipe 2`] = `
+{
+  "hash": "ed539510e603cff269dae23e5b41886a1fc13845",
+  "length": 11285,
+}
+`;
+
+exports[`planning golden snapshots > shellSparks palm keeps its recipe 1`] = `
+{
+  "hash": "f6b1c5ebb028c15ad79326d494d0ddca23847c2c",
+  "length": 2077,
+}
+`;
+
+exports[`planning golden snapshots > shellSparks palm keeps its recipe 2`] = `
+{
+  "hash": "32445495c59d5aead5976781dea6eea4b3c9ace2",
+  "length": 1033,
+}
+`;
+
+exports[`planning golden snapshots > shellSparks peony keeps its recipe 1`] = `
+{
+  "hash": "74735bebff7a54ff4eb01f26026dbd3a37f7ad92",
+  "length": 26138,
+}
+`;
+
+exports[`planning golden snapshots > shellSparks peony keeps its recipe 2`] = `
+{
+  "hash": "b50bbbdd60276da89a9cc4d8b52438346b587ce4",
+  "length": 13074,
+}
+`;
+
+exports[`planning golden snapshots > shellSparks ring keeps its recipe 1`] = `
+{
+  "hash": "c75e78ee84b478febb744f1f07ae2d8c06a8b4b4",
+  "length": 14327,
+}
+`;
+
+exports[`planning golden snapshots > shellSparks ring keeps its recipe 2`] = `
+{
+  "hash": "54bd31336dfed29a4354fb0ae8b4b3c99e1a2d8f",
+  "length": 7146,
+}
+`;
+
+exports[`planning golden snapshots > shellSparks strobe keeps its recipe 1`] = `
+{
+  "hash": "c133326f1a335affaf4df990c76e6f1da17f2584",
+  "length": 24535,
+}
+`;
+
+exports[`planning golden snapshots > shellSparks strobe keeps its recipe 2`] = `
+{
+  "hash": "7ea1aedc739eec4ec34123fa51897ab7b98c8854",
+  "length": 12269,
+}
+`;
+
+exports[`planning golden snapshots > shellSparks willow keeps its recipe 1`] = `
+{
+  "hash": "c9fa7cbc1f66d791ae98fd60db06ab3600d630ce",
+  "length": 19175,
+}
+`;
+
+exports[`planning golden snapshots > shellSparks willow keeps its recipe 2`] = `
+{
+  "hash": "81122a44735987202d9edefd1085a7381387bab2",
+  "length": 9582,
+}
+`;

@@ -1,0 +1,279 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`effect golden recordings > champagne draws identically (full motion) 1`] = `
+{
+  "announced": [],
+  "calls": 9900,
+  "hash": "d27addb26bc3a918edecabdfbf9e309bf43e723b",
+  "status": "running",
+}
+`;
+
+exports[`effect golden recordings > champagne draws identically (reduced motion) 1`] = `
+{
+  "announced": [],
+  "calls": 2596,
+  "hash": "4c9c4a54201280fe49db4bd14d010b10baa5d067",
+  "status": "running",
+}
+`;
+
+exports[`effect golden recordings > confetti burst draws identically (full motion) 1`] = `
+{
+  "announced": [],
+  "calls": 51203,
+  "hash": "e6491004e8e09252bdada4cb7d2872061594545e",
+  "status": "running",
+}
+`;
+
+exports[`effect golden recordings > confetti burst draws identically (reduced motion) 1`] = `
+{
+  "announced": [],
+  "calls": 51203,
+  "hash": "e6491004e8e09252bdada4cb7d2872061594545e",
+  "status": "running",
+}
+`;
+
+exports[`effect golden recordings > confetti rain draws identically (full motion) 1`] = `
+{
+  "announced": [],
+  "calls": 94464,
+  "hash": "26ca0f521736bd780a676592d16e86ab48f78a5a",
+  "status": "running",
+}
+`;
+
+exports[`effect golden recordings > confetti rain draws identically (reduced motion) 1`] = `
+{
+  "announced": [],
+  "calls": 94464,
+  "hash": "26ca0f521736bd780a676592d16e86ab48f78a5a",
+  "status": "running",
+}
+`;
+
+exports[`effect golden recordings > countdown draws identically (full motion) 1`] = `
+{
+  "announced": [
+    "Countdown complete",
+  ],
+  "calls": 4284,
+  "hash": "c018c5a6d9874668f4896c0fd5cd45840faea1bf",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > countdown draws identically (reduced motion) 1`] = `
+{
+  "announced": [
+    "Countdown complete",
+  ],
+  "calls": 4284,
+  "hash": "0bfd3dfe73388bf3fba21f4a0f901364ca0f6a0b",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > fireworks draws identically (full motion) 1`] = `
+{
+  "announced": [],
+  "calls": 191240,
+  "hash": "f25dd0be679c007cc2e6c9db6f829560fc0e2710",
+  "status": "running",
+}
+`;
+
+exports[`effect golden recordings > fireworks draws identically (reduced motion) 1`] = `
+{
+  "announced": [],
+  "calls": 760,
+  "hash": "a9eed86811b1b47dba3539b9fe043e8be9f09a7c",
+  "status": "running",
+}
+`;
+
+exports[`effect golden recordings > fireworks finale draws identically (full motion) 1`] = `
+{
+  "announced": [],
+  "calls": 168673,
+  "hash": "6ecfd251016dd1c0e307eef6757d063879387c42",
+  "status": "running",
+}
+`;
+
+exports[`effect golden recordings > fireworks finale draws identically (reduced motion) 1`] = `
+{
+  "announced": [],
+  "calls": 760,
+  "hash": "a9eed86811b1b47dba3539b9fe043e8be9f09a7c",
+  "status": "running",
+}
+`;
+
+exports[`effect golden recordings > flash draws identically (full motion) 1`] = `
+{
+  "announced": [],
+  "calls": 36,
+  "hash": "3df415c7f9250977ae7a980e04e8e476b0a2a7a6",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > flash draws identically (reduced motion) 1`] = `
+{
+  "announced": [],
+  "calls": 36,
+  "hash": "3df415c7f9250977ae7a980e04e8e476b0a2a7a6",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > name reveal draws identically (full motion) 1`] = `
+{
+  "announced": [
+    "Jay Gatsby",
+  ],
+  "calls": 5904,
+  "hash": "7b2afad66e3b13e5164fdd26b69141b35b8e1b3d",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > name reveal draws identically (reduced motion) 1`] = `
+{
+  "announced": [
+    "Jay Gatsby",
+  ],
+  "calls": 5904,
+  "hash": "7b2afad66e3b13e5164fdd26b69141b35b8e1b3d",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > orbs corners inward draws identically (full motion) 1`] = `
+{
+  "announced": [],
+  "calls": 12277,
+  "hash": "26815c1c35b0a0331ee55fc0ade770c56ec6f909",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > orbs corners inward draws identically (reduced motion) 1`] = `
+{
+  "announced": [],
+  "calls": 42,
+  "hash": "bdb4b6de5c120feb90ce228200c59cfd6e1d0c5a",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > orbs corners outward draws identically (full motion) 1`] = `
+{
+  "announced": [],
+  "calls": 7374,
+  "hash": "36458a5101f1f171dc90f9f301eb0d45049478fb",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > orbs corners outward draws identically (reduced motion) 1`] = `
+{
+  "announced": [],
+  "calls": 42,
+  "hash": "bdb4b6de5c120feb90ce228200c59cfd6e1d0c5a",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > orbs sides inward draws identically (full motion) 1`] = `
+{
+  "announced": [],
+  "calls": 8955,
+  "hash": "1d9c0e66bd6d0a6882aa6bf82f04a604b85402d9",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > orbs sides inward draws identically (reduced motion) 1`] = `
+{
+  "announced": [],
+  "calls": 42,
+  "hash": "bdb4b6de5c120feb90ce228200c59cfd6e1d0c5a",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > orbs sides outward draws identically (full motion) 1`] = `
+{
+  "announced": [],
+  "calls": 3750,
+  "hash": "bd8e1de0548d8b003818e1e69173559588e4741f",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > orbs sides outward draws identically (reduced motion) 1`] = `
+{
+  "announced": [],
+  "calls": 42,
+  "hash": "bdb4b6de5c120feb90ce228200c59cfd6e1d0c5a",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > searchlights draws identically (full motion) 1`] = `
+{
+  "announced": [],
+  "calls": 3660,
+  "hash": "6542a7c046daaaf1dfe882d765e30dd9702bc346",
+  "status": "running",
+}
+`;
+
+exports[`effect golden recordings > searchlights draws identically (reduced motion) 1`] = `
+{
+  "announced": [],
+  "calls": 3660,
+  "hash": "a6a8843664f534b243b9c9ca5e66c4fd3a25fe05",
+  "status": "running",
+}
+`;
+
+exports[`effect golden recordings > sunburst fan draws identically (full motion) 1`] = `
+{
+  "announced": [],
+  "calls": 1530,
+  "hash": "f6f163b2cf7cb524a2fd2acd8e56d1f754609957",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > sunburst fan draws identically (reduced motion) 1`] = `
+{
+  "announced": [],
+  "calls": 24,
+  "hash": "80d0d9cb06a8573cb17ce71b53c9c4459495fd9c",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > sunburst iris draws identically (full motion) 1`] = `
+{
+  "announced": [],
+  "calls": 1183,
+  "hash": "45886b69d09f5b2fe0f8ff732a2baf12092699e9",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > sunburst iris draws identically (reduced motion) 1`] = `
+{
+  "announced": [],
+  "calls": 24,
+  "hash": "80d0d9cb06a8573cb17ce71b53c9c4459495fd9c",
+  "status": "done",
+}
+`;

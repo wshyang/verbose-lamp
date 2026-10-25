@@ -1,0 +1,14 @@
+/* Slim gold scrollbars for the docked panel only. */
+.spectacle-preview__panel::-webkit-scrollbar,
+.spectacle-preview__panel *::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.spectacle-preview__panel::-webkit-scrollbar-track,
+.spectacle-preview__panel *::-webkit-scrollbar-track {
+  background: rgba(23, 16, 6, 0.6);
+}
+.spectacle-preview__panel::-webkit-scrollbar-thumb,
+.spectacle-preview__panel *::-webkit-scrollbar-thumb {
+  background: rgba(169, 138, 88, 0.55);
+}

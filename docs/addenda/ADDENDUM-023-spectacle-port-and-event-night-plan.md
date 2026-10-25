@@ -333,3 +333,16 @@ Manual browser checklist for the user (also in ADDENDUM-024):
 6. **Premiere** button and browser Back both return; premiere restarts.
 Rollback: each commit is independent; reverting D removes the screen, reverting C restores
 the original iris behaviour.
+
+---
+
+## Progress
+
+- **Commit A (Steps 1–4) — landed.** `random`, `useReducedMotion` (now `src/shared/hooks/`),
+  and the `spectacle`, `lucky-draw`, `gilded-ui`, `deco-lattice` (pure code under `model/`,
+  frame under `components/`) and `spectacle-preview` features ported verbatim from the kalma
+  checkout; only import paths and the two scoped CSS files changed. Golden safety net added:
+  recording-canvas runs of all 9 effects (15 configurations × full/reduced motion, plus a
+  determinism check), `drawDrum`, `planShow`/`shellSparks`/`planOrbTransition`,
+  `buildDecoLattice` and `planSpin` snapshots. Nothing is mounted in the app yet.
+  Validation: tsc ✓ vitest ✓ (393 tests) build ✓ — browser not available in sandbox.

@@ -1,0 +1,29 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`drawDrum golden recordings > fast spin with smear draws identically 1`] = `
+{
+  "calls": 453,
+  "hash": "75f7630bec6fec8324943cadcdd886d854e67d97",
+}
+`;
+
+exports[`drawDrum golden recordings > landed with glow draws identically 1`] = `
+{
+  "calls": 281,
+  "hash": "53f3527ff342b25f0a03298b07852fc52e3d6753",
+}
+`;
+
+exports[`drawDrum golden recordings > rest at slot 0 draws identically 1`] = `
+{
+  "calls": 279,
+  "hash": "f939399a4496c107a0dc1d1187df658ca6ad9c99",
+}
+`;
+
+exports[`drawDrum golden recordings > rest between slots draws identically 1`] = `
+{
+  "calls": 317,
+  "hash": "5f6294d0cc74a3a712866fbf06e5dcc03b763180",
+}
+`;
