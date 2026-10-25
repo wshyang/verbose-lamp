@@ -99,6 +99,16 @@ export interface FlashParams {
   durationMs?: number;
 }
 
+export interface SparklerParams {
+  origin: NormPoint;
+  /** 1 = one handheld sparkler, up to 5 for a fan. */
+  count?: number;
+  seed?: number;
+  /** 0..1 — density, head size and smoke. */
+  intensity?: number;
+  durationMs?: number;
+}
+
 export interface EffectParamsMap {
   fireworks: FireworksParams;
   'orb-transition': OrbTransitionParams;
@@ -109,6 +119,7 @@ export interface EffectParamsMap {
   countdown: CountdownParams;
   'name-reveal': NameRevealParams;
   flash: FlashParams;
+  sparkler: SparklerParams;
 }
 
 export type EffectId = keyof EffectParamsMap;

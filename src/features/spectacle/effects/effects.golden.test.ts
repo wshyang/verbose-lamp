@@ -33,6 +33,8 @@ const CASES: readonly GoldenCase[] = [
   { name: 'searchlights', effect: 'searchlights', params: { beams: 3, seed: 1925 } },
   { name: 'countdown', effect: 'countdown', params: { from: 3 } },
   { name: 'name reveal', effect: 'name-reveal', params: { name: 'Jay Gatsby', subtitle: 'Lucky draw winner' } },
+  { name: 'sparkler single', effect: 'sparkler', params: { origin: ORIGIN, seed: 1925 } },
+  { name: 'sparkler fan', effect: 'sparkler', params: { origin: ORIGIN, seed: 1925, count: 5, intensity: 0.9 } },
   { name: 'flash', effect: 'flash', params: { origin: ORIGIN } },
 ];
 

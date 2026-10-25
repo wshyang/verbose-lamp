@@ -6,6 +6,7 @@ import { flashEffect } from '../effects/flash/flashEffect';
 import { nameRevealEffect } from '../effects/nameReveal/nameRevealEffect';
 import { orbsEffect } from '../effects/orbs/orbsEffect';
 import { searchlightsEffect } from '../effects/searchlights/searchlightsEffect';
+import { sparklersEffect } from '../effects/sparklers/sparklersEffect';
 import { sunburstEffect } from '../effects/sunburst/sunburstEffect';
 import type { EffectParamsMap } from '../model/types';
 import type { EffectDefinition } from './types';
@@ -23,4 +24,5 @@ export const effectRegistry: {
   countdown: countdownEffect,
   'name-reveal': nameRevealEffect,
   flash: flashEffect,
+  sparkler: sparklersEffect,
 };
