@@ -195,8 +195,13 @@ ADDENDUM-001/024; this change only added props/tests around them.
 - **Fallback visual smoke:** screenshots of the frozen Act V frame, the
   premiere spectacle panel/pick flow, an inward sparkler at its collision point,
   and Event Night's medallion/searchlights were inspected; the stage renders
-  non-blank and no page errors were captured. Sandbox font requests failed, so
-  these used fallback fonts and are **not** likeness evidence.
+  non-blank and no page errors were captured. The likeness spec itself was also
+  smoke-run with `--update-snapshots` (4 mobile + 3 desktop shots: monogram,
+  hero, orbit, HUD, nitrate, screen border), the frames were inspected, and the
+  generated snapshots were then **discarded** — desktop capture under software
+  WebGL needed a 90s screenshot timeout and `test.slow()`, now recorded in
+  `e2e/likeness.spec.ts`. Sandbox font requests failed, so these used fallback
+  fonts and are **not** likeness evidence.
 - **Not performed:** supported `npx playwright install chromium`, likeness
   baseline generation/review, and any real-GPU check. Three.js prints
   deprecation warnings (`THREE.Clock`, CJS require) under the headless renderer;
