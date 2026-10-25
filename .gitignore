@@ -1,2 +1,19 @@
 .DS_Store
-.DS_Store
+
+# Installed dependencies. `node_modules/` was committed during the initial import
+# (10 066 tracked files) and is left tracked for now: untracking it is a mechanical
+# change bigger than this round's budget. New installs are ignored from here on, so
+# `npm install` no longer dirties the index (ADDENDUM-025 §6).
+node_modules/
+
+# Build and test output
+dist/
+coverage/
+test-results/
+playwright-report/
+blob-report/
+.vite/
+*.tsbuildinfo
+
+# Playwright browsers are downloaded per machine, never committed
+.vitest-cache/
