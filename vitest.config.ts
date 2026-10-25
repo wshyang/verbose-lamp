@@ -36,13 +36,13 @@ const FULL = { statements: 100, branches: 100, functions: 100, lines: 100 } as c
 
 /**
  * Global floors are a ratchet at the logic-surface level measured when this gate was
- * introduced (65.3 % statements, 64.3 % branches, 58.5 % functions, 65.7 % lines, raised to 66.3 / 65.8 / 60.0 / 66.7 by Phase 1 67.6 / 66.6 / 62.6 / 68.2 by Phase 2 and 68.1 / 67.4 / 62.7 / 68.6 by Phase 3, with
+ * introduced (65.3 % statements, 64.3 % branches, 58.5 % functions, 65.7 % lines, raised to 66.3 / 65.8 / 60.0 / 66.7 by Phase 1 67.6 / 66.6 / 62.6 / 68.2 by Phase 2 68.1 / 67.4 / 62.7 / 68.6 by Phase 3 and 71.9 / 71.5 / 68.0 / 72.3 by Phase 4 so far, with
  * every non-excluded file counted, loaded by a test or not): raise them whenever a phase
  * raises coverage, never lower them. Modules
  * the integration adds or rewrites are named below at 100% as they land, so a later
  * change cannot quietly drop them.
  */
-const GLOBAL_FLOORS = { statements: 68, branches: 67, functions: 62, lines: 68 } as const;
+const GLOBAL_FLOORS = { statements: 71, branches: 71, functions: 67, lines: 72 } as const;
 
 // Separate from vite.config.ts on purpose: the single-file and Tailwind plugins are
 // irrelevant to node unit tests, and the project rule forbids editing vite.config.ts.
@@ -85,6 +85,8 @@ export default defineConfig({
         'src/features/deco-lattice/model/nineSlice.ts': FULL,
         'src/features/deco-lattice/model/motifs.ts': FULL,
         'src/features/deco-lattice/model/tone.ts': FULL,
+        'src/features/art-deco-frame/engine/frameGrammar/latticeSource.ts': FULL,
+        'src/features/frame-studio/model/patternSeed.ts': FULL,
       },
     },
   },

@@ -234,3 +234,20 @@ describe('clampScreenBorderStyle', () => {
     expect(clamped.extra).toBe('kept');
   });
 });
+
+describe('clampFrameStyle lattice seed', () => {
+  // Without this the reroll would apply for a frame and then be dropped by the clamp,
+  // so every reroll would redraw the default pattern.
+  it('keeps the formula seed a reroll chose', () => {
+    const style: FrameStyle = {
+      ...DEFAULT_FRAME_STYLE,
+      formula: { ...DEFAULT_FRAME_STYLE.formula, source: 'lattice', seed: 4242 },
+    };
+
+    expect(clampFrameStyle(style).formula.seed).toBe(4242);
+  });
+
+  it('leaves the seed absent when none was given', () => {
+    expect(clampFrameStyle(DEFAULT_FRAME_STYLE).formula.seed).toBeUndefined();
+  });
+});

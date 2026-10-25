@@ -6,6 +6,7 @@ import {
   FrameLayerSource,
   FrameSurface,
   IntricacyPreset,
+  ScreenBorderPattern,
 } from '@/features/art-deco-frame';
 import { GENE_GROUPS } from '../data/frameDesigns';
 import type { GeneKey } from '@/features/art-deco-frame';
@@ -35,9 +36,12 @@ interface FrameStudioControlProps {
   proportionsOpen: boolean;
   genome: Record<GeneKey, number>;
   borderEnabled: boolean;
+  borderPattern: ScreenBorderPattern;
   borderWeight: number;
   onSurfaceChange: (surface: FrameSurface) => void;
   onPatternChange: (source: FrameSource) => void;
+  /** Reroll the seeded Deco Lattice pattern (ADDENDUM-021 §3.5). */
+  onRerollPattern: () => void;
   onLayerToggle: (source: FrameLayerSource, enabled: boolean) => void;
   onLayerLevelChange: (source: FrameLayerSource, level: number) => void;
   onDesignChange: (index: number) => void;
@@ -46,10 +50,22 @@ interface FrameStudioControlProps {
   onProportionsToggle: (open: boolean) => void;
   onGeneChange: (key: GeneKey, value: number) => void;
   onBorderEnabledChange: (enabled: boolean) => void;
+  onBorderPatternChange: (pattern: ScreenBorderPattern) => void;
+  onRerollBorder: () => void;
   onBorderWeightChange: (weight: number) => void;
   onReset: () => void;
   onDismiss: () => void;
 }
+
+const BORDER_PATTERNS: readonly { id: ScreenBorderPattern; label: string }[] = [
+  { id: 'poster', label: 'Printed poster' },
+  { id: 'lattice', label: 'Deco lattice' },
+];
+
+/** The seed reaches the foundation and any composed layer, so either one earns a reroll. */
+const isLatticeActive = (props: Pick<FrameStudioControlProps, 'baseSource' | 'layers'>) =>
+  props.baseSource === 'lattice' ||
+  props.layers.some((layer) => layer.source === 'lattice' && layer.enabled);
 
 const chip = (active: boolean) =>
   `cursor-pointer border transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#f8e29b] focus-visible:outline-offset-1 ${
@@ -129,6 +145,17 @@ export const FrameStudioControl: React.FC<FrameStudioControlProps> = (props) => 
             <p className="text-[10px] font-editorial leading-snug text-[#d9c7a3]/75">
               Keep the authored frame as your base, or build from another foundation.
             </p>
+            {isLatticeActive(props) && (
+              <button
+                type="button"
+                onClick={props.onRerollPattern}
+                className={`w-full px-2 py-1.5 text-[9px] tracking-[0.12em] uppercase ${chip(false)}`}
+                title="Draw a new seeded lattice pattern"
+                data-testid="frame-studio__reroll"
+              >
+                Reroll pattern
+              </button>
+            )}
           </div>
 
           {props.isDesignPattern && (
@@ -288,6 +315,34 @@ export const FrameStudioControl: React.FC<FrameStudioControlProps> = (props) => 
               data-testid="frame-studio__border-enable"
             />
           </label>
+          <div className="space-y-1.5">
+            <div className="text-[9px] tracking-[0.2em] uppercase text-[#d4af37]/80">Pattern</div>
+            <div className="grid grid-cols-2 gap-1" role="group" aria-label="Screen border pattern">
+              {BORDER_PATTERNS.map((pattern) => (
+                <button
+                  key={pattern.id}
+                  type="button"
+                  onClick={() => props.onBorderPatternChange(pattern.id)}
+                  aria-pressed={props.borderPattern === pattern.id}
+                  className={`px-2 py-1.5 text-[9px] tracking-[0.12em] uppercase ${chip(props.borderPattern === pattern.id)}`}
+                  data-testid="frame-studio__border-pattern"
+                >
+                  {pattern.label}
+                </button>
+              ))}
+            </div>
+            {props.borderPattern === 'lattice' && (
+              <button
+                type="button"
+                onClick={props.onRerollBorder}
+                className={`w-full px-2 py-1.5 text-[9px] tracking-[0.12em] uppercase ${chip(false)}`}
+                title="Draw a new seeded proscenium"
+                data-testid="frame-studio__border-reroll"
+              >
+                Reroll proscenium
+              </button>
+            )}
+          </div>
           <div className={props.borderEnabled ? 'space-y-1' : 'space-y-1 opacity-40'}>
             <div className="flex items-baseline justify-between">
               <span className="text-[9px] tracking-[0.2em] uppercase text-[#d4af37]/80">Border weight</span>

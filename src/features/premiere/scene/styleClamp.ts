@@ -72,6 +72,7 @@ export function clampFrameStyle(style: FrameStyle): FrameStyle {
       source: formula.source,
       level: clampFormulaLevel(formula.level),
       genome: clampGenome(formula.genome),
+      ...(formula.seed === undefined ? {} : { seed: formula.seed }),
       layers: (formula.layers ?? []).map((layer) => ({
         source: layer.source,
         enabled: layer.enabled,

@@ -10,7 +10,7 @@ exports[`buildDecoLattice golden snapshots > default medallion keeps its geometr
 
 exports[`buildDecoLattice golden snapshots > invitation-panel preset keeps its geometry 1`] = `
 {
-  "hash": "8afeb59f64e0a9da4a4d475d663c56f8a59e2249",
+  "hash": "9788210219b92d73935bba76e03d50cc5e925658",
   "paths": 5,
   "specs": 24,
 }
@@ -18,7 +18,7 @@ exports[`buildDecoLattice golden snapshots > invitation-panel preset keeps its g
 
 exports[`buildDecoLattice golden snapshots > lucky-draw frame keeps its geometry 1`] = `
 {
-  "hash": "3d2f8166295a89b9f35db1f28fff757735bb4ab7",
+  "hash": "38cb8c10f443e194f3ea8b1d70aaf374a6df41c8",
   "paths": 5,
   "specs": 24,
 }
@@ -58,7 +58,7 @@ exports[`buildDecoLattice golden snapshots > medallion level 4 keeps its geometr
 
 exports[`buildDecoLattice golden snapshots > premiere-frame preset keeps its geometry 1`] = `
 {
-  "hash": "dd4de1faec2c16597ae15c218107388d0cd2ff61",
+  "hash": "ac2d3c7d908011da39a48e9b077eeebe862ed259",
   "paths": 8,
   "specs": 194,
 }

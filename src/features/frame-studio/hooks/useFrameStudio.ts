@@ -12,10 +12,12 @@ import {
   FrameStyle,
   FrameSurface,
   INTRICACY_PRESETS,
+  ScreenBorderPattern,
   ScreenBorderStyle,
 } from '@/features/art-deco-frame';
 import { SIGNATURE_GENOME, clampGenome, withGene, type GeneKey } from '@/features/art-deco-frame';
 import { DESIGN_GALLERY, describeDesign, designAt, findDesignEntry } from '../data/frameDesigns';
+import { nextPatternSeed } from '../model/patternSeed';
 
 export interface FrameStudioTarget {
   setSequenceFrameStyle: (style: FrameStyle) => void;
@@ -111,6 +113,27 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
   const setDetail = useCallback(
     (percent: number) => commitSequence(formula, detailValue(percent)),
     [commitSequence, formula]
+  );
+
+  /** A fresh lattice pattern from the next seed; the choreography is unchanged. */
+  const rerollPattern = useCallback(
+    () => commitSequence({ ...formula, seed: nextPatternSeed(formula.seed) }, intricacy),
+    [commitSequence, formula, intricacy]
+  );
+
+  /** Switch the proscenium between the printed poster edge and Deco Lattice. */
+  const setBorderPattern = useCallback(
+    (pattern: ScreenBorderPattern) => {
+      if (pattern === (border.pattern ?? 'poster')) return;
+      commitBorder({ ...border, pattern });
+    },
+    [border, commitBorder]
+  );
+
+  /** A fresh proscenium seed; only the brass angles move. */
+  const rerollBorder = useCallback(
+    () => commitBorder({ ...border, seed: nextPatternSeed(border.seed) }),
+    [border, commitBorder]
   );
 
   const setBorderWeight = useCallback(
@@ -212,6 +235,10 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
     setGene: setGeneForSurface,
     borderEnabled,
     setBorderEnabled,
+    rerollPattern,
+    borderPattern: border.pattern ?? 'poster',
+    setBorderPattern,
+    rerollBorder,
     borderWeight: detailPercent(border.weight),
     setBorderWeight,
     resetAll,
