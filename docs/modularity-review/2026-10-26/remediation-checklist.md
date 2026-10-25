@@ -85,7 +85,7 @@ Goal: `premiere` no longer imports `frame-studio`, and there is one port type, n
 - [x] 3.6 Verify with `grep -rn "frame-studio" src/features/premiere` (non-test). Expect no hits.
 - [x] 3.7 Addendum 039 + register row. Gate. The Frame Studio must still drive the scene: the `getTarget` getter is lazy, so timing is unchanged.
 
-## [~] Phase 4
+## [~] Phase 4 — Finding 4 (Significant): 4A and 4B done, 4C open
 > **Status:** 4A and 4B done and committed. 4C (moving the two sections) **not started**: it removes two visible sections from the premiere console and rewrites ~14 test files that build the console state through `useSpectaclePreview`, `stubPreview` and four mock styles. Needs a decision on the premiere console first. See ADDENDUM-040 §4.
  — Finding 4 (Significant): console cohesion, one celebration recipe, one seed
 Three independent sub-tasks, in this order.
@@ -145,7 +145,15 @@ Goal: the "barrel is the only door" rule becomes a test. Run after Phases 1–4 
 - [x] 5.5 `premiere/model/types.ts` and `premiere/scene/sceneApi.ts`: use `import type … from '@/features/art-deco-frame'` (type-only). (Both were already type-only; the review's "loads Three" claim for this edge was wrong.)
 - [x] 5.6 Docs: `docs/ARCHITECTURE.md` (the `model` entry, the dependency table, premiere/frame-studio ownership and spectacle-preview scope as they now are), CLAUDE.md §6 ("through a feature barrel **or its `model` entry**"). Addendum 041 + register row. Gate.
 
-## [ ] Phase 6 — Finding 6 (Minor, optional): one source of truth for premiere state
+## [ ] Phase 6 (not done, see note)
+> **Status: deliberately not done.** The plan called this phase optional ("when the next premiere setting is added"). On reading the hooks it is a behaviour change, not a layout change, and cannot be verified here:
+> - `togglePlayback` sets React state from the value the store returns, so the HUD flips in the same tick as the click; a selector would flip it on the store's next notification.
+> - `selectAct` and `applyHeroTitle` set `activeAct` ahead of the store's own chapter detection; a selector would show the old act until the next frame.
+> - The 48 ms telemetry throttle keeps the HUD from re-rendering every frame; how it interacts with selector-driven fields only shows in a real browser.
+>
+> The unit tests mock the scene and this sandbox has no browser, so a green gate would say nothing about any of these. Do it when a browser is available, ideally with the next premiere setting. `managerRef` is still threaded through 31 sites.
+
+ — Finding 6 (Minor, optional): one source of truth for premiere state
 Do this when the next premiere setting is added, or drop it. It is the largest change and the one with HUD re-render risk.
 
 - [ ] 6.1 Inventory and record which store fields are mirrored by React state: `currentTime`, `isPlaying`, `activeChapterIndex` (as `activeAct`), `cameraMode`, `isNitrateForced` (as `nitrateMode`), `heroConfig`. `soundOn` is audio-only and stays in React.
@@ -162,10 +170,10 @@ Do this when the next premiere setting is added, or drop it. It is the largest c
 - [ ] 6.5 Addendum 042 + register row. Gate, plus a local browser check of the timeline scrub, camera toggle, nitrate toggle and title edit.
 
 ## Phase 7 — Close-out
-- [ ] 7.1 Run the code-reviewer over the full diff and fix CRITICAL and HIGH findings.
-- [ ] 7.2 Re-run the modularity review's greps (duplicate clamps, `1925`, deep imports, `frame-studio` in `premiere`, `@/features/` in the four image features). Record the result in the checklist file.
-- [ ] 7.3 Tick the checklist file and report what was deferred (the vocabulary grouping, and Phase 6 if dropped).
-- [ ] 7.4 Browser caveat: type-checks, tests pass, builds; visual verification pending until `npm run e2e` is run on darwin.
+- [ ] 7.1 Run the code-reviewer over the full diff and fix CRITICAL and HIGH findings. (Not run: left for you to request.)
+- [x] 7.2 Greps re-run: no formula-level clamp outside `styleRules` (the Deco Lattice's own layer count is noted in ADDENDUM-037); `1925` only in `DEFAULT_SEED`, the two hash/offset literals and two comments; 0 deep imports in source; 0 `frame-studio` references in `premiere`; 0 sibling imports in the four image features; `managerRef` still 31 (Phase 6 not done).
+- [x] 7.3 Checklist ticked. Deferred and open: Phase 4C (move the lattice and gold-nav sections out of the console; needs a decision on the premiere console, see ADDENDUM-040 §4), Phase 6 (single source of truth for premiere state; needs a browser), the `FrameStudioVocabulary` grouping export, and the Deco Lattice's own 1-4 layer count.
+- [x] 7.4 Browser caveat: type-checks, tests pass, builds; visual verification pending until `npm run e2e` is run on darwin.
 
 ## Critical files
 - Phase 1: `art-deco-frame/engine/frameGrammar/{styleRules(new),generative,latticeSource,index}.ts`, `premiere/scene/styleClamp.ts`, `premiere/scene3d/premiereStore.ts`, `frame-studio/model/{studioFormula,studioActions}.ts`
