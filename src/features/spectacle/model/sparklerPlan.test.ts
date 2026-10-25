@@ -205,3 +205,40 @@ describe('isSparklerShowDone', () => {
     expect(isSparklerShowDone([], 0)).toBe(true);
   });
 });
+
+// A caller can hand `play()` any number. A sparkler whose duration is NaN or infinite never
+// finishes (its heat is NaN, or it burns forever), and the effect would hold a canvas and a
+// particle pool for the life of the page. Bad durations fall back to the default; real ones are
+// bounded.
+const GROW_PLUS_FADE_MS = 180 + 620;
+
+describe('planSparkler duration', () => {
+  const origin = { x: 0.5, y: 0.5 };
+
+  it.each([Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY])(
+    'treats %s as no duration and burns for the default',
+    (durationMs) => {
+      const plan = planSparkler({ origin, durationMs });
+
+      expect(plan.durationMs).toBe(planSparkler({ origin }).durationMs);
+      expect(Number.isFinite(sparklerHeat(plan, 500))).toBe(true);
+    },
+  );
+
+  it('always lets a show finish', () => {
+    const plans = planSparklerShow({ origin, count: 3, durationMs: Number.NaN });
+
+    expect(isSparklerShowDone(plans, 60_000)).toBe(true);
+  });
+
+  it('keeps a real duration, bounded to something a canvas can hold', () => {
+    expect(planSparkler({ origin, durationMs: 4000 }).durationMs).toBe(4000);
+    // Shorter than the strike plus the fade, the head would never reach full heat before it fades.
+    const floor = planSparkler({ origin, durationMs: -500 }).durationMs;
+    expect(floor).toBe(GROW_PLUS_FADE_MS);
+    expect(planSparkler({ origin, durationMs: floor - 1 }).durationMs).toBe(floor);
+    expect(sparklerHeat(planSparkler({ origin, durationMs: 1 }), floor / 2)).toBeGreaterThan(0);
+    expect(planSparkler({ origin, durationMs: 10 ** 9 }).durationMs).toBeLessThanOrEqual(30_000);
+  });
+});
+

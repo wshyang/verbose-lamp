@@ -73,6 +73,9 @@ const DEFAULT_DURATION_MS = 2600;
 const DEFAULT_INTENSITY = 0.75;
 const GROW_MS = 180;
 const FADE_MS = 620;
+/** Shortest burn that still shows a strike and a fade, and the longest a canvas should be asked to hold. */
+const MIN_DURATION_MS = GROW_MS + FADE_MS;
+const MAX_DURATION_MS = 30_000;
 const BASE_RATE = 520;
 const SPARKS_PER_UNIT = 260;
 const MAX_SPARKLERS = 5;
@@ -81,6 +84,12 @@ const FAN_RISE = 0.022;
 
 function resolveIntensity(value: number | undefined): number {
   return clamp01(value ?? DEFAULT_INTENSITY);
+}
+
+/** A caller-supplied burn: unset or non-finite means the default, anything else is held to a sane range. */
+function resolveDuration(value: number | undefined): number {
+  if (value === undefined || !Number.isFinite(value)) return DEFAULT_DURATION_MS;
+  return Math.min(MAX_DURATION_MS, Math.max(MIN_DURATION_MS, value));
 }
 
 function buildSparks(seed: number, intensity: number): readonly SparklerSpark[] {
@@ -105,7 +114,7 @@ export function planSparkler(request: SparklerRequest): SparklerPlan {
     origin: request.origin,
     seed,
     headRadius: 0.006 + intensity * 0.01,
-    durationMs: request.durationMs ?? DEFAULT_DURATION_MS,
+    durationMs: resolveDuration(request.durationMs),
     growMs: GROW_MS,
     fadeMs: FADE_MS,
     emissionRate: BASE_RATE * (0.45 + intensity * 0.75),
