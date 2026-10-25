@@ -36,6 +36,7 @@ export async function gotoFrozen(
   }
 
   if (!options.hud) {
+    await dismissFrameStudio(page);
     await page.keyboard.press('h');
     await expect(page.locator('footer')).toHaveCSS('opacity', '0');
   }
@@ -49,16 +50,33 @@ export async function gotoFrozen(
   );
 }
 
-/** Opens Frame Studio and switches it to the screen-border surface. */
+/** The studio docks open on first visit; this leaves it open and focused on the panel. */
+export async function openFrameStudio(page: Page): Promise<void> {
+  if ((await page.getByTestId('frame-studio__panel').count()) === 0) {
+    await page.getByTestId('frame-studio__reveal').click();
+  }
+  await expect(page.getByTestId('frame-studio__panel')).toBeVisible();
+}
+
+export async function dismissFrameStudio(page: Page): Promise<void> {
+  const dismiss = page.getByTestId('frame-studio__dismiss');
+  if (await dismiss.count()) {
+    await dismiss.click();
+    await expect(page.getByTestId('frame-studio__panel')).toHaveCount(0);
+  }
+}
+
+/** Opens Frame Studio, enables the screen border, then dismisses the panel again. */
 export async function showScreenBorder(page: Page): Promise<void> {
-  await page.getByTestId('frame-studio__reveal').click();
+  await openFrameStudio(page);
   await page.getByTestId('frame-studio__surface-border').click();
   const enable = page.getByTestId('frame-studio__border-enable');
   if (!(await enable.isChecked())) await enable.check();
   await expect(enable).toBeChecked();
+  await dismissFrameStudio(page);
 }
 
-/** The timeline's clock readout, e.g. `00:11 / 00:38`. */
+/** The `00:11 / 00:38` readout in the timeline. */
 export function clockReadout(page: Page) {
   return page.locator('footer').getByText(/^\d\d:\d\d\s+\/\s+\d\d:\d\d$/);
 }

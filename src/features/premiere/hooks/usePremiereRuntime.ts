@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type MutableRefObject, type RefObject } fr
 import { CinemaAudioEngine } from '../audio/cinemaAudio';
 import { parseFreezeAt } from '../model/freeze';
 import type { PlaybackTelemetry, PremiereSceneApi } from '../scene/sceneApi';
-import { createPremiereStore, storeSceneApi, type PremiereStore } from '../scene3d/premiereStore';
+import { armScene, createPremiereStore, storeSceneApi, type PremiereStore } from '../scene3d/premiereStore';
 
 export interface PremiereRuntimeOptions {
   mountRef: RefObject<HTMLDivElement | null>;
@@ -52,6 +52,9 @@ export function usePremiereRuntime({
     audioRef.current = audio;
     const scene = storeSceneApi(store);
     managerRef.current = scene;
+
+    // StrictMode mounts, disposes and remounts this effect, and `dispose()` stops the clock.
+    armScene(store);
 
     return () => {
       scene.dispose();

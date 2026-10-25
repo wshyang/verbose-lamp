@@ -38,11 +38,13 @@ r186, Vitest. No backend, database, auth, or persistence.
   appears.
 - Playwright e2e is live (ADDENDUM-022 §0.5, ADDENDUM-026): `npm run e2e` runs the
   likeness screenshot gate and the interaction flows in real Chromium (SwiftShader).
-  Video-on default was not taken; traces are kept on failure instead. Baselines are
-  OS-suffixed and only comparable on the same OS, browser and version, so
+  Video-on default was not taken; traces are kept on failure instead.
+  Baselines are OS-suffixed and only comparable on the same OS, browser and version, so
   `npm run e2e:update` is a deliberate, reviewed act — never a reflex after a red run.
-  The sandbox has no browser and cannot reach the Playwright CDN, so screenshot runs are
-  a local step.
+  No baselines are committed yet: record them once per target machine.
+  The Playwright CDN is unreachable from the sandbox, so the browser comes from npm —
+  `@sparticuz/chromium`, pointed at through `PLAYWRIGHT_CHROMIUM_EXECUTABLE` — with NSS
+  built from source for its missing shared objects. See ADDENDUM-028 §2 and §7.
 
 ## 3. Test infrastructure defaults
 

@@ -88,7 +88,11 @@ Unit tests sit beside the module they cover (`foo.ts` + `foo.test.ts`) and run i
 node environment (`vitest.config.ts`, deliberately separate from `vite.config.ts`). Pure
 logic such as frame grammar, timing math, and image pipelines is tested; geometry is
 protected by snapshot tests on data, not pixels. Three.js and DOM rendering code is kept
-thin and is not unit-tested. Playwright e2e is deferred (see ADDENDUM-001).
+thin and is unit-tested through the scene graph it builds. Coverage is gated at 100%.
+
+Playwright e2e is live (`npm run e2e`): twelve frozen-frame likeness screenshots plus the
+guest flows, in real Chromium on SwiftShader. Baselines are OS- and browser-specific and
+are recorded per machine — see ADDENDUM-026 and ADDENDUM-028.
 
 ## Contributing conventions
 

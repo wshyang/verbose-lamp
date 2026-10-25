@@ -143,6 +143,15 @@ export function createPremiereStore(options: PremiereStoreOptions = {}): Premier
  * Presents the store as the scene surface the hooks already speak, so
  * `usePremiereTransport`, `usePremiereSceneOptions` and `useFrameStudio` need no change.
  */
+/**
+ * Starts the performance. Mounting the scene means playing it, and the only thing that
+ * overrides that is a frozen URL. The runtime calls this on every effect run because React
+ * StrictMode (and any prop change) disposes the scene first, and `dispose()` stops the clock.
+ */
+export function armScene(store: PremiereStore): void {
+  store.setState({ isPlaying: store.getState().freezeAt === null });
+}
+
 export function storeSceneApi(store: PremiereStore): PremiereSceneApi {
   const state = () => store.getState();
   return {

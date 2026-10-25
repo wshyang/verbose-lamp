@@ -130,12 +130,18 @@ describe('effects that must finish on their own', () => {
     expect(log.join('\n')).toContain('drawImage');
   });
 
-  it('fireworks shows the emerald pistil over a long seeded show', () => {
-    const { log } = run(
-      'fireworks',
-      { seed: 1925, intensity: 1, greenLight: true, durationMs: 20000 },
-      { untilMs: 20000, stepMs: 100 },
-    );
-    expect(log.join('\n')).toContain('drawImage');
-  });
+  // 200 simulated steps of a full-intensity show: the 5 s default is a timing accident, not a
+  // budget, and a loaded CI box crosses it while the assertions still hold.
+  it(
+    'fireworks shows the emerald pistil over a long seeded show',
+    () => {
+      const { log } = run(
+        'fireworks',
+        { seed: 1925, intensity: 1, greenLight: true, durationMs: 20000 },
+        { untilMs: 20000, stepMs: 100 },
+      );
+      expect(log.join('\n')).toContain('drawImage');
+    },
+    30_000,
+  );
 });

@@ -118,6 +118,32 @@ describe('usePremiereRuntime', () => {
     expect(result.current.getState().isPlaying).toBe(false);
   });
 
+  it('re-arms playback when the effect round trip disposes the scene', () => {
+    // This is the StrictMode sequence: mount, dispose, mount again. A new mountRef identity
+    // re-runs the effect the same way, so the test drives it with rerender.
+    const first = options();
+    const { rerender, result } = renderHook((props) => usePremiereRuntime(props), {
+      initialProps: first,
+    });
+    act(() => first.managerRef.current?.dispose());
+    expect(result.current.getState().isPlaying).toBe(false);
+
+    rerender(options());
+    expect(result.current.getState().isPlaying).toBe(true);
+  });
+
+  it('stays paused through that round trip when the URL froze the clock', () => {
+    window.history.replaceState({}, '', '/?freezeAt=4.32');
+    const first = options();
+    const { rerender, result } = renderHook((props) => usePremiereRuntime(props), {
+      initialProps: first,
+    });
+    act(() => first.managerRef.current?.dispose());
+    rerender(options());
+    expect(result.current.getState().isPlaying).toBe(false);
+    expect(result.current.getState().currentTime).toBe(4.32);
+  });
+
   it('does nothing until the host element exists', () => {
     const props = options();
     props.mountRef.current = null;
