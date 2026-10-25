@@ -93,8 +93,10 @@ describe('createGatsbyCardRig', () => {
     expect(main.position.y).toBe(-0.36);
     expect(mid.position.y).toBe(1.36);
     expect(top.position.y).toBe(2.48);
-    expect(bottom.position.y).toBe(-2.62);
-    expect(bottom.position.z).toBe(0.12);
+    expect(top.position.z).toBe(0.24);
+    // The credit sits in the lower pediment band, in front of the frame's crest.
+    expect(bottom.position.y).toBe(-1.77);
+    expect(bottom.position.z).toBe(0.22);
   });
 
   it('lets the hero override replace every line and the alternation flag', () => {

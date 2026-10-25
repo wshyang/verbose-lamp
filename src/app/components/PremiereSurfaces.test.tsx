@@ -179,6 +179,8 @@ describe('PremiereSurfaces', () => {
     expect(screen.getByRole('dialog')).toBeTruthy();
     expect(state.shortcuts.at(-1)?.isDialogOpen).toBe(true);
 
+    // Escape is handled by the focused dialog, so put the caret inside it first.
+    await userEvent.click(screen.getByTestId('title-customizer__main-title'));
     await userEvent.keyboard('{Escape}');
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(state.shortcuts.at(-1)?.isDialogOpen).toBe(false);
