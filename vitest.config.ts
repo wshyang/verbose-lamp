@@ -99,6 +99,8 @@ export default defineConfig({
         'src/shared/lib/svgExport.ts': FULL,
         'src/shared/lib/fonts.ts': FULL,
         'src/shared/hooks/useEscapeKey.ts': FULL,
+        'src/features/gilded-ui/model/glyphIcons.ts': FULL,
+        'src/features/gilded-ui/model/navItems.ts': FULL,
         'src/shared/hooks/useDialogFocus.ts': FULL,
         'src/features/art-deco-frame/engine/frameGrammar/latticeSource.ts': FULL,
         'src/features/frame-studio/model/patternSeed.ts': FULL,

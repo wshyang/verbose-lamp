@@ -1,4 +1,6 @@
+import { iconPathFor } from '../model/glyphIcons';
 import type { NavItem } from '../model/navItems';
+import type { GlyphInput } from './GildedGlyph';
 import { GildedTile } from './GildedTile';
 
 interface GildedNavBarProps {
@@ -8,6 +10,16 @@ interface GildedNavBarProps {
   ariaLabel?: string;
 }
 
+/**
+ * Built-in icons first: an emoji only renders if the host has a colour-emoji font, and a headless or
+ * minimal Linux usually does not, which leaves an empty box. Anything not drawn falls back to the
+ * emoji text, so a user's own line still shows (ADDENDUM-033).
+ */
+const glyphFor = (emoji: string): GlyphInput => {
+  const path = iconPathFor(emoji);
+  return path === null ? { kind: 'emoji', emoji } : { kind: 'svg', path };
+};
+
 /** Bottom navigation in shimmering gold, generated from emoji + label. */
 export function GildedNavBar({ items, activeId, onSelect, ariaLabel = 'Event sections' }: GildedNavBarProps) {
   return (
@@ -15,7 +27,7 @@ export function GildedNavBar({ items, activeId, onSelect, ariaLabel = 'Event sec
       {items.map((item) => (
         <GildedTile
           key={item.id}
-          glyph={{ kind: 'emoji', emoji: item.emoji }}
+          glyph={glyphFor(item.emoji)}
           label={item.label}
           state={item.id === activeId ? 'active' : 'idle'}
           current={item.id === activeId}

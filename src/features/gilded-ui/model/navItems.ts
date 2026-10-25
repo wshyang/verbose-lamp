@@ -21,6 +21,10 @@ export function validateNavItems(items: readonly NavItem[]): NavValidation {
   return issues.length ? { ok: false, issues } : { ok: true, items };
 }
 
+/** Lower-case words joined by single hyphens, with none at either end. */
+const slug = (text: string): string =>
+  text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
 /** Editable "emoji,label" lines → nav items. First grapheme is the glyph. */
 export function parseNavLines(text: string): readonly NavItem[] {
   return text
@@ -32,7 +36,7 @@ export function parseNavLines(text: string): readonly NavItem[] {
       const emoji = comma === -1 ? line : line.slice(0, comma).trim();
       const label = comma === -1 ? '' : line.slice(comma + 1).trim();
       return {
-        id: `nav-${i}-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'item'}`,
+        id: `nav-${i}-${slug(label) || 'item'}`,
         emoji: [...emoji][0] ?? '✦',
         label,
       };
