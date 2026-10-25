@@ -11,7 +11,7 @@ import {
   SEQUENCE_CHAPTERS,
   TOTAL_SEQUENCE_DURATION,
 } from '../data/sequence';
-import type { CameraMode, HeroTitleConfig } from '../model/types';
+import type { CameraMode, HeroTitleConfig, SequenceChapter } from '../model/types';
 import { createBallroomEnvironment, createDecoWallpaperTextures } from './environment';
 import { createGatsbyCardRig, type GatsbyCardRig } from './decoCards';
 import {
@@ -23,6 +23,24 @@ import {
 import { SIGNATURE_GENOME, clampGenome } from '@/features/art-deco-frame';
 import { createScreenBorderRig, type ScreenBorderRig } from '@/features/art-deco-frame';
 import { getCinemaCameraPose, resolveViewportFit, ViewportFit } from './responsiveLayout';
+import { mulberry32 } from '@/shared/lib/random';
+import {
+  activeChapterIndex,
+  cardPhase,
+  cinemaCameraZ,
+  clamp,
+  greenLight,
+  lightRig,
+  nitrateLevel,
+  rigAnchors,
+  searchlightSway,
+} from './choreography';
+import type { PremiereSceneApi, PremiereSceneOptions, PlaybackTelemetry } from './sceneApi';
+
+/** Fixed seed for the gold-dust field, so every load is the same frame (ADDENDUM-022 §0.1). */
+const DUST_SEED = 1920;
+/** Frames rendered before the container announces itself ready for a screenshot. */
+const FRAME_READY_COUNT = 3;
 
 const CinemaNitrateShader = {
   uniforms: {
@@ -87,13 +105,9 @@ const CinemaNitrateShader = {
   `,
 };
 
-export interface PlaybackTelemetry {
-  currentTime: number;
-  activeChapterIndex: number;
-  isPlaying: boolean;
-}
+export type { PlaybackTelemetry } from './sceneApi';
 
-export class GatsbySceneManager {
+export class GatsbySceneManager implements PremiereSceneApi {
   private container: HTMLElement;
   private renderer: THREE.WebGLRenderer;
   private scene: THREE.Scene;
@@ -146,22 +160,23 @@ export class GatsbySceneManager {
   private rafId: number | null = null;
   private clock = new THREE.Clock();
   private lastChapterIdx = -1;
+  private readonly freezeAt: number | null;
+  private framesRendered = 0;
 
   private onTelemetry?: (telemetry: PlaybackTelemetry) => void;
   private onChapterChange?: (chapterIdx: number) => void;
 
-  constructor(
-    container: HTMLElement,
-    callbacks?: {
-      onTelemetry?: (t: PlaybackTelemetry) => void;
-      onChapterChange?: (idx: number) => void;
-    }
-  ) {
+  constructor(container: HTMLElement, options: PremiereSceneOptions = {}) {
     this.container = container;
+    this.freezeAt = options.freezeAt ?? null;
     this.hasCoarsePointer =
       window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
-    this.onTelemetry = callbacks?.onTelemetry;
-    this.onChapterChange = callbacks?.onChapterChange;
+    this.onTelemetry = options.onTelemetry;
+    this.onChapterChange = options.onChapterChange;
+    if (this.freezeAt !== null) {
+      this.currentTime = this.freezeAt;
+      this.isPlaying = false;
+    }
 
     const width = Math.max(1, container.clientWidth);
     const height = Math.max(1, container.clientHeight);
@@ -354,16 +369,17 @@ export class GatsbySceneManager {
 
     // 4. Stereoscopic 3D Champagne Gold Dust & Diamond Confetti Field
     const count = 950;
+    const random = mulberry32(DUST_SEED);
     const positions = new Float32Array(count * 3);
     const scales = new Float32Array(count);
     const phases = new Float32Array(count);
 
     for (let i = 0; i < count; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 24;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 14;
-      positions[i * 3 + 2] = 12 - Math.random() * 136; // spans entire theatrical Z corridor
-      scales[i] = 0.4 + Math.random() * 1.8;
-      phases[i] = Math.random() * Math.PI * 2;
+      positions[i * 3] = (random() - 0.5) * 24;
+      positions[i * 3 + 1] = (random() - 0.5) * 14;
+      positions[i * 3 + 2] = 12 - random() * 136; // spans entire theatrical Z corridor
+      scales[i] = 0.4 + random() * 1.8;
+      phases[i] = random() * Math.PI * 2;
     }
 
     const dustGeo = new THREE.BufferGeometry();
@@ -482,7 +498,7 @@ export class GatsbySceneManager {
     this.cameraMode = mode;
     this.controls.enabled = mode === 'orbit';
     if (mode === 'orbit') {
-      const idx = this.getActiveChapterIndex(this.currentTime);
+      const idx = activeChapterIndex(this.currentTime, SEQUENCE_CHAPTERS);
       this.focusOrbitOnChapter(idx);
     } else {
       this.camera.up.set(0, 1, 0);
@@ -546,14 +562,6 @@ export class GatsbySceneManager {
     this.forceNitrateMode = enabled;
   }
 
-  private getActiveChapterIndex(t: number): number {
-    for (let i = 0; i < SEQUENCE_CHAPTERS.length; i++) {
-      const c = SEQUENCE_CHAPTERS[i];
-      if (t >= c.startTime && t < c.endTime) return i;
-    }
-    return SEQUENCE_CHAPTERS.length - 1;
-  }
-
   private handleResize = () => {
     const width = Math.max(1, this.container.clientWidth);
     const height = Math.max(1, this.container.clientHeight);
@@ -569,6 +577,7 @@ export class GatsbySceneManager {
   };
 
   private handlePointerMove = (e: PointerEvent) => {
+    if (this.freezeAt !== null) return;
     const nx = (e.clientX / Math.max(1, window.innerWidth)) * 2 - 1;
     const ny = -((e.clientY / Math.max(1, window.innerHeight)) * 2 - 1);
     this.pointerTarget.set(nx, ny);
@@ -577,10 +586,13 @@ export class GatsbySceneManager {
   private animate = () => {
     this.rafId = requestAnimationFrame(this.animate);
 
-    const dt = Math.min(0.05, this.clock.getDelta());
-    const elapsed = this.clock.elapsedTime;
+    const frozen = this.freezeAt !== null;
+    // A frozen frame still renders (so a screenshot has something to take) but
+    // time, grain and camera drift hold still.
+    const dt = frozen ? 0 : Math.min(0.05, this.clock.getDelta());
+    const elapsed = frozen ? (this.freezeAt as number) : this.clock.elapsedTime;
 
-    if (this.isPlaying) {
+    if (this.isPlaying && !frozen) {
       this.currentTime += dt;
       if (this.currentTime >= TOTAL_SEQUENCE_DURATION) {
         this.currentTime = 0;
@@ -588,149 +600,28 @@ export class GatsbySceneManager {
     }
 
     const t = this.currentTime;
-    const activeIdx = this.getActiveChapterIndex(t);
-
+    const activeIdx = activeChapterIndex(t, SEQUENCE_CHAPTERS);
     if (activeIdx !== this.lastChapterIdx) {
       this.lastChapterIdx = activeIdx;
       this.onChapterChange?.(activeIdx);
     }
 
     this.pointerSmooth.lerp(this.pointerTarget, Math.min(1, dt * 4.5));
+    this.updateCards(t, elapsed);
 
-    // Update each card's golden frame draw-on, typography wipe, and theatrical gate parting
-    for (let i = 0; i < this.cardRigs.length; i++) {
-      const rig = this.cardRigs[i];
-      const ch = rig.chapter;
-      const dur = ch.endTime - ch.startTime;
-      const localT = (t - ch.startTime) / dur;
-      const isFinale = i === this.cardRigs.length - 1;
-
-      if (localT < -0.18 || localT > 1.18) {
-        rig.updateState({
-          drawProgress: 0,
-          textProgress: 0,
-          partOpen: 0,
-          opacity: 0,
-          time: elapsed,
-        });
-        continue;
-      }
-
-      // Draw-on phase: 0.0 -> 0.42
-      const drawProgress = THREE.MathUtils.smoothstep(localT, -0.04, 0.42);
-      // Text wipe phase: 0.14 -> 0.50
-      const textProgress = THREE.MathUtils.smoothstep(localT, 0.14, 0.5);
-      // Gate parting as camera flies through: 0.80 -> 1.04 (except finale which holds majestically)
-      const partOpen = isFinale
-        ? 0
-        : THREE.MathUtils.smoothstep(localT, 0.8, 1.03);
-
-      // Smooth fade-in from deep corridor & fade-out after passing lens
-      const fadeIn = THREE.MathUtils.smoothstep(localT, -0.15, 0.04);
-      const fadeOut = isFinale
-        ? 1.0 - THREE.MathUtils.smoothstep(localT, 0.91, 0.995)
-        : 1.0 - THREE.MathUtils.smoothstep(localT, 0.94, 1.08);
-
-      rig.updateState({
-        drawProgress,
-        textProgress,
-        partOpen,
-        opacity: fadeIn * fadeOut,
-        time: elapsed,
-      });
-    }
-
-    // Camera Z-Axis Theatrical Fly-Through Choreography
     const activeCh = SEQUENCE_CHAPTERS[activeIdx];
     const chDur = activeCh.endTime - activeCh.startTime;
-    const chLocal = THREE.MathUtils.clamp((t - activeCh.startTime) / chDur, 0, 1);
+    const chLocal = clamp((t - activeCh.startTime) / chDur, 0, 1);
 
     if (this.cameraMode === 'cinema') {
-      const isFinale = activeIdx === SEQUENCE_CHAPTERS.length - 1;
-      // Aspect-responsive framing pull-back so narrower viewports never clip side chevron/diamond wings
-      const aspectPullback = this.viewportFit.cameraPullback;
-
-      let targetZ: number;
-
-      if (!isFinale) {
-        const startDist = 12.2 + aspectPullback;
-        const endDist = 9.0 + aspectPullback * 0.85;
-        // Stately cinematic push-in during hold (0..0.78),
-        // then exhilarating Baz Luhrmann 3D fly-through portal (0.78..1.0) into next chamber!
-        if (chLocal < 0.78) {
-          const holdFrac = chLocal / 0.78;
-          targetZ = THREE.MathUtils.lerp(
-            activeCh.zPosition + startDist,
-            activeCh.zPosition + endDist,
-            holdFrac
-          );
-        } else {
-          const flyFrac = (chLocal - 0.78) / 0.22;
-          const easeFly = flyFrac * flyFrac * (3 - 2 * flyFrac);
-          const nextIsFinale = activeIdx + 1 === SEQUENCE_CHAPTERS.length - 1;
-          const nextStartDist = (nextIsFinale ? 15.2 : 12.2) + aspectPullback;
-          const nextZ = SEQUENCE_CHAPTERS[activeIdx + 1].zPosition + nextStartDist;
-          targetZ = THREE.MathUtils.lerp(activeCh.zPosition + endDist, nextZ, easeFly);
-        }
-      } else {
-        // Grand Finale ("THE GREAT GATSBY"): frames entire 15-ray Chrysler crown & diamond wings
-        const heroStart = 15.2 + aspectPullback;
-        const heroHold = 12.4 + aspectPullback;
-        const easeHero = 1 - Math.pow(1 - Math.min(1, chLocal / 0.52), 2.5);
-        const drift = chLocal * 0.75;
-        targetZ =
-          THREE.MathUtils.lerp(activeCh.zPosition + heroStart, activeCh.zPosition + heroHold, easeHero) -
-          drift;
-      }
-
-      const pose = getCinemaCameraPose(this.viewportFit, this.pointerSmooth, elapsed);
-      this.camera.position.set(pose.x, pose.y, targetZ);
-      this.camera.lookAt(pose.targetX, pose.targetY, targetZ - 11.0);
-      this.camera.rotation.z = pose.roll;
+      this.updateCinemaCamera({ activeIdx, chLocal, elapsed });
     } else {
       this.controls.update();
     }
 
-    // Track recessed Art Deco wallpaper & premiere searchlights behind camera
-    const anchorZ = this.cameraMode === 'cinema' ? this.camera.position.z - 12.0 : activeCh.zPosition - 3.5;
-    this.backdropGroup.position.z = anchorZ;
-    this.searchLightL.rotation.z = -0.36 + Math.sin(elapsed * 0.38) * 0.14;
-    this.searchLightR.rotation.z = 0.36 + Math.cos(elapsed * 0.33) * 0.14;
-
-    // Move specular lighting rig with active card so bevelled 24k gold bars gleam dynamically
-    const lightFocusZ = this.cameraMode === 'cinema' ? this.camera.position.z - 6.5 : activeCh.zPosition + 3.5;
-    this.rigLightKey.position.set(
-      Math.sin(elapsed * 0.75) * 5.5,
-      2.6 + Math.cos(elapsed * 0.5) * 1.4,
-      lightFocusZ + 3.2
-    );
-    this.rigLightRim.position.set(
-      Math.cos(elapsed * 0.62) * -6.0,
-      -2.2 + Math.sin(elapsed * 0.55) * 1.5,
-      lightFocusZ + 1.5
-    );
-    this.rigLightCool.position.set(0, 4.5, lightFocusZ - 2.0);
-
-    // Update Distant Green Light (prominent in Act I behind the GG Signet Gate + subtle bookend)
-    this.greenLightUniforms.uTime.value = elapsed;
-    const act1Green = 1.0 - THREE.MathUtils.smoothstep(t, 4.8, 7.6);
-    const finaleBookend = THREE.MathUtils.smoothstep(t, 34.8, 37.6) * 0.65;
-    this.greenLightUniforms.uIntensity.value = Math.max(act1Green, finaleBookend);
-    this.greenLightMesh.position.z =
-      t > 30 ? SEQUENCE_CHAPTERS[4].zPosition - 7.5 : -7.5;
-    this.greenLightMesh.visible = this.greenLightUniforms.uIntensity.value > 0.01;
-
-    // Update Gold Dust Uniforms
-    this.dustUniforms.uTime.value = elapsed;
-    this.dustUniforms.uCamZ.value = this.camera.position.z;
-
-    // Update 1920s Silver-Nitrate Opening Transition (auto during first 2.3s of Act I, or manual toggle)
-    const openingNitrate = 1.0 - THREE.MathUtils.smoothstep(t, 0.35, 2.55);
-    const targetNitrate = this.forceNitrateMode ? 0.92 : openingNitrate * 0.82;
-    this.nitratePass.uniforms.uTime.value = elapsed;
-    this.nitratePass.uniforms.uNitrate.value = targetNitrate;
+    this.updateAtmosphere({ t, elapsed, activeCh });
+    this.updateNitrate(t, elapsed);
     this.screenBorderRig.update(elapsed);
-
     this.composer.render();
 
     this.onTelemetry?.({
@@ -738,7 +629,78 @@ export class GatsbySceneManager {
       activeChapterIndex: activeIdx,
       isPlaying: this.isPlaying,
     });
+    this.markFrameReady();
   };
+
+  /** Draw-on, typography wipe, gate parting and fade for every card. */
+  private updateCards(t: number, elapsed: number) {
+    for (let i = 0; i < this.cardRigs.length; i += 1) {
+      const rig = this.cardRigs[i];
+      const ch = rig.chapter;
+      const phase = cardPhase({
+        localT: (t - ch.startTime) / (ch.endTime - ch.startTime),
+        isFinale: i === this.cardRigs.length - 1,
+      });
+      rig.updateState({ ...phase, time: elapsed });
+    }
+  }
+
+  private updateCinemaCamera(input: { activeIdx: number; chLocal: number; elapsed: number }) {
+    const { activeIdx, chLocal, elapsed } = input;
+    const targetZ = cinemaCameraZ({
+      chapters: SEQUENCE_CHAPTERS,
+      activeIdx,
+      chapterLocal: chLocal,
+      pullback: this.viewportFit.cameraPullback,
+    });
+    const pose = getCinemaCameraPose(this.viewportFit, this.pointerSmooth, elapsed);
+    this.camera.position.set(pose.x, pose.y, targetZ);
+    this.camera.lookAt(pose.targetX, pose.targetY, targetZ - 11.0);
+    this.camera.rotation.z = pose.roll;
+  }
+
+  /** Backdrop, searchlights, light rig, green light and dust all ride the camera. */
+  private updateAtmosphere(input: { t: number; elapsed: number; activeCh: SequenceChapter }) {
+    const { t, elapsed, activeCh } = input;
+    const anchors = rigAnchors({
+      cameraMode: this.cameraMode,
+      cameraZ: this.camera.position.z,
+      chapterZ: activeCh.zPosition,
+    });
+    this.backdropGroup.position.z = anchors.backdropZ;
+
+    const sway = searchlightSway(elapsed);
+    this.searchLightL.rotation.z = sway.left;
+    this.searchLightR.rotation.z = sway.right;
+
+    const rig = lightRig(elapsed, anchors.lightZ);
+    this.rigLightKey.position.set(...rig.key);
+    this.rigLightRim.position.set(...rig.rim);
+    this.rigLightCool.position.set(...rig.cool);
+
+    this.greenLightUniforms.uTime.value = elapsed;
+    const green = greenLight({ t, heroZ: SEQUENCE_CHAPTERS[SEQUENCE_CHAPTERS.length - 1].zPosition });
+    this.greenLightUniforms.uIntensity.value = green.intensity;
+    this.greenLightMesh.position.z = green.z;
+    this.greenLightMesh.visible = green.intensity > 0.01;
+
+    this.dustUniforms.uTime.value = elapsed;
+    this.dustUniforms.uCamZ.value = this.camera.position.z;
+  }
+
+  private updateNitrate(t: number, elapsed: number) {
+    this.nitratePass.uniforms.uTime.value = elapsed;
+    this.nitratePass.uniforms.uNitrate.value = nitrateLevel({ t, forced: this.forceNitrateMode });
+  }
+
+  /** Tells the e2e harness that a stable frame is on screen (ADDENDUM-022 §0.2). */
+  private markFrameReady() {
+    if (this.freezeAt === null) return;
+    this.framesRendered += 1;
+    if (this.framesRendered === FRAME_READY_COUNT) {
+      this.container.dataset.frameReady = 'true';
+    }
+  }
 
   public dispose() {
     if (this.rafId !== null) {

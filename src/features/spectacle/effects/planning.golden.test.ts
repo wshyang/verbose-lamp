@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { mulberry32 } from '@/shared/lib/random';
 import type { FireworkShellType, OrbTransitionParams } from '../model/types';
-import { stableDigest } from '../testing/digest';
+import { stableDigest } from '@/test/digest';
 import { shellSparks } from './fireworks/shells';
 import { planShow } from './fireworks/show';
 import { planOrbCrossfade, planOrbTransition } from './orbs/orbPlan';

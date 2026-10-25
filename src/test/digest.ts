@@ -1,4 +1,4 @@
-import { hashText } from './recordingCanvas';
+import { createHash } from 'node:crypto';
 
 /**
  * Golden digests compare *shape and magnitude*, not the last bit of a float.
@@ -9,6 +9,10 @@ import { hashText } from './recordingCanvas';
  * value by far more than 1e-6 — while staying portable across hosts.
  */
 export const DIGEST_DECIMALS = 6;
+
+function hashText(text: string): string {
+  return createHash('sha1').update(text).digest('hex');
+}
 
 const SCALE = 10 ** DIGEST_DECIMALS;
 

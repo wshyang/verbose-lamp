@@ -97,7 +97,9 @@ export function PremiereTimeline({
             data-testid="timeline__scrubber"
           />
           <div className="shrink-0 font-mono text-[11px] tabular-nums tracking-wider text-[#e6d5b2]/85">
-            {formatSeconds(currentTime)} <span className="text-[#d4af37]/50">/</span> {formatSeconds(duration)}
+            <span data-testid="timeline__clock">
+              {formatSeconds(currentTime)} <span className="text-[#d4af37]/50">/</span> {formatSeconds(duration)}
+            </span>
           </div>
         </div>
       </div>

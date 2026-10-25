@@ -1,10 +1,12 @@
 import { useEffect, useRef, type MutableRefObject, type RefObject } from 'react';
 import { CinemaAudioEngine } from '../audio/cinemaAudio';
-import { GatsbySceneManager, type PlaybackTelemetry } from '../scene/GatsbySceneManager';
+import { parseFreezeAt } from '../model/freeze';
+import { GatsbySceneManager } from '../scene/GatsbySceneManager';
+import type { PlaybackTelemetry, PremiereSceneApi } from '../scene/sceneApi';
 
 interface PremiereRuntimeOptions {
   mountRef: RefObject<HTMLDivElement | null>;
-  managerRef: MutableRefObject<GatsbySceneManager | null>;
+  managerRef: MutableRefObject<PremiereSceneApi | null>;
   audioRef: MutableRefObject<CinemaAudioEngine | null>;
   onTelemetry: (telemetry: PlaybackTelemetry) => void;
   onChapterChange: (chapterIndex: number) => void;
@@ -27,6 +29,8 @@ export function usePremiereRuntime({
     const audio = new CinemaAudioEngine();
     audioRef.current = audio;
     const manager = new GatsbySceneManager(container, {
+      // `?freezeAt=` pins one frame for the screenshot harness; users never see it.
+      freezeAt: parseFreezeAt(window.location.search) ?? undefined,
       onTelemetry: (telemetry) => callbacksRef.current.onTelemetry(telemetry),
       onChapterChange: (chapterIndex) => {
         callbacksRef.current.onChapterChange(chapterIndex);
