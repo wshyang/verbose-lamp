@@ -1,2 +1,17 @@
 .DS_Store
-.DS_Store
+
+# Installed dependencies. `node_modules/` had been committed by the initial import and
+# is untracked from here on.
+node_modules/
+
+# Build and test output (dist/index.html is tracked on purpose: the single-file build)
+dist-preview/
+coverage/
+coverage-json/
+coverage-summary/
+test-results/
+playwright-report/
+blob-report/
+.vite/
+*.tsbuildinfo
+.vitest-cache/
