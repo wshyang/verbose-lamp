@@ -128,11 +128,24 @@ What the port is *not* doing was checked directly: patching `WebGL2RenderingCont
 
 Recorded rather than chased: if a future change makes the premiere feel heavy, this table and the 95/16 draw profile are the baseline to improve on, not a regression to explain.
 
+### 5.4 Phase 4: `@react-three/postprocessing` A/B — fails, decisively
+
+ADDENDUM-022 §8 allowed this only if it produced zero screenshot failures. It was built and measured rather than argued about: `@react-three/postprocessing@3.0.5` + `postprocessing@6.39.5` in a copy of the tree, with the app's own nitrate GLSL re-expressed as an `Effect` (same maths, `mainImage` entry point, `inputBuffer` sampler), the bloom tuned to the same three numbers, and a half-float buffer.
+
+Result at `act2-hold`, against the shipped build on the same browser:
+
+| Chain | Mean abs delta | Pixels over the gate's threshold | Verdict |
+|---|---|---|---|
+| three `EffectComposer` (shipped) | — | — | reference |
+| `postprocessing` + `EffectComposer` | **15.78 / 255** | **9.63%** (124,847 px of 1.3 M) | fail, by a factor of ten against `maxDiffPixelRatio: 0.01` |
+
+The bloom is visibly different — `postprocessing`'s mipmap blur is a different algorithm from `UnrealBloomPass`'s five-level down/up sample, exactly as ADDENDUM-022 §2 predicted — so the glow around the gate bars and the type is wider and flatter. The dependencies were removed again and `package.json` / `package-lock.json` are byte-identical to before the experiment. The A/B is closed with a number; it does not need re-litigating.
+
 ## 6. What is still not verified
 
 - **Committed baselines.** The suite does record and replay: `--update-snapshots` wrote all twelve PNGs in 18.8 min and a replay against them passed (§6.2). They are not committed, for the reason below. The gate compares per OS, browser build and GPU path. These shots come from Chrome 153 on Debian 12 with a locally built NSS; the user's managed browser is Chromium 156. Committing these PNGs would make the user's first `npm run e2e` fail for reasons unrelated to the scene, and ADDENDUM-022 forbids re-baselining to silence that. So: run `npx playwright install chromium` and `npm run e2e:update` **once** on the target machine — a legitimate initial recording, not a re-baseline, because there is nothing to overwrite — then treat it as the gate.
 - **Mobile likeness.** The flows run on both projects (§6.1), but the twelve likeness shots were recorded and replayed on `desktop-chromium` only. The mobile project has baselines of its own to record; nothing about the port is specific to either viewport, and `gotoFrozen` is shared.
-- **Phase 4** of ADDENDUM-022 (optional `@react-three/postprocessing` A/B, drei helpers) — every item is still gated on the likeness gate and is not attempted.
+- **Phase 4** is now measured, not deferred in the dark — see §5.4, and ADDENDUM-029 for the rejection record. The drei half of Phase 4 stays closed: drei was dropped entirely in ADDENDUM-027 §5.
 - The residual of §5.1.
 
 ## 6.1 Validation for this addendum
