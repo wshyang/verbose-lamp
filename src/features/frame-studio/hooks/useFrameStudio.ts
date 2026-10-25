@@ -26,7 +26,14 @@ export interface FrameStudioTarget {
 const detailPercent = (value: number) => Math.round(value * 100);
 const detailValue = (percent: number) => Math.min(1, Math.max(0, percent / 100));
 
-const defaultFrameFormula = (): FrameFormula => ({
+/**
+ * The studio always carries a full layer set: state is seeded from
+ * DEFAULT_FRAME_LAYERS and every updater maps over it, so `layers` is
+ * required here even though the shared FrameFormula type leaves it optional.
+ */
+type StudioFormula = FrameFormula & { layers: readonly FramePatternLayer[] };
+
+const defaultFrameFormula = (): StudioFormula => ({
   ...DEFAULT_FRAME_STYLE.formula,
   genome: { ...SIGNATURE_GENOME },
   layers: DEFAULT_FRAME_LAYERS.map((layer) => ({ ...layer })),
@@ -35,14 +42,14 @@ const defaultFrameFormula = (): FrameFormula => ({
 export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
   const [isOpen, setIsOpen] = useState(true);
   const [surface, setSurfaceState] = useState<FrameSurface>('title-cards');
-  const [formula, setFormula] = useState<FrameFormula>(defaultFrameFormula);
+  const [formula, setFormula] = useState<StudioFormula>(defaultFrameFormula);
   const [intricacy, setIntricacy] = useState(DEFAULT_FRAME_STYLE.intricacy);
   const [border, setBorder] = useState<ScreenBorderStyle>({ ...DEFAULT_SCREEN_BORDER_STYLE, genome: { ...SIGNATURE_GENOME } });
   const [borderEnabled, setBorderEnabledState] = useState(false);
   const [proportionsOpen, setProportionsOpen] = useState(false);
 
   const commitSequence = useCallback(
-    (nextFormula: FrameFormula, nextIntricacy: number) => {
+    (nextFormula: StudioFormula, nextIntricacy: number) => {
       setFormula(nextFormula);
       setIntricacy(nextIntricacy);
       getTarget()?.setSequenceFrameStyle({ intricacy: nextIntricacy, formula: nextFormula });
@@ -60,7 +67,7 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
 
   const selectPattern = useCallback(
     (source: FrameSource) => {
-      const layers = (formula.layers ?? DEFAULT_FRAME_LAYERS).map((layer) =>
+      const layers = formula.layers.map((layer) =>
         layer.source === source ? { ...layer, enabled: false } : layer
       );
       const level = source === 'authored' ? DEFAULT_FRAME_STYLE.formula.level : formula.level;
@@ -84,7 +91,7 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
 
   const updateLayer = useCallback(
     (source: FrameLayerSource, changes: Partial<Pick<FramePatternLayer, 'enabled' | 'level'>>) => {
-      const layers = (formula.layers ?? DEFAULT_FRAME_LAYERS).map((layer) =>
+      const layers = formula.layers.map((layer) =>
         layer.source === source ? { ...layer, ...changes } : layer
       );
       commitSequence({ ...formula, layers }, intricacy);
@@ -121,6 +128,20 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
   const setGeneOnBorder = useCallback(
     (key: GeneKey, value: number) => commitBorder({ ...border, genome: withGene(border.genome, key, value) }),
     [border, commitBorder]
+  );
+
+  /** Rerolls the seeded pattern (lattice walks, tones, stagger). UI reroll only. */
+  const rerollSeed = useCallback(
+    () => commitSequence(
+      { ...formula, seed: Math.floor(Math.random() * 1_000_000) },
+      intricacy,
+    ),
+    [commitSequence, formula, intricacy],
+  );
+
+  const setBorderPattern = useCallback(
+    (pattern: 'poster' | 'lattice') => commitBorder({ ...border, pattern }),
+    [border, commitBorder],
   );
 
   const setBorderEnabled = useCallback(
@@ -160,15 +181,15 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
   );
 
   const layerOptions = useMemo(() => {
-    const settings = formula.layers ?? DEFAULT_FRAME_LAYERS;
     return FRAME_LAYER_SOURCES.filter((pattern) => pattern.id !== formula.source).map((pattern) => {
-      const layer = settings.find((entry) => entry.source === pattern.id);
+      // The seeded layer set covers every layer source (see StudioFormula).
+      const layer = formula.layers.find((entry) => entry.source === pattern.id) as FramePatternLayer;
       return {
         source: pattern.id,
         label: pattern.label,
         blurb: pattern.blurb,
-        enabled: layer?.enabled ?? false,
-        level: layer?.level ?? 2,
+        enabled: layer.enabled,
+        level: layer.level,
       };
     });
   }, [formula.layers, formula.source]);
@@ -204,6 +225,10 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
     detailPresets: INTRICACY_PRESETS,
     activePreset,
     isDesignPattern: formula.source === 'authored',
+    isLatticePattern: formula.source === 'lattice'
+      || layerOptions.some((layer) => layer.source === 'lattice' && layer.enabled),
+    latticeSeed: formula.seed ?? 1925,
+    rerollSeed,
     setLayerEnabled,
     setLayerLevel,
     proportionsOpen,
@@ -214,6 +239,8 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
     setBorderEnabled,
     borderWeight: detailPercent(border.weight),
     setBorderWeight,
+    borderPattern: border.pattern ?? 'poster',
+    setBorderPattern,
     resetAll,
   };
 }

@@ -1,11 +1,11 @@
-import { useCallback, type Dispatch, type MutableRefObject, type SetStateAction } from 'react';
-import { CinemaAudioEngine } from '../audio/cinemaAudio';
-import { GatsbySceneManager } from '../scene/GatsbySceneManager';
+import { useCallback, type Dispatch, type RefObject, type SetStateAction } from 'react';
+import type { CinemaAudioEngine } from '../audio/cinemaAudio';
 import type { CameraMode, HeroTitleConfig } from '../model/types';
+import type { PremiereSceneApi } from '../scene/sceneApi';
 
 interface PremiereSceneOptions {
-  managerRef: MutableRefObject<GatsbySceneManager | null>;
-  audioRef: MutableRefObject<CinemaAudioEngine | null>;
+  sceneApi: PremiereSceneApi;
+  audioRef: RefObject<CinemaAudioEngine | null>;
   cameraMode: CameraMode;
   nitrateMode: boolean;
   setCameraMode: Dispatch<SetStateAction<CameraMode>>;
@@ -17,7 +17,7 @@ interface PremiereSceneOptions {
 }
 
 export function usePremiereSceneOptions({
-  managerRef,
+  sceneApi,
   audioRef,
   cameraMode,
   nitrateMode,
@@ -31,14 +31,14 @@ export function usePremiereSceneOptions({
   const toggleCameraMode = useCallback(() => {
     const nextMode: CameraMode = cameraMode === 'cinema' ? 'orbit' : 'cinema';
     setCameraMode(nextMode);
-    managerRef.current?.setCameraMode(nextMode);
-  }, [cameraMode, managerRef, setCameraMode]);
+    sceneApi.setCameraMode(nextMode);
+  }, [cameraMode, sceneApi, setCameraMode]);
 
   const toggleNitrateMode = useCallback(() => {
     const nextMode = !nitrateMode;
     setNitrateMode(nextMode);
-    managerRef.current?.setNitrateMode(nextMode);
-  }, [managerRef, nitrateMode, setNitrateMode]);
+    sceneApi.setNitrateMode(nextMode);
+  }, [nitrateMode, sceneApi, setNitrateMode]);
 
   const toggleSound = useCallback(() => {
     const audio = audioRef.current;
@@ -46,20 +46,21 @@ export function usePremiereSceneOptions({
     setSoundOn(audio.toggle());
   }, [audioRef, setSoundOn]);
 
-  const applyHeroTitle = useCallback((config: HeroTitleConfig) => {
-    setHeroConfig(config);
-    const manager = managerRef.current;
-    if (!manager) return;
-    manager.updateHeroTitle(config);
-    if (cameraMode === 'orbit') {
-      setCameraMode('cinema');
-      manager.setCameraMode('cinema');
-    }
-    manager.jumpToChapter(4);
-    manager.setPlaying(true);
-    setActiveAct(4);
-    setIsPlaying(true);
-  }, [cameraMode, managerRef, setActiveAct, setCameraMode, setHeroConfig, setIsPlaying]);
+  const applyHeroTitle = useCallback(
+    (config: HeroTitleConfig) => {
+      setHeroConfig(config);
+      sceneApi.updateHeroTitle(config);
+      if (cameraMode === 'orbit') {
+        setCameraMode('cinema');
+        sceneApi.setCameraMode('cinema');
+      }
+      sceneApi.jumpToChapter(4);
+      sceneApi.setPlaying(true);
+      setActiveAct(4);
+      setIsPlaying(true);
+    },
+    [cameraMode, sceneApi, setActiveAct, setCameraMode, setHeroConfig, setIsPlaying]
+  );
 
   return { toggleCameraMode, toggleNitrateMode, toggleSound, applyHeroTitle };
 }

@@ -5,7 +5,15 @@ interface GeometryAccumulator {
   positions: number[];
   normals: number[];
   pathData: number[]; // x: normalized u (0..1), y: delay (0..0.7), z: partSide (-1..+1)
+  toneData: number[]; // x: brass tone 0..1, y: per-layer gradient angle (radians)
   indices: number[];
+}
+
+/** Golden-angle spread so neighbouring tutorial layers rake light differently. */
+const TONE_ANGLE_STEP = 2.399963;
+
+export function toneAngleFor(tone: number): number {
+  return tone * 3 * TONE_ANGLE_STEP;
 }
 
 /**
@@ -32,8 +40,6 @@ function appendChamferedPolyline(acc: GeometryAccumulator, spec: PolylineSpec) {
     totalLen += Math.max(1e-4, d);
     cumLen.push(totalLen);
   }
-
-  if (totalLen < 1e-4) return;
 
   // Cross-section profile in (lateralOffset, zOffset, normalLateral, normalZ)
   // 6 vertices across the front + bevels + sides for crisp jewelry-grade facets:
@@ -141,6 +147,8 @@ function appendChamferedPolyline(acc: GeometryAccumulator, spec: PolylineSpec) {
       acc.positions.push(curr.x + tx * lat, curr.y + ty * lat, spec.z + zOff);
       acc.normals.push(unx * nLat, uny * nLat, nZ);
       acc.pathData.push(uNorm, spec.delay, partSide);
+      const tone = spec.tone ?? 0;
+      acc.toneData.push(tone, toneAngleFor(tone));
     }
   }
 
@@ -159,12 +167,13 @@ function appendChamferedPolyline(acc: GeometryAccumulator, spec: PolylineSpec) {
 
 /** Shared rail extrusion for title cards and camera-attached poster borders. */
 export function createChamferedFrameGeometry(specs: PolylineSpec[]): THREE.BufferGeometry {
-  const acc: GeometryAccumulator = { positions: [], normals: [], pathData: [], indices: [] };
+  const acc: GeometryAccumulator = { positions: [], normals: [], pathData: [], toneData: [], indices: [] };
   for (const spec of specs) appendChamferedPolyline(acc, spec);
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(acc.positions, 3));
   geometry.setAttribute('normal', new THREE.Float32BufferAttribute(acc.normals, 3));
   geometry.setAttribute('aPathData', new THREE.Float32BufferAttribute(acc.pathData, 3));
+  geometry.setAttribute('aTone', new THREE.Float32BufferAttribute(acc.toneData, 2));
   geometry.setIndex(acc.indices);
   geometry.computeBoundingSphere();
   return geometry;

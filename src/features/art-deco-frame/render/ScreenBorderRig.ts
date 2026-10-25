@@ -28,7 +28,11 @@ export function createScreenBorderRig(
   root.visible = false;
   camera.add(root);
 
-  let style: ScreenBorderStyle = { weight: initialStyle.weight, genome: clampGenome(initialStyle.genome) };
+  let style: ScreenBorderStyle = {
+    weight: initialStyle.weight,
+    genome: clampGenome(initialStyle.genome),
+    pattern: initialStyle.pattern,
+  };
   let aspectRatio = aspect;
   const uniforms = createGoldFrameUniforms(1, 1);
   const material = createGoldFrameMaterial(uniforms);
@@ -36,7 +40,10 @@ export function createScreenBorderRig(
   material.depthWrite = false;
 
   const buildGeometry = () => {
-    const { specs } = buildEdgeBorder({ aspect: aspectRatio, genome: style.genome, density: style.weight });
+    uniforms.uBrass.value = style.pattern === 'lattice' ? 1 : 0;
+    const { specs } = buildEdgeBorder({
+      aspect: aspectRatio, genome: style.genome, density: style.weight, pattern: style.pattern,
+    });
     return createChamferedFrameGeometry(specs);
   };
 
@@ -65,8 +72,11 @@ export function createScreenBorderRig(
     setStyle: (next) => {
       const genome = clampGenome(next.genome);
       const weight = THREE.MathUtils.clamp(next.weight, 0, 1);
-      if (weight === style.weight && JSON.stringify(genome) === JSON.stringify(style.genome)) return;
-      style = { weight, genome };
+      const unchanged = weight === style.weight
+        && next.pattern === style.pattern
+        && JSON.stringify(genome) === JSON.stringify(style.genome);
+      if (unchanged) return;
+      style = { weight, genome, pattern: next.pattern };
       rebuild();
     },
     setEnabled: (enabled) => {

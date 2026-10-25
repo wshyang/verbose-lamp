@@ -3,3 +3,15 @@ export { DecoLatticeFrame } from './components/DecoLatticeFrame';
 export { specsToLayerPaths, type LayerPath } from './model/latticeSvg';
 export { isOctilinear, type LatticeSpec, type Pt } from './model/lattice';
 export { LATTICE_PRESETS, SPOONER_MEDALLION, PREMIERE_FRAME } from './model/presets';
+export {
+  clipPolylineOutsideRect,
+  clipSegmentToConvex,
+  segmentIntersectsRect,
+  type CentredRect,
+} from './model/clip';
+export {
+  decomposeNineSlice,
+  friezePeriods,
+  type NineSlice,
+  type NineSliceRect,
+} from './model/nineSlice';

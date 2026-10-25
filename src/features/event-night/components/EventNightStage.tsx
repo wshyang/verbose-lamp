@@ -2,14 +2,14 @@ import { GildedNavBar } from '@/features/gilded-ui';
 import { LuckyDrawStage } from '@/features/lucky-draw';
 import { useSpectacle } from '@/features/spectacle';
 import {
+  KeepClearSpeaker,
+  OriginCrosshair,
+  PickOriginHint,
   SpectaclePreviewLauncher, SpectaclePreviewPanel, useSpectaclePreview,
 } from '@/features/spectacle-preview';
 import { useAmbientShow } from '../hooks/useAmbientShow';
 import { useEventNight } from '../hooks/useEventNight';
 import { EventNightHeader } from './EventNightHeader';
-import { KeepClearSpeaker } from './KeepClearSpeaker';
-import { OriginCrosshair } from './OriginCrosshair';
-import { PickOriginHint } from './PickOriginHint';
 import { StageBackdrop } from './StageBackdrop';
 import { TitleMedallion } from './TitleMedallion';
 
@@ -35,16 +35,16 @@ export function EventNightStage({ onExit }: EventNightStageProps) {
   return (
     <>
       <StageBackdrop />
-      <div
-        className="relative z-10 flex h-full min-h-0 flex-col"
-        onClick={(e) => preview.onStageClick(e.clientX, e.clientY)}
-      >
+      <div className="relative z-10 flex h-full min-h-0 flex-col">
         <EventNightHeader
           onExit={onExit}
           onOpenDraw={night.openDraw}
           launcher={<SpectaclePreviewLauncher open={preview.open} onToggle={() => preview.setOpen(!preview.open)} />}
         />
-        <main className="relative flex min-h-0 flex-1 items-center justify-center overflow-y-auto px-4 pb-28 pt-2">
+        <main
+          className="relative flex min-h-0 flex-1 items-center justify-center overflow-y-auto px-4 pb-28 pt-2"
+          onClick={(event) => preview.onStageClick(event.clientX, event.clientY)}
+        >
           <TitleMedallion
             lattice={{
               seed: preview.latticeSeed, density: preview.latticeDensity, level: preview.latticeLevel,
@@ -57,9 +57,13 @@ export function EventNightStage({ onExit }: EventNightStageProps) {
           <GildedNavBar items={preview.navItems} activeId={night.activeId} onSelect={night.selectNav} />
         </div>
       </div>
-      {preview.open && <OriginCrosshair origin={preview.origin} isPicking={preview.picking} />}
-      {preview.picking && <PickOriginHint />}
-      {preview.keepClearOn && <KeepClearSpeaker rect={preview.speaker} onMove={preview.moveSpeaker} />}
+      {preview.open && (
+        <OriginCrosshair origin={preview.origin} isPicking={preview.picking} testId="event-night__origin-crosshair" />
+      )}
+      {preview.picking && <PickOriginHint testId="event-night__pick-hint" />}
+      {preview.keepClearOn && (
+        <KeepClearSpeaker rect={preview.speaker} onMove={preview.moveSpeaker} testId="event-night__speaker" />
+      )}
       <SpectaclePreviewPanel preview={preview} onOpenDraw={night.openDraw} />
       {night.isDrawOpen && <LuckyDrawStage onClose={night.closeDraw} onLanded={night.handleLanded} />}
     </>

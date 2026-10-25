@@ -20,6 +20,14 @@ export {
   mirrorHalves,
 } from './generative';
 export { buildEdgeBorder, viewportScaleAtDistance } from './edgeBorder';
+export { buildLatticeBorder, type LatticeBorderRequest } from './latticeBorder';
+export {
+  buildLatticeRails,
+  latticeAperture,
+  DEFAULT_LATTICE_SEED,
+  type LatticeBox,
+  type LatticeRailsQuery,
+} from './latticeSource';
 export {
   annotateRanks,
   applyIntricacy,

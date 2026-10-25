@@ -18,7 +18,10 @@ export type RailKind =
   | 'column'
   | 'chevron'
   | 'ray'
-  | 'arch';
+  | 'arch'
+  | 'lattice-strand'
+  | 'reed'
+  | 'octagram';
 
 export interface PolylineSpec {
   points: Point2[];
@@ -31,6 +34,8 @@ export interface PolylineSpec {
   kind?: RailKind;
   /** Derived importance 0 (essential) .. 3 (flourish). Computed by annotateRanks(). */
   rank?: number;
+  /** Per-rail brass tone 0..1; absent means delivered gold. */
+  tone?: number;
 }
 
 /** Intricacy scalar k in [0, 1]. 0.5 is the Film Baseline (identity). */
@@ -56,7 +61,7 @@ export const INTRICACY_PRESETS: readonly IntricacyPreset[] = [
 /*  FRAME GENESIS (ADDENDUM-004): the rule that draws the base rails           */
 /* -------------------------------------------------------------------------- */
 
-export type FrameSource = 'authored' | 'fractal' | 'rosette' | 'arcade';
+export type FrameSource = 'authored' | 'fractal' | 'rosette' | 'arcade' | 'lattice';
 export type FrameLayerSource = Exclude<FrameSource, 'authored'>;
 export type FrameSurface = 'title-cards' | 'screen-border';
 
@@ -73,6 +78,8 @@ export interface FrameFormula {
   level: number;
   /** Proportion genes; the signature genome reproduces the delivered frame. */
   genome: BaseGenome;
+  /** Seed for seeded sources (`lattice` walks/tones). Default 1925. */
+  seed?: number;
   /** Optional decorative patterns composited over the foundation. */
   layers?: readonly FramePatternLayer[];
 }
@@ -112,6 +119,12 @@ export const FRAME_SOURCES: readonly FrameSourceInfo[] = [
     blurb: 'Recursive bays of stepped arches between piers, each level nested inward.',
     isGenerative: true,
   },
+  {
+    id: 'lattice',
+    label: 'Deco Lattice',
+    blurb: 'The film’s parallel-line bundles on a 45° lattice, with reeds and clasps.',
+    isGenerative: true,
+  },
 ] as const;
 
 export const FRAME_LAYER_SOURCES: readonly (FrameSourceInfo & { id: FrameLayerSource })[] = Object.freeze(
@@ -124,6 +137,7 @@ export const DEFAULT_FRAME_LAYERS: readonly FramePatternLayer[] = [
   { source: 'fractal', enabled: false, level: 2 },
   { source: 'rosette', enabled: false, level: 2 },
   { source: 'arcade', enabled: false, level: 2 },
+  { source: 'lattice', enabled: false, level: 2 },
 ] as const;
 
 export const DEFAULT_FRAME_FORMULA: FrameFormula = {
@@ -148,6 +162,8 @@ export interface ScreenBorderStyle {
   weight: number;
   /** proportion genes shared with the title frame */
   genome: BaseGenome;
+  /** Border language: the delivered poster edge, or the Deco Lattice proscenium. */
+  pattern?: 'poster' | 'lattice';
 }
 
 export const DEFAULT_SCREEN_BORDER_STYLE: ScreenBorderStyle = {

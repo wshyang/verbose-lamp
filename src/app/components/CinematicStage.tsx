@@ -1,24 +1,30 @@
-import type { RefObject } from 'react';
-import type { CameraMode } from '@/features/premiere';
+import { useStore } from 'zustand';
+import { PremiereCanvas, type CameraMode, type PremiereStore } from '@/features/premiere';
 import { cn } from '@/shared/lib/cn';
 
 interface CinematicStageProps {
-  mountRef: RefObject<HTMLDivElement | null>;
+  store: PremiereStore;
   cameraMode: CameraMode;
   hudHidden: boolean;
+  onStageClick: (clientX: number, clientY: number) => void;
 }
 
-export function CinematicStage({ mountRef, cameraMode, hudHidden }: CinematicStageProps) {
+export function CinematicStage({ store, cameraMode, hudHidden, onStageClick }: CinematicStageProps) {
+  const frameReady = useStore(store, (state) => state.frameReady);
   return (
     <>
       <div
-        ref={mountRef}
         className={cn(
           'absolute inset-0 h-full w-full',
           cameraMode === 'orbit' && 'cursor-grab active:cursor-grabbing'
         )}
         aria-label="Interactive WebGL title sequence"
-      />
+        data-testid="cinematic-stage__canvas"
+        data-frame-ready={frameReady ? 'true' : 'false'}
+        onClick={(event) => onStageClick(event.clientX, event.clientY)}
+      >
+        <PremiereCanvas store={store} />
+      </div>
       <div
         className={cn(
           'pointer-events-none absolute inset-3 border border-[#d4af37]/20 transition-opacity duration-500 sm:inset-5',

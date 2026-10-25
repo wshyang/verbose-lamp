@@ -34,6 +34,9 @@ const BASE_RANK: Record<RailKind, number> = {
   ray: 3,
   arch: 3,
   pinstripe: 3,
+  'lattice-strand': 2,
+  reed: 3,
+  octagram: 1,
 };
 
 /**
@@ -45,6 +48,9 @@ export function annotateRanks(specs: PolylineSpec[]): PolylineSpec[] {
   // the primary frame (rank 0). Count pairs, not halves.
   let frameHalvesSeen = 0;
   return specs.map((spec) => {
+    // A producer that already knows a rail's importance (the Deco Lattice
+    // tutorial layers, ADDENDUM-021) may annotate it; derivation is the default.
+    if (spec.rank !== undefined) return { ...spec };
     const kind = spec.kind ?? 'frame';
     if (kind !== 'frame') return { ...spec, rank: BASE_RANK[kind] };
     const pairOrdinal = Math.floor(frameHalvesSeen / 2);
@@ -80,9 +86,10 @@ function unitNormal(a: Point2, b: Point2): Point2 {
 }
 
 function miterAt(prev: Point2 | null, curr: Point2, next: Point2 | null): Point2 {
-  if (!prev && next) return unitNormal(curr, next);
-  if (!next && prev) return unitNormal(prev, curr);
-  if (!prev || !next) return { x: 0, y: 1 };
+  // offsetPolylineOutward only samples polylines of 2+ points, so at most one
+  // neighbour is ever missing (an open end); both missing cannot occur.
+  if (!prev) return unitNormal(curr, next as Point2);
+  if (!next) return unitNormal(prev, curr);
   const n1 = unitNormal(prev, curr);
   const n2 = unitNormal(curr, next);
   const mx = n1.x + n2.x;
@@ -141,6 +148,9 @@ const GENERATION_CAP: Record<RailKind, number> = {
   arch: 0,
   monogram: 0,
   pinstripe: 0,
+  'lattice-strand': 0,
+  reed: 0,
+  octagram: 0,
 };
 
 const echoRing: Production = (spec, i) => ({

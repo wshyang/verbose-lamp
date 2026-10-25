@@ -46,6 +46,15 @@ describe('cropFromDetection', () => {
     expect(cropFromDetection({}, SQUARE_FRAME)).toBeNull();
     expect(cropFromDetection(guest(0), SQUARE_FRAME)).toBeNull();
   });
+
+  it('returns null when the eye midpoint overflows while the span stays finite', () => {
+    // Equal huge x keypoints cancel in the span (driven by y here) but their
+    // midpoint overflows to Infinity.
+    const face: FaceDetection = {
+      keypoints: [{ x: 1.7e308, y: 0.9 }, { x: 1.7e308, y: 0.1 }],
+    };
+    expect(cropFromDetection(face, { width: 1, height: 1000 })).toBeNull();
+  });
 });
 
 describe('largestFace', () => {

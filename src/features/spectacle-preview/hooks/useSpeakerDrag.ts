@@ -4,17 +4,17 @@ import { useCallback, useRef, type PointerEvent } from 'react';
 export function useSpeakerDrag(move: (dx: number, dy: number) => void) {
   const isDragging = useRef(false);
 
-  const onPointerDown = useCallback((e: PointerEvent<HTMLElement>) => {
+  const onPointerDown = useCallback((event: PointerEvent<HTMLElement>) => {
     isDragging.current = true;
-    e.currentTarget.setPointerCapture(e.pointerId);
+    event.currentTarget.setPointerCapture(event.pointerId);
   }, []);
 
   const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
+    (event: PointerEvent<HTMLElement>) => {
       if (!isDragging.current) return;
-      move(e.movementX / window.innerWidth, e.movementY / window.innerHeight);
+      move(event.movementX / window.innerWidth, event.movementY / window.innerHeight);
     },
-    [move],
+    [move]
   );
 
   const onPointerUp = useCallback(() => {

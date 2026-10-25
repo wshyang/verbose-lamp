@@ -8,6 +8,7 @@
  * the same chamfered gold geometry and trim shader as the title cards.
  */
 import { BaseGenome, clampGenome } from './genome';
+import { buildLatticeBorder } from './latticeBorder';
 import { PolylineSpec, Point2, RailKind } from './types';
 
 export interface EdgeBorderRequest {
@@ -16,6 +17,10 @@ export interface EdgeBorderRequest {
   genome?: BaseGenome;
   /** 0..1 — how many nested rules and how dense the reeding */
   density: number;
+  /** Border language (ADDENDUM-021 §3.5.3). Default: the delivered poster edge. */
+  pattern?: 'poster' | 'lattice';
+  /** Seed for the lattice pattern. */
+  seed?: number;
 }
 
 export interface EdgeBorderGeometry {
@@ -33,7 +38,6 @@ const MAX_REED_PER_RUN = 26;
 const CORNER_FAN_REACH = 0.42;
 const REED_INSET = 0.095;
 const MIN_TICK_LENGTH = 0.008;
-const MIN_RAY_LENGTH = 0.004;
 const CORNER_FAN_ARCS = 3;
 
 function snap(value: number): number {
@@ -53,10 +57,11 @@ function rail(
 }
 
 function reflectX(specs: PolylineSpec[]): PolylineSpec[] {
+  // Only rail() products are reflected here, and rail() always sets partDir.
   return specs.map((spec) => ({
     ...spec,
     points: spec.points.map((point) => ({ x: snap(-point.x), y: point.y })),
-    partDir: -(spec.partDir ?? 1),
+    partDir: -(spec.partDir as number),
   }));
 }
 
@@ -116,12 +121,13 @@ function cornerFan(aspect: number, genome: BaseGenome, density: number): Polylin
   const reach = CORNER_FAN_REACH * genome.rayReach;
   const rails: PolylineSpec[] = [];
 
+  // ribs >= 3 and the clamped rayReach keeps every rib well above degenerate
+  // length, so no per-rib guards are needed.
   for (let index = 0; index < ribs; index += 1) {
-    const fraction = ribs === 1 ? 0 : index / (ribs - 1);
+    const fraction = index / (ribs - 1);
     const angle = baseAngle + fraction * span;
     const length = reach * (1 - fraction * 0.22);
     const end = { x: snap(origin.x + Math.cos(angle) * length), y: snap(origin.y + Math.sin(angle) * length) };
-    if (Math.hypot(end.x - origin.x, end.y - origin.y) < MIN_RAY_LENGTH) continue;
     rails.push(rail([origin, end], 0.009, 'ray', 0.16 + fraction * 0.05, -0.02, -1));
   }
 
@@ -138,8 +144,8 @@ function cornerFan(aspect: number, genome: BaseGenome, density: number): Polylin
     for (let k = 1; k < slots; k += 1) {
       const level = genome.fractalDepth - twoAdicValuation(k);
       if (level === 0) continue;
+      // Clamped ratio/depth keep this length above any degenerate threshold.
       const length = reach * Math.pow(genome.fractalRatio, level);
-      if (length < MIN_RAY_LENGTH) continue;
       const angle = baseAngle + (span * k) / slots;
       rails.push(
         rail([origin, { x: snap(origin.x + Math.cos(angle) * length), y: snap(origin.y + Math.sin(angle) * length) }], 0.009 * Math.pow(0.72, level), 'ray', 0.2 + level * 0.02, -0.04, -1)
@@ -176,12 +182,13 @@ function reeding(aspect: number, genome: BaseGenome, density: number): PolylineS
 
   // One run is generated from the mid-edge toward the top-right corner, then reflected
   // into all four runs, so every edge is reeded identically.
+  // count >= MIN_REED_PER_RUN and the clamped wingSweep keeps every tick
+  // longer than MIN_TICK_LENGTH, so runs never drop a tick.
   const buildRun = (toPoint: (t: number) => Point2, direction: Point2, lengthAt: (t: number) => number): PolylineSpec[] =>
     Array.from({ length: count }, (_, index) => {
-      const t = count === 1 ? 0 : index / (count - 1);
+      const t = index / (count - 1);
       const from = toPoint(t);
       const length = lengthAt(t);
-      if (length < MIN_TICK_LENGTH) return null;
       return rail(
         [from, { x: snap(from.x + direction.x * length), y: snap(from.y + direction.y * length) }],
         index % 2 === 0 ? 0.007 : 0.004,
@@ -190,7 +197,7 @@ function reeding(aspect: number, genome: BaseGenome, density: number): PolylineS
         -0.01,
         1
       );
-    }).filter((spec): spec is PolylineSpec => spec !== null);
+    });
 
   const vertical = buildRun(
     (t) => ({ x: runStart + (aspect - 2 * runStart) * t, y: 1 - REED_INSET }),
@@ -212,7 +219,13 @@ function reeding(aspect: number, genome: BaseGenome, density: number): PolylineS
     const subdivide = (run: PolylineSpec[], along: 'x' | 'y', span: number): PolylineSpec[] =>
       run.slice(0, Math.max(0, run.length - 1)).flatMap((spec) => {
         const [start] = spec.points;
-        const height = Math.abs(start.y - spec.points[1].y) * genome.fractalRatio;
+        // Tick length is measured across the run: y-extent on horizontal runs,
+        // x-extent on vertical ones (the port previously read y for both, so
+        // vertical runs never subdivided).
+        const tickLength = along === 'x'
+          ? Math.abs(start.y - spec.points[1].y)
+          : Math.abs(start.x - spec.points[1].x);
+        const height = tickLength * genome.fractalRatio;
         if (height < MIN_TICK_LENGTH) return [];
         const step = (span / Math.max(1, count - 1)) * 0.5;
         const point =
@@ -258,12 +271,14 @@ export function buildEdgeBorder(request: EdgeBorderRequest): EdgeBorderGeometry 
   const density = Math.min(1, Math.max(0, request.density));
   const nestedCount = Math.min(MAX_NESTED_RULES, 1 + Math.round(density * 3));
 
-  const specs = [
-    ...nestedRules(aspect, nestedCount, genome),
-    ...allCornerFans(aspect, genome, density),
-    ...reeding(aspect, genome, density),
-    ...innerHairline(aspect, density),
-  ];
+  const specs = request.pattern === 'lattice'
+    ? buildLatticeBorder({ aspect, density, seed: request.seed })
+    : [
+        ...nestedRules(aspect, nestedCount, genome),
+        ...allCornerFans(aspect, genome, density),
+        ...reeding(aspect, genome, density),
+        ...innerHairline(aspect, density),
+      ];
 
   const extentX = Math.max(...specs.flatMap((spec) => spec.points.map((point) => Math.abs(point.x))));
   const extentY = Math.max(...specs.flatMap((spec) => spec.points.map((point) => Math.abs(point.y))));

@@ -4,6 +4,7 @@ import {
   DEFAULT_TUNING,
   componentSizesOf,
   gridFromMatte,
+  keepEverything,
   pruneIslands,
   trimEdge,
   tunedGrid,
@@ -11,7 +12,9 @@ import {
   withKnob,
 } from './cutOut';
 import { alphaOf, planeOf } from './matte';
-import { forgetSegmenter, segmentSubject } from './segmentSubject';
+import {
+  forgetSegmenter, loadTransformers, segmentSubject, warmUpSegmenter,
+} from './segmentSubject';
 import { subjectAlpha } from './subjectAlpha';
 import { FACE_DISC, HAWKER_CROP, SECOND_HEAD, buildHawkerFrame, buildHawkerMatte } from './fixtures';
 import type { TransformersModule } from './types';
@@ -72,6 +75,17 @@ describe('cut-out grid', () => {
     expect(DEFAULT_TUNING.edge).toBe(0);
     expect(withBackground(DEFAULT_TUNING, { on: false }).removeBackground).toBe(false);
   });
+
+  it('keeps the old knob for non-finite input, keeps everything, and sorts components', () => {
+    expect(withKnob(DEFAULT_TUNING, { knob: 'edge', value: Number.NaN }).edge).toBe(DEFAULT_TUNING.edge);
+    expect(withKnob(DEFAULT_TUNING, { knob: 'edge', value: Number.POSITIVE_INFINITY }).edge).toBe(DEFAULT_TUNING.edge);
+    expect(Array.from(keepEverything(3))).toEqual(Array(9).fill(0));
+    const scene = gridWith([{ x: 0, y: 0, w: 2, h: 2 }, { x: 8, y: 8, w: 3, h: 3 }]);
+    expect(componentSizesOf(scene, SIZE)).toEqual([9, 4]);
+    expect(pruneIslands(scene, SIZE, 0)).toEqual(scene);
+    const allBackground = new Uint8Array(SIZE * SIZE).fill(1);
+    expect(pruneIslands(allBackground, SIZE, 4)).toEqual(allBackground);
+  });
 });
 
 describe('subjectAlpha on the hawker-centre fixture', () => {
@@ -107,6 +121,12 @@ describe('subjectAlpha on the hawker-centre fixture', () => {
   it('keeps everything when background removal is off', () => {
     expect(run({ ...tuning, removeBackground: false }).data.every((value) => value === 255)).toBe(true);
   });
+
+  it('resamples a matte that is not already the output square', () => {
+    const small = { width: 16, height: 16, data: new Uint8ClampedArray(256).fill(255) };
+    const alpha = subjectAlpha({ matte: small, tuning, outSize: 32, grid: 8 });
+    expect([alpha.width, alpha.height, alpha.data.length]).toEqual([32, 32, 1024]);
+  });
 });
 
 describe('matte shapes and the segmenter loader', () => {
@@ -119,6 +139,9 @@ describe('matte shapes and the segmenter loader', () => {
     expect(alphaOf({ data: [1, 2, 3, 4, 5, 6], width: 2, height: 1, channels: 3 })).toBeNull();
     expect(alphaOf({ data: [1, 2, 3], width: 2, height: 1 })).toBeNull();
     expect(planeOf(null)).toBeNull();
+    expect(planeOf({})).toBeNull();
+    expect(alphaOf({ data: [1], width: 0.5, height: 1 })).toBeNull();
+    expect(alphaOf({ data: [1], width: 1, height: 0 })).toBeNull();
   });
 
   it('returns the matte from a fake model, and null when loading fails', async () => {
@@ -131,5 +154,39 @@ describe('matte shapes and the segmenter loader', () => {
     expect((await segmentSubject(photo, async () => fake))?.data).toEqual(matte.data);
     forgetSegmenter();
     expect(await segmentSubject(photo, () => Promise.reject(new Error('CDN blocked')))).toBeNull();
+  });
+
+  it('rejects unusable and wrongly-sized model planes', async () => {
+    const photo = buildHawkerFrame();
+    const moduleWith = (result: unknown): TransformersModule => ({
+      pipeline: async () => async () => result,
+      RawImage: class { constructor(public data: Uint8ClampedArray) {} },
+    });
+    expect(await segmentSubject(photo, async () => moduleWith(null))).toBeNull();
+    forgetSegmenter();
+    expect(await segmentSubject(photo, async () => moduleWith({
+      data: new Uint8ClampedArray(4), width: 2, height: 2, channels: 1,
+    }))).toBeNull();
+  });
+
+  it('warms up with custom/default loaders and clears failures', async () => {
+    const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+    warmUpSegmenter(() => Promise.reject(new Error('offline')));
+    await flush();
+    let calls = 0;
+    warmUpSegmenter(async () => {
+      calls += 1;
+      return {
+        pipeline: async () => async () => null,
+        RawImage: class { constructor(public data: Uint8ClampedArray) {} },
+      } as unknown as TransformersModule;
+    });
+    await flush();
+    expect(calls).toBe(1);
+    forgetSegmenter();
+    await expect(loadTransformers()).rejects.toBeDefined();
+    forgetSegmenter();
+    expect(() => warmUpSegmenter()).not.toThrow();
+    await flush();
   });
 });

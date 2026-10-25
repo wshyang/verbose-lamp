@@ -11,6 +11,7 @@ import { TransitionsSection } from './TransitionsSection';
 interface PanelProps {
   preview: SpectaclePreview;
   onOpenDraw: () => void;
+  placement?: 'left' | 'right';
 }
 
 function PanelHeader({ preview: p }: { preview: SpectaclePreview }) {
@@ -33,12 +34,13 @@ function PanelHeader({ preview: p }: { preview: SpectaclePreview }) {
 }
 
 /** Small docked, non-modal panel — the effect stays visible while you drive it. */
-export function SpectaclePreviewPanel({ preview, onOpenDraw }: PanelProps) {
+export function SpectaclePreviewPanel({ preview, onOpenDraw, placement = 'right' }: PanelProps) {
   if (!preview.open) return null;
+  const placementClass = placement === 'left' ? 'left-3' : 'right-3';
   return (
     <aside
       data-testid="spectacle-preview__panel"
-      className="spectacle-preview__panel fixed bottom-24 right-3 top-16 z-[60] w-[min(320px,92vw)] overflow-y-auto border border-[#8a6a2f]/50 bg-[#0d0904]/95 shadow-[0_0_40px_rgba(0,0,0,0.8)] backdrop-blur-sm"
+      className={`spectacle-preview__panel fixed bottom-24 ${placementClass} top-16 z-[80] w-[min(320px,92vw)] overflow-y-auto border border-[#8a6a2f]/50 bg-[#0d0904]/95 shadow-[0_0_40px_rgba(0,0,0,0.8)] backdrop-blur-sm`}
     >
       <PanelHeader preview={preview} />
       <BackdropSection preview={preview} />

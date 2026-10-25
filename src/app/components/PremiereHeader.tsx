@@ -9,6 +9,7 @@ import {
 import { QrGeneratorLauncher } from '@/features/qr-generator';
 import { AvatarStudioLauncher } from '@/features/avatar-studio';
 import { EventNightLauncher } from '@/features/event-night';
+import { SpectaclePreviewLauncher } from '@/features/spectacle-preview';
 import type { CameraMode } from '@/features/premiere';
 import { Button, IconButton } from '@/shared/ui';
 import { cn } from '@/shared/lib/cn';
@@ -21,6 +22,8 @@ interface PremiereHeaderProps {
   onOpenResearch: () => void;
   onOpenCustomizer: () => void;
   onOpenEventNight: () => void;
+  spectacleOpen: boolean;
+  onToggleSpectacle: () => void;
   onToggleCameraMode: () => void;
   onToggleNitrate: () => void;
   onToggleSound: () => void;
@@ -34,6 +37,8 @@ export function PremiereHeader({
   onOpenResearch,
   onOpenCustomizer,
   onOpenEventNight,
+  spectacleOpen,
+  onToggleSpectacle,
   onToggleCameraMode,
   onToggleNitrate,
   onToggleSound,
@@ -66,6 +71,7 @@ export function PremiereHeader({
         <QrGeneratorLauncher />
         <AvatarStudioLauncher />
         <EventNightLauncher onOpen={onOpenEventNight} />
+        <SpectaclePreviewLauncher open={spectacleOpen} onToggle={onToggleSpectacle} />
         <Button
           onClick={onToggleCameraMode}
           variant={cameraMode === 'orbit' ? 'selected' : 'panel'}

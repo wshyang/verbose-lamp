@@ -31,7 +31,7 @@
 
 | Item | Status | Trigger to un-defer |
 |---|---|---|
-| Playwright e2e with video-on | Deferred | First time a browser is available in CI or a second interactive feature ships |
+| Playwright e2e with video-on | Un-deferred by ADDENDUM-022; scaffolded in ADDENDUM-025 (supported-browser baselines pending) | Trigger met: a second interactive feature shipped |
 | Dockerfile / Dockerfile.dev / cloudflared | Deferred | First deployment target is named |
 | SHIP-HATS inert pipeline files | Deferred | Project is slated for a GovTech environment |
 | `data-testid` on pre-existing controls | Partial | Added to every control touched from now on; backfill when the HUD is next split |

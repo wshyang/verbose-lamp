@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_TUNING, HAWKER_CROP, SECOND_HEAD, buildHawkerFrame, buildHawkerMatte } from '@/features/background-removal';
 import { DEFAULT_BACKDROPS, renderEnamelPanel } from '@/features/enamel-backdrop';
 import { GILDING_PRESETS } from '@/features/gilded-portrait';
-import { AVATAR_SIZE, composeAvatar, composeLayers, cutOutSubject, outlineRing } from './compose';
+import {
+  AVATAR_SIZE, composeAvatar, composeLayers, cutOutSubject, emptySubject, outlineRing,
+} from './compose';
 import { boxToPhoto, clampBox, moveBox, photoToBox, resizeBox, startingBox } from './cropBox';
-import { STAGE_HINTS, nextStage } from './stage';
+import { STAGE_HINTS, isStageBusy, nextStage, stageHint } from './stage';
 import type { AvatarComposition, StageFacts } from './types';
 
 const photo = buildHawkerFrame();
@@ -86,6 +88,25 @@ describe('composeAvatar', () => {
     expect(outlineRing(subject.alpha).data.every((value) => value === 0)).toBe(true);
   });
 
+  it('builds an empty subject and composes a backdrop without metal data', () => {
+    const subject = emptySubject(4);
+    expect(subject.shine).toBe(0);
+    expect(subject.alpha.data.every((value) => value === 0)).toBe(true);
+    const backdrop = { image: { width: 4, height: 4, data: new Uint8ClampedArray(64).fill(40) } };
+    const composed = composeLayers({ subject, backdrop, frame: 'plaque', rampId: 'bright' });
+    expect(composed.image.data[20]).toBe(40);
+    expect(composed.metal.data[5]).toBe(0);
+  });
+
+  it('rejects mismatched layer sizes and defaults composition to 512', () => {
+    const subject = emptySubject(4);
+    const backdrop = { image: { width: 5, height: 5, data: new Uint8ClampedArray(100) } };
+    expect(() => composeLayers({ subject, backdrop, frame: 'plaque', rampId: 'bright' }))
+      .toThrow(RangeError);
+    const avatar = composeAvatar({ ...composition(), size: undefined });
+    expect(avatar.width).toBe(AVATAR_SIZE);
+  });
+
   it('matches the 16×16 composition data snapshot', () => {
     const avatar = composeAvatar(composition({ size: 16 }));
     const rows = Array.from({ length: 16 }, (_, y) => Array.from(avatar.data.slice(y * 64, y * 64 + 64), (v) => v.toString(16).padStart(2, '0')).join(''));
@@ -104,6 +125,15 @@ describe('nextStage', () => {
     expect(nextStage(base)).toBe('ready');
     expect(nextStage({ ...base, matte: null })).toBe('plain');
     expect(nextStage({ ...base, error: 'nope' })).toBe('failed');
+  });
+
+  it('reports only working/refining as busy and resolves stage hints', () => {
+    expect(isStageBusy('working')).toBe(true);
+    expect(isStageBusy('refining')).toBe(true);
+    for (const stage of ['idle', 'ready', 'plain', 'cropping', 'failed'] as const) {
+      expect(isStageBusy(stage)).toBe(false);
+      expect(stageHint(stage)).toBe(STAGE_HINTS[stage]);
+    }
   });
 
   it('never exposes internals in its copy', () => {

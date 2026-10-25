@@ -107,7 +107,7 @@ interface JewelLook {
 
 function jewel(id: string, name: string, look: JewelLook): BackdropPreset {
   const { palette, ...rest } = look;
-  const spec: BackdropSpec = { ...JEWEL_FINISH, ...rest, colourOne: palette.colourOne, colourTwo: palette.colourTwo, accents: palette.accents ?? [] };
+  const spec: BackdropSpec = { ...JEWEL_FINISH, ...rest, colourOne: palette.colourOne, colourTwo: palette.colourTwo, accents: palette.accents };
   return Object.freeze({ id, name, spec: Object.freeze(spec) });
 }
 
