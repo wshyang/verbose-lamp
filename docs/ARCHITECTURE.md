@@ -132,7 +132,8 @@ header or timeline into another product simply to reuse a button or modal.
 ## Adding A Feature
 
 1. Put product state, validation, and pure computations in the feature's
-   `model` or `hooks`; add adjacent tests for pure modules.
+   `model` or `hooks`; add adjacent tests for pure modules, and keep the
+   100 % pure-layer coverage gate (`npm run test:coverage`, ADDENDUM-029) green.
 2. Keep React components focused on markup, accessible state, and event wiring.
 3. Expose only supported components, hooks, and types through the feature barrel.
 4. Reuse shared controls when their interaction contract fits; add a new shared

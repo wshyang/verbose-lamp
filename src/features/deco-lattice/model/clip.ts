@@ -51,7 +51,7 @@ function rectInterval(a: Pt, b: Pt, rect: ClippingRect): Interval | null {
   for (const [p, q] of edges) {
     if (!clipEdge(interval, p, q)) return null;
   }
-  return interval.enter <= interval.exit ? interval : null;
+  return interval;
 }
 
 export function clipSegmentToRect(a: Pt, b: Pt, rect: ClippingRect): readonly [Pt, Pt] | null {
@@ -89,7 +89,6 @@ export function clipSegmentToConvex(
     const denominator = n.x * d.x + n.y * d.y;
     if (!clipEdge(interval, -denominator, offset)) return null;
   }
-  if (interval.enter > interval.exit) return null;
   return [at(a, b, interval.enter), at(a, b, interval.exit)];
 }
 

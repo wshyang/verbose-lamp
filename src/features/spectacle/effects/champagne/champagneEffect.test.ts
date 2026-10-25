@@ -19,3 +19,14 @@ describe('champagneEffect', () => {
     expect(arcs()).toBe(4);
   });
 });
+
+describe('champagneEffect defaults', () => {
+  it('runs with the default seed and rate when created without params', () => {
+    const { ctx, log } = createRecordingContext();
+    const frame: FrameInfo = { ctx, w: 1280, h: 720, fade: 1 };
+    const context = { quality: qualitySettings('high'), reducedMotion: false, announce: vi.fn() };
+    const instance = champagneEffect.create(context, {});
+    instance.update(200, frame); // past the 1000 / 7 ms default-rate interval
+    expect(log.filter((entry) => entry.startsWith('arc(')).length).toBe(2);
+  });
+});

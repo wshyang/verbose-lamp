@@ -38,3 +38,11 @@ describe('planSpin', () => {
     expect(Math.abs(landed - 1)).toBeLessThan(1e-6);
   });
 });
+
+describe('planSpin before the start', () => {
+  it('holds the start position at and before t = 0', () => {
+    const profile = planSpin({ startP: 4.2, winnerIndex: 3, n: 30 });
+    expect(profile.positionAt(0)).toBe(4.2);
+    expect(profile.positionAt(-100)).toBe(4.2);
+  });
+});

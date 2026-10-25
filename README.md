@@ -29,6 +29,7 @@ WebGL support. No `.env` or secrets are needed.
 | `npm run build` | Production build into `dist/` (a single self-contained HTML file, via `vite-plugin-singlefile`) |
 | `npm run preview` | Serve the built `dist/` locally to check the production bundle |
 | `npm test` | Run the Vitest unit tests once (`vitest run`, node environment) |
+| `npm run test:coverage` | Run the tests under the coverage gate — the pure layer must stay at 100 % (see ADDENDUM-029) |
 | `npx tsc --noEmit` | Type-check the whole project |
 
 Before calling a change done, run `npx tsc --noEmit`, `npm test`, and `npm run build`.
@@ -85,10 +86,13 @@ must not import from `src/app/`. The `@` alias points at `src/`. See
 ## Testing
 
 Unit tests sit beside the module they cover (`foo.ts` + `foo.test.ts`) and run in Vitest's
-node environment (`vitest.config.ts`, deliberately separate from `vite.config.ts`). Pure
-logic such as frame grammar, timing math, and image pipelines is tested; geometry is
-protected by snapshot tests on data, not pixels. Three.js and DOM rendering code is kept
-thin and is not unit-tested. Playwright e2e is deferred (see ADDENDUM-001).
+node environment (`vitest.config.ts`, deliberately separate from `vite.config.ts`). The
+pure layer — frame grammar, timing math, image pipelines, effect choreography — is held at
+**100 % lines/branches/functions/statements** by `npm run test:coverage` (ADDENDUM-029);
+geometry is protected by snapshot tests on data, not pixels. DOM components have jsdom
+suites beside them (ADDENDUM-028), and a Playwright likeness gate is scaffolded awaiting
+browser-captured baselines (ADDENDUM-027). Three.js rendering code stays thin by design:
+the scene shells out to the tested pure modules.
 
 ## Contributing conventions
 

@@ -114,3 +114,10 @@ describe('clipSpecOutsideRect', () => {
     expect(clipped.every((s) => !s.closed && s.layer === 2)).toBe(true);
   });
 });
+
+describe('clipSegmentToConvex degenerate polygons', () => {
+  it('returns null for a polygon with fewer than three vertices', () => {
+    expect(clipSegmentToConvex({ x: 0, y: 0 }, { x: 1, y: 0 }, [{ x: 0, y: 0 }, { x: 1, y: 0 }])).toBeNull();
+    expect(clipSegmentToConvex({ x: 0, y: 0 }, { x: 1, y: 0 }, [])).toBeNull();
+  });
+});

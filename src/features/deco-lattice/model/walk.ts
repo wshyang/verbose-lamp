@@ -48,7 +48,8 @@ export function traceWalks(o: WalkOptions): readonly (readonly Pt[])[] {
     let p: Pt = { x: Math.round(startX / o.cell) * o.cell, y: o.cell };
     if (!isFree(p, o, occupied)) continue;
     const pts: Pt[] = [p];
-    reserve(occupied, p, o.cell);
+    const trail: Pt[] = [p];
+    occupied.add(cellKey(p.x, p.y));
     let dir = 2; // into the wedge, along +y
     for (let turn = 0; turn < 6; turn += 1) {
       dir = nextDir(dir, rng);
@@ -58,13 +59,17 @@ export function traceWalks(o: WalkOptions): readonly (readonly Pt[])[] {
         const q = { x: p.x + OCTI_DIRS[dir][0] * o.cell, y: p.y + OCTI_DIRS[dir][1] * o.cell };
         if (!isFree(q, o, occupied)) break;
         p = q;
-        reserve(occupied, p, o.cell);
+        trail.push(p);
+        occupied.add(cellKey(p.x, p.y));
         advanced += 1;
       }
       if (advanced === 0) break;
       pts.push(p);
     }
-    if (pts.length >= 2) walks.push(pts);
+    if (pts.length >= 2) {
+      walks.push(pts);
+      for (const cell of trail) reserve(occupied, cell, o.cell);
+    }
   }
   return walks;
 }

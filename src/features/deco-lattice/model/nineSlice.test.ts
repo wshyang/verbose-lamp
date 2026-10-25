@@ -56,3 +56,10 @@ describe('nineSliceLayout', () => {
     expect(aperture.hh).toBeGreaterThan(0);
   });
 });
+
+describe('nineSliceLayout ratio fallback', () => {
+  it('falls back to the 0.62 corner ratio for a non-finite request', () => {
+    const layout = nineSliceLayout({ hw: 2, hh: 1, cornerRatio: Number.NaN, period: 0.2 });
+    expect(layout.cornerSize).toBeCloseTo(0.62, 12);
+  });
+});

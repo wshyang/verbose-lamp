@@ -6,12 +6,13 @@ import {
   gridFromMatte,
   pruneIslands,
   trimEdge,
+  keepEverything,
   tunedGrid,
   withBackground,
   withKnob,
 } from './cutOut';
 import { alphaOf, planeOf } from './matte';
-import { forgetSegmenter, segmentSubject } from './segmentSubject';
+import { forgetSegmenter, segmentSubject, warmUpSegmenter } from './segmentSubject';
 import { subjectAlpha } from './subjectAlpha';
 import { FACE_DISC, HAWKER_CROP, SECOND_HEAD, buildHawkerFrame, buildHawkerMatte } from './fixtures';
 import type { TransformersModule } from './types';
@@ -131,5 +132,87 @@ describe('matte shapes and the segmenter loader', () => {
     expect((await segmentSubject(photo, async () => fake))?.data).toEqual(matte.data);
     forgetSegmenter();
     expect(await segmentSubject(photo, () => Promise.reject(new Error('CDN blocked')))).toBeNull();
+  });
+});
+
+describe('cut-out grid edge cases', () => {
+  it('keeps the current knob value for a non-finite change', () => {
+    expect(withKnob(DEFAULT_TUNING, { knob: 'edge', value: Number.NaN }).edge).toBe(DEFAULT_TUNING.edge);
+    expect(withKnob(DEFAULT_TUNING, { knob: 'threshold', value: Number.POSITIVE_INFINITY }).threshold)
+      .toBe(DEFAULT_TUNING.threshold);
+  });
+
+  it('keepEverything marks every cell as subject', () => {
+    const grid = keepEverything(4);
+    expect(grid).toHaveLength(16);
+    expect(grid.every((cell) => cell === 0)).toBe(true);
+  });
+
+  it('orders several component sizes largest first', () => {
+    const scene = gridWith([{ x: 0, y: 0, w: 2, h: 2 }, { x: 6, y: 6, w: 4, h: 4 }]);
+    expect(componentSizesOf(scene, SIZE)).toEqual([16, 4]);
+  });
+
+  it('copies the grid untouched when pruning is off or there is no subject', () => {
+    const scene = gridWith([{ x: 6, y: 6, w: 4, h: 4 }]);
+    const off = pruneIslands(scene, SIZE, 0);
+    expect(off).toEqual(scene);
+    expect(off).not.toBe(scene);
+    const empty = gridWith([]);
+    expect(pruneIslands(empty, SIZE, 8)).toEqual(empty);
+  });
+});
+
+describe('matte rejection and segmenter warm-up', () => {
+  afterEach(forgetSegmenter);
+
+  const flush = () => new Promise((resolve) => setTimeout(resolve, 25)); // a cold import can outlast one tick
+  const fakeModule = (result: unknown): TransformersModule => ({
+    pipeline: async () => async () => result,
+    RawImage: class { constructor(public data: Uint8ClampedArray) {} },
+  });
+
+  it('rejects non-objects, empty answers and impossible dimensions', () => {
+    expect(planeOf(42)).toBeNull();
+    expect(planeOf([])).toBeNull();
+    expect(planeOf({})).toBeNull();
+    expect(planeOf({ mask: null, data: [1], width: 1, height: 1 })).not.toBeNull();
+    expect(alphaOf({ data: [], width: 0, height: 1 })).toBeNull();
+    expect(alphaOf({ data: [1, 2], width: 1.5, height: 1 })).toBeNull();
+  });
+
+  it('returns null when the model answer is not a matte or the wrong size', async () => {
+    const photo = buildHawkerFrame();
+    expect(await segmentSubject(photo, async () => fakeModule(42))).toBeNull();
+    forgetSegmenter();
+    const tiny = { data: [255], width: 1, height: 1, channels: 1 };
+    expect(await segmentSubject(photo, async () => fakeModule(tiny))).toBeNull();
+  });
+
+  it('warms up without poisoning later calls, and defaults never throw', async () => {
+    const photo = buildHawkerFrame();
+    const matte = buildHawkerMatte();
+    const plane = { data: matte.data, width: matte.width, height: matte.height, channels: 1 };
+
+    warmUpSegmenter(() => Promise.reject(new Error('CDN blocked')));
+    await flush();
+    expect((await segmentSubject(photo, async () => fakeModule(plane)))?.data).toEqual(matte.data);
+
+    forgetSegmenter();
+    warmUpSegmenter();
+    await flush();
+    expect((await segmentSubject(photo, async () => fakeModule(plane)))?.data).toEqual(matte.data);
+
+    forgetSegmenter();
+    await expect(segmentSubject(photo)).resolves.toBeNull();
+  });
+});
+
+describe('subjectAlpha size normalisation', () => {
+  it('resamples a matte that is not already the output square', () => {
+    const small = { width: 4, height: 4, data: new Uint8ClampedArray(16).fill(200) };
+    const alpha = subjectAlpha({ matte: small, tuning: DEFAULT_TUNING, outSize: 8, grid: 2 });
+    expect([alpha.width, alpha.height, alpha.data.length]).toEqual([8, 8, 64]);
+    expect(alpha.data.every((value) => value === 200)).toBe(true);
   });
 });
