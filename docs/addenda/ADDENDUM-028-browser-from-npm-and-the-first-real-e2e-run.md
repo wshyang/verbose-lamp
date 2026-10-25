@@ -113,6 +113,21 @@ What remains is a roughly 1% luminance difference in lit surfaces, an order of m
 
 `spectacle/effects/defaults.test.ts › fireworks shows the emerald pistil over a long seeded show` simulates 200 steps of a full-intensity show and was sitting a few hundred milliseconds under Vitest's 5 s default. It timed out twice while the comparison above was saturating both cores and passed immediately after; the assertions were never wrong. It now carries an explicit 30 s budget, because a test whose margin is CPU speed is a test that reports load as failure.
 
+### 5.3 Frame throughput, measured and inconclusive
+
+The gate only compares pixels, so one more number was taken while the browser was here: sustained `requestAnimationFrame` rate at a frozen 11.28 s, 1440×900, on the software rasteriser. Run twice in opposite orders to cancel warm-up:
+
+| Order | Pre-port | Port |
+|---|---|---|
+| old, then new | 0.57 fps | 0.44 fps |
+| new, then old | 0.95 fps | 1.16 fps |
+
+The port is consistently ~15–20% slower, and the absolute numbers move by 2× between runs. This box has two cores and a load average of ~2, so the measurement cannot separate React Three Fiber's per-frame JavaScript from scheduling noise, and one frame here is dominated by SwiftShader rasterising four full-screen passes. Events still dispatch promptly when the main thread is idle (`setTimeout(0)` round trip: **1 ms** in both builds); the 25 s stalls seen when driving clicks against a 1 fps page are the software renderer's, not the port's.
+
+What the port is *not* doing was checked directly: patching `WebGL2RenderingContext.prototype.drawElements/drawArrays` before load and counting over three frames gives **95 draws and 16 clears per frame in both builds, identically**. So React Three Fiber is not rendering the scene a second time behind the composer — its `useFrame(…, 1)` priority is doing exactly what ADDENDUM-022 §6.3 said it would — and the frame cost between the two builds is the same GPU work. The delta that remains is the per-frame JavaScript of thirteen `useFrame` subscribers plus the store reads, which on a GPU is microseconds against a 16 ms budget and on this box is inside the noise floor.
+
+Recorded rather than chased: if a future change makes the premiere feel heavy, this table and the 95/16 draw profile are the baseline to improve on, not a regression to explain.
+
 ## 6. What is still not verified
 
 - **Committed baselines.** The suite does record and replay: `--update-snapshots` wrote all twelve PNGs in 18.8 min and a replay against them passed (§6.2). They are not committed, for the reason below. The gate compares per OS, browser build and GPU path. These shots come from Chrome 153 on Debian 12 with a locally built NSS; the user's managed browser is Chromium 156. Committing these PNGs would make the user's first `npm run e2e` fail for reasons unrelated to the scene, and ADDENDUM-022 forbids re-baselining to silence that. So: run `npx playwright install chromium` and `npm run e2e:update` **once** on the target machine — a legitimate initial recording, not a re-baseline, because there is nothing to overwrite — then treat it as the gate.
@@ -128,6 +143,9 @@ What remains is a roughly 1% luminance difference in lit surfaces, an order of m
 - `npx playwright test e2e/flows.spec.ts --project=desktop-chromium --workers=1` → **8/8**, 4.4 min.
 - `… --project=mobile-chromium --workers=1` → **8/8**, 4.3 min, after §4.3.
 - Twelve old-vs-new likeness comparisons → **0 differing pixels** at the gate's comparator settings, **0 page errors** in either build (§5).
+- Twelve-shot likeness recorded (§6.2) and replayed → **12/12**.
+- Draw-call parity between the two builds: **95 draws / 16 clears per frame**, identical (§5.3).
+- A twelve-surface sweep in the browser — premiere (desktop and 390×844), the studio's border and proportions surfaces, research, title customiser, QR generator, spectacle console, avatar studio, Event Night (desktop and mobile) — screenshotted and inspected with no page errors. The only console noise in every run is a single `net::ERR_CONNECTION_CLOSED` from the sandboxed font/asset request that the proxy drops; it predates this work.
 
 ### 6.2 The suite itself, both directions
 
