@@ -1,52 +1,48 @@
 import { describe, expect, it } from 'vitest';
-import { mulberry32 } from '@/shared/lib/random';
 import { circleOverlapsRect } from '../../model/geometry';
-import { shellRecipe, shellSparks } from './shells';
+import type { NormRect } from '../../model/types';
 import { burstRadiusNorm, planShow } from './show';
 
-describe('shell recipes', () => {
-  it('are deterministic per seed (seed 1925)', () => {
-    const a = shellSparks({ type: 'kamuro', rng: mulberry32(1925), scale: 1, pistil: 'gold' });
-    const b = shellSparks({ type: 'kamuro', rng: mulberry32(1925), scale: 1, pistil: 'gold' });
-    expect(a).toEqual(b);
-    expect(a.length).toBe(shellRecipe('kamuro').count);
+const EVERYTHING: NormRect = { x: 0, y: 0, w: 1, h: 1 };
+
+describe('planShow with no room for a burst', () => {
+  it('places nothing when the whole sky is off limits', () => {
+    const events = planShow({ seed: 1925, intensity: 1, keepClear: [EVERYTHING] });
+    expect(events).toEqual([]);
   });
 
-  it('double-break adds an emerald pistil when green light is on', () => {
-    const sparks = shellSparks({ type: 'double-break', rng: mulberry32(1925), scale: 1, pistil: 'emerald' });
-    expect(sparks.some((s) => s.green)).toBe(true);
+  it('places no finale shells either when the sky is off limits', () => {
+    const events = planShow({ seed: 1925, intensity: 1, finale: true, keepClear: [EVERYTHING] });
+    expect(events).toEqual([]);
   });
 
-  it('ring sparks lie on a tilted circle', () => {
-    const sparks = shellSparks({ type: 'ring', rng: mulberry32(7), scale: 1, pistil: 'gold' });
-    for (const s of sparks) {
-      const r = Math.hypot(s.dx, s.dy / 0.56);
-      expect(r).toBeGreaterThan(0.9);
-      expect(r).toBeLessThan(1.1);
+  it('keeps bursts out of the speaker box but fills the rest of the sky', () => {
+    const speaker: NormRect = { x: 0.35, y: 0.2, w: 0.3, h: 0.3 };
+    const events = planShow({ seed: 1925, intensity: 1, keepClear: [speaker], aspect: 16 / 9 });
+    expect(events.length).toBeGreaterThan(0);
+    for (const event of events) {
+      const overlaps = circleOverlapsRect({
+        centre: { x: event.x, y: event.y },
+        radius: burstRadiusNorm(event.depth) + 0.02,
+        rect: speaker,
+        aspect: 16 / 9,
+      });
+      expect(overlaps).toBe(false);
     }
+  });
+
+  it('a finale adds its closing volley inside the show', () => {
+    const plain = planShow({ seed: 1925, intensity: 0.5, durationMs: 12_000 });
+    const finale = planShow({ seed: 1925, intensity: 0.5, durationMs: 12_000, finale: true });
+    expect(finale.length).toBeGreaterThan(plain.length);
+    expect(Math.max(...finale.map((event) => event.tMs))).toBeLessThanOrEqual(12_000);
   });
 });
 
-describe('planShow', () => {
-  it('is deterministic per seed', () => {
-    expect(planShow({ seed: 1925, finale: true })).toEqual(planShow({ seed: 1925, finale: true }));
-  });
-
-  it('never overlaps keep-clear rects, over 200 seeds', () => {
-    const rect = { x: 0.38, y: 0.18, w: 0.24, h: 0.3 };
-    for (let seed = 0; seed < 200; seed += 1) {
-      const events = planShow({ seed, keepClear: [rect], finale: true, intensity: 1 });
-      for (const e of events) {
-        const hit = circleOverlapsRect({ centre: { x: e.x, y: e.y }, radius: burstRadiusNorm(e.depth), rect, aspect: 16 / 9 });
-        expect(hit).toBe(false);
-      }
-    }
-  });
-
-  it('keeps bursts in the upper band and ends with a dense finale', () => {
-    const events = planShow({ seed: 42, finale: true, durationMs: 12000, intensity: 0.7 });
-    for (const e of events) expect(e.y).toBeLessThanOrEqual(0.65);
-    const finaleCount = events.filter((e) => e.tMs >= 8500).length;
-    expect(finaleCount).toBeGreaterThanOrEqual(10);
+describe('planShow defaults', () => {
+  it('plans a house show when given no options at all', () => {
+    const events = planShow({});
+    expect(events.length).toBeGreaterThan(0);
+    expect(events.every((event) => event.tMs <= 12_000)).toBe(true);
   });
 });

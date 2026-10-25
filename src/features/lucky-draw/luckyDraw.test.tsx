@@ -279,6 +279,22 @@ describe('useDrumCanvas', () => {
     return null;
   }
 
+  function HarnessNoSway({ drumFeed, canvas }: { drumFeed: ReturnType<typeof feed>; canvas: HTMLCanvasElement }) {
+    const refs = useDrumCanvas(drumFeed);
+    if (!refs.canvasRef.current) (refs.canvasRef as { current: HTMLCanvasElement | null }).current = canvas;
+    return null;
+  }
+
+  it('assumes a ratio of one when the browser reports none', () => {
+    vi.stubGlobal('devicePixelRatio', 0);
+    const canvas = document.createElement('canvas');
+    render(<Harness drumFeed={feed()} canvas={canvas} sway={document.createElement('div')} />);
+    // A 1× canvas: no ratio, no scaling.
+    expect(canvas.width).toBe(640);
+    expect(canvas.height).toBe(400);
+    vi.unstubAllGlobals();
+  });
+
   it('sizes the canvas for the device and draws every frame', () => {
     const canvas = document.createElement('canvas');
     const getContext = vi.spyOn(canvas, 'getContext');
@@ -320,6 +336,15 @@ describe('useDrumCanvas', () => {
     render(<Harness drumFeed={single} canvas={canvas} sway={document.createElement('div')} />);
     act(() => pumpFrame(100));
     expect(getContext).toHaveBeenCalled();
+  });
+
+  it('draws without swaying when the sway element is not attached', () => {
+    const canvas = document.createElement('canvas');
+    // No sway element: the loop still paints, and the missing ref is skipped.
+    render(<HarnessNoSway drumFeed={feed()} canvas={canvas} />);
+    expect(frames).toHaveLength(1);
+    act(() => pumpFrame(1_500));
+    expect(frames).toHaveLength(1);
   });
 
   it('does nothing without a canvas', () => {

@@ -7,6 +7,7 @@ import { usePremiereController } from './usePremiereController';
 
 const runtimeArgs = vi.hoisted(() => ({
   calls: [] as Array<Record<string, unknown>>,
+  sceneTargets: [] as Array<() => unknown>,
 }));
 
 vi.mock('./usePremiereRuntime', () => ({
@@ -17,12 +18,16 @@ vi.mock('./usePremiereRuntime', () => ({
 }));
 
 vi.mock('@/features/frame-studio', () => ({
-  useFrameStudio: () => ({ isOpen: true, close: vi.fn() }),
+  useFrameStudio: (getTarget: () => unknown) => {
+    runtimeArgs.sceneTargets.push(getTarget);
+    return { isOpen: true, close: vi.fn() };
+  },
 }));
 
 describe('usePremiereController', () => {
   beforeEach(() => {
     runtimeArgs.calls = [];
+    runtimeArgs.sceneTargets = [];
   });
 
   afterEach(() => {
@@ -52,16 +57,16 @@ describe('usePremiereController', () => {
     const { result } = renderHook(() => usePremiereController());
     const onTelemetry = runtimeArgs.calls[0].onTelemetry as (t: PlaybackTelemetry) => void;
 
-    act(() => onTelemetry({ currentTime: 1.5, isPlaying: true }));
+    act(() => onTelemetry({ activeChapterIndex: 0, currentTime: 1.5, isPlaying: true }));
     expect(result.current.currentTime).toBe(1.5);
 
     nowMs = 1_030; // inside the 48 ms window: the frame is skipped
-    act(() => onTelemetry({ currentTime: 9, isPlaying: false }));
+    act(() => onTelemetry({ activeChapterIndex: 0, currentTime: 9, isPlaying: false }));
     expect(result.current.currentTime).toBe(1.5);
     expect(result.current.isPlaying).toBe(true);
 
     nowMs = 1_060;
-    act(() => onTelemetry({ currentTime: 2, isPlaying: false }));
+    act(() => onTelemetry({ activeChapterIndex: 0, currentTime: 2, isPlaying: false }));
     expect(result.current.currentTime).toBe(2);
     expect(result.current.isPlaying).toBe(false);
   });
@@ -79,6 +84,15 @@ describe('usePremiereController', () => {
     const onChapterChange = runtimeArgs.calls[0].onChapterChange as (index: number) => void;
     act(() => onChapterChange(9));
     expect(result.current.currentChapter).toBe(SEQUENCE_CHAPTERS[0]);
+  });
+
+  it('gives the frame studio a getter for the live scene manager', () => {
+    renderHook(() => usePremiereController());
+    const getTarget = runtimeArgs.sceneTargets[0];
+    // Nothing is mounted in this test, so the getter reports honestly that there
+    // is no scene to style yet, rather than handing out a stale manager.
+    expect(getTarget()).toBeNull();
+    expect(getTarget).toBeTypeOf('function');
   });
 
   it('hands the runtime live refs and stable callbacks', () => {

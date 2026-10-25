@@ -381,9 +381,9 @@ describe('useAvatarLook', () => {
 
   it('drops the preset badge once a tone is hand-tuned, and restores it from a preset', () => {
     const { result } = renderHook(() => useAvatarLook());
-    act(() => result.current.setGildingRamp('antique'));
+    act(() => result.current.setGildingRamp('deep'));
     expect(result.current.gildingPresetId).toBeNull();
-    expect(result.current.gilding.rampId).toBe('antique');
+    expect(result.current.gilding.rampId).toBe('deep');
 
     act(() => result.current.setGildingTone('clarity', 0.5));
     expect(result.current.gildingPresetId).toBeNull();
@@ -395,16 +395,16 @@ describe('useAvatarLook', () => {
     expect(result.current.isShimmering).toBe(false);
     act(() => result.current.toggleFineTuning());
     expect(result.current.isFineTuning).toBe(true);
-    act(() => result.current.setFrame('oval'));
-    expect(result.current.frame).toBe('oval');
+    act(() => result.current.setFrame('plaque'));
+    expect(result.current.frame).toBe('plaque');
     act(() => result.current.setFinish('gilded'));
     expect(result.current.finish).toBe('gilded');
   });
 
   it('restores every sample default', () => {
     const { result } = renderHook(() => useAvatarLook());
-    act(() => result.current.setFrame('oval'));
-    act(() => result.current.setGildingRamp('antique'));
+    act(() => result.current.setFrame('plaque'));
+    act(() => result.current.setGildingRamp('deep'));
     act(() => result.current.applySampleDefaults());
     expect(result.current.frame).toBe('medallion');
     expect(result.current.gildingPresetId).not.toBeNull();
@@ -440,6 +440,32 @@ describe('useAvatarStudio', () => {
     );
     expect(result.current.isExporting).toBe(false);
 
+    vi.unstubAllGlobals();
+  });
+
+  it('names an export "portrait" when the photo has no stem', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => ({ blob: async () => new Blob(['x'], { type: 'image/jpeg' }) })));
+    const { result } = renderHook(() => useAvatarStudio());
+    await act(async () => {
+      await result.current.session.loadFile(new File(['x'], '.png', { type: 'image/png' }));
+    });
+    await settle();
+    await settle();
+    act(() => result.current.session.confirmCrop(BOX));
+    expect(result.current.canDownload).toBe(true);
+    await act(async () => {
+      await result.current.downloadPng();
+    });
+    expect(deps.downloadGildedPng).toHaveBeenCalledWith(expect.anything(), 'portrait-gilded-avatar');
+    vi.unstubAllGlobals();
+  });
+
+  it('reports an export failure', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => ({ blob: async () => new Blob(['x'], { type: 'image/jpeg' }) })));
+    const { result } = renderHook(() => useAvatarStudio());
+    act(() => result.current.showWeiLing());
+    await settle();
+    await settle();
     deps.downloadGildedPng.mockRejectedValueOnce(new Error('nope'));
     await act(async () => {
       await result.current.downloadPng();

@@ -24,7 +24,9 @@ function fadeOf(effect: ActiveEffect, now: number): number {
 }
 
 function createEntry(layer: LayerId, instance: EffectInstance): { entry: ActiveEffect; finished: Promise<void> } {
-  let resolve = () => {};
+  // Definite assignment: the promise executor runs synchronously, so `resolve`
+  // is always the real resolver before the entry is used.
+  let resolve!: () => void;
   const finished = new Promise<void>((r) => {
     resolve = r;
   });

@@ -88,6 +88,28 @@ describe('downloadSvgAsPng', () => {
     expect(URL.revokeObjectURL).toHaveBeenCalled();
   });
 
+  it('refuses to paint when the browser has no 2D context', async () => {
+    class ImmediateImage {
+      onload: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      set src(_value: string) {
+        queueMicrotask(() => this.onload?.());
+      }
+    }
+    vi.stubGlobal('Image', ImmediateImage);
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null);
+    await expect(downloadSvgAsPng(makeSvg(), 'golden-qr')).rejects.toThrow('Canvas is unavailable');
+  });
+
+  it('does nothing when the encoder yields no png', async () => {
+    vi.stubGlobal('Image', FakeImage);
+    vi.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementation((callback: BlobCallback) => callback(null));
+    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click');
+    await expect(downloadSvgAsPng(makeSvg(), 'golden-qr')).resolves.toBeUndefined();
+    expect(click).not.toHaveBeenCalled();
+    expect(URL.revokeObjectURL).toHaveBeenCalled();
+  });
+
   it('rejects when the image cannot be rasterised', async () => {
     class BrokenImage {
       onload: (() => void) | null = null;

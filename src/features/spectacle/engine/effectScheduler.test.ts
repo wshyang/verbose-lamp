@@ -150,4 +150,40 @@ describe('createEffectScheduler', () => {
     runFrame(1_016);
     expect(clearAll).toHaveBeenCalledOnce();
   });
+
+    it('keeps the first stop time when stop() is called twice', async () => {
+      const { scheduler } = setup();
+      const { instance } = makeInstance(['running']);
+      const handle = scheduler.add('light-overlay', instance);
+      handle.stop();
+      performance.now = vi.fn(() => 9_999);
+      handle.stop(); // the second call must not move the fade clock
+      performance.now = vi.fn(() => 1_016);
+      runFrame(1_016);
+      // Fading from the first stop: a second stop at 9999 would have left the
+      // effect at full strength because its clock would sit in the future.
+      const fade = (instance.update as unknown as { mock: { calls: Array<[number, { fade: number }]> } }).mock
+        .calls[0][1].fade;
+      expect(fade).toBeGreaterThan(0.9);
+      expect(fade).toBeLessThan(1);
+      scheduler.dispose();
+      await expect(handle.finished).resolves.toBeUndefined();
+    });
+
+    it('stopAll leaves an effect that is already stopping alone', () => {
+      const { scheduler } = setup();
+      const { instance } = makeInstance(['running']);
+      const handle = scheduler.add('light-overlay', instance);
+      handle.stop();
+      performance.now = vi.fn(() => 1_400);
+      scheduler.stopAll();
+      performance.now = vi.fn(() => 1_416);
+      runFrame(1_416);
+      // 416 ms after the first stop the fade is over; a reset at 1400 would have
+      // brought the effect back to nearly full strength.
+      const fade = (instance.update as unknown as { mock: { calls: Array<[number, { fade: number }]> } }).mock
+        .calls[0][1].fade;
+      expect(fade).toBe(0);
+      scheduler.dispose();
+    });
 });

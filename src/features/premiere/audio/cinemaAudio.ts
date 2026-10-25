@@ -66,10 +66,12 @@ export class CinemaAudioEngine {
   }
 
   public triggerActShimmer(actIdx: number) {
-    if (!this.isEnabled || !this.ctx || !this.masterGain) return;
+    const ctx = this.ctx;
+    const masterGain = this.masterGain;
+    if (!this.isEnabled || !ctx || !masterGain) return;
 
     const chord = this.actChords[actIdx % this.actChords.length];
-    const now = this.ctx.currentTime;
+    const now = ctx.currentTime;
 
     // Retune drone root subtly
     if (this.droneOscs[0]) {
@@ -81,10 +83,9 @@ export class CinemaAudioEngine {
 
     // Crystalline golden harp / celesta upward arpeggio as the golden frames draw outward
     chord.forEach((freq, i) => {
-      if (!this.ctx || !this.masterGain) return;
       const startT = now + i * 0.11;
-      const osc = this.ctx.createOscillator();
-      const env = this.ctx.createGain();
+      const osc = ctx.createOscillator();
+      const env = ctx.createGain();
 
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(freq * 2, startT);
@@ -94,7 +95,7 @@ export class CinemaAudioEngine {
       env.gain.exponentialRampToValueAtTime(0.0001, startT + 2.4);
 
       osc.connect(env);
-      env.connect(this.masterGain);
+      env.connect(masterGain);
       osc.start(startT);
       osc.stop(startT + 2.5);
     });

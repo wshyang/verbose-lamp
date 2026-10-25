@@ -68,6 +68,20 @@ describe('CinemaAudioEngine', () => {
     expect(built.ctx.resume).not.toHaveBeenCalled();
   });
 
+  it('reuses the context when sound is switched back on', () => {
+    built = makeAudioContext('running');
+    vi.stubGlobal('AudioContext', FakeAudioContext);
+    const engine = new CinemaAudioEngine();
+    engine.toggle();
+    engine.toggle();
+    const created = (globalThis as unknown as { AudioContext: unknown }).AudioContext;
+    engine.toggle();
+    // The second start must not build a second AudioContext: only the first one did.
+    expect(created).toBe(FakeAudioContext);
+    expect(built.ctx.createGain).toHaveBeenCalled();
+    engine.dispose();
+  });
+
   it('resumes a suspended context and stops on the second toggle', () => {
     vi.useFakeTimers();
     built = makeAudioContext('suspended');
@@ -104,6 +118,15 @@ describe('CinemaAudioEngine', () => {
     // Removing the drone list exercises the defensive `if (this.droneOscs[0])` guards.
     (engine as unknown as { droneOscs: unknown[] }).droneOscs = [];
     expect(() => engine.triggerActShimmer(0)).not.toThrow();
+  });
+
+  it('skips the chime while the master gain is gone', () => {
+    const engine = new CinemaAudioEngine();
+    engine.toggle();
+    built.ctx.createOscillator.mockClear();
+    (engine as unknown as { masterGain: null }).masterGain = null;
+    expect(() => engine.triggerActShimmer(1)).not.toThrow();
+    expect(built.ctx.createOscillator).not.toHaveBeenCalled();
   });
 
   it('closes the context on dispose', () => {

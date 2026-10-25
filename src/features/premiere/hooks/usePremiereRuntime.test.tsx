@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { CinemaAudioEngine } from '../audio/cinemaAudio';
 import type { PlaybackTelemetry, PremiereSceneApi } from '../scene/sceneApi';
 import { usePremiereRuntime } from './usePremiereRuntime';
 
@@ -45,7 +46,7 @@ describe('usePremiereRuntime', () => {
     if (withContainer) document.body.appendChild(element);
     const mountRef = { current: withContainer ? element : null };
     const managerRef = { current: null as PremiereSceneApi | null };
-    const audioRef = { current: null as unknown };
+    const audioRef = { current: null as CinemaAudioEngine | null };
     const callbacks = makeCallbacks();
     const hook = renderHook(() => usePremiereRuntime({ mountRef, managerRef, audioRef, ...callbacks }));
     return { element, mountRef, managerRef, audioRef, callbacks, hook };
@@ -76,7 +77,7 @@ describe('usePremiereRuntime', () => {
     expect(instance.container).toBe(element);
     expect(instance.options.freezeAt).toBe(3);
 
-    const telemetry = { currentTime: 4, isPlaying: true };
+    const telemetry = { activeChapterIndex: 1, currentTime: 4, isPlaying: true };
     (instance.options.onTelemetry as (t: PlaybackTelemetry) => void)(telemetry);
     expect(callbacks.onTelemetry).toHaveBeenCalledWith(telemetry);
     (instance.options.onChapterChange as (i: number) => void)(2);
@@ -118,7 +119,7 @@ describe('usePremiereRuntime', () => {
   it('forwards telemetry through the live callback ref', () => {
     const mountRef = { current: document.createElement('div') };
     const managerRef = { current: null as PremiereSceneApi | null };
-    const audioRef = { current: null as unknown };
+    const audioRef = { current: null as CinemaAudioEngine | null };
     const first = makeCallbacks();
     const second = makeCallbacks();
     const { result, rerender } = renderHook(
@@ -127,14 +128,22 @@ describe('usePremiereRuntime', () => {
       { initialProps: first }
     );
     rerender(second);
-    const telemetry = { currentTime: 9, isPlaying: false };
+    const telemetry = { activeChapterIndex: 1, currentTime: 9, isPlaying: false };
     result.current.sceneCallbacks.onTelemetry(telemetry);
     expect(first.onTelemetry).not.toHaveBeenCalled();
     expect(second.onTelemetry).toHaveBeenCalledWith(telemetry);
   });
 
-  it('tolerates a frame-ready call before the container exists', () => {
+  it('mounts the classic renderer without a freeze point', () => {
+    setSearch('?renderer=classic');
     const { hook } = renderRuntime();
+    expect(hook.result.current.renderer).toBe('classic');
+    expect(sceneManager.instances).toHaveLength(1);
+    expect(sceneManager.instances[0].options.freezeAt).toBeUndefined();
+  });
+
+  it('tolerates a frame-ready call before the container exists', () => {
+    const { hook } = renderRuntime({ withContainer: false });
     expect(() => hook.result.current.sceneCallbacks.onFrameReady()).not.toThrow();
   });
 });

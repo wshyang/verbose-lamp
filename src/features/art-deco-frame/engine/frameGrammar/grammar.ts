@@ -79,10 +79,8 @@ function unitNormal(a: Point2, b: Point2): Point2 {
   return { x: -dy / len, y: dx / len };
 }
 
-function miterAt(prev: Point2 | null, curr: Point2, next: Point2 | null): Point2 {
-  if (!prev && next) return unitNormal(curr, next);
-  if (!next && prev) return unitNormal(prev, curr);
-  if (!prev || !next) return { x: 0, y: 1 };
+/** The miter at an interior vertex: both neighbours exist by construction. */
+function miterAt(prev: Point2, curr: Point2, next: Point2): Point2 {
   const n1 = unitNormal(prev, curr);
   const n2 = unitNormal(curr, next);
   const mx = n1.x + n2.x;
@@ -102,9 +100,12 @@ function miterAt(prev: Point2 | null, curr: Point2, next: Point2 | null): Point2
 export function offsetPolylineOutward(points: Point2[], d: number, closed: boolean): Point2[] {
   const n = points.length;
   if (n < 2) return points.map((p) => ({ ...p }));
-  const sampleNormal = (i: number) => {
-    const prev = i > 0 ? points[i - 1] : closed ? points[n - 1] : null;
-    const next = i < n - 1 ? points[i + 1] : closed ? points[0] : null;
+  const sampleNormal = (i: number): Point2 => {
+    // Open polylines end on a one-sided normal; only interior vertices get a miter.
+    if (i === 0 && !closed) return unitNormal(points[0], points[1]);
+    if (i === n - 1 && !closed) return unitNormal(points[n - 2], points[n - 1]);
+    const prev = i > 0 ? points[i - 1] : points[n - 1];
+    const next = i < n - 1 ? points[i + 1] : points[0];
     return miterAt(prev, points[i], next);
   };
   // Outward = away from the card origin (0,0), where every frame is centred. Using the

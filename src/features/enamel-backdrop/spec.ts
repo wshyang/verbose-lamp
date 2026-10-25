@@ -1,3 +1,4 @@
+import { accentsOf } from './accents';
 import { DEFAULT_PATTERNS, PATTERN_KNOBS, SPEC_KNOBS } from './palettes';
 import { RADIANCE_SHAPES, WAVE_FORMS } from './patterns';
 import type { BackdropKind, BackdropPattern, BackdropSpec, EnamelPalette, InlayStyle, SpecKnob } from './types';
@@ -64,7 +65,7 @@ export function describeKnob(pattern: BackdropPattern, key: string): string {
 
 /** Every enamel of a palette in band order, for swatches. */
 export function paletteStops(palette: EnamelPalette): string[] {
-  return [palette.colourOne, ...(palette.accents ?? []), palette.colourTwo];
+  return [palette.colourOne, ...accentsOf(palette), palette.colourTwo];
 }
 
 /** True when the spec's enamels match a palette, so its chip can show as selected. */
@@ -73,6 +74,6 @@ export function isPaletteActive(spec: BackdropSpec, palette: EnamelPalette): boo
   return (
     spec.colourOne.toLowerCase() === palette.colourOne.toLowerCase() &&
     spec.colourTwo.toLowerCase() === palette.colourTwo.toLowerCase() &&
-    accents === (palette.accents ?? []).join().toLowerCase()
+    accents === accentsOf(palette).join().toLowerCase()
   );
 }

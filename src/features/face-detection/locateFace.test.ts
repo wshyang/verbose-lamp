@@ -16,7 +16,7 @@ const IMAGE: RgbaImage = { width: 8, height: 8, data: new Uint8ClampedArray(8 * 
 
 /** Two eyes 40 % of the frame apart, centred — a crop must come back. */
 const FACE: FaceDetection = {
-  boundingBox: { x: 0.3, y: 0.2, width: 0.4, height: 0.5 },
+  boundingBox: { originX: 0.3, originY: 0.2, width: 0.4, height: 0.5 },
   keypoints: [
     { x: 0.3, y: 0.4 },
     { x: 0.7, y: 0.4 },
@@ -64,7 +64,7 @@ describe('locateFace', () => {
 
   it('crops around the biggest face', async () => {
     const { load } = makeLoader([
-      { ...FACE, boundingBox: { x: 0, y: 0, width: 0.1, height: 0.1 } },
+      { ...FACE, boundingBox: { originX: 0, originY: 0, width: 0.1, height: 0.1 } },
       FACE,
     ]);
     const box = await locateFace(IMAGE, { load, toSource: () => document.createElement('canvas') });
@@ -159,5 +159,18 @@ describe('canvasSourceOf', () => {
 describe('loadTasksVision', () => {
   it('is a function so callers can inject their own loader', () => {
     expect(loadTasksVision).toBeTypeOf('function');
+  });
+});
+
+describe('locateFace without a document', () => {
+  it('has no image source when there is no DOM to draw into', () => {
+    const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'document');
+    // Simulate a worker: `document` is absent, so no canvas source can be made.
+    Reflect.deleteProperty(globalThis, 'document');
+    try {
+      expect(canvasSourceOf(IMAGE)).toBeNull();
+    } finally {
+      if (descriptor) Object.defineProperty(globalThis, 'document', descriptor);
+    }
   });
 });

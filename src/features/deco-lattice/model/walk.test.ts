@@ -54,3 +54,25 @@ describe('traceWalks', () => {
     expect(traceWalks({ ...OPEN, count: 0 })).toEqual([]);
   });
 });
+
+describe('turn weighting', () => {
+  it('takes straight runs as well as turns across seeds', () => {
+    // The straight branch (roll < 0.55) must be reachable: scan a few seeds and
+    // look for a step that keeps the same heading.
+    const headings = new Set<string>();
+    let straight = 0;
+    for (let seed = 1; seed <= 12; seed += 1) {
+      for (const walk of traceWalks({ ...OPEN, seed })) {
+        for (let i = 1; i < walk.length - 1; i += 1) {
+          const before = { x: walk[i].x - walk[i - 1].x, y: walk[i].y - walk[i - 1].y };
+          const after = { x: walk[i + 1].x - walk[i].x, y: walk[i + 1].y - walk[i].y };
+          const norm = (v: { x: number; y: number }) => `${Math.sign(v.x)},${Math.sign(v.y)}`;
+          headings.add(norm(after));
+          if (norm(before) === norm(after)) straight += 1;
+        }
+      }
+    }
+    expect(straight).toBeGreaterThan(0);
+    expect(headings.size).toBeGreaterThan(1);
+  });
+});

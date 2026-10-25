@@ -13,7 +13,9 @@ import {
   withPatternKnob,
   withPatternKind,
   withSpecKnob,
+  withColours,
 } from './index';
+import type { BackdropSpec } from './types';
 
 const SUNBURST = DEFAULT_PATTERNS.sunburst;
 const SPEC = DEFAULT_BACKDROPS[0].spec;
@@ -81,5 +83,23 @@ describe('spec edits', () => {
     const kept = withPalette(SPEC, ENAMEL_PALETTES[0]);
     const edited = withPalette(kept, { ...ENAMEL_PALETTES[0] });
     expect(edited.colourOne).toBe(ENAMEL_PALETTES[0].colourOne);
+  });
+});
+
+describe('colour and accent guards', () => {
+  it('accepts a valid colourTwo and keeps the old one for junk', () => {
+    const spec = DEFAULT_BACKDROPS[0].spec;
+    const recoloured = withColours(spec, { colourTwo: '#123456' });
+    expect(recoloured.colourTwo).toBe('#123456');
+    expect(withColours(spec, { colourTwo: 'not-a-colour' }).colourTwo).toBe(spec.colourTwo);
+  });
+
+  it('treats a spec with no accents as accent-free', () => {
+    const palette = ENAMEL_PALETTES[0];
+    const bare = { ...DEFAULT_BACKDROPS[0].spec, accents: undefined } as unknown as BackdropSpec;
+    expect(isPaletteActive(bare, { ...palette, accents: [] })).toBe(
+      bare.colourOne.toLowerCase() === palette.colourOne.toLowerCase() &&
+        bare.colourTwo.toLowerCase() === palette.colourTwo.toLowerCase()
+    );
   });
 });

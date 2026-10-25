@@ -78,6 +78,13 @@ describe('useFrameStudio', () => {
     expect(hook.result.current.layers).toHaveLength(FRAME_LAYER_SOURCES.length);
   });
 
+  it('sets the sequence intricacy level', () => {
+    const { hook, target } = setup();
+    act(() => hook.result.current.setLevel(3));
+    expect(hook.result.current.level).toBe(3);
+    expect(target?.setSequenceFrameStyle.mock.calls[0][0].formula.level).toBe(3);
+  });
+
   it('clamps layer levels, detail and the border weight', () => {
     const { hook, target } = setup();
     const source = FRAME_LAYER_SOURCES.find((layer) => layer.id !== hook.result.current.baseSource)!;
@@ -146,6 +153,25 @@ describe('useFrameStudio', () => {
     expect(hook.result.current.isOpen).toBe(false);
     press('F');
     expect(hook.result.current.isOpen).toBe(true);
+  });
+
+  it('leaves other keys alone and does not re-enable an already-on border', () => {
+    const { hook, target } = setup();
+    press('x');
+    expect(hook.result.current.isOpen).toBe(true);
+    act(() => hook.result.current.setBorderEnabled(true));
+    target?.setScreenBorderEnabled.mockClear();
+    act(() => hook.result.current.setSurface('screen-border'));
+    // The border was already on, so the surface switch must not claim it again.
+    expect(target?.setScreenBorderEnabled).not.toHaveBeenCalled();
+    expect(hook.result.current.borderEnabled).toBe(true);
+  });
+
+  it('reports no preset when the detail sits between the named ones', () => {
+    const { hook } = setup();
+    act(() => hook.result.current.setDetail(37));
+    expect(hook.result.current.detailPercent).toBe(37);
+    expect(hook.result.current.activePreset).toBeNull();
   });
 
   it('works without a scene target', () => {

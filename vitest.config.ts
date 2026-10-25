@@ -46,6 +46,16 @@ export default defineConfig({
       reporter: ['text', 'json-summary'],
       include: ['src/**/*.{ts,tsx}'],
       exclude: LOGIC_SURFACE_EXCLUDES,
+      // The contract from ADDENDUM-025 §3.4, enforced rather than described: every
+      // logic module is covered to the last branch (ADDENDUM-028 §3). Anything that
+      // legitimately cannot run here is excluded above *with a reason* or marked
+      // with a `v8 ignore` block that says why.
+      thresholds: {
+        statements: 100,
+        branches: 100,
+        functions: 100,
+        lines: 100,
+      },
     },
   },
 });

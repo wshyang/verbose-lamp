@@ -17,19 +17,17 @@ export const GREEN_LIGHT: Rgb = { r: 0.35, g: 1, b: 0.55 };
 
 export function blackbodyColor(t: number): Rgb {
   const x = Math.min(1, Math.max(0, t));
-  for (let i = 1; i < STOPS.length; i += 1) {
-    if (x <= STOPS[i].t) {
-      const a = STOPS[i - 1];
-      const b = STOPS[i];
-      const u = (x - a.t) / (b.t - a.t);
-      return {
-        r: a.c.r + (b.c.r - a.c.r) * u,
-        g: a.c.g + (b.c.g - a.c.g) * u,
-        b: a.c.b + (b.c.b - a.c.b) * u,
-      };
-    }
-  }
-  return STOPS[STOPS.length - 1].c;
+  // The ramp is clamped to [0, 1] and its last stop sits at 1, so a segment is
+  // always found: there is no "past the end" colour to fall back to.
+  const upper = STOPS.findIndex((stop, index) => index > 0 && x <= stop.t);
+  const a = STOPS[upper - 1];
+  const b = STOPS[upper];
+  const u = (x - a.t) / (b.t - a.t);
+  return {
+    r: a.c.r + (b.c.r - a.c.r) * u,
+    g: a.c.g + (b.c.g - a.c.g) * u,
+    b: a.c.b + (b.c.b - a.c.b) * u,
+  };
 }
 
 export function rgbCss(c: Rgb, alpha: number): string {

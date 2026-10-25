@@ -147,19 +147,19 @@ describe('useGildedPortrait', () => {
     expect(result.current.params.levels).toBe(100);
     act(() => result.current.setFolds(9.6));
     expect(result.current.params.folds).toBe(4);
-    act(() => result.current.setRamp('antique'));
-    expect(result.current.params.rampId).toBe('antique');
+    act(() => result.current.setRamp('deep'));
+    expect(result.current.params.rampId).toBe('deep');
   });
 
   it('turns the mask off and back on with sensible defaults', () => {
     const { result } = renderHook(() => useGildedPortrait());
-    act(() => result.current.setMaskShape('vignette'));
+    act(() => result.current.setMaskShape('oval'));
     expect(result.current.params.mask.feather).toBeGreaterThan(0);
 
     act(() => result.current.setMaskShape('none'));
     expect(result.current.params.mask).toEqual({ shape: 'none', feather: 0, choke: 0 });
 
-    act(() => result.current.setMaskShape('ellipse'));
+    act(() => result.current.setMaskShape('rounded-rect'));
     expect(result.current.params.mask.feather).toBeGreaterThan(0);
   });
 

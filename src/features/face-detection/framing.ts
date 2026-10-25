@@ -40,8 +40,9 @@ export function cropFromDetection(face: FaceDetection, frame: RasterDimensions):
   if (right === undefined || left === undefined) return null;
   const eyes = { x: ((right.x + left.x) / 2) * frame.width, y: ((right.y + left.y) / 2) * frame.height };
   const apart = Math.hypot((right.x - left.x) * frame.width, (right.y - left.y) * frame.height);
+  // `apart` is derived from the same four numbers, so a finite `apart` above the
+  // minimum already proves the midpoint is finite.
   if (!Number.isFinite(apart) || apart < MIN_EYE_SPAN) return null;
-  if (!Number.isFinite(eyes.x) || !Number.isFinite(eyes.y)) return null;
 
   const shortest = Math.min(frame.width, frame.height);
   const fromEyes = apart * CROP_PER_INTER_OCULAR;

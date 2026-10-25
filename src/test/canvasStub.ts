@@ -11,6 +11,13 @@ function isMeasureText(prop: string): boolean {
   return prop === 'measureText';
 }
 
+/** A transparent image of the requested size, tolerating jsdom's loose argument types. */
+function imageDataOf(w: unknown, h: unknown): ImageData {
+  const width = Number(w);
+  const height = Number(h);
+  return { width, height, data: new Uint8ClampedArray(Math.max(0, width * height * 4)) } as ImageData;
+}
+
 function makeContext(): Context2D {
   const state: Record<string, unknown> = {};
   const results: Record<string, (...args: unknown[]) => unknown> = {
@@ -18,16 +25,8 @@ function makeContext(): Context2D {
     createLinearGradient: () => ({ addColorStop: () => undefined }),
     createRadialGradient: () => ({ addColorStop: () => undefined }),
     createPattern: () => ({}),
-    createImageData: (w: number, h: number) => ({
-      width: w,
-      height: h,
-      data: new Uint8ClampedArray(Math.max(0, w * h * 4)),
-    }),
-    getImageData: (_x: number, _y: number, w: number, h: number) => ({
-      width: w,
-      height: h,
-      data: new Uint8ClampedArray(Math.max(0, w * h * 4)),
-    }),
+    createImageData: (w: unknown, h: unknown) => imageDataOf(w, h),
+    getImageData: (_x: unknown, _y: unknown, w: unknown, h: unknown) => imageDataOf(w, h),
     isPointInPath: () => false,
   };
   return new Proxy({} as Record<string, unknown>, {

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { act, renderHook } from '@testing-library/react';
 import { createRef } from 'react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { SEQUENCE_CHAPTERS } from '../data/sequence';
 import type { PremiereSceneApi } from '../scene/sceneApi';
 import { usePremiereSceneOptions } from './usePremiereSceneOptions';
@@ -192,6 +192,35 @@ describe('usePremiereSceneOptions', () => {
     );
     expect(set.setActiveAct).toHaveBeenCalledWith(4);
     expect(set.setIsPlaying).toHaveBeenCalledWith(true);
+  });
+
+  it('keeps the cinema camera when a hero title is applied from cinema', () => {
+    const { scene, set, hook } = renderOptions();
+    const hero = { keystone: 'THE', preTitle: 'GREAT', mainTitle: 'GATSBY', subCredit: '', pinstripeAlternation: true };
+    act(() => hook.result.current.applyHeroTitle(hero));
+    expect(set.setCameraMode).not.toHaveBeenCalled();
+    expect(scene.calls).not.toContain('setCameraMode:cinema');
+  });
+
+  it('replays without touching the camera while in cinema', () => {
+    const scene = createSceneSpy();
+    const set = {
+      setCameraMode: vi.fn(),
+      setCurrentTime: vi.fn(),
+      setActiveAct: vi.fn(),
+      setIsPlaying: vi.fn(),
+    };
+    const { result } = renderHook(() =>
+      usePremiereTransport({
+        managerRef: { current: scene },
+        audioRef: { current: null },
+        cameraMode: 'cinema',
+        ...set,
+      })
+    );
+    act(() => result.current.replay());
+    expect(set.setCameraMode).not.toHaveBeenCalled();
+    expect(scene.calls).toContain('setTime:0');
   });
 
   it('applies a hero title without a scene', () => {

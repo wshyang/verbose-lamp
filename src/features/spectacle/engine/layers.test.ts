@@ -139,3 +139,15 @@ describe('createLayerRegistry', () => {
     expect(observers).toHaveLength(0);
   });
 });
+
+describe('device pixel ratio without a value', () => {
+  it('falls back to 1 when the browser reports no ratio', () => {
+    installObserver();
+    Object.defineProperty(window, 'devicePixelRatio', { configurable: true, value: 0 });
+    const host = makeHost(400, 300);
+    const registry = createLayerRegistry(host, qualitySettings('high'));
+    const layer = registry.ensure('solid-overlay');
+    expect(layer.canvas.width).toBe(400);
+    expect(layer.canvas.height).toBe(300);
+  });
+});

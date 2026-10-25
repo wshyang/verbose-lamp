@@ -9,6 +9,9 @@ node_modules/
 # Build and test output
 dist/
 coverage/
+# Per-run JSON used for line-level triage (ADDENDUM-028 §1)
+coverage-json/
+coverage-summary/
 test-results/
 playwright-report/
 blob-report/

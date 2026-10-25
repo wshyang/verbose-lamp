@@ -68,6 +68,14 @@ describe('useSpectacleStage', () => {
     expect(hook.result.current.qualityTier).toBeNull();
   });
 
+  it('hands back a stoppable handle when there is no stage yet', async () => {
+    const { hook } = setup({ withHost: false });
+    const handle = hook.result.current.play('sparklers', { count: 2 });
+    expect(() => handle.stop()).not.toThrow();
+    await expect(handle.finished).resolves.toBeUndefined();
+    expect(stageCalls.play).not.toHaveBeenCalled();
+  });
+
   it('forwards play and stopAll to the stage', () => {
     const { hook } = setup();
     act(() => {

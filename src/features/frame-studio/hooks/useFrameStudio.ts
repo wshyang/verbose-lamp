@@ -16,6 +16,7 @@ import {
 } from '@/features/art-deco-frame';
 import { SIGNATURE_GENOME, clampGenome, withGene, type GeneKey } from '@/features/art-deco-frame';
 import { DESIGN_GALLERY, describeDesign, designAt, findDesignEntry } from '../data/frameDesigns';
+import { layerSettingsOf, layerViewOf } from '../model/layerView';
 
 export interface FrameStudioTarget {
   setSequenceFrameStyle: (style: FrameStyle) => void;
@@ -60,7 +61,7 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
 
   const selectPattern = useCallback(
     (source: FrameSource) => {
-      const layers = (formula.layers ?? DEFAULT_FRAME_LAYERS).map((layer) =>
+      const layers = layerSettingsOf(formula).map((layer) =>
         layer.source === source ? { ...layer, enabled: false } : layer
       );
       const level = source === 'authored' ? DEFAULT_FRAME_STYLE.formula.level : formula.level;
@@ -84,7 +85,7 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
 
   const updateLayer = useCallback(
     (source: FrameLayerSource, changes: Partial<Pick<FramePatternLayer, 'enabled' | 'level'>>) => {
-      const layers = (formula.layers ?? DEFAULT_FRAME_LAYERS).map((layer) =>
+      const layers = layerSettingsOf(formula).map((layer) =>
         layer.source === source ? { ...layer, ...changes } : layer
       );
       commitSequence({ ...formula, layers }, intricacy);
@@ -160,17 +161,12 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
   );
 
   const layerOptions = useMemo(() => {
-    const settings = formula.layers ?? DEFAULT_FRAME_LAYERS;
-    return FRAME_LAYER_SOURCES.filter((pattern) => pattern.id !== formula.source).map((pattern) => {
-      const layer = settings.find((entry) => entry.source === pattern.id);
-      return {
-        source: pattern.id,
-        label: pattern.label,
-        blurb: pattern.blurb,
-        enabled: layer?.enabled ?? false,
-        level: layer?.level ?? 2,
-      };
-    });
+    const settings = layerSettingsOf(formula);
+    return FRAME_LAYER_SOURCES.filter((pattern) => pattern.id !== formula.source).map((pattern) => ({
+      ...layerViewOf(settings, pattern.id),
+      label: pattern.label,
+      blurb: pattern.blurb,
+    }));
   }, [formula.layers, formula.source]);
 
   useEffect(() => {

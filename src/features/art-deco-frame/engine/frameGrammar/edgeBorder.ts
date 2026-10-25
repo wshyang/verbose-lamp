@@ -33,7 +33,6 @@ const MAX_REED_PER_RUN = 26;
 const CORNER_FAN_REACH = 0.42;
 const REED_INSET = 0.095;
 const MIN_TICK_LENGTH = 0.008;
-const MIN_RAY_LENGTH = 0.004;
 const CORNER_FAN_ARCS = 3;
 
 function snap(value: number): number {
@@ -52,7 +51,7 @@ function rail(
   return { points, width, depth: Math.max(width * 1.7, 0.012), kind, delay, z, partDir, closed };
 }
 
-function reflectX(specs: PolylineSpec[]): PolylineSpec[] {
+export function reflectX(specs: PolylineSpec[]): PolylineSpec[] {
   return specs.map((spec) => ({
     ...spec,
     points: spec.points.map((point) => ({ x: snap(-point.x), y: point.y })),
@@ -60,7 +59,7 @@ function reflectX(specs: PolylineSpec[]): PolylineSpec[] {
   }));
 }
 
-function reflectY(specs: PolylineSpec[]): PolylineSpec[] {
+export function reflectY(specs: PolylineSpec[]): PolylineSpec[] {
   return specs.map((spec) => ({
     ...spec,
     points: spec.points.map((point) => ({ x: point.x, y: snap(-point.y) })),
@@ -117,11 +116,10 @@ function cornerFan(aspect: number, genome: BaseGenome, density: number): Polylin
   const rails: PolylineSpec[] = [];
 
   for (let index = 0; index < ribs; index += 1) {
-    const fraction = ribs === 1 ? 0 : index / (ribs - 1);
+    const fraction = index / (ribs - 1);
     const angle = baseAngle + fraction * span;
     const length = reach * (1 - fraction * 0.22);
     const end = { x: snap(origin.x + Math.cos(angle) * length), y: snap(origin.y + Math.sin(angle) * length) };
-    if (Math.hypot(end.x - origin.x, end.y - origin.y) < MIN_RAY_LENGTH) continue;
     rails.push(rail([origin, end], 0.009, 'ray', 0.16 + fraction * 0.05, -0.02, -1));
   }
 
@@ -139,7 +137,6 @@ function cornerFan(aspect: number, genome: BaseGenome, density: number): Polylin
       const level = genome.fractalDepth - twoAdicValuation(k);
       if (level === 0) continue;
       const length = reach * Math.pow(genome.fractalRatio, level);
-      if (length < MIN_RAY_LENGTH) continue;
       const angle = baseAngle + (span * k) / slots;
       rails.push(
         rail([origin, { x: snap(origin.x + Math.cos(angle) * length), y: snap(origin.y + Math.sin(angle) * length) }], 0.009 * Math.pow(0.72, level), 'ray', 0.2 + level * 0.02, -0.04, -1)
@@ -178,10 +175,9 @@ function reeding(aspect: number, genome: BaseGenome, density: number): PolylineS
   // into all four runs, so every edge is reeded identically.
   const buildRun = (toPoint: (t: number) => Point2, direction: Point2, lengthAt: (t: number) => number): PolylineSpec[] =>
     Array.from({ length: count }, (_, index) => {
-      const t = count === 1 ? 0 : index / (count - 1);
+      const t = index / (count - 1);
       const from = toPoint(t);
       const length = lengthAt(t);
-      if (length < MIN_TICK_LENGTH) return null;
       return rail(
         [from, { x: snap(from.x + direction.x * length), y: snap(from.y + direction.y * length) }],
         index % 2 === 0 ? 0.007 : 0.004,
@@ -190,7 +186,7 @@ function reeding(aspect: number, genome: BaseGenome, density: number): PolylineS
         -0.01,
         1
       );
-    }).filter((spec): spec is PolylineSpec => spec !== null);
+    });
 
   const vertical = buildRun(
     (t) => ({ x: runStart + (aspect - 2 * runStart) * t, y: 1 - REED_INSET }),
@@ -209,22 +205,21 @@ function reeding(aspect: number, genome: BaseGenome, density: number): PolylineS
 
   // Recursion: a half-height sub-tick midway between ticks.
   if (genome.fractalDepth > 0) {
-    const subdivide = (run: PolylineSpec[], along: 'x' | 'y', span: number): PolylineSpec[] =>
+    // Only the vertical run has teeth tall enough to split: its ticks stand on y,
+    // so a horizontal run would subdivide into zero-height stubs and is skipped.
+    const subdivide = (run: PolylineSpec[]): PolylineSpec[] =>
       run.slice(0, Math.max(0, run.length - 1)).flatMap((spec) => {
         const [start] = spec.points;
         const height = Math.abs(start.y - spec.points[1].y) * genome.fractalRatio;
         if (height < MIN_TICK_LENGTH) return [];
-        const step = (span / Math.max(1, count - 1)) * 0.5;
-        const point =
-          along === 'x' ? { x: snap(start.x + step), y: start.y } : { x: start.x, y: snap(start.y - step) };
-        const tip =
-          along === 'x' ? { x: point.x, y: snap(point.y - height) } : { x: snap(point.x - height), y: point.y };
+        const step = ((aspect - 2 * runStart) / Math.max(1, count - 1)) * 0.5;
+        const point = { x: snap(start.x + step), y: start.y };
+        const tip = { x: point.x, y: snap(point.y - height) };
         return [rail([point, tip], spec.width * 0.7, 'rule', spec.delay + 0.02, spec.z - 0.01, 1)];
       });
 
-    for (const run of [subdivide(vertical, 'x', aspect - 2 * runStart), subdivide(horizontal, 'y', 1 - 2 * runStart)]) {
-      rails.push(...run, ...reflectX(run), ...reflectY(run), ...reflectY(reflectX(run)));
-    }
+    const refinement = subdivide(vertical);
+    rails.push(...refinement, ...reflectX(refinement), ...reflectY(refinement), ...reflectY(reflectX(refinement)));
   }
   return rails;
 }
