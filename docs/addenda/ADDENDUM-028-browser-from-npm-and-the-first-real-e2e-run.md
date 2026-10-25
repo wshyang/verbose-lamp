@@ -152,7 +152,7 @@ The bloom is visibly different — `postprocessing`'s mipmap blur is a different
 
 - `npx tsc --noEmit` → clean.
 - `npm test` → **1,200 tests in 157 files**, all green; statements 6127/6127, branches 2175/2175, functions 1426/1426, lines 5426/5426 — **100% on all four**.
-- `npm run build` → clean, 1,734.46 kB / 566.41 kB gzip (the port's bundle, unchanged by this addendum).
+- `npm run build` → clean, 1,734.46 kB / 566.41 kB gzip (the port's bundle, unchanged by this addendum). *(Corrected by ADDENDUM-030 §5: that figure included CSS harvested from reference checkouts and from the previous `dist/`; the stylesheet now depends on `src/` alone and the bundle is 1,706.78 kB / 562.23 kB gzip, so the port's true cost is +115.7 kB gzip rather than +120 kB.)*
 - `npx playwright test e2e/flows.spec.ts --project=desktop-chromium --workers=1` → **8/8**, 4.4 min.
 - `… --project=mobile-chromium --workers=1` → **8/8**, 4.3 min, after §4.3.
 - Twelve old-vs-new likeness comparisons → **0 differing pixels** at the gate's comparator settings, **0 page errors** in either build (§5).

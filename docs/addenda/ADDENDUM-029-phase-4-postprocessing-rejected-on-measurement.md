@@ -38,7 +38,7 @@ Nothing was merged. The two dependencies were removed, `package.json` and `packa
 
 - **Closed:** the `postprocessing` half of Phase 4. Re-open only if the visual contract itself changes (its own addendum) — not to revisit a measured 10× miss.
 - **Closed by ADDENDUM-027 §5:** the drei half. drei was installed per the plan, then dropped for three's own `OrbitControls`; nothing in Phase 4 needs it back.
-- **Still open, deliberately:** Playwright shots of `features/avatar-studio`'s cut-out and gilding output. That is new test surface rather than a swap, it needs sample photographs as fixtures, and it is not a port question. It belongs in its own addendum.
+- **Closed by ADDENDUM-030** (was: still open, deliberately): Playwright shots of `features/avatar-studio`'s cut-out and gilding output. That is new test surface rather than a swap, it needs sample photographs as fixtures, and it is not a port question. It belongs in its own addendum.
 - The numbers from the shipped chain — 95 draws and 16 clears per frame, identical to the pre-port build — are in ADDENDUM-028 §5.3, and they are the reason this rejection is a rejection of the *chain*, not of the port: the port costs no extra GPU work.
 
 ## 5. Validation
