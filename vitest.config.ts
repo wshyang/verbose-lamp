@@ -85,6 +85,7 @@ export default defineConfig({
         'src/features/deco-lattice/model/nineSlice.ts': FULL,
         'src/features/deco-lattice/model/motifs.ts': FULL,
         'src/features/deco-lattice/model/tone.ts': FULL,
+        'src/features/spectacle/model/sparklerPlan.ts': FULL,
         'src/shared/lib/svgExport.ts': FULL,
         'src/features/art-deco-frame/engine/frameGrammar/latticeSource.ts': FULL,
         'src/features/frame-studio/model/patternSeed.ts': FULL,
