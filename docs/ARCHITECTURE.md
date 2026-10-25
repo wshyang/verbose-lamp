@@ -36,10 +36,11 @@ src/
     spectacle-preview/          # Docked console that drives the spectacle effects
     title-customizer/           # Presets, normalization, and editor dialog
   shared/
-    hooks/                      # useReducedMotion
-    ui/                         # Button, IconButton, RangeInput, Dialog
+    hooks/                      # useReducedMotion, useEscapeKey, useDialogFocus
+    ui/                         # Button, IconButton, RangeInput, Dialog, CornerBrackets
     lib/                        # Small framework-neutral utilities
       random.ts                 # Seeded PRNG (mulberry32, hash01) and crypto pick
+      svgExport.ts              # SVG/PNG download shared by the QR code and Deco Lattice
       raster/                   # RgbaImage/AlphaMask contracts, resample, morphology
 ```
 
@@ -52,8 +53,10 @@ supported import surface; internal files should remain private to that feature.
 - `src/App.tsx` is intentionally thin. `src/app/GatsbyPremiere.tsx` composes the
   screen and connects feature APIs; it does not implement playback or geometry.
 - `features/premiere` owns the five-act sequence, camera/audio controls, and the
-  scene lifecycle. React UI talks to the typed controller rather than reaching
-  into Three.js objects.
+  scene lifecycle. The scene is a React Three Fiber tree (`scene3d/`) driven by a
+  zustand store; pure seams (`scene/`: choreography, orbit focus, style clamps, the
+  playback clock) hold the maths. React UI talks to the typed controller and the
+  `PremiereSceneApi` port, never to Three.js objects.
 - `features/art-deco-frame` owns reusable frame grammar, genome data, beveled
   rail geometry, typography glyphs, and materials. It has no timeline or HUD.
 - `features/frame-studio` owns editor state and control presentation. Its hook
@@ -143,3 +146,11 @@ The three.js renderer is deliberately isolated from normal feature UI. A new app
 can reuse the QR generator, title customizer, research dialog, or frame studio
 without mounting the premiere canvas; a frame-based experience can reuse the
 Art Deco engine through its typed exports.
+
+## Limits
+
+Functions stay within 50 lines, 3 parameters and nesting 3; files within 800 lines.
+`src/discipline.test.ts` enforces this over the whole tree as a ratchet, and
+`src/test/disciplineBaseline.ts` is the live record of what is still over (ADDENDUM-034).
+Splitting a feature along its seams (a pure `model/` module, a hook that decides, small
+components that render) is how that debt is paid; the recorded number only goes down.

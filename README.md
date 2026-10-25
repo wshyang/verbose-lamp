@@ -7,7 +7,7 @@ QR generator, a gilded avatar studio, and a research dossier.
 
 There is no backend, database, auth, or persistence.
 
-**Stack:** React 19, TypeScript 5, Vite 7, Tailwind CSS 4, Three.js r186, Vitest.
+**Stack:** React 19, TypeScript 5, Vite 7, Tailwind CSS 4, Three.js r186 through React Three Fiber, zustand, Vitest.
 
 ## Quick start
 
@@ -28,10 +28,11 @@ WebGL support. No `.env` or secrets are needed.
 | `npm run dev` | Start the Vite dev server with hot reload |
 | `npm run build` | Production build into `dist/` (a single self-contained HTML file, via `vite-plugin-singlefile`) |
 | `npm run preview` | Serve the built `dist/` locally to check the production bundle |
-| `npm test` | Run the Vitest unit tests once (`vitest run`, node environment) |
+| `npm test` | Run the Vitest tests once (`vitest run`; DOM suites opt in to jsdom per file) |
+| `npm run test:coverage` | The same run with the coverage gate (logic surface, ratcheted floors) |
 | `npx tsc --noEmit` | Type-check the whole project |
 
-Before calling a change done, run `npx tsc --noEmit`, `npm test`, and `npm run build`.
+Before calling a change done, run `npx tsc --noEmit`, `npm test`, `npm run test:coverage` and `npm run build`.
 
 ## Using the app
 
@@ -51,8 +52,8 @@ Controls:
 
 The app is client-only, but a few things load from the network:
 
-- **Fonts:** Cinzel, Cormorant Garamond, Marcellus and Poiret One from Google Fonts
-  (`index.html`). Offline, the browser falls back to system fonts.
+- **Fonts:** none. The faces are self-hosted through `@fontsource` (`src/app/fonts.ts`) and the
+  app mounts only once they are ready, so offline visits keep their typography.
 - **Avatar Studio models:** face detection (MediaPipe Tasks Vision and the BlazeFace model)
   and background removal (Hugging Face Transformers) are fetched from jsDelivr and Google
   storage (see `src/features/face-detection/locateFace.ts` and
@@ -88,7 +89,10 @@ Unit tests sit beside the module they cover (`foo.ts` + `foo.test.ts`) and run i
 node environment (`vitest.config.ts`, deliberately separate from `vite.config.ts`). Pure
 logic such as frame grammar, timing math, and image pipelines is tested; geometry is
 protected by snapshot tests on data, not pixels. Three.js and DOM rendering code is kept
-thin and is not unit-tested. Playwright e2e is deferred (see ADDENDUM-001).
+thin; jsdom and headless-scene tests cover its wiring, never its pixels. `npm run
+test:coverage` gates the logic surface (excludes are stated by rule in `vitest.config.ts`).
+`src/discipline.test.ts` holds the function and file limits as a ratchet (ADDENDUM-034).
+Playwright e2e is deferred (see ADDENDUM-001).
 
 ## Contributing conventions
 

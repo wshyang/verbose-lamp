@@ -10,7 +10,7 @@
  * way everywhere.
  */
 
-export type DebtReason = 'component' | 'render-rig' | 'geometry-primitive' | 'feature-hook' | 'logic-orchestrator';
+export type DebtReason = 'component' | 'render-rig' | 'geometry-primitive' | 'logic-orchestrator';
 
 export const REASON_TEXT: Record<DebtReason, string> = {
   component:
@@ -19,8 +19,6 @@ export const REASON_TEXT: Record<DebtReason, string> = {
     'A three.js rig from the original import. Its behaviour is pinned by geometry goldens and, since ADDENDUM-029, by headless scene tests. Split when next touched substantively (ADDENDUM-001 §4).',
   'geometry-primitive':
     'A geometry primitive whose parameters are drawing coordinates. A single options object would rename every call site and hide the coordinates being passed; the length is the shape of the drawing, not tangled control flow.',
-  'feature-hook':
-    'A feature hook that composes several domains (session, analysis, export). Linear, and each phase has its own tests; splitting it would only move the composition elsewhere.',
   'logic-orchestrator':
     'A linear orchestrator left from the original import. Pure code motion is safe here but has not been the highest-value work; recorded so it cannot grow.',
 };
