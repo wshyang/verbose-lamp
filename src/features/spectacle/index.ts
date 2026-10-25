@@ -11,5 +11,6 @@ export type {
   NormPoint,
   NormRect,
   QualityTier,
+  SparklerParams,
   SpectacleStage,
 } from './model/types';

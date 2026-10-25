@@ -12,6 +12,7 @@ import { EventNightLauncher } from '@/features/event-night';
 import type { CameraMode } from '@/features/premiere';
 import { Button, IconButton } from '@/shared/ui';
 import { cn } from '@/shared/lib/cn';
+import { PremiereEffectsDock } from './PremiereEffectsDock';
 
 interface PremiereHeaderProps {
   cameraMode: CameraMode;
@@ -63,6 +64,7 @@ export function PremiereHeader({
           <span className="hidden sm:inline">Customize Title</span>
           <span className="sm:hidden">Custom</span>
         </Button>
+        <PremiereEffectsDock />
         <QrGeneratorLauncher />
         <AvatarStudioLauncher />
         <EventNightLauncher onOpen={onOpenEventNight} />

@@ -2,6 +2,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import { SpectacleProvider } from '@/features/spectacle';
 import { PremiereHeader } from './PremiereHeader';
 
 function renderHeader(overrides: Partial<Parameters<typeof PremiereHeader>[0]> = {}) {
@@ -13,15 +14,19 @@ function renderHeader(overrides: Partial<Parameters<typeof PremiereHeader>[0]> =
     onToggleNitrate: vi.fn(),
     onToggleSound: vi.fn(),
   };
+  // The header hosts the spectacle console and the sparkler button, so it needs
+  // its provider — the same one the premiere mounts.
   render(
-    <PremiereHeader
-      cameraMode="cinema"
-      nitrateMode={false}
-      soundOn={false}
-      hudHidden={false}
-      {...handlers}
-      {...overrides}
-    />
+    <SpectacleProvider className="relative h-dvh">
+      <PremiereHeader
+        cameraMode="cinema"
+        nitrateMode={false}
+        soundOn={false}
+        hudHidden={false}
+        {...handlers}
+        {...overrides}
+      />
+    </SpectacleProvider>
   );
   return handlers;
 }
@@ -69,6 +74,7 @@ describe('PremiereHeader', () => {
 
   it('labels the sound button by what it will do', () => {
     const { unmount } = render(
+      <SpectacleProvider>
       <PremiereHeader
         cameraMode="cinema"
         nitrateMode={false}
@@ -81,6 +87,7 @@ describe('PremiereHeader', () => {
         onToggleNitrate={vi.fn()}
         onToggleSound={vi.fn()}
       />
+      </SpectacleProvider>
     );
     expect(screen.getByTestId('premiere-header__sound').getAttribute('aria-label')).toBe(
       'Enable sound'
@@ -88,6 +95,7 @@ describe('PremiereHeader', () => {
     unmount();
 
     render(
+      <SpectacleProvider>
       <PremiereHeader
         cameraMode="cinema"
         nitrateMode={false}
@@ -100,6 +108,7 @@ describe('PremiereHeader', () => {
         onToggleNitrate={vi.fn()}
         onToggleSound={vi.fn()}
       />
+      </SpectacleProvider>
     );
     expect(screen.getByTestId('premiere-header__sound').getAttribute('aria-label')).toBe(
       'Mute sound'

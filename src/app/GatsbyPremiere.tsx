@@ -7,6 +7,7 @@ import {
   usePremiereController,
   usePremiereShortcuts,
 } from '@/features/premiere';
+import { SpectacleProvider } from '@/features/spectacle';
 import { CinematicStage } from './components/CinematicStage';
 import { FloatingHudToggle } from './components/FloatingHudToggle';
 import { FrameStudioDock } from './components/FrameStudioDock';
@@ -37,6 +38,9 @@ export function GatsbyPremiere({ onOpenEventNight }: GatsbyPremiereProps) {
 
   return (
     <main className="relative h-dvh w-screen select-none overflow-hidden bg-[#050407]">
+      {/* One spectacle host for the whole premiere: the console, the sparkler
+          button and the lucky draw all play onto it (ADDENDUM-027). */}
+      <SpectacleProvider className="absolute inset-0 overflow-hidden">
       <CinematicStage
         mountRef={premiere.stageRef}
         cameraMode={premiere.cameraMode}
@@ -79,6 +83,7 @@ export function GatsbyPremiere({ onOpenEventNight }: GatsbyPremiereProps) {
         onApply={premiere.applyHeroTitle}
         onClose={closeCustomizer}
       />
+      </SpectacleProvider>
     </main>
   );
 }

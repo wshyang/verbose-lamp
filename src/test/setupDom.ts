@@ -14,7 +14,35 @@ export function hasDom(): boolean {
   return typeof document !== 'undefined';
 }
 
+/** jsdom has no media queries. Components read two of them; stub both as "off". */
+function installMatchMedia(): void {
+  if (typeof window === 'undefined' || typeof window.matchMedia === 'function') return;
+  window.matchMedia = (query: string): MediaQueryList =>
+    ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addEventListener: () => undefined,
+      removeEventListener: () => undefined,
+      addListener: () => undefined,
+      removeListener: () => undefined,
+      dispatchEvent: () => false,
+    }) as unknown as MediaQueryList;
+}
+
+/** jsdom has no ResizeObserver; the spectacle stage observes its host. */
+function installResizeObserver(): void {
+  if (typeof globalThis.ResizeObserver === 'function') return;
+  globalThis.ResizeObserver = class {
+    observe(): void {}
+    unobserve(): void {}
+    disconnect(): void {}
+  } as unknown as typeof ResizeObserver;
+}
+
 if (hasDom()) {
+  installMatchMedia();
+  installResizeObserver();
   const { cleanup } = await import('@testing-library/react');
   const { afterEach } = await import('vitest');
   afterEach(() => cleanup());

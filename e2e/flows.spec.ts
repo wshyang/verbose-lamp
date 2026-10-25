@@ -68,11 +68,11 @@ test.describe('premiere flows', () => {
     await expect(page.getByTestId('spectacle-preview__panel')).toBeHidden();
   });
 
-  test('the sparkler button lights sparklers and reports them', async ({ page }) => {
-    await page.getByTestId('sparkler-launcher__toggle').click();
-    await expect(page.getByTestId('sparkler-launcher__overlay')).toBeVisible();
-    await page.getByTestId('sparkler-launcher__light').click();
-    await expect(page.getByTestId('spectacle-layer__announcement')).not.toHaveText('');
+  test('the sparkler button lights sparklers and announces them', async ({ page }) => {
+    await page.getByTestId('party-sparklers__launch').click();
+    await expect(page.getByTestId('party-sparklers__overlay')).toBeVisible();
+    await page.getByTestId('party-sparklers__light').click();
+    await expect(page.getByTestId('spectacle-layer__announcement')).toHaveText('Sparklers lit');
   });
 
   test('Dinner & Dance switches screens and Back returns', async ({ page }) => {
