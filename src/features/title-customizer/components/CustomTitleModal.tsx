@@ -41,7 +41,7 @@ export const CustomTitleModal: React.FC<CustomTitleModalProps> = ({
       onClose={onClose}
       labelledBy="title-customizer__title"
       className="relative w-full max-w-lg border border-[#d4af37]/50 bg-[#09070c]/95 p-6 shadow-[0_0_70px_rgba(212,175,55,0.2)] sm:p-7"
-      backdropClassName="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-md"
+      backdropClassName="fixed inset-0 z-[80] flex items-center justify-center bg-black/75 p-4 backdrop-blur-md"
       testId="title-customizer__dialog"
     >
         <span className="pointer-events-none absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-[#f8e29b]/70" />

@@ -127,3 +127,36 @@ describe('viewport edge border', () => {
     expect(viewportScaleAtDistance(3, Math.PI / 3)).toBeCloseTo(3 * Math.tan(Math.PI / 6), 10);
   });
 });
+
+describe('edge border recursion and limits', () => {
+  const border = (aspect: number, density: number, genome: BaseGenome = SIGNATURE_GENOME) =>
+    buildEdgeBorder({ aspect, genome, density });
+
+  it('adds ruler ribs and sub-ticks once recursion is on', () => {
+    const flat = border(1.78, 0.8);
+    const recursive = border(1.78, 0.8, withGene(SIGNATURE_GENOME, 'fractalDepth', 2));
+    expect(recursive.specs.length).toBeGreaterThan(flat.specs.length);
+  });
+
+  it('keeps every rail finite for extreme genes', () => {
+    const extreme = withGene(
+      withGene(SIGNATURE_GENOME, 'rayDensity', 1.8),
+      'fractalRatio',
+      0.2,
+    );
+    const { specs } = border(0.5, 1, withGene(extreme, 'fractalDepth', 3));
+    expect(specs.length).toBeGreaterThan(0);
+    for (const spec of specs) {
+      for (const point of spec.points) {
+        expect(Number.isFinite(point.x)).toBe(true);
+        expect(Number.isFinite(point.y)).toBe(true);
+      }
+    }
+  });
+
+  it('clamps the aspect and density into their documented ranges', () => {
+    expect(border(99, 5).extentX).toBeLessThanOrEqual(3.2);
+    expect(border(0.1, -5).extentX).toBeLessThanOrEqual(0.5);
+    expect(border(0.1, -5).specs.length).toBeLessThan(border(99, 5).specs.length);
+  });
+});

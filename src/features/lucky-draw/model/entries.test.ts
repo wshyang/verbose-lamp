@@ -23,3 +23,10 @@ describe('validateEntries', () => {
     expect(pool.map((e) => e.id)).toEqual(['buchanan-d']);
   });
 });
+describe('validateEntries without an id', () => {
+  it('reports a missing id', () => {
+    const result = validateEntries([gatsby, { id: '', name: 'Anonymous' }]);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.issues).toContain('An entry is missing its id.');
+  });
+});

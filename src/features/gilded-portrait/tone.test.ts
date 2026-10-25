@@ -36,6 +36,13 @@ describe('tone operations', () => {
     expect(Array.from(adjusted)).toEqual([0, expect.closeTo(Math.sqrt(0.5), 5), 1]);
   });
 
+  it('returns a copy when the buffer does not match the declared shape', () => {
+    const source = new Float32Array([0, 0.5, 1]);
+    const blurred = boxBlur(source, { width: 4, height: 3, radius: 2 });
+    expect(Array.from(blurred)).toEqual(Array.from(source));
+    expect(blurred).not.toBe(source);
+  });
+
   it('preserves the mean while blurring with a separable box filter', () => {
     const source = new Float32Array([0, 0.1, 0.85, 0.2, 0.4, 1, 0.6, 0.3, 0.75, 0.05, 0.2, 0.9]);
     const blurred = boxBlur(source, { width: 4, height: 3, radius: 2 });

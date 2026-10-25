@@ -20,6 +20,11 @@ export interface CinemaCameraPose {
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
+/** Coarse-pointer devices get the mobile auto-level framing (ADDENDUM-012). */
+export function detectCoarsePointer(): boolean {
+  return window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
+}
+
 export function resolveViewportFit(width: number, height: number, hasCoarsePointer: boolean): ViewportFit {
   const safeWidth = Math.max(1, width);
   const safeHeight = Math.max(1, height);

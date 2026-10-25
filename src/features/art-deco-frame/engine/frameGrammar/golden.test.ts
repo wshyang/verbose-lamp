@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { buildFrameSpecs } from './index';
+import { buildAuthoredFrame, buildFrameSpecs } from './index';
+import { SIGNATURE_GENOME } from './genome';
+import { FILM_BASELINE_INTRICACY } from './types';
 import { FrameArchetype } from '../../model/types';
 
 /**
@@ -39,4 +41,12 @@ describe('golden frame geometry (Film Baseline)', () => {
       expect(toGeometryOnly(specs)).toMatchSnapshot();
     });
   }
+});
+
+describe('authored frame defaults', () => {
+  it('defaults to the film baseline intricacy', () => {
+    expect(buildAuthoredFrame('diamond_gateway', 5.4, SIGNATURE_GENOME)).toEqual(
+      buildAuthoredFrame('diamond_gateway', 5.4, SIGNATURE_GENOME, FILM_BASELINE_INTRICACY),
+    );
+  });
 });

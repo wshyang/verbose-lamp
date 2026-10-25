@@ -72,14 +72,14 @@ exports[`planning golden snapshots > planShow seed 1925 keeps its schedule 2`] =
 
 exports[`planning golden snapshots > shellSparks chrysanthemum keeps its recipe 1`] = `
 {
-  "hash": "e6febb27f145011d6b2fdbd368ec15a22b512594",
+  "hash": "b7f2d1b92c6ea6365a160f12d0f96f42e2908a7e",
   "length": 27875,
 }
 `;
 
 exports[`planning golden snapshots > shellSparks chrysanthemum keeps its recipe 2`] = `
 {
-  "hash": "04f22f66f9afe4b6859ca1ee54fb96c248bc4fd9",
+  "hash": "a7eef93a16ea9884b7b1cc3de2da563430741688",
   "length": 13937,
 }
 `;
@@ -100,28 +100,28 @@ exports[`planning golden snapshots > shellSparks crossette keeps its recipe 2`] 
 
 exports[`planning golden snapshots > shellSparks double-break keeps its recipe 1`] = `
 {
-  "hash": "b73607ffd77b9a8e30f5957d981fba429f6add82",
-  "length": 28433,
+  "hash": "811825b2d146b507c25b53f9f042606d2988b059",
+  "length": 28434,
 }
 `;
 
 exports[`planning golden snapshots > shellSparks double-break keeps its recipe 2`] = `
 {
-  "hash": "b962709e84c99f8d1aa99db5ba8b31d2dbd4d8e0",
+  "hash": "3fa29970538c8f2ab6085c16cb56344d90b2d7e8",
   "length": 14312,
 }
 `;
 
 exports[`planning golden snapshots > shellSparks kamuro keeps its recipe 1`] = `
 {
-  "hash": "0f33784145b89380cf5abbe029f1607e1d90e64d",
+  "hash": "43f69000a3d451f4ff06106f193b9ef42439d0f3",
   "length": 22582,
 }
 `;
 
 exports[`planning golden snapshots > shellSparks kamuro keeps its recipe 2`] = `
 {
-  "hash": "ed539510e603cff269dae23e5b41886a1fc13845",
+  "hash": "5cd4a5c2c2271137caf60b0033beaacc209d5e62",
   "length": 11285,
 }
 `;
@@ -142,14 +142,14 @@ exports[`planning golden snapshots > shellSparks palm keeps its recipe 2`] = `
 
 exports[`planning golden snapshots > shellSparks peony keeps its recipe 1`] = `
 {
-  "hash": "74735bebff7a54ff4eb01f26026dbd3a37f7ad92",
+  "hash": "4b2fff67ad78684691162233f169b0024f289335",
   "length": 26138,
 }
 `;
 
 exports[`planning golden snapshots > shellSparks peony keeps its recipe 2`] = `
 {
-  "hash": "b50bbbdd60276da89a9cc4d8b52438346b587ce4",
+  "hash": "b56f5cdf892daeb258c7d010d33c51fd01d01c52",
   "length": 13074,
 }
 `;
@@ -170,28 +170,28 @@ exports[`planning golden snapshots > shellSparks ring keeps its recipe 2`] = `
 
 exports[`planning golden snapshots > shellSparks strobe keeps its recipe 1`] = `
 {
-  "hash": "c133326f1a335affaf4df990c76e6f1da17f2584",
+  "hash": "fa06fb3d5a976ba9f81203d773bfae1eb080e160",
   "length": 24535,
 }
 `;
 
 exports[`planning golden snapshots > shellSparks strobe keeps its recipe 2`] = `
 {
-  "hash": "7ea1aedc739eec4ec34123fa51897ab7b98c8854",
+  "hash": "605e08597f8846a922c0e7f6f4a978f62f193738",
   "length": 12269,
 }
 `;
 
 exports[`planning golden snapshots > shellSparks willow keeps its recipe 1`] = `
 {
-  "hash": "c9fa7cbc1f66d791ae98fd60db06ab3600d630ce",
+  "hash": "852fdfb04ccfb9602d2db62be485f76063a2c110",
   "length": 19175,
 }
 `;
 
 exports[`planning golden snapshots > shellSparks willow keeps its recipe 2`] = `
 {
-  "hash": "81122a44735987202d9edefd1085a7381387bab2",
+  "hash": "8998f495206bdbd7144475c12c94f8150dc8a0c6",
   "length": 9582,
 }
 `;

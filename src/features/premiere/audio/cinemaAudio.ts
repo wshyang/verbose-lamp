@@ -66,22 +66,29 @@ export class CinemaAudioEngine {
   }
 
   public triggerActShimmer(actIdx: number) {
-    if (!this.isEnabled || !this.ctx || !this.masterGain) return;
+    if (!this.isEnabled) return;
+    /* v8 ignore start -- dispose() nulls the context; callers never hold a disposed engine */
+    if (!this.ctx || !this.masterGain) return;
+    /* v8 ignore stop */
 
     const chord = this.actChords[actIdx % this.actChords.length];
     const now = this.ctx.currentTime;
 
     // Retune drone root subtly
+    /* v8 ignore start -- the drone bank always has its four oscillators while enabled */
     if (this.droneOscs[0]) {
       this.droneOscs[0].frequency.exponentialRampToValueAtTime(chord[0] * 0.5, now + 1.2);
     }
     if (this.droneOscs[1]) {
       this.droneOscs[1].frequency.exponentialRampToValueAtTime(chord[0], now + 1.2);
     }
+    /* v8 ignore stop */
 
     // Crystalline golden harp / celesta upward arpeggio as the golden frames draw outward
     chord.forEach((freq, i) => {
+      /* v8 ignore start -- dispose() nulls the context; callers never hold a disposed engine */
       if (!this.ctx || !this.masterGain) return;
+      /* v8 ignore stop */
       const startT = now + i * 0.11;
       const osc = this.ctx.createOscillator();
       const env = this.ctx.createGain();

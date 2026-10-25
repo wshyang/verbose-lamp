@@ -38,3 +38,11 @@ describe('planSpin', () => {
     expect(Math.abs(landed - 1)).toBeLessThan(1e-6);
   });
 });
+describe('spin profile at the edges', () => {
+  it('holds the start position before the drum moves', () => {
+    const profile = planSpin({ startP: 0.2, winnerIndex: 7, n: 30 });
+    expect(profile.positionAt(0)).toBe(0.2);
+    expect(profile.positionAt(-50)).toBe(0.2);
+    expect(profile.velocityAt(0)).toBe(0);
+  });
+});

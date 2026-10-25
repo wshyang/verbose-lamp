@@ -137,3 +137,18 @@ describe('jewel finishes lifted from implementation B (ADDENDUM-019)', () => {
     expect(spread(0.9)).toBeGreaterThan(spread(0) * 1.05);
   });
 });
+
+describe('renderEnamelPanel edge cases', () => {
+  it('paints a single band of enamel', () => {
+    const single = { ...emeraldSunburst.spec, bands: 1 };
+    const panel = renderEnamelPanel(single, 16);
+    expect(panel.image.width).toBe(16);
+    expect(panel.image.data.length).toBe(16 * 16 * 4);
+  });
+
+  it('needs no neighbour on a one-pixel panel', () => {
+    const panel = renderEnamelPanel(emeraldSunburst.spec, 1);
+    expect(panel.image.data.length).toBe(4);
+    expect(panel.metal?.data.length).toBe(1);
+  });
+});

@@ -63,8 +63,7 @@ export function Dialog({
     }
     if (event.key !== 'Tab') return;
 
-    const dialog = dialogRef.current;
-    if (!dialog) return;
+    const dialog = event.currentTarget;
     const focusable = getFocusableElements(dialog);
     if (focusable.length === 0) {
       event.preventDefault();

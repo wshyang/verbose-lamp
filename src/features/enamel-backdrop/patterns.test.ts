@@ -177,3 +177,11 @@ describe('spec edits', () => {
     expect(ENAMEL_PALETTES).toHaveLength(10);
   });
 });
+
+describe('fieldAt rejects an unwired pattern', () => {
+  it('throws with the pattern in the message', () => {
+    expect(() =>
+      fieldAt({ x: 0, y: 0 }, { size: 8, bands: 3 }, { kind: 'lace' } as unknown as BackdropPattern),
+    ).toThrow(/Unhandled backdrop pattern/);
+  });
+});

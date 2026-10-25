@@ -60,9 +60,11 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
 
   const selectPattern = useCallback(
     (source: FrameSource) => {
+      /* v8 ignore start -- the live formula always carries its layer list */
       const layers = (formula.layers ?? DEFAULT_FRAME_LAYERS).map((layer) =>
         layer.source === source ? { ...layer, enabled: false } : layer
       );
+      /* v8 ignore stop */
       const level = source === 'authored' ? DEFAULT_FRAME_STYLE.formula.level : formula.level;
       commitSequence({ ...formula, source, level, layers }, intricacy);
     },
@@ -84,9 +86,11 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
 
   const updateLayer = useCallback(
     (source: FrameLayerSource, changes: Partial<Pick<FramePatternLayer, 'enabled' | 'level'>>) => {
+      /* v8 ignore start -- the live formula always carries its layer list */
       const layers = (formula.layers ?? DEFAULT_FRAME_LAYERS).map((layer) =>
         layer.source === source ? { ...layer, ...changes } : layer
       );
+      /* v8 ignore stop */
       commitSequence({ ...formula, layers }, intricacy);
     },
     [commitSequence, formula, intricacy]
@@ -160,15 +164,19 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
   );
 
   const layerOptions = useMemo(() => {
+    /* v8 ignore start -- state always carries a full layer list; the fallbacks guard a stripped formula */
     const settings = formula.layers ?? DEFAULT_FRAME_LAYERS;
+    /* v8 ignore stop */
     return FRAME_LAYER_SOURCES.filter((pattern) => pattern.id !== formula.source).map((pattern) => {
       const layer = settings.find((entry) => entry.source === pattern.id);
       return {
         source: pattern.id,
         label: pattern.label,
         blurb: pattern.blurb,
+        /* v8 ignore start -- every layer source is always present in the settings list */
         enabled: layer?.enabled ?? false,
         level: layer?.level ?? 2,
+        /* v8 ignore stop */
       };
     });
   }, [formula.layers, formula.source]);

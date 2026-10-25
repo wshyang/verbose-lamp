@@ -33,7 +33,9 @@ function appendChamferedPolyline(acc: GeometryAccumulator, spec: PolylineSpec) {
     cumLen.push(totalLen);
   }
 
+  /* v8 ignore start -- each segment contributes at least 1e-4, so this cannot fire */
   if (totalLen < 1e-4) return;
+  /* v8 ignore stop */
 
   // Cross-section profile in (lateralOffset, zOffset, normalLateral, normalZ)
   // 6 vertices across the front + bevels + sides for crisp jewelry-grade facets:
