@@ -8,6 +8,8 @@ node_modules/
 
 # Build and test output
 dist/
+# Production build served as a sandbox preview; the tracked artefact is dist/index.html
+dist-preview/
 coverage/
 # Per-run JSON used for line-level triage (ADDENDUM-028 §1)
 coverage-json/
