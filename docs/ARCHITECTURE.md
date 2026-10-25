@@ -140,7 +140,12 @@ header or timeline into another product simply to reuse a button or modal.
    primitive only when it is useful to more than one feature.
 5. Record architectural or behavior decisions in the sequential addenda register.
 
-The three.js renderer is deliberately isolated from normal feature UI. A new app
-can reuse the QR generator, title customizer, research dialog, or frame studio
-without mounting `GatsbySceneManager`; a frame-based experience can reuse the
-Art Deco engine through its typed exports.
+The three.js renderer is deliberately isolated from normal feature UI. Since
+ADDENDUM-031 the premiere renders through React Three Fiber: a zustand store
+(`scene3d/premiereStore`) behind the same `PremiereSceneApi` port the hooks
+already drove, one small component per concern under `scene3d/` (clock,
+camera, title cards, atmosphere, post), GLSL under `scene3d/shaders/`, and the
+heavy geometry/texture builders kept imperative under `scene/`. A new app can
+reuse the QR generator, title customizer, research dialog, or frame studio
+without mounting the stage; a frame-based experience can reuse the Art Deco
+engine through its typed exports.

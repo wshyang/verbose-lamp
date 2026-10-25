@@ -41,7 +41,6 @@ export default defineConfig({
         '**/hooks/**',
         'src/**/use*.ts',
         // Three.js / WebAudio hosts (pixel layer; Playwright gate owns them).
-        'src/features/premiere/scene/GatsbySceneManager.ts',
         'src/features/premiere/scene/decoCards.ts',
         'src/features/premiere/scene/environment.ts',
         'src/features/premiere/audio/**',

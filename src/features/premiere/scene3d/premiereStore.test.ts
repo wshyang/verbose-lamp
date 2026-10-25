@@ -22,6 +22,7 @@ describe('createPremiereStore', () => {
     expect(state.isNitrateForced).toBe(false);
     expect(state.isBorderEnabled).toBe(false);
     expect(state.freezeAt).toBeNull();
+    expect(state.orbitFocusSerial).toBe(0);
     expect(state.heroConfig).toEqual(DEFAULT_HERO_TITLE);
     expect(state.heroConfig).not.toBe(DEFAULT_HERO_TITLE);
     expect(state.frameStyle.intricacy).toBe(DEFAULT_FRAME_STYLE.intricacy);
@@ -78,6 +79,18 @@ describe('createPremiereStore', () => {
     expect(store.getState().currentTime).toBe(27.65);
   });
 
+  it('bumps the orbit-focus serial on jumps and orbit entries only', () => {
+    const store = createPremiereStore();
+    store.getState().jumpToChapter(1);
+    expect(store.getState().orbitFocusSerial).toBe(1);
+    store.getState().setCameraMode('cinema');
+    expect(store.getState().orbitFocusSerial).toBe(1);
+    store.getState().setCameraMode('orbit');
+    expect(store.getState().orbitFocusSerial).toBe(2);
+    store.getState().jumpToChapter(3);
+    expect(store.getState().orbitFocusSerial).toBe(3);
+  });
+
   it('style setters clamp before storing', () => {
     const store = createPremiereStore();
     store.getState().setSequenceFrameStyle(wildFrameStyle);
@@ -116,6 +129,7 @@ describe('storeSceneApi', () => {
     expect(api.togglePlaying()).toBe(true);
     api.setCameraMode('orbit');
     expect(store.getState().cameraMode).toBe('orbit');
+    expect(store.getState().orbitFocusSerial).toBe(2);
     api.setNitrateMode(true);
     expect(store.getState().isNitrateForced).toBe(true);
     api.updateHeroTitle({ ...DEFAULT_HERO_TITLE, mainTitle: 'DAISY' });

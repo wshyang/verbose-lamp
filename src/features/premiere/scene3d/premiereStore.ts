@@ -36,6 +36,12 @@ export interface PremiereStoreState {
   borderStyle: ScreenBorderStyle;
   isBorderEnabled: boolean;
   freezeAt: number | null;
+  /**
+   * Bumped whenever the orbit camera should (re)focus: on a chapter jump
+   * and on entering orbit mode — the two places the manager called
+   * focusOrbitOnChapter. CinemaCamera effects subscribe to it.
+   */
+  orbitFocusSerial: number;
   /** Advance the playhead by dt (caller caps it); frozen/paused is a no-op, the loop wraps to 0. */
   advanceBy: (dt: number) => void;
   setTime: (time: number) => void;
@@ -66,6 +72,7 @@ export function createPremiereStore(freezeAt: number | null = null): PremiereSto
     borderStyle: { ...DEFAULT_SCREEN_BORDER_STYLE },
     isBorderEnabled: false,
     freezeAt,
+    orbitFocusSerial: 0,
     advanceBy: (dt) => {
       const state = get();
       if (state.freezeAt !== null || !state.isPlaying) return;
@@ -79,8 +86,16 @@ export function createPremiereStore(freezeAt: number | null = null): PremiereSto
       return get().isPlaying;
     },
     jumpToChapter: (index) =>
-      set({ currentTime: chapterJumpTarget(index, SEQUENCE_CHAPTERS).time }),
-    setCameraMode: (cameraMode) => set({ cameraMode }),
+      set((state) => ({
+        currentTime: chapterJumpTarget(index, SEQUENCE_CHAPTERS).time,
+        orbitFocusSerial: state.orbitFocusSerial + 1,
+      })),
+    setCameraMode: (cameraMode) =>
+      set((state) =>
+        cameraMode === 'orbit'
+          ? { cameraMode, orbitFocusSerial: state.orbitFocusSerial + 1 }
+          : { cameraMode },
+      ),
     setNitrateForced: (isNitrateForced) => set({ isNitrateForced }),
     updateHeroTitle: (config) => set({ heroConfig: { ...config } }),
     setSequenceFrameStyle: (style) => set({ frameStyle: clampFrameStyle(style) }),

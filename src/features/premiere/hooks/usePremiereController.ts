@@ -12,7 +12,6 @@ export function usePremiereController() {
   const stageRef = useRef<HTMLDivElement | null>(null);
   const managerRef = useRef<PremiereSceneApi | null>(null);
   const audioRef = useRef<CinemaAudioEngine | null>(null);
-  const lastUiSyncRef = useRef(0);
 
   const [currentTime, setCurrentTime] = useState(0);
   const [activeAct, setActiveAct] = useState(0);
@@ -22,16 +21,19 @@ export function usePremiereController() {
   const [soundOn, setSoundOn] = useState(false);
   const [heroConfig, setHeroConfig] = useState<HeroTitleConfig>({ ...DEFAULT_HERO_TITLE });
 
+  // The scene's PlaybackClock throttles telemetry at the source (48 ms).
   const onTelemetry = useCallback((telemetry: { currentTime: number; isPlaying: boolean }) => {
-    const now = performance.now();
-    if (now - lastUiSyncRef.current <= 48) return;
-    lastUiSyncRef.current = now;
     setCurrentTime(telemetry.currentTime);
     setIsPlaying(telemetry.isPlaying);
   }, []);
   const onChapterChange = useCallback((chapterIndex: number) => setActiveAct(chapterIndex), []);
 
-  usePremiereRuntime({ mountRef: stageRef, managerRef, audioRef, onTelemetry, onChapterChange });
+  const { store, handleSceneTelemetry, handleSceneChapterChange } = usePremiereRuntime({
+    managerRef,
+    audioRef,
+    onTelemetry,
+    onChapterChange,
+  });
   const getSceneManager = useCallback(() => managerRef.current, []);
   const frameStudio = useFrameStudio(getSceneManager);
   const transport = usePremiereTransport({
@@ -59,6 +61,9 @@ export function usePremiereController() {
 
   return {
     stageRef,
+    store,
+    handleSceneTelemetry,
+    handleSceneChapterChange,
     currentTime,
     activeAct,
     isPlaying,

@@ -25,6 +25,9 @@ vi.mock('@/features/premiere', async (importActual) => {
     ...actual,
     usePremiereController: () => ({
       stageRef: { current: null },
+      store: null,
+      handleSceneTelemetry: vi.fn(),
+      handleSceneChapterChange: vi.fn(),
       cameraMode: 'cinema',
       nitrateMode: false,
       soundOn: false,

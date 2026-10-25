@@ -21,3 +21,10 @@ export interface PremiereSceneApi {
   setScreenBorderEnabled: (enabled: boolean) => void;
   dispose: () => void;
 }
+
+/** Playback state the renderer reports to the HUD, throttled at the source. */
+export interface PlaybackTelemetry {
+  currentTime: number;
+  activeChapterIndex: number;
+  isPlaying: boolean;
+}

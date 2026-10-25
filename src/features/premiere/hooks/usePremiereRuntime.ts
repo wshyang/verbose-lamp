@@ -1,48 +1,59 @@
-import { useEffect, useRef, type MutableRefObject, type RefObject } from 'react';
+import { useCallback, useEffect, useRef, useState, type MutableRefObject } from 'react';
 import { CinemaAudioEngine } from '../audio/cinemaAudio';
 import { parseFreezeAt } from '../model/freeze';
-import { GatsbySceneManager, type PlaybackTelemetry } from '../scene/GatsbySceneManager';
-import type { PremiereSceneApi } from '../scene/sceneApi';
+import type { PlaybackTelemetry, PremiereSceneApi } from '../scene/sceneApi';
+import { createPremiereStore, storeSceneApi } from '../scene3d/premiereStore';
 
 interface PremiereRuntimeOptions {
-  mountRef: RefObject<HTMLDivElement | null>;
   managerRef: MutableRefObject<PremiereSceneApi | null>;
   audioRef: MutableRefObject<CinemaAudioEngine | null>;
   onTelemetry: (telemetry: PlaybackTelemetry) => void;
   onChapterChange: (chapterIndex: number) => void;
 }
 
+/**
+ * Owns the premiere's runtime objects (ADDENDUM-022 §2.4): the zustand
+ * store the R3F stage renders from — exposed to the transport,
+ * scene-options and Frame Studio hooks through the same
+ * PremiereSceneApi port the imperative manager satisfied — and the
+ * audio engine. The store exists from the first render, so the Canvas
+ * mounts immediately; the scene callbacks handed to it stay stable.
+ */
 export function usePremiereRuntime({
-  mountRef,
   managerRef,
   audioRef,
   onTelemetry,
   onChapterChange,
 }: PremiereRuntimeOptions) {
+  const [runtime] = useState(() => {
+    const store = createPremiereStore(parseFreezeAt(window.location.search));
+    return { store, api: storeSceneApi(store) };
+  });
   const callbacksRef = useRef({ onTelemetry, onChapterChange });
   callbacksRef.current = { onTelemetry, onChapterChange };
 
   useEffect(() => {
-    const container = mountRef.current;
-    if (!container) return;
-
     const audio = new CinemaAudioEngine();
     audioRef.current = audio;
-    const manager = new GatsbySceneManager(container, {
-      freezeAt: parseFreezeAt(window.location.search),
-      onTelemetry: (telemetry) => callbacksRef.current.onTelemetry(telemetry),
-      onChapterChange: (chapterIndex) => {
-        callbacksRef.current.onChapterChange(chapterIndex);
-        audio.triggerActShimmer(chapterIndex);
-      },
-    });
-    managerRef.current = manager;
-
+    managerRef.current = runtime.api;
     return () => {
-      manager.dispose();
       audio.dispose();
       managerRef.current = null;
       audioRef.current = null;
     };
-  }, [audioRef, managerRef, mountRef]);
+  }, [audioRef, managerRef, runtime]);
+
+  const handleSceneTelemetry = useCallback(
+    (telemetry: PlaybackTelemetry) => callbacksRef.current.onTelemetry(telemetry),
+    [],
+  );
+  const handleSceneChapterChange = useCallback(
+    (chapterIndex: number) => {
+      callbacksRef.current.onChapterChange(chapterIndex);
+      audioRef.current?.triggerActShimmer(chapterIndex);
+    },
+    [audioRef],
+  );
+
+  return { store: runtime.store, handleSceneTelemetry, handleSceneChapterChange };
 }
