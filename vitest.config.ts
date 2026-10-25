@@ -76,6 +76,8 @@ export default defineConfig({
         'src/features/premiere/scene/playback.ts': FULL,
         'src/features/premiere/scene3d/premiereStore.ts': FULL,
         'src/features/premiere/scene3d/storeSceneApi.ts': FULL,
+        'src/features/premiere/scene3d/pointerAim.ts': FULL,
+        'src/features/premiere/scene3d/usePointerAim.ts': FULL,
       },
     },
   },
