@@ -11,6 +11,7 @@ import {
   cantorSegments,
   mirrorHalves,
 } from './index';
+import { clampGenesisLevel } from './generative';
 
 const ARCHETYPES: FrameArchetype[] = [
   'monogram_gate',
@@ -126,4 +127,18 @@ describe('math helpers', () => {
   });
 
 
+});
+
+describe('clampGenesisLevel', () => {
+  it('falls back to level 2 for anything that is not a finite number', () => {
+    expect(clampGenesisLevel(Number.NaN)).toBe(2);
+    expect(clampGenesisLevel(Number.POSITIVE_INFINITY)).toBe(2);
+  });
+
+  it('rounds and bounds the level to 1…4', () => {
+    expect(clampGenesisLevel(-3)).toBe(1);
+    expect(clampGenesisLevel(0.4)).toBe(1);
+    expect(clampGenesisLevel(2.6)).toBe(3);
+    expect(clampGenesisLevel(9)).toBe(4);
+  });
 });

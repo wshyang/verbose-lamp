@@ -39,3 +39,14 @@ describe('flashIntensityAt', () => {
     expect(flashIntensityAt(seg, 500)).toBe(0);
   });
 });
+
+describe('sanitizeFlashPlan dimming', () => {
+  it('dims the fourth large flash inside a second instead of refusing it', () => {
+    const segments = [0, 100, 200, 300].map((startMs) => ({ startMs, attackMs: 0, holdMs: 0, decayMs: 1, peak: 1 }));
+
+    const plan = sanitizeFlashPlan(segments);
+
+    expect(plan.map((segment) => segment.peak)).toEqual([1, 1, 1, plan[3].peak]);
+    expect(plan[3].peak).toBeLessThan(1);
+  });
+});

@@ -32,3 +32,28 @@ describe('resolveActiveId', () => {
     expect(resolveActiveId([], 'anything')).toBe('');
   });
 });
+
+describe('validateNavItems edge cases', () => {
+  it('names duplicate and empty ids instead of silently keeping them', () => {
+    const result = validateNavItems([
+      { id: 'foyer', emoji: '🏛', label: 'Foyer' },
+      { id: 'foyer', emoji: '🥂', label: 'Toast' },
+      { id: '', emoji: '🎷', label: 'Program' },
+    ]);
+
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.issues.some((issue) => issue.includes('foyer'))).toBe(true);
+    expect(result.issues.some((issue) => issue.includes('Duplicate or empty id'))).toBe(true);
+  });
+
+  it('rejects a bar with fewer than two or more than five items', () => {
+    const one = validateNavItems([{ id: 'a', emoji: '🏛', label: 'Foyer' }]);
+    const six = validateNavItems(
+      Array.from({ length: 6 }, (_, i) => ({ id: `n${i}`, emoji: '🥂', label: `Item ${i}` }))
+    );
+
+    expect(one.ok).toBe(false);
+    expect(six.ok).toBe(false);
+  });
+});
