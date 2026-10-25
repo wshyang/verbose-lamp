@@ -20,7 +20,7 @@ import {
   FrameStyle,
   ScreenBorderStyle,
 } from '@/features/art-deco-frame';
-import { SIGNATURE_GENOME, clampGenome } from '@/features/art-deco-frame';
+import { SIGNATURE_GENOME } from '@/features/art-deco-frame';
 import { createScreenBorderRig, type ScreenBorderRig } from '@/features/art-deco-frame';
 import { createPrng } from '@/shared/lib/random';
 import {
@@ -36,7 +36,14 @@ import {
   searchlightSway,
 } from './choreography';
 import { getCinemaCameraPose, resolveViewportFit, ViewportFit } from './responsiveLayout';
+import { orbitFocus } from './orbitFocus';
 import type { PremiereSceneApi } from './sceneApi';
+import {
+  chapterJumpTarget,
+  clampFrameStyle,
+  clampScreenBorderStyle,
+  clampSequenceTime,
+} from './styleClamp';
 
 /** Fixed so the gold-dust field is identical on every load (ADDENDUM-022 §0.1). */
 const DUST_SEED = 1920;
@@ -486,16 +493,15 @@ export class GatsbySceneManager implements PremiereSceneApi {
   }
 
   public jumpToChapter(index: number) {
-    const clamped = Math.max(0, Math.min(SEQUENCE_CHAPTERS.length - 1, index));
-    const ch = SEQUENCE_CHAPTERS[clamped];
-    this.currentTime = ch.startTime + 0.15;
+    const target = chapterJumpTarget(index, SEQUENCE_CHAPTERS);
+    this.currentTime = target.time;
     if (this.cameraMode === 'orbit') {
-      this.focusOrbitOnChapter(clamped);
+      this.focusOrbitOnChapter(target.index);
     }
   }
 
   public setTime(t: number) {
-    this.currentTime = THREE.MathUtils.clamp(t, 0, TOTAL_SEQUENCE_DURATION - 0.001);
+    this.currentTime = clampSequenceTime(t);
   }
 
   public setPlaying(playing: boolean) {
@@ -519,15 +525,13 @@ export class GatsbySceneManager implements PremiereSceneApi {
   }
 
   private focusOrbitOnChapter(idx: number) {
-    const ch = SEQUENCE_CHAPTERS[idx];
-    // Advance into the hold portion of the card if currently at the very start so user sees full frame
-    const local = (this.currentTime - ch.startTime) / (ch.endTime - ch.startTime);
-    if (local < 0.42 || local > 0.85) {
-      this.currentTime = ch.startTime + (ch.endTime - ch.startTime) * 0.56;
+    const focus = orbitFocus(SEQUENCE_CHAPTERS[idx], this.currentTime);
+    if (focus.holdAt !== null) {
+      this.currentTime = focus.holdAt;
       this.isPlaying = false;
     }
-    this.controls.target.set(0, 0, ch.zPosition);
-    this.camera.position.set(2.4, 0.9, ch.zPosition + 9.2);
+    this.controls.target.set(...focus.target);
+    this.camera.position.set(...focus.cameraPosition);
     this.controls.update();
   }
 
@@ -542,33 +546,12 @@ export class GatsbySceneManager implements PremiereSceneApi {
   }
 
   public setSequenceFrameStyle(style: FrameStyle) {
-    this.frameStyle = {
-      intricacy: THREE.MathUtils.clamp(style.intricacy, 0, 1),
-      formula: {
-        source: style.formula.source,
-        level: THREE.MathUtils.clamp(Math.round(style.formula.level), 1, 4),
-        seed:
-          style.formula.seed === undefined
-            ? undefined
-            : Math.max(0, Math.round(style.formula.seed)),
-        genome: clampGenome(style.formula.genome),
-        layers: style.formula.layers?.map((layer) => ({
-          source: layer.source,
-          enabled: layer.enabled,
-          level: THREE.MathUtils.clamp(Math.round(layer.level), 1, 4),
-        })) ?? [],
-      },
-    };
+    this.frameStyle = clampFrameStyle(style);
     this.scheduleFrameRebuild();
   }
 
   public setScreenBorderStyle(style: ScreenBorderStyle) {
-    this.screenBorderStyle = {
-      weight: THREE.MathUtils.clamp(style.weight, 0, 1),
-      genome: clampGenome(style.genome),
-      pattern: style.pattern ?? 'poster',
-      seed: style.seed === undefined ? undefined : Math.max(0, Math.round(style.seed)),
-    };
+    this.screenBorderStyle = clampScreenBorderStyle(style);
     this.screenBorderRig.setStyle(this.screenBorderStyle);
   }
 
