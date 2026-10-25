@@ -160,6 +160,11 @@ const ExportRow: React.FC<{ qr: Generator }> = ({ qr }) => (
       <ImageIcon className="w-3.5 h-3.5 text-[#f8e29b]" />
       {qr.isExporting ? 'Engraving…' : 'Download PNG'}
     </Button>
+    {qr.exportError && (
+      <p role="alert" className="text-xs italic text-[#e0cfa9]/80" data-testid="qr-generator__export-error">
+        {qr.exportError}
+      </p>
+    )}
   </div>
 );
 

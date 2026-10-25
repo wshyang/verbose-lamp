@@ -22,6 +22,8 @@ export interface QrGeneratorState {
   readonly summary: QrSummary | null;
   readonly error: string | null;
   readonly isExporting: boolean;
+  /** Why the last PNG export failed, or null. SVG export cannot fail in a way the browser hides. */
+  readonly exportError: string | null;
   readonly svgRef: React.RefObject<SVGSVGElement | null>;
   readonly setText: (text: string) => void;
   readonly setCaption: (caption: string) => void;
@@ -54,6 +56,7 @@ export function useQrGenerator(): QrGeneratorState {
   const [shape, setShape] = useState<QrModuleShape>('plaque');
   const [isShimmering, setShimmering] = useState(true);
   const [isExporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
 
   const encoded = useMemo(() => tryEncodeQr({ text, errorCorrection }), [text, errorCorrection]);
   const plan = useMemo(
@@ -87,8 +90,11 @@ export function useQrGenerator(): QrGeneratorState {
   const downloadPng = useCallback(async () => {
     if (!svgRef.current || isExporting) return;
     setExporting(true);
+    setExportError(null);
     try {
       await downloadSvgAsPng(svgRef.current, toSafeFileStem(caption));
+    } catch (error) {
+      setExportError(error instanceof Error ? error.message : 'The PNG could not be made.');
     } finally {
       setExporting(false);
     }
@@ -96,7 +102,7 @@ export function useQrGenerator(): QrGeneratorState {
 
   return {
     text, caption, errorCorrection, shape, isShimmering, activePresetId,
-    plan, summary, error: encoded.ok ? null : encoded.reason, isExporting, svgRef,
+    plan, summary, error: encoded.ok ? null : encoded.reason, isExporting, exportError, svgRef,
     setText, setCaption, setErrorCorrection, setShape, setShimmering,
     applyPreset, downloadSvg, downloadPng,
   };
