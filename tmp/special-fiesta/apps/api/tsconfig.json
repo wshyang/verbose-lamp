@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "paths": {
+      "@psd/contracts": ["../../packages/contracts/src/index.ts"],
+      "@psd/tournament": ["../../packages/tournament/src/index.ts"],
+      "@psd/tournament/*": ["../../packages/tournament/src/*/index.ts"]
+    }
+  },
+  "include": ["src/**/*.ts"]
+}

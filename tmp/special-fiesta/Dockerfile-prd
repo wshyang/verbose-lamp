@@ -1,0 +1,102 @@
+# PSD Active Day App — production image: API + built SPA, ONE process, no supervisor (ADR-323).
+#
+# The API has no compiled output on purpose (its build step is a typecheck); production runs
+# `tsx` over the TypeScript source, which is why tsx lives in apps/api dependencies and the
+# runtime stage carries source, not dist. The web app is the opposite: Vite emits a static
+# bundle that the API serves same-origin via WEB_DIST, so one port fronts the whole app.
+#
+# THIS IS THE PRODUCTION IMAGE (ADR-175, ADR-323). It builds the same bits as Dockerfile, seeds
+# nothing but the baseline (no demo day), and drops the in-container process manager: no
+# supervisord, no cloudflared. The platform in front of it owns ingress and owns restarts.
+#
+#   docker build -t psd-active-day -f Dockerfile-prd .
+#   docker run -d -p 3000:3000 --restart unless-stopped \
+#     -e SUPERADMIN_INITIAL_PASSCODE=... -v psd-data:/data psd-active-day
+#
+# THE RESTART POLICY IS PART OF THE CONTRACT. PROCESS_SUPERVISED=true tells the app that
+# something will start it again, so the superadmin Restart button (ADR-118) exits 0. With
+# `--restart on-failure` (or no policy) that exit leaves the app down. Use `always`,
+# `unless-stopped`, or the orchestrator's equivalent. A plain `docker run --restart` does not
+# act on an unhealthy HEALTHCHECK; only an orchestrator does. The check is /api/health/ready
+# (ADR-324): listener, event loop and a read-only database round trip, not just "the process is up".
+#
+# Runtime environment:
+#   SUPERADMIN_INITIAL_PASSCODE  required on first boot (seeds the superadmin account)
+#   PORT                         listen port, 3000 in this image
+#   DATABASE_DRIVER/DATABASE_URL point at external Postgres instead of the /data volume
+#   PSD_SEED=demo                override at RUN time to seed the demo day from this image
+
+FROM node:22-alpine AS builder
+WORKDIR /app
+
+# Manifests first so `npm ci` caches across source-only changes.
+COPY package.json package-lock.json ./
+COPY packages/contracts/package.json packages/contracts/
+COPY packages/tournament/package.json packages/tournament/
+COPY apps/api/package.json apps/api/
+COPY apps/web/package.json apps/web/
+RUN npm ci
+
+# Every workspace tsconfig extends this one. Vite resolves `extends` while building, so without
+# it `npm run build --workspace @psd/web` fails with "failed to resolve extends" — a break that
+# only ever shows up inside the image, because a developer's checkout always has the file.
+COPY tsconfig.base.json ./
+
+COPY packages/contracts packages/contracts
+COPY packages/tournament packages/tournament
+COPY apps/api apps/api
+COPY apps/web apps/web
+COPY scripts scripts
+RUN npm run build --workspace @psd/web
+
+# Prune to production dependencies for the runtime stage. tsx survives this because it is a
+# real runtime dependency of the API (its start script), not a build tool.
+RUN npm ci --omit=dev
+
+
+FROM node:22-alpine
+# bash: db-provision.sh / db-reset.sh are bash scripts and the app calls them for
+# DB_INIT=demo and DB_INIT_RESET=stale (ADR-249, ADR-264).
+# tini: PID 1. Node as PID 1 ignores SIGTERM unless it handles it, and the bash children above
+# need reaping; tini forwards the signal to the app's graceful shutdown and reaps them.
+RUN apk add --no-cache bash tini
+
+WORKDIR /app
+ENV NODE_ENV=production \
+    PORT=3000 \
+    PGLITE_DATA_DIR=/data \
+    WEB_DIST=/app/apps/web/dist \
+    PROCESS_SUPERVISED=true
+
+COPY --from=builder /app/package.json /app/package-lock.json ./
+COPY --from=builder /app/node_modules node_modules
+COPY --from=builder /app/packages/contracts packages/contracts
+COPY --from=builder /app/packages/tournament packages/tournament
+COPY --from=builder /app/apps/api apps/api
+COPY --from=builder /app/apps/web/package.json apps/web/package.json
+COPY --from=builder /app/apps/web/dist apps/web/dist
+COPY --from=builder /app/scripts scripts
+COPY --from=builder /app/tsconfig.base.json ./
+COPY db-provision.sh db-reset.sh _dev-common.sh ./
+
+# ADR-175 — WHICH DATA TIER A FRESH DATABASE GETS. `default` stops after schema.sql and
+# seed-default.sql: the reference data an event cannot run without (point config, the
+# superadmin), and not one fabricated participant. seed-demo.sql is never read. A real event's
+# leaderboard must contain only people who actually turned up, and demo rows are far easier to
+# never create than to find and delete afterwards.
+ENV PSD_SEED=default
+
+# PGlite data lives here unless DATABASE_DRIVER=postgres points elsewhere. The app runs as the
+# unprivileged `node` user, so the directory must belong to it before the volume is declared.
+RUN mkdir -p /data && chown node:node /data
+VOLUME /data
+USER node
+
+EXPOSE 3000
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+  CMD wget -qO- "http://127.0.0.1:${PORT}/api/health/ready" || exit 1
+
+ENTRYPOINT ["/sbin/tini", "--"]
+# One Node process, no tsx CLI wrapper: a wrapper would sit between tini and the app and the
+# app's SIGTERM handler would never see the signal.
+CMD ["node", "--import", "tsx", "apps/api/src/index.ts"]

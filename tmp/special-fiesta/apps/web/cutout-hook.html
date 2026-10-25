@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cut-out hook — callable from Playwright</title>
+  </head>
+  <body>
+    <!--
+      No UI: this page exists only to load tools/cutoutHook.ts, which attaches
+      `window.__PSD_CUTOUT_RUN__`. scripts/cutout-full-report.ts drives it with
+      `page.evaluate(() => window.__PSD_CUTOUT_RUN__(name))`, once per photograph.
+      Dev server only — not linked from the app, not covered by `vite build`.
+    -->
+    <p data-testid="cutout-hook__ready">cutout hook loaded</p>
+    <script type="module" src="/tools/cutoutHook.ts"></script>
+  </body>
+</html>

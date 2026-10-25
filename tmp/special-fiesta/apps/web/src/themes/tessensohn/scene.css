@@ -1,0 +1,395 @@
+/*
+ * ADR-299 — the CSC @ Tessensohn backdrop: the Civil Service Club's own About-page banner, ported.
+ *
+ * Provenance and permission: docs/design/tessensohn-scene-credits.md. The positions and keyframes
+ * below are CSC's rules from csc.sg/2023/css/about.min.css, with every class given a `csc-`
+ * prefix (generic names such as `.bg`, `.pot` and `.tree1` would collide with ours) and scoped
+ * under `.venue-scene--tessensohn`. The scene is layered <img>s positioned in percentages of the
+ * plate and animated by CSS alone; characters are cut into parts so each part moves by itself.
+ *
+ * Two things are ours rather than CSC's:
+ *   - the badminton-court group (CSC shows it only on its desktop banner), placed by `.csc-court`;
+ *   - the ENTRANCES (building rising, car arriving, cyclist leaving) play only when the scene
+ *     says `data-intro="play"`, which is the first page of a visit. Every route mounts its own
+ *     scene, so left to run unconditionally they would replay on every tap. At rest the car sits
+ *     parked, the building stands and the cyclist is gone.
+ */
+
+.venue-scene--tessensohn {
+  background-color: var(--scene-sky);
+}
+
+/* CSC's desktop banner is 3259 x 1204; the shared strip box (gameboy.css) sizes itself from this. */
+.venue-scene--tessensohn[data-layout='wide'] {
+  --scene-aspect: 2.7068;
+}
+
+.venue-scene--tessensohn > *,
+.venue-scene--tessensohn .csc-img-wrapper > *:not(:first-child) {
+  position: absolute;
+}
+
+.venue-scene--tessensohn img {
+  display: block;
+  max-width: none;
+}
+
+.venue-scene--tessensohn .csc-img-wrapper {
+  position: relative;
+}
+
+/* The first image of a group only gives the group its size; the parts are laid over it. */
+.venue-scene--tessensohn .csc-img-wrapper > :first-child {
+  opacity: 0;
+  width: 100%;
+}
+
+.venue-scene--tessensohn .csc-bg {
+  left: 0;
+  width: 100%;
+  top: 0;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---- layout and loops (CSC's rules) ---- */
+.venue-scene--tessensohn .csc-bg { object-fit: cover; top: 0%; height: 100%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-building { top: 18%; left: -15%; width: 113%; transform-origin: bottom center; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-hill { top: 34%; left: -146%; width: 310%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-pot { top: 67.5%; left: 27%; width: 6%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-bbq { top: 63.5%; left: 36%; width: 8%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-bbq .csc-img-wrapper .csc-bbqtong { top: 15%; width: 57%; left: 0%; transform-origin: top right; animation: 2s csc-bbqarm alternate 1s infinite ease; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-bbq .csc-img-wrapper .csc-bbqmain { top: 10%; width: 57%; left: 40%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-bbq .csc-img-wrapper .csc-bbqbaby { top: 7%; width: 57%; left: 49%; transform-origin: 70% 40%; animation: 2s csc-bbqarm infinite ease; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-bbq .csc-img-wrapper .csc-bbqhead { top: 0%; width: 22%; left: 54%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-house { top: 52%; left: 15%; width: 165%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-sparkler { top: 63%; left: 80%; width: 29%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-sparkler .csc-img-wrapper .csc-sparkler1main { top: 23%; left: 0%; width: 20%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-sparkler .csc-img-wrapper .csc-sparkler1head { top: 13%; left: 8%; width: 7%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-sparkler .csc-img-wrapper .csc-sparkler1hand { top: 1%; left: 15%; width: 12%; transform-origin: bottom left; animation: 3s csc-wave infinite ease; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-pet { top: 66.5%; left: 80.5%; width: 14%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-pet .csc-img-wrapper .csc-pettail { top: 75%; left: 35%; width: 11%; transform-origin: bottom left; animation: .5s csc-wag infinite; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-pet .csc-img-wrapper .csc-petdog { top: 51%; left: 0%; width: 53%; transform-origin: 60% 60%; animation: 2s csc-bark infinite ease; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-pet .csc-img-wrapper .csc-petmain { top: 0%; left: 60%; width: 44%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-pet .csc-img-wrapper .csc-petarm { top: 14%; left: 51%; width: 53%; transform-origin: 90% 90%; animation: 2s csc-petarm infinite ease; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-palmtree { top: 48%; left: 55%; width: 33%; transform-origin: bottom center; animation: 7s csc-smallsway infinite .5s ease-in-out; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-bush2 { top: 71.5%; left: 64%; width: 15%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-loyangsign { top: 70%; left: 62.5%; width: 8%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-bush1 { top: 73%; left: 57.5%; width: 13.5%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-ground { bottom: 0%; left: -147.5%; width: 315%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-car { top: 77%; left: 9.5%; width: 31%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-car .csc-img-wrapper .csc-carshadow { bottom: 0; width: 100%; mix-blend-mode: multiply; opacity: .5; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-car .csc-img-wrapper .csc-carmain { width: 100%; top: 0%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-car .csc-img-wrapper .csc-carwheel1 { width: 14%; left: 9%; top: 59%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-car .csc-img-wrapper .csc-carwheel2 { width: 14%; left: 73.5%; top: 59%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-bike2 { top: 85%; left: 11.5%; width: 18%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-bike2 .csc-img-wrapper .csc-bikeshadow2 { width: 100%; bottom: 0; mix-blend-mode: multiply; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-bike2 .csc-img-wrapper .csc-bike2wheel11 { top: 74%; left: 11%; width: 22%; animation: 2s csc-wheel infinite 1s linear; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-bike2 .csc-img-wrapper .csc-bike2wheel12 { top: 72%; left: 8.5%; width: 27%; animation: 2s csc-wheel infinite 1s linear; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-bike2 .csc-img-wrapper .csc-bike2wheel21 { top: 74%; left: 75%; width: 22%; animation: 2s csc-wheel infinite 1s linear; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-bike2 .csc-img-wrapper .csc-bike2wheel22 { top: 72%; left: 71.5%; width: 27%; animation: 2s csc-wheel infinite 1s linear; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-bike2 .csc-img-wrapper .csc-bike2arm1 { top: 14%; left: 19%; width: 23%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-bike2 .csc-img-wrapper .csc-bike2arm2 { top: 30%; left: 22%; width: 25%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-bike2 .csc-img-wrapper .csc-bike2pedal1 { width: 16%; left: 47%; top: 76%; transform-origin: bottom right; animation: 2s csc-pedal infinite 1s linear; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-bike2 .csc-img-wrapper .csc-bikeleg2 { width: 34%; left: 47%; top: 26%; transform-origin: top left; animation: 2s csc-bikeleg22mobile infinite 1s ease-in-out; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-bike2 .csc-img-wrapper .csc-bike2main { width: 69%; left: 20%; top: 33%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-bike2 .csc-img-wrapper .csc-bike2leg1 { width: 27%; left: 35%; top: 30%; transform-origin: top right; animation: 2s csc-bikeleg1mobile infinite 1s ease-in-out; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-bike2 .csc-img-wrapper .csc-bike2man { width: 43%; left: 13%; top: 0%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-bike2 .csc-img-wrapper .csc-bike2pedalwheel { width: 22%; left: 47%; top: 70%; animation: 2s csc-pedal infinite 1s linear; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-bike2 .csc-img-wrapper .csc-bike2pedal2 { width: 22%; left: 60%; top: 79%; transform-origin: top left; animation: 2s csc-pedal infinite 1s linear; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-cloud3 { top: 0%; left: -44%; width: 100%; animation: 22s csc-cloudleft infinite .5s ease-in-out; mix-blend-mode: plus-lighter; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-cloud4 { top: 8%; left: 26%; width: 103%; animation: 21s csc-cloudleft infinite ease-in-out; mix-blend-mode: plus-lighter; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-bbqtent { top: 54%; left: 25%; width: 35.5%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-smoke1 { top: 64%; left: 26%; width: 5.5%; animation: 3.7s csc-smoke1 infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-smoke2 { top: 65%; left: 32%; width: 4%; animation: 4.1s csc-smoke2 infinite ease-in-out; }
+
+/* ---- the court (ours) ---- */
+.venue-scene--tessensohn[data-layout='phone'] .csc-court { left: 24%; top: 78%; width: 74%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-court>.csc-court-frame { position: relative; aspect-ratio: 473 / 195; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-court>.csc-court-frame>* { position: absolute; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-court>.csc-court-frame>:first-child { opacity: 1; width: 100%; top: 52.6458%; left: 0; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-court>.csc-court-frame>.csc-net { top: 0.0000%; left: 49.3103%; width: 1.3793%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-court>.csc-court-frame>.csc-tennis1 { top: 7.1047%; left: 19.4827%; width: 24.8275%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-court>.csc-court-frame>.csc-tennis2 { top: 24.1372%; left: 59.1379%; width: 24.8275%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-tennis1 .csc-img-wrapper .csc-tennis1leg { top: 49%; left: 46%; width: 26%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-tennis1 .csc-img-wrapper .csc-tennis2leg { top: 48%; left: 2%; width: 68%; transform-origin: top right; animation: 4s csc-tennis1leg infinite ease; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-tennis1 .csc-img-wrapper .csc-tennis1racket { top: 9%; left: 0%; width: 54%; transform-origin: bottom right; animation: 3s csc-tennis1racket infinite ease; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-tennis1 .csc-img-wrapper .csc-tennis1main { top: 25%; left: 40%; width: 38%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-tennis1 .csc-img-wrapper .csc-tennisball { width: 12%; top: 9%; left: 86%; animation: 6s csc-tennisball infinite ease; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-tennis1 .csc-img-wrapper .csc-tennis1arm2 { top: 9%; left: 56%; width: 37%; transform-origin: bottom left; animation: 6s csc-tennis1racket infinite ease; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-tennis1 .csc-img-wrapper .csc-tennis1head { top: 11%; left: 36%; width: 29%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-tennis2 { animation: 3s csc-tennis2 infinite .5s ease; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-tennis2 .csc-img-wrapper .csc-tennis2leg1 { top: 68%; left: 2%; width: 26%; transform-origin: 80% top; animation: 2s csc-tennis2leg infinite ease; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-tennis2 .csc-img-wrapper .csc-tennis2leg2 { top: 68%; left: 34%; width: 35%; transform-origin: left top; animation: 3s csc-tennis2leg alternate infinite ease; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-tennis2 .csc-img-wrapper .csc-tennis2main { top: 15%; left: 15%; width: 44%; }
+.venue-scene--tessensohn[data-layout='phone'] .csc-tennis2 .csc-img-wrapper .csc-tennis2arm { top: 29%; left: 16%; width: 80%; transform-origin: left center; animation: 3s csc-sway infinite ease,2s csc-tennis2racket infinite ease; }
+
+/* ---- entrances: first page of a visit only (ours; the motion is CSC's) ---- */
+.venue-scene--tessensohn[data-layout='phone'][data-intro='play'] .csc-building { animation: 2s csc-building ease; }
+.venue-scene--tessensohn[data-layout='phone'][data-intro='play'] .csc-car { animation: 8s csc-carXmobile forwards ease-in-out; }
+.venue-scene--tessensohn[data-layout='phone'][data-intro='play'] .csc-car .csc-img-wrapper { animation: 8s csc-carYmobile forwards ease-in-out; }
+.venue-scene--tessensohn[data-layout='phone'][data-intro='play'] .csc-car .csc-img-wrapper .csc-carwheel1 { animation: 8s csc-carwheel ease; }
+.venue-scene--tessensohn[data-layout='phone'][data-intro='play'] .csc-car .csc-img-wrapper .csc-carwheel2 { animation: 8s csc-carwheel ease; }
+.venue-scene--tessensohn[data-layout='phone'][data-intro='play'] .csc-bike2 { animation: 4s csc-bike2Xmobile forwards 1s ease-in-out; }
+.venue-scene--tessensohn[data-layout='phone'][data-intro='play'] .csc-bike2 .csc-img-wrapper { animation: 4s csc-bike2Ymobile forwards 1s ease-in-out; }
+
+/* At rest the cyclist has already left. */
+.venue-scene--tessensohn[data-layout='phone'][data-intro='rest'] .csc-bike2 {
+  display: none;
+}
+
+/* ---- keyframes (CSC's) ---- */
+@keyframes csc-bark { 0%{transform:skew(0deg,0deg) rotate(0deg);}25%{transform:skew(-5deg,5deg) rotate(2deg);}100%{transform:skew(0deg,0deg) rotate(0deg);} }
+@keyframes csc-bbqarm { 0%{transform:rotate(0deg);}50%{transform:rotate(-10deg);}100%{transform:rotate(0deg);} }
+@keyframes csc-bike2Xmobile { 0%{transform:translateX(0%);}100%{transform:translateX(-200%);} }
+@keyframes csc-bike2Ymobile { 0%{transform:translateY(0%);}40%{transform:translateY(40%);}100%{transform:translateY(-80%);} }
+@keyframes csc-bikeleg1mobile { 0%,100%{transform:rotate(0deg);}50%{transform:rotate(-15deg);} }
+@keyframes csc-bikeleg22mobile { 0%,100%{transform:rotate(0deg);}50%{transform:rotate(25deg);} }
+@keyframes csc-building { 0%{transform:scaleY(1) scaleX(1) translateY(200%);}66.67%{transform:scaleY(1) scaleX(.8) translateY(0%);}83.33%{transform:scaleY(.8) scaleX(1.1) translateY(0%);}100%{transform:scaleY(1) scaleX(1) translateY(0%);} }
+@keyframes csc-carXmobile { 0%{transform:translateX(300%);-webkit-transform:translateX(300%);}100%{transform:translateX(0%);-webkit-transform:translateX(0%);} }
+@keyframes csc-carYmobile { 0%{transform:translateY(0%);-webkit-transform:translateY(0%);}50%{transform:translateY(-15%);-webkit-transform:translateY(-15%);}100%{transform:translateY(0%);-webkit-transform:translateY(0%);} }
+@keyframes csc-carwheel { 0%{transform:rotate(0deg);}99.99%{transform:rotate(-2160deg);}100%{transform:rotate(0deg);} }
+@keyframes csc-cloudleft { 0%{opacity:0;transform:translateX(50%);}25%{opacity:.9;}75%{opacity:.9;}100%{opacity:0;transform:translateX(0%);} }
+@keyframes csc-pedal { 0%{transform:rotate(0deg);}99.99%{transform:rotate(-360deg);}100%{transform:rotate(0deg);} }
+@keyframes csc-petarm { 0%{transform:rotate(0deg);}25%{transform:rotate(-12deg);}100%{transform:rotate(0deg);} }
+@keyframes csc-smallsway { 0%{transform:skewX(0deg);}25%{transform:skewX(-1.5deg);}75%{transform:skewX(2.5deg);}100%{transform:skewX(0deg);} }
+@keyframes csc-smoke1 { 0%{opacity:0;transform:translate(30%,20%);}33.33%{opacity:1;}66.67%{opacity:1;transform:translate(0,0) scale(1);}100%{opacity:0;transform:translate(0,0) scale(1.5);} }
+@keyframes csc-smoke2 { 0%{opacity:0;transform:translate(-30%,20%);}33.33%{opacity:1;}66.67%{opacity:1;transform:translate(0,0) scale(1);}100%{opacity:0;transform:translate(0,0) scale(1.5);} }
+@keyframes csc-sway { 0%{transform:skewX(0deg);}25%{transform:skewX(-2.5deg);}75%{transform:skewX(5deg);}100%{transform:skewX(0deg);} }
+@keyframes csc-tennis1leg { 0%{transform:rotate(0deg);}50%{transform:rotate(-15deg);}100%{transform:rotate(0deg);} }
+@keyframes csc-tennis1racket { 0%{transform:rotate(0deg);}50%{transform:rotate(10deg);}100%{transform:rotate(0deg);} }
+@keyframes csc-tennis2 { 0%{transform:translateX(0%);}33.33%{transform:translateX(-10%);}66.67%{transform:translateX(10%);}100%{transform:translateX(0%);} }
+@keyframes csc-tennis2leg { 0%{transform:rotate(0deg);}50%{transform:rotate(-10deg);}100%{transform:rotate(0deg);} }
+@keyframes csc-tennisball { 0%{transform:translateY(-260%);}50%{transform:translateY(0%);}100%{transform:translateY(-260%);} }
+@keyframes csc-wag { 0%{transform:rotate(0deg);}33.33%{transform:rotate(-25deg);}66.67%{transform:rotate(30deg);}100%{transform:rotate(0deg);} }
+@keyframes csc-wave { 0%,100%{transform:rotate(0deg);}50%{transform:rotate(-20deg);} }
+@keyframes csc-wheel { 0%{transform:rotate(0deg);}99.99%{transform:rotate(-360deg);}100%{transform:rotate(0deg);} }
+
+@keyframes csc-tennis2racket { 0%{transform:rotate(0deg);}50%{transform:rotate(10deg);}100%{transform:rotate(0deg);} }
+
+/* ==== The wide layout: CSC's desktop banner (3259 x 1204), for screens wider than a phone. ====
+ * A different composition, not the phone one scaled up, so its own rules; both are CSC's own.
+ * The entrances are the same one-shots (building, car, two cyclists, ring), played once per load. */
+.venue-scene--tessensohn[data-layout='wide'] .csc-cloud1 { width: 42%; left: -12%; top: -5%; animation: 23s csc-cloudright infinite ease-in-out; mix-blend-mode: color-dodge; will-change: opacity; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-cloud2 { width: 53%; left: 18%; top: 0%; animation: 24s csc-cloudright infinite ease-in-out; mix-blend-mode: color-dodge; will-change: opacity; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-cloud3 { width: 53%; left: 22%; top: 9%; animation: 22s csc-cloudleft infinite .5s ease-in-out; mix-blend-mode: color-dodge; will-change: opacity; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-cloud4 { width: 64%; left: 29%; top: -10%; animation: 21s csc-cloudleft infinite ease-in-out; mix-blend-mode: color-dodge; will-change: opacity; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-cloud5 { width: 65%; left: 59%; top: -14%; animation: 23s csc-cloudright infinite .5s ease-in-out; mix-blend-mode: color-dodge; will-change: opacity; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-fern1 { width: 4%; left: 43%; top: 63%; transform-origin: bottom center; animation: 3s csc-smallsway infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-fern2 { width: 2.5%; left: 49%; top: 53%; transform-origin: bottom center; animation: 3s csc-sway infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-fern3 { width: 4%; left: 54%; transform-origin: bottom center; animation: 5s csc-sway infinite ease-in-out; top: 41%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-fernleaf1 { top: 61%; left: 47%; width: 1.5%; animation: 5s csc-leafleft infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-fernleaf2 { top: 53%; left: 52%; width: 1.5%; animation: 3s csc-leafleft infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-hill { width: 102%; bottom: 0; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bgtree1 { width: 7%; left: 2.5%; top: 10%; transform-origin: bottom center; animation: 3s csc-smallsway infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bgtree2 { width: 13%; left: -3.5%; top: 28%; transform-origin: bottom center; animation: 5s csc-smallsway infinite .5s ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bbqtent { top: 28%; left: 62.5%; width: 12.5%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-smoke1 { top: 43%; left: 63%; width: 1.5%; animation: 3.7s csc-smoke1 infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-smoke2 { top: 45%; left: 65.5%; width: 1%; animation: 4.1s csc-smoke2 infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-palmtree { top: 6%; left: 71.5%; width: 16%; transform-origin: bottom center; animation: 7s csc-smallsway infinite .5s ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bush2 { top: 54%; left: 74%; width: 8%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-loyangsign { top: 54%; left: 75.5%; width: 3%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bush1 { top: 59%; left: 72.5%; width: 6%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-dog { top: 54.5%; left: 80.5%; width: 2.5%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-dog .csc-img-wrapper .csc-dogtail { top: 84%; left: 73%; width: 33%; transform-origin: top left; animation: .5s csc-wagalt infinite; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-dog .csc-img-wrapper .csc-dogmain { top: 0%; width: 80%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-sparkler { top: 42.5%; left: 85.5%; width: 12%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-sparkler .csc-img-wrapper .csc-sparkler1main { top: 23%; left: 0%; width: 20%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-sparkler .csc-img-wrapper .csc-sparkler2main { top: 23%; left: 42%; width: 16%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-sparkler .csc-img-wrapper .csc-sparkler3main { top: 23%; left: 67%; width: 29%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-sparkler .csc-img-wrapper .csc-sparkler1head { top: 13%; left: 8%; width: 7%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-sparkler .csc-img-wrapper .csc-sparkler1hand { top: 1%; left: 15%; width: 12%; transform-origin: bottom left; animation: 3s csc-wave infinite ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-sparkler .csc-img-wrapper .csc-sparkler2head { top: 9%; left: 46%; width: 13%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-sparkler .csc-img-wrapper .csc-sparkler2hand1 { top: 1%; left: 38%; width: 8%; transform-origin: bottom right; animation: 4s csc-wavealt infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-sparkler .csc-img-wrapper .csc-sparkler2hand2 { top: 1%; left: 54%; width: 9%; transform-origin: bottom left; animation: 6s csc-wave infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-sparkler .csc-img-wrapper .csc-sparkler3hand1 { top: 15%; left: 65%; width: 5%; transform-origin: bottom right; animation: 2s csc-wave infinite ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-sparkler .csc-img-wrapper .csc-sparkler3hand2 { top: 16%; left: 78%; width: 20%; transform-origin: bottom left; animation: 5s csc-wave infinite ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-sparkler .csc-img-wrapper .csc-sparkler3head { top: 14%; left: 69%; width: 12%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-grocery { top: 55%; left: 61%; width: 2%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-grocery .csc-img-wrapper .csc-groceryhair { top: 0%; left: 10%; width: 46%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-grocery .csc-img-wrapper .csc-grocerymain { top: 18%; left: 0%; width: 100%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-grocery .csc-img-wrapper .csc-groceryhead { top: 0%; left: 12%; width: 47%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-pot { top: 47%; left: 63%; width: 2%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bbq { top: 42%; left: 66.2%; width: 2.5%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bbq .csc-img-wrapper .csc-bbqtong { top: 15%; width: 57%; left: 0%; transform-origin: top right; animation: 2s csc-bbqarm alternate 1s infinite ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bbq .csc-img-wrapper .csc-bbqmain { top: 10%; width: 57%; left: 40%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bbq .csc-img-wrapper .csc-bbqbaby { top: 7%; width: 57%; left: 49%; transform-origin: 70% 40%; animation: 2s csc-bbqarm infinite ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bbq .csc-img-wrapper .csc-bbqhead { top: 0%; width: 22%; left: 54%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-building { width: 40%; top: -3%; left: 1.5%; transform-origin: bottom center; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-house { top: 24%; left: 56%; width: 70%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-ground { width: 102%; bottom: 0; left: 0%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-table1 { top: 59.5%; left: 55%; width: 8%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-table2 { top: 56%; left: 63.5%; width: 8%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-pet { top: 52%; left: 69.5%; width: 5%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-pet .csc-img-wrapper .csc-pettail { top: 75%; left: 35%; width: 11%; transform-origin: bottom left; animation: .5s csc-wag infinite; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-pet .csc-img-wrapper .csc-petdog { top: 51%; left: 0%; width: 53%; transform-origin: 60% 60%; animation: 2s csc-bark infinite ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-pet .csc-img-wrapper .csc-petmain { top: 0%; left: 60%; width: 44%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-pet .csc-img-wrapper .csc-petarm { top: 14%; left: 51%; width: 53%; transform-origin: 90% 90%; animation: 2s csc-petarm infinite ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-tree1 { width: 7%; left: 13%; top: 56%; transform-origin: bottom center; animation: 8s csc-sway infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-tree2 { width: 9.5%; left: 28.5%; top: 33%; transform-origin: bottom center; animation: 5s csc-smallsway infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-leaf1 { top: 73%; left: 14.5%; width: 1%; animation: 4s csc-leafleft infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-leaf2 { top: 83%; left: 17%; width: 1%; animation: 2.5s csc-leafright infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-leaf3 { top: 61%; left: 25%; width: 1.5%; animation: 5s csc-leafleft infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-car { width: 16.5%; left: -1%; top: 73%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-car .csc-img-wrapper .csc-carshadow { bottom: 0; width: 100%; mix-blend-mode: multiply; opacity: .5; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-car .csc-img-wrapper .csc-carmain { width: 100%; top: 0%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-car .csc-img-wrapper .csc-carwheel1 { width: 14%; left: 9%; top: 59%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-car .csc-img-wrapper .csc-carwheel2 { width: 14%; left: 73.5%; top: 59%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bike1 { width: 5.5%; left: 20.5%; top: 73.5%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bike1 .csc-img-wrapper .csc-bikeshadow1 { width: 100%; bottom: 0; mix-blend-mode: multiply; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bike1 .csc-img-wrapper .csc-bike1wheel1 { width: 40%; left: 0%; top: 59%; animation: 1.5s csc-wheel infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bike1 .csc-img-wrapper .csc-bike1wheel2 { width: 40%; left: 59%; top: 59%; animation: 1.5s csc-wheel infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bike1 .csc-img-wrapper .csc-bike1arm { width: 26%; left: 19%; top: 22%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bike1 .csc-img-wrapper .csc-bike1leg1 { width: 19%; left: 51%; top: 25%; transform-origin: top right; animation: 1.5s csc-bikeleg2 infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bike1 .csc-img-wrapper .csc-bike1main { width: 70%; left: 16%; top: 37%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bike1 .csc-img-wrapper .csc-bike1leg2 { width: 32%; left: 35%; top: 34%; transform-origin: top left; animation: 1.5s csc-bikeleg1 infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bike1 .csc-img-wrapper .csc-bike1body { width: 46%; left: 13%; top: 2%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bike2 { width: 5.5%; left: 26.5%; top: 71.5%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bike2 .csc-img-wrapper .csc-bikeshadow2 { width: 100%; bottom: 0; mix-blend-mode: multiply; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bike2 .csc-img-wrapper .csc-bike2wheel11 { top: 74%; left: 11%; width: 22%; animation: 1s csc-wheel infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bike2 .csc-img-wrapper .csc-bike2wheel12 { top: 72%; left: 8.5%; width: 27%; animation: 1s csc-wheel infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bike2 .csc-img-wrapper .csc-bike2wheel21 { top: 74%; left: 75%; width: 22%; animation: 1s csc-wheel infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bike2 .csc-img-wrapper .csc-bike2wheel22 { top: 72%; left: 71.5%; width: 27%; animation: 1s csc-wheel infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bike2 .csc-img-wrapper .csc-bike2arm1 { top: 14%; left: 19%; width: 23%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bike2 .csc-img-wrapper .csc-bike2arm2 { top: 30%; left: 22%; width: 25%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bike2 .csc-img-wrapper .csc-bike2pedal1 { width: 16%; left: 47%; top: 76%; transform-origin: bottom right; animation: 1s csc-pedal infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bike2 .csc-img-wrapper .csc-bikeleg2 { width: 34%; left: 47%; top: 26%; transform-origin: top left; animation: 1s csc-bikeleg22 infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bike2 .csc-img-wrapper .csc-bike2main { width: 69%; left: 20%; top: 33%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bike2 .csc-img-wrapper .csc-bike2leg1 { width: 27%; left: 35%; top: 30%; transform-origin: top right; animation: 1s csc-bikeleg1 infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bike2 .csc-img-wrapper .csc-bike2man { width: 43%; left: 13%; top: 0%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bike2 .csc-img-wrapper .csc-bike2pedalwheel { width: 22%; left: 47%; top: 70%; animation: 1s csc-pedal infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-bike2 .csc-img-wrapper .csc-bike2pedal2 { width: 22%; left: 60%; top: 79%; transform-origin: top left; animation: 1s csc-pedal infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-court { top: 83%; left: 33.5%; width: 29%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-net { top: 66%; left: 47.8%; width: .4%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-tennis1 { top: 71%; left: 40.5%; width: 4.5%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-tennis1 .csc-img-wrapper .csc-tennis1leg { top: 49%; left: 46%; width: 26%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-tennis1 .csc-img-wrapper .csc-tennis2leg { top: 48%; left: 2%; width: 68%; transform-origin: top right; animation: 4s csc-tennis1leg infinite ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-tennis1 .csc-img-wrapper .csc-tennis1racket { top: 9%; left: 0%; width: 54%; transform-origin: bottom right; animation: 3s csc-tennis1racket infinite ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-tennis1 .csc-img-wrapper .csc-tennis1main { top: 25%; left: 40%; width: 38%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-tennis1 .csc-img-wrapper .csc-tennisball { width: 12%; top: 9%; left: 86%; animation: 6s csc-tennisball infinite ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-tennis1 .csc-img-wrapper .csc-tennis1arm2 { top: 9%; left: 56%; width: 37%; transform-origin: bottom left; animation: 6s csc-tennis1racket infinite ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-tennis1 .csc-img-wrapper .csc-tennis1head { top: 11%; left: 36%; width: 29%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-tennis2 { top: 76.5%; left: 52%; width: 4.5%; animation: 3s csc-tennis2 infinite .5s ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-tennis2 .csc-img-wrapper .csc-tennis2leg1 { top: 68%; left: 2%; width: 26%; transform-origin: 80% top; animation: 2s csc-tennis2leg infinite ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-tennis2 .csc-img-wrapper .csc-tennis2leg2 { top: 68%; left: 34%; width: 35%; transform-origin: left top; animation: 3s csc-tennis2leg alternate infinite ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-tennis2 .csc-img-wrapper .csc-tennis2main { top: 15%; left: 15%; width: 44%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-tennis2 .csc-img-wrapper .csc-tennis2arm { top: 29%; left: 16%; width: 80%; transform-origin: left center; animation: 3s csc-sway infinite ease,2s csc-tennis2racket infinite ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-pool { top: 72%; left: 63%; width: 46%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-poolshine { top: 79%; left: 66.5%; width: 38%; animation: 4s csc-poolshine infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-swimsuit { top: 74%; left: 73.5%; width: 6.5%; animation: 12s csc-tennis2 infinite ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-swimsuit .csc-img-wrapper { animation: 6s csc-float infinite ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-swimsuit .csc-img-wrapper .csc-swimsuitfloat { top: 3%; left: 9%; width: 84%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-swimsuit .csc-img-wrapper .csc-swimsuitleg1 { top: 43%; left: 2%; width: 50%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-swimsuit .csc-img-wrapper .csc-swimsuitarm1 { top: 0%; left: 45%; width: 17%; transform-origin: bottom right; animation: 1.5s csc-wave infinite ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-swimsuit .csc-img-wrapper .csc-swimsuitarm2 { top: 34%; left: 65%; width: 29%; transform-origin: top left; animation: 2s csc-wavealt infinite 1s ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-swimsuit .csc-img-wrapper .csc-swimsuithair { top: 10%; left: 53%; width: 30%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-swimsuit .csc-img-wrapper .csc-swimsuitmain { top: 28%; left: 30%; width: 41%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-swimsuit .csc-img-wrapper .csc-swimsuitleg2 { top: 54%; left: 11%; width: 52%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-swimsuit .csc-img-wrapper .csc-swimsuithead { top: 10%; left: 55%; width: 16%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-boy { top: 80%; left: 80.5%; width: 4.5%; animation: 4s csc-float infinite 1.5s ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-boy .csc-img-wrapper .csc-boyarm1 { top: 33%; left: 0%; width: 65%; transform-origin: top right; animation: 3s csc-wavealt infinite 1s ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-boy .csc-img-wrapper .csc-boyarm2 { top: 33%; left: 59%; width: 31%; transform-origin: top center; animation: 4s csc-wave infinite 1.5s ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-boy .csc-img-wrapper .csc-boymain { top: 19%; left: 39%; width: 47%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-boy .csc-img-wrapper .csc-boyhead { top: 0%; left: 56%; width: 29%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-kid { top: 83%; left: 86.5%; width: 4.5%; animation: 5s csc-float infinite 1s ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-kid .csc-img-wrapper .csc-kidarm1 { top: 56%; left: 0%; width: 52%; transform-origin: top right; animation: 1s csc-wave infinite 1s ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-kid .csc-img-wrapper .csc-kidarm2 { top: 0%; left: 70%; width: 31%; transform-origin: bottom left; animation: 1s csc-wavealt infinite 1s ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-kid .csc-img-wrapper .csc-kidmain { top: 40%; left: 48%; width: 60%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-kid .csc-img-wrapper .csc-kidhead { top: 2%; left: 45%; width: 32%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-float { top: 84%; left: 90%; width: 5.5%; animation: 7s csc-float infinite 2s ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-beachball { top: 91%; left: 86.5%; width: 2%; animation: 6s csc-ballfloat infinite ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-donut { top: 86%; left: 96%; width: 5%; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-donut .csc-img-wrapper { transform: translateY(-200%); }
+.venue-scene--tessensohn[data-layout='wide'] .csc-donut .csc-img-wrapper .csc-donutmain { width: 100%; top: 0%; animation: 8s csc-float infinite ease; }
+.venue-scene--tessensohn[data-layout='wide'] .csc-guide { width: 100%; opacity: .25; top: 0; }
+
+/* ---- wide entrances ---- */
+.venue-scene--tessensohn[data-layout='wide'][data-intro='play'] .csc-building { animation: 2s csc-building ease; }
+.venue-scene--tessensohn[data-layout='wide'][data-intro='play'] .csc-car { animation: 15s csc-carX forwards ease; }
+.venue-scene--tessensohn[data-layout='wide'][data-intro='play'] .csc-car .csc-img-wrapper { animation: 15s csc-carY forwards ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'][data-intro='play'] .csc-car .csc-img-wrapper .csc-carwheel1 { animation: 15s csc-carwheel ease; }
+.venue-scene--tessensohn[data-layout='wide'][data-intro='play'] .csc-car .csc-img-wrapper .csc-carwheel2 { animation: 15s csc-carwheel ease; }
+.venue-scene--tessensohn[data-layout='wide'][data-intro='play'] .csc-bike1 { animation: 4s csc-bike1X forwards ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'][data-intro='play'] .csc-bike1 .csc-img-wrapper { animation: 3s csc-bike1Y forwards ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'][data-intro='play'] .csc-bike2 { animation: 6s csc-bike2X forwards 1s ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'][data-intro='play'] .csc-bike2 .csc-img-wrapper { animation: 5s csc-bike2Y forwards 1s ease-in-out; }
+.venue-scene--tessensohn[data-layout='wide'][data-intro='play'] .csc-donut { animation: 1.5s csc-donutX forwards 2s ease-in; transform: translateX(120%); }
+.venue-scene--tessensohn[data-layout='wide'][data-intro='play'] .csc-donut .csc-img-wrapper { animation: 1.5s csc-donutY forwards 2s ease-in; }
+
+/* At rest the cyclists have already left. */
+.venue-scene--tessensohn[data-layout='wide'][data-intro='rest'] .csc-bike1 {
+  display: none;
+}
+
+.venue-scene--tessensohn[data-layout='wide'][data-intro='rest'] .csc-bike2 {
+  display: none;
+}
+
+/* ---- wide keyframes (CSC's) ---- */
+@keyframes csc-bike1X { 0%{transform:translateX(0%);}100%{transform:translateX(-500%);} }
+@keyframes csc-bike1Y { 0%{transform:translateY(0%);}100%{transform:translateY(-80%);} }
+@keyframes csc-bike2X { 0%{transform:translateX(0%);}100%{transform:translateX(-700%);} }
+@keyframes csc-bike2Y { 0%{transform:translateY(0%);}40%{transform:translateY(20%);}100%{transform:translateY(-80%);} }
+@keyframes csc-bikeleg1 { 0%,100%{transform:rotate(0deg);}50%{transform:rotate(-30deg);} }
+@keyframes csc-bikeleg2 { 0%,100%{transform:rotate(0deg);}50%{transform:rotate(10deg);} }
+@keyframes csc-bikeleg22 { 0%,100%{transform:rotate(0deg);}50%{transform:rotate(20deg);} }
+@keyframes csc-carX { 0%{transform:translateX(640%);}100%{transform:translateX(0%);} }
+@keyframes csc-carY { 0%{transform:translateY(-80%);}10%{transform:translateY(-60%);}30%{transform:translateY(-85%);}60%{transform:translateY(15%);}100%{transform:translateY(0%);} }
+@keyframes csc-cloudright { 0%{opacity:0;transform:translateX(-50%);}25%{opacity:.9;}75%{opacity:.9;}100%{opacity:0;transform:translateX(0%);} }
+@keyframes csc-donutX { 0%{transform:translateX(120%);}100%{transform:translateX(0%);} }
+@keyframes csc-donutY { 0%{transform:translateY(-300%);}100%{transform:translateY(0%);} }
+@keyframes csc-leafleft { 0%{opacity:0;transform:translate(30%,-20%);}33.33%{opacity:1;}86.67%{opacity:1;transform:translate(0,0) scale(1);}100%{opacity:0;transform:translate(0,0) scale(1.5);} }
+@keyframes csc-leafright { 0%{opacity:0;transform:translate(-30%,-20%);}33.33%{opacity:1;}86.67%{opacity:1;transform:translate(0,0) scale(1);}100%{opacity:0;transform:translate(0,0) scale(1.5);} }
+@keyframes csc-wagalt { 0%{transform:rotate(0deg);}33.33%{transform:rotate(10deg);}66.67%{transform:rotate(-10deg);}100%{transform:rotate(0deg);} }
+
+/*
+ * Reduced motion (ADR-298): everything that loops stops; what TRAVELS is hidden rather than left
+ * frozen mid-air (the cyclist, drifting cloud and smoke, the ball in flight); and the entrances,
+ * which end in the picture CSC drew, are simply not run, so the building stands and the car is
+ * parked from the first frame.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .venue-scene--tessensohn,
+  .venue-scene--tessensohn * {
+    animation: none !important;
+  }
+
+  .venue-scene--tessensohn .csc-bike1,
+  .venue-scene--tessensohn .csc-bike2,
+  .venue-scene--tessensohn .csc-cloud1,
+  .venue-scene--tessensohn .csc-cloud2,
+  .venue-scene--tessensohn .csc-cloud5,
+  .venue-scene--tessensohn .csc-cloud3,
+  .venue-scene--tessensohn .csc-cloud4,
+  .venue-scene--tessensohn .csc-fernleaf1,
+  .venue-scene--tessensohn .csc-fernleaf2,
+  .venue-scene--tessensohn .csc-leaf1,
+  .venue-scene--tessensohn .csc-leaf2,
+  .venue-scene--tessensohn .csc-leaf3,
+  .venue-scene--tessensohn .csc-smoke1,
+  .venue-scene--tessensohn .csc-smoke2,
+  .venue-scene--tessensohn .csc-tennisball {
+    display: none;
+  }
+
+  .venue-scene--tessensohn[data-intro='play'] .csc-building,
+  .venue-scene--tessensohn[data-intro='play'] .csc-car,
+  .venue-scene--tessensohn[data-intro='play'] .csc-car .csc-img-wrapper,
+  .venue-scene--tessensohn[data-intro='play'] .csc-car .csc-img-wrapper .csc-carwheel1,
+  .venue-scene--tessensohn[data-intro='play'] .csc-car .csc-img-wrapper .csc-carwheel2 {
+    animation: none;
+  }
+
+  .venue-scene--tessensohn[data-intro='play'] .csc-bike1,
+  .venue-scene--tessensohn[data-intro='play'] .csc-bike1 .csc-img-wrapper,
+  .venue-scene--tessensohn[data-intro='play'] .csc-bike2,
+  .venue-scene--tessensohn[data-intro='play'] .csc-bike2 .csc-img-wrapper {
+    animation: none;
+  }
+
+  .venue-scene--tessensohn[data-layout='wide'][data-intro='play'] .csc-donut,
+  .venue-scene--tessensohn[data-layout='wide'][data-intro='play'] .csc-donut .csc-img-wrapper {
+    animation: none;
+    transform: none;
+  }
+}
