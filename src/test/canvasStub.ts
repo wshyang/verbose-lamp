@@ -18,6 +18,11 @@ function makeContext(): Context2D {
     createLinearGradient: () => ({ addColorStop: () => undefined }),
     createRadialGradient: () => ({ addColorStop: () => undefined }),
     createPattern: () => ({}),
+    createImageData: (w: number, h: number) => ({
+      width: w,
+      height: h,
+      data: new Uint8ClampedArray(Math.max(0, w * h * 4)),
+    }),
     getImageData: (_x: number, _y: number, w: number, h: number) => ({
       width: w,
       height: h,
@@ -46,6 +51,10 @@ export function installCanvas2d(): void {
   } catch {
     // jsdom without `canvas` throws NotImplemented; fall through and stub.
   }
+  // jsdom's toBlob never invokes its callback; exports need a real Blob promise.
+  HTMLCanvasElement.prototype.toBlob = function toBlob(callback: BlobCallback): void {
+    queueMicrotask(() => callback(new Blob()));
+  } as typeof HTMLCanvasElement.prototype.toBlob;
   const original = HTMLCanvasElement.prototype.getContext;
   HTMLCanvasElement.prototype.getContext = function getContext(
     this: HTMLCanvasElement,
