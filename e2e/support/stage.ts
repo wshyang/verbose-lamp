@@ -117,6 +117,15 @@ export async function enableScreenBorder(page: Page): Promise<void> {
   await expect(enable).toBeChecked();
 }
 
+/** The Deco Lattice foundation for the title card and the lattice pattern for the border, both on. */
+export async function enableLatticeBrass(page: Page): Promise<void> {
+  await openFrameStudio(page);
+  await page.getByTestId('frame-studio__pattern').filter({ hasText: /lattice/i }).click();
+  await enableScreenBorder(page);
+  await page.getByTestId('frame-studio__border-pattern').filter({ hasText: /lattice/i }).click();
+  await expect(page.getByTestId('frame-studio__border-reroll')).toBeVisible();
+}
+
 /** The `00:11 / 00:38` readout in the timeline. */
 export function clockReadout(page: Page): Locator {
   return page.locator('footer').getByText(/^\d\d:\d\d\s+\/\s+\d\d:\d\d$/);
