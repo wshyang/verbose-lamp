@@ -252,6 +252,23 @@ describe('GatsbySceneManager playback', () => {
     expect(last.isPlaying).toBe(true);
   });
 
+  // The film clock caps a frame at 50 ms so a hidden tab never skips an act, while the
+  // shader clock keeps wall time. Both were true of the shipped manager and must stay true.
+  it('caps a long frame for the film clock but not for the shader clock', () => {
+    const onTelemetry = vi.fn();
+    build({ onTelemetry });
+    vi.spyOn(THREE.Clock.prototype, 'getDelta').mockImplementation(function (this: THREE.Clock) {
+      this.elapsedTime += 1.5;
+      return 1.5;
+    });
+    step();
+
+    // The constructor already drew one 50 ms frame; the 1.5 s stall adds only 50 ms more.
+    expect(onTelemetry.mock.calls.at(-1)![0].currentTime).toBeCloseTo(0.1, 9);
+    // The shader clock took the whole stall on top of that first frame's 50 ms.
+    expect(gl.shaderPasses[0].uTime.value).toBeCloseTo(1.55, 9);
+  });
+
   it('wraps to the very start at the end of the sequence', () => {
     const onTelemetry = vi.fn();
     const { manager } = build({ onTelemetry });
