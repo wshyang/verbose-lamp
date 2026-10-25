@@ -1,7 +1,15 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { SEQUENCE_CHAPTERS, TOTAL_SEQUENCE_DURATION } from '../data/sequence';
-import { activeChapterIndex, clamp, lerp, smoothstep } from './choreography';
+import {
+  CARD_WINDOW,
+  activeChapterIndex,
+  cardPhase,
+  cardRole,
+  clamp,
+  lerp,
+  smoothstep,
+} from './choreography';
 
 describe('choreography primitives', () => {
   it('matches three’s smoothstep across the curve', () => {
@@ -66,5 +74,86 @@ describe('activeChapterIndex', () => {
 
   it('returns -1 for an empty chapter list', () => {
     expect(activeChapterIndex(1, [])).toBe(-1);
+  });
+});
+
+const OFF_STAGE = { drawProgress: 0, textProgress: 0, partOpen: 0, opacity: 0 };
+
+describe('cardRole', () => {
+  it('makes only the last chapter the finale', () => {
+    expect(cardRole(0, 5)).toBe('standard');
+    expect(cardRole(3, 5)).toBe('standard');
+    expect(cardRole(4, 5)).toBe('finale');
+  });
+
+  it('treats a lone chapter as the finale', () => {
+    expect(cardRole(0, 1)).toBe('finale');
+  });
+});
+
+// Expected values were computed from the shipped manager's inline arithmetic
+// (GatsbySceneManager.animate, `THREE.MathUtils.smoothstep`), not from this module.
+describe('cardPhase', () => {
+  it('stays dark outside the staging window, whatever the role', () => {
+    expect(cardPhase({ localT: -CARD_WINDOW - 0.01, role: 'standard' })).toEqual(OFF_STAGE);
+    expect(cardPhase({ localT: 1 + CARD_WINDOW + 0.01, role: 'finale' })).toEqual(OFF_STAGE);
+  });
+
+  it('is still staged exactly on the window edges', () => {
+    expect(cardPhase({ localT: -CARD_WINDOW, role: 'standard' })).toEqual(OFF_STAGE);
+    expect(cardPhase({ localT: 1 + CARD_WINDOW, role: 'finale' }).opacity).toBe(0);
+    expect(cardPhase({ localT: 1 + CARD_WINDOW, role: 'finale' }).drawProgress).toBe(1);
+  });
+
+  it('draws on and fades in at the card’s first instant', () => {
+    const phase = cardPhase({ localT: 0, role: 'standard' });
+
+    expect(phase.drawProgress).toBeCloseTo(0.021369277554, 10);
+    expect(phase.textProgress).toBe(0);
+    expect(phase.partOpen).toBe(0);
+    expect(phase.opacity).toBeCloseTo(0.885697623560, 10);
+  });
+
+  it('is fully drawn and legible mid-card, with the gate shut', () => {
+    expect(cardPhase({ localT: 0.5, role: 'standard' })).toEqual({
+      drawProgress: 1,
+      textProgress: 1,
+      partOpen: 0,
+      opacity: 1,
+    });
+  });
+
+  it('parts the gate as the camera flies through a standard card', () => {
+    const phase = cardPhase({ localT: 0.9, role: 'standard' });
+
+    expect(phase.partOpen).toBeCloseTo(0.402728692364, 10);
+    expect(phase.opacity).toBe(1);
+    expect(cardPhase({ localT: 0.95, role: 'standard' }).partOpen).toBeCloseTo(0.721213117449, 10);
+  });
+
+  it('keeps the finale gate shut and fades it out earlier than a standard card', () => {
+    const finale = cardPhase({ localT: 0.95, role: 'finale' });
+    const standard = cardPhase({ localT: 0.95, role: 'standard' });
+
+    expect(finale.partOpen).toBe(0);
+    expect(finale.opacity).toBeCloseTo(0.544066761653, 10);
+    expect(standard.opacity).toBeCloseTo(0.985422740525, 10);
+    expect(finale.opacity).toBeLessThan(standard.opacity);
+  });
+
+  it('has fully faded the finale by the end of its own time', () => {
+    expect(cardPhase({ localT: 1, role: 'finale' }).opacity).toBe(0);
+  });
+
+  it('never leaves 0..1 for any progress value across the whole window', () => {
+    for (let step = -20; step <= 120; step += 1) {
+      for (const role of ['standard', 'finale'] as const) {
+        const phase = cardPhase({ localT: step / 100, role });
+        for (const value of Object.values(phase)) {
+          expect(value).toBeGreaterThanOrEqual(0);
+          expect(value).toBeLessThanOrEqual(1);
+        }
+      }
+    }
   });
 });

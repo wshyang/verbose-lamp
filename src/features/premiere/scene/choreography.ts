@@ -37,3 +37,48 @@ export function activeChapterIndex(t: number, chapters: readonly ChapterTiming[]
   }
   return chapters.length - 1;
 }
+
+/** The two staging roles a card can play. The finale holds its gate shut and fades out sooner. */
+export type CardRole = 'standard' | 'finale';
+
+/** Only the last chapter is the finale. */
+export function cardRole(index: number, chapterCount: number): CardRole {
+  return index === chapterCount - 1 ? 'finale' : 'standard';
+}
+
+/** The draw-on, text wipe, gate parting and fade of one card. All 0 when off-stage. */
+export interface CardPhase {
+  readonly drawProgress: number;
+  readonly textProgress: number;
+  readonly partOpen: number;
+  readonly opacity: number;
+}
+
+export interface CardPhaseRequest {
+  /** 0 is the card's first instant, 1 its last. */
+  readonly localT: number;
+  readonly role: CardRole;
+}
+
+/** A card is only staged within this distance outside its own 0..1 life. */
+export const CARD_WINDOW = 0.18;
+
+const OFF_STAGE: CardPhase = { drawProgress: 0, textProgress: 0, partOpen: 0, opacity: 0 };
+
+function fadeOpacity(localT: number, role: CardRole): number {
+  const fadeIn = smoothstep(localT, -0.15, 0.04);
+  const fadeOut =
+    role === 'finale' ? 1 - smoothstep(localT, 0.91, 0.995) : 1 - smoothstep(localT, 0.94, 1.08);
+  return fadeIn * fadeOut;
+}
+
+export function cardPhase({ localT, role }: CardPhaseRequest): CardPhase {
+  if (localT < -CARD_WINDOW || localT > 1 + CARD_WINDOW) return OFF_STAGE;
+  return {
+    drawProgress: smoothstep(localT, -0.04, 0.42),
+    textProgress: smoothstep(localT, 0.14, 0.5),
+    // The finale holds its gate shut; every other act parts it as the camera flies through.
+    partOpen: role === 'finale' ? 0 : smoothstep(localT, 0.8, 1.03),
+    opacity: fadeOpacity(localT, role),
+  };
+}
