@@ -34,6 +34,8 @@ const BASE_RANK: Record<RailKind, number> = {
   ray: 3,
   arch: 3,
   pinstripe: 3,
+  strand: 3,
+  reed: 3,
 };
 
 /**
@@ -141,6 +143,8 @@ const GENERATION_CAP: Record<RailKind, number> = {
   arch: 0,
   monogram: 0,
   pinstripe: 0,
+  strand: 0,
+  reed: 0,
 };
 
 const echoRing: Production = (spec, i) => ({

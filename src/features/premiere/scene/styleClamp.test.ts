@@ -5,6 +5,7 @@ import {
   DEFAULT_SCREEN_BORDER_STYLE,
   SIGNATURE_GENOME,
   type FrameStyle,
+  type ScreenBorderStyle,
 } from '@/features/art-deco-frame';
 import { SEQUENCE_CHAPTERS, TOTAL_SEQUENCE_DURATION } from '../data/sequence';
 import {
@@ -210,14 +211,26 @@ describe('clampScreenBorderStyle', () => {
   });
 
   // PR #6 found that dropping the lattice `pattern` and `seed` here silently pinned the
-  // border to the printed poster edge. Those fields land with the lattice work; until
-  // then the guarantee is structural: every field this module does not own passes through.
-  it('passes through any field it does not own, such as the lattice pattern and seed', () => {
-    const input = { weight: 0.3, genome: { ...SIGNATURE_GENOME }, pattern: 'lattice', seed: 1925 };
+  // border to the printed poster edge.
+  it('keeps the lattice pattern and seed', () => {
+    const input: ScreenBorderStyle = {
+      weight: 0.3,
+      genome: { ...SIGNATURE_GENOME },
+      pattern: 'lattice',
+      seed: 1925,
+    };
 
-    const clamped = clampScreenBorderStyle(input) as typeof input;
+    const clamped = clampScreenBorderStyle(input);
 
     expect(clamped.pattern).toBe('lattice');
     expect(clamped.seed).toBe(1925);
+  });
+
+  it('passes through any other field it does not own', () => {
+    const input = { weight: 0.3, genome: { ...SIGNATURE_GENOME }, extra: 'kept' };
+
+    const clamped = clampScreenBorderStyle(input) as typeof input;
+
+    expect(clamped.extra).toBe('kept');
   });
 });

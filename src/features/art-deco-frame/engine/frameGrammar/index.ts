@@ -19,7 +19,7 @@ export {
   frameBox,
   mirrorHalves,
 } from './generative';
-export { buildEdgeBorder, viewportScaleAtDistance } from './edgeBorder';
+export { buildEdgeBorder, buildLatticeProscenium, viewportScaleAtDistance } from './edgeBorder';
 export {
   annotateRanks,
   applyIntricacy,
