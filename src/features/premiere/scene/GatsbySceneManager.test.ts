@@ -476,8 +476,8 @@ describe('GatsbySceneManager edge branches', () => {
     manager.dispose();
   });
 
-  it('holds one frozen frame, ignores the pointer and flags the container ready', () => {
-    const { manager, container } = createManager({ freezeAt: 4.32 });
+  it('holds one frozen frame and ignores the pointer', () => {
+    const { manager } = createManager({ freezeAt: 4.32 });
     expect(manager['currentTime']).toBe(4.32);
     expect(manager['isPlaying']).toBe(false);
 
@@ -485,15 +485,20 @@ describe('GatsbySceneManager edge branches', () => {
     expect(manager['pointerTarget'].x).toBe(0);
     expect(manager['pointerTarget'].y).toBe(0);
 
-    // The constructor renders the first frame; two more complete the freeze contract.
+    // The constructor renders the first frame; the freeze holds the playhead regardless.
+    runFrames(2);
+    expect(manager['currentTime']).toBe(4.32);
+    manager.dispose();
+  });
+
+  it('flags the container ready on the third frame', () => {
+    const { manager, container } = createManager();
+    // The constructor renders frame one; the flag waits for the third.
     expect(container.dataset.frameReady).toBeUndefined();
     runFrames(1);
     expect(container.dataset.frameReady).toBeUndefined();
-    expect(manager['currentTime']).toBe(4.32);
-
     runFrames(1);
     expect(container.dataset.frameReady).toBe('true');
-    expect(manager['currentTime']).toBe(4.32);
     manager.dispose();
   });
 

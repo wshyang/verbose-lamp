@@ -163,7 +163,8 @@ export class GatsbySceneManager implements PremiereSceneApi {
 
   /** Set only by the screenshot affordance: hold this time and never advance. */
   private readonly freezeAt: number | null;
-  private frozenFrames = 0;
+  /** How many frames have been rendered; the third one flags the mount div ready. */
+  private renderedFrames = 0;
 
   constructor(container: HTMLElement, options?: SceneManagerOptions) {
     const callbacks = options;
@@ -681,10 +682,9 @@ export class GatsbySceneManager implements PremiereSceneApi {
 
     this.composer.render();
 
-    if (this.freezeAt !== null) {
-      this.frozenFrames += 1;
-      if (this.frozenFrames === 3) this.container.dataset.frameReady = 'true';
-    }
+    // e2e waits on this before screenshotting or driving the timeline (ADDENDUM-022 §0.4).
+    this.renderedFrames += 1;
+    if (this.renderedFrames === 3) this.container.dataset.frameReady = 'true';
 
     this.onTelemetry?.({
       currentTime: this.currentTime,
