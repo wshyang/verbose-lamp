@@ -26,7 +26,7 @@ export function easeInOutCubic(t: number): number {
   return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
 }
 
-/** Quadratic Bézier point — orb flight arcs. */
+/** Quadratic Bézier point — sparkler flight arcs. */
 export interface QuadCurve {
   p0: NormPoint;
   p1: NormPoint;

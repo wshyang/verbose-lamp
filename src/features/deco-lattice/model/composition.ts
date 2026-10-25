@@ -1,4 +1,6 @@
+import { mulberry32 } from '@/shared/lib/random';
 import { bundle } from './bundle';
+import { clipSpecOutsideRect, rectFromHalfExtents, type ClippingRect } from './clip';
 import type { LatticeSpec, Pt } from './lattice';
 import {
   axisArrow, claspChevron, cornerDiamond, diagonalArm, nestedOctagram, reedRow,
@@ -15,6 +17,10 @@ export interface DecoLatticeRequest {
   density?: number;
   /** 1..4 — how many tutorial layers to build; each level is a superset. */
   level?: number;
+  /** Centred clear area (half extents) rails must not enter, e.g. for type. */
+  aperture?: { hw: number; hh: number };
+  /** Extra keep-out cartouches, in the same centred coordinates. */
+  textSlots?: readonly ClippingRect[];
 }
 
 export interface DecoLatticeGeometry {
@@ -65,13 +71,34 @@ function layer1({ req, m, heavy }: LayerContext): readonly LatticeSpec[] {
   return specs;
 }
 
-function layer2({ req, m, heavy }: LayerContext): readonly LatticeSpec[] {
-  if (req.mode === 'frame') return [];
+function layer2(ctx: LayerContext): readonly LatticeSpec[] {
+  const { req, m, heavy } = ctx;
+  if (req.mode === 'frame') return seededBracket(ctx);
   const rings = nestedOctagram(0.396 * m, 3, 0.8);
   return rings.map((points, i) => ({
     points, closed: true, width: heavy * (i === 0 ? 0.8 : 0.35), layer: 1 as const,
     rank: (i === 0 ? 1 : 2) as 1 | 2,
   }));
+}
+
+/**
+ * The frame mode's seeded element (ADDENDUM-029): a corner bracket whose
+ * elbow slides along the 45° lattice and whose strand count varies with the
+ * seed, so the Studio's pattern reroll visibly reworks all four corners.
+ * Endpoints stay anchored to the frame rails; the orbit mirrors the rest.
+ */
+function seededBracket({ req, m, heavy }: LayerContext): readonly LatticeSpec[] {
+  const rng = mulberry32(req.seed ?? 1925);
+  const cell = heavy / 2;
+  const slide = (Math.floor(rng() * 5) - 2) * cell;
+  const strands = 2 + Math.floor(rng() * 3);
+  const bracket: readonly Pt[] = [
+    { x: req.hw - 0.55 * m, y: req.hh - 0.36 * m },
+    { x: req.hw - 0.48 * m + slide, y: req.hh - 0.36 * m },
+    { x: req.hw - 0.36 * m, y: req.hh - 0.48 * m + slide },
+    { x: req.hw - 0.36 * m, y: req.hh - 0.55 * m },
+  ];
+  return bundle(bracket, { strands, spacing: heavy * 0.6, width: heavy * 0.25, layer: 2, rank: 2 });
 }
 
 function layer3({ req, m, heavy, density }: LayerContext): readonly LatticeSpec[] {
@@ -90,14 +117,6 @@ function layer3({ req, m, heavy, density }: LayerContext): readonly LatticeSpec[
     }
     specs.push({ points: diagonalArm(0.38 * m, 0.045 * m), closed: true, width: heavy * 0.5, layer: 2, rank: 2 });
     specs.push({ points: axisArrow(0.46 * m, 0.12 * m), width: heavy * 0.5, layer: 2, rank: 2 });
-  } else {
-    const bracket: readonly Pt[] = [
-      { x: req.hw - 0.55 * m, y: req.hh - 0.36 * m },
-      { x: req.hw - 0.48 * m, y: req.hh - 0.36 * m },
-      { x: req.hw - 0.36 * m, y: req.hh - 0.48 * m },
-      { x: req.hw - 0.36 * m, y: req.hh - 0.55 * m },
-    ];
-    specs.push(...bundle(bracket, { strands: 3, spacing: heavy * 0.6, width: heavy * 0.25, layer: 2, rank: 2 }));
   }
   return specs;
 }
@@ -131,11 +150,25 @@ export function buildDecoLattice(req: DecoLatticeRequest): DecoLatticeGeometry {
   const group = Math.abs(req.hw - req.hh) < 1e-9 ? D4 : D2;
   const context: LayerContext = { req, m, heavy, density };
   const layers = [layer1(context), layer2(context), layer3(context), layer4(context)];
-  const specs = layers.slice(0, level).flatMap((layer, i) => orbit(layer, i === 0 || i === 3 ? dedupeGroup(group) : group));
-  return { specs, hw: req.hw, hh: req.hh };
+  const orbited = layers.slice(0, level).flatMap((layer, i) => orbit(layer, i === 0 || i === 3 ? dedupeGroup(group) : group));
+  return { specs: clearKeepOuts(orbited, req), hw: req.hw, hh: req.hh };
 }
 
 /** Closed centred motifs already span the frame; orbit only fills quadrants. */
 function dedupeGroup(group: readonly (readonly [number, number, number, number])[]) {
   return group;
+}
+/** Clips every rail around the aperture and text slots, when given. */
+function clearKeepOuts(
+  specs: readonly LatticeSpec[],
+  req: DecoLatticeRequest,
+): readonly LatticeSpec[] {
+  const keepOuts: ClippingRect[] = [
+    ...(req.aperture ? [rectFromHalfExtents(req.aperture.hw, req.aperture.hh)] : []),
+    ...(req.textSlots ?? []),
+  ];
+  return keepOuts.reduce<readonly LatticeSpec[]>(
+    (current, rect) => current.flatMap((spec) => clipSpecOutsideRect(spec, rect)),
+    specs,
+  );
 }

@@ -36,7 +36,7 @@ export function PremiereTimeline({
   return (
     <footer className={cn(
       'absolute bottom-0 left-0 right-14 z-20 px-6 pb-6 transition-all duration-500 sm:right-16 sm:px-9 sm:pb-8',
-      hudHidden ? 'pointer-events-none translate-y-4 opacity-0' : 'translate-y-0 opacity-100'
+      hudHidden ? 'invisible pointer-events-none translate-y-4 opacity-0' : 'visible translate-y-0 opacity-100'
     )}>
       <div className="mx-auto max-w-5xl border border-[#d4af37]/30 bg-[#08060c]/78 px-4 py-3.5 shadow-[0_10px_50px_rgba(0,0,0,0.75)] backdrop-blur-md sm:px-6">
         <div className="mb-3 flex flex-col justify-between gap-2.5 lg:flex-row lg:items-center">

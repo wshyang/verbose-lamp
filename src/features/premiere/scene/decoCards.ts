@@ -5,6 +5,7 @@ import {
   createExtrudedDecoTextMesh,
   createGoldFrameMaterial,
   createGoldFrameUniforms,
+  frameFinishForStyle,
   DEFAULT_FRAME_STYLE,
   type DecoTextRig,
   type FrameStyle,
@@ -171,10 +172,14 @@ export function createGatsbyCardRig(
   let frameGeo = buildFrameGeometry(chapter.archetype, mainTextWidth, frameStyle);
 
   const frameUniforms = createGoldFrameUniforms();
-  const goldMat = createGoldFrameMaterial(frameUniforms);
+  let frameFinish = frameFinishForStyle(frameStyle);
+  let goldMat = createGoldFrameMaterial(frameUniforms, frameFinish);
 
   const frameMesh = new THREE.Mesh(frameGeo, goldMat);
   root.add(frameMesh);
+  // Introspection handle for scene tests and probes (ADDENDUM-022 §7): the
+  // exact uniforms object bound into the frame shader program.
+  root.userData.frameUniforms = frameUniforms;
 
   const setFrameStyle = (next: FrameStyle) => {
     const sameStyle =
@@ -193,6 +198,13 @@ export function createGatsbyCardRig(
     frameGeo = buildFrameGeometry(chapter.archetype, mainTextWidth, frameStyle);
     frameMesh.geometry = frameGeo;
     previous.dispose();
+    const nextFinish = frameFinishForStyle(frameStyle);
+    if (nextFinish !== frameFinish) {
+      frameFinish = nextFinish;
+      goldMat.dispose();
+      goldMat = createGoldFrameMaterial(frameUniforms, frameFinish);
+      frameMesh.material = goldMat;
+    }
   };
 
   return {

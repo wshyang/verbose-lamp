@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_TUNING, HAWKER_CROP, SECOND_HEAD, buildHawkerFrame, buildHawkerMatte } from '@/features/background-removal';
 import { DEFAULT_BACKDROPS, renderEnamelPanel } from '@/features/enamel-backdrop';
 import { GILDING_PRESETS } from '@/features/gilded-portrait';
-import { AVATAR_SIZE, composeAvatar, composeLayers, cutOutSubject, outlineRing } from './compose';
+import { AVATAR_SIZE, composeAvatar, composeLayers, cutOutSubject, emptySubject, outlineRing } from './compose';
 import { boxToPhoto, clampBox, moveBox, photoToBox, resizeBox, startingBox } from './cropBox';
 import { STAGE_HINTS, nextStage } from './stage';
 import type { AvatarComposition, StageFacts } from './types';
@@ -132,5 +132,35 @@ describe('cropBox (ported)', () => {
     const onPhoto = boxToPhoto({ x: 20, y: 10, size: 50 }, shown, frame);
     expect(onPhoto).toEqual({ x: 40, y: 20, size: 100 });
     expect(photoToBox(onPhoto, shown, frame)).toEqual({ x: 20, y: 10, size: 50 });
+  });
+});
+
+describe('composeLayers invariants', () => {
+  it('rejects layers of different sizes', () => {
+    const subject = cutOutSubject({ ...composition(), size: 32 });
+    const backdrop = renderEnamelPanel(backdropSpec, 16);
+    expect(() => composeLayers({ subject, backdrop, frame: 'plaque', rampId: 'bright' })).toThrow(RangeError);
+  });
+
+  it('composes against a panel that carries no metal layer', () => {
+    const subject = cutOutSubject({ ...composition(), size: 32 });
+    const panel = renderEnamelPanel(backdropSpec, 32);
+    const bare = { ...panel, metal: undefined } as unknown as typeof panel;
+    const avatar = composeLayers({ subject, backdrop: bare, frame: 'plaque', rampId: 'bright' });
+    expect(avatar.image.width).toBe(32);
+    expect(avatar.metal.data.length).toBe(32 * 32);
+  });
+
+  it('builds a fully transparent empty subject', () => {
+    const empty = emptySubject(4);
+    expect(empty.pixels.data.every((value) => value === 0)).toBe(true);
+    expect(empty.alpha.data.every((value) => value === 0)).toBe(true);
+    expect(empty.shine).toBe(0);
+  });
+
+  it('renders at the 512 default when the caller omits the size', () => {
+    const { size: _size, ...rest } = composition();
+    const avatar = composeAvatar(rest);
+    expect([avatar.width, avatar.height]).toEqual([512, 512]);
   });
 });

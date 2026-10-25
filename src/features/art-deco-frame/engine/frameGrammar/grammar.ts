@@ -34,6 +34,9 @@ const BASE_RANK: Record<RailKind, number> = {
   ray: 3,
   arch: 3,
   pinstripe: 3,
+  star: 1,
+  lattice: 2,
+  reed: 3,
 };
 
 /**
@@ -80,9 +83,9 @@ function unitNormal(a: Point2, b: Point2): Point2 {
 }
 
 function miterAt(prev: Point2 | null, curr: Point2, next: Point2 | null): Point2 {
-  if (!prev && next) return unitNormal(curr, next);
-  if (!next && prev) return unitNormal(prev, curr);
-  if (!prev || !next) return { x: 0, y: 1 };
+  // sampleNormal only calls this for n >= 2, so at least one neighbour exists.
+  if (!prev) return unitNormal(curr, next as Point2);
+  if (!next) return unitNormal(prev, curr);
   const n1 = unitNormal(prev, curr);
   const n2 = unitNormal(curr, next);
   const mx = n1.x + n2.x;
@@ -141,6 +144,9 @@ const GENERATION_CAP: Record<RailKind, number> = {
   arch: 0,
   monogram: 0,
   pinstripe: 0,
+  star: 2,
+  lattice: 1,
+  reed: 0,
 };
 
 const echoRing: Production = (spec, i) => ({
@@ -213,6 +219,22 @@ const dashDotTip: Production = (spec) => {
   };
 };
 
+/** Star elaboration echoes inward, like nestedOctagram (ADDENDUM-021 §3.2). */
+const starEcho: Production = (spec, i) => ({
+  ...spec,
+  points: scaleAbout(spec.points, centroidOf(spec.points), Math.pow(0.8, i)),
+  width: spec.width * 0.65,
+  delay: spec.delay + 0.04 * i,
+});
+
+/** Lattice elaboration adds one parallel strand per generation. */
+const latticeStrand: Production = (spec, i) => ({
+  ...spec,
+  points: offsetPolylineOutward(spec.points, 0.07 * i, Boolean(spec.closed)),
+  width: spec.width * 0.6,
+  delay: spec.delay + 0.03 * i,
+});
+
 const PRODUCTIONS: Partial<Record<RailKind, Production>> = {
   frame: echoRing,
   diamond: nestedDiamond,
@@ -220,6 +242,9 @@ const PRODUCTIONS: Partial<Record<RailKind, Production>> = {
   column: shadowColumn,
   chevron: nestedChevron,
   ray: dashDotTip,
+  star: starEcho,
+  lattice: latticeStrand,
+  // reed intentionally has no production: density already controls it.
 };
 
 /* -------------------------------------------------------------------------- */

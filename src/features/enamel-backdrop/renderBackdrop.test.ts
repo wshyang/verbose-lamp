@@ -137,3 +137,16 @@ describe('jewel finishes lifted from implementation B (ADDENDUM-019)', () => {
     expect(spread(0.9)).toBeGreaterThan(spread(0) * 1.05);
   });
 });
+
+describe('renderEnamelBackdrop degenerate sizes', () => {
+  it('renders a single pixel, where the gradient has no neighbours', () => {
+    const pixel = renderEnamelBackdrop(emeraldSunburst.spec, 1);
+    expect(pixel.data).toHaveLength(4);
+    expect(pixel.data[3]).toBe(255);
+  });
+
+  it('renders a single-band spec as one flat enamel', () => {
+    const flat = renderEnamelBackdrop({ ...emeraldSunburst.spec, bands: 1 }, 8);
+    expect(flat.data).toHaveLength(8 * 8 * 4);
+  });
+});

@@ -23,3 +23,11 @@ describe('validateEntries', () => {
     expect(pool.map((e) => e.id)).toEqual(['buchanan-d']);
   });
 });
+
+describe('validateEntries blank ids', () => {
+  it('reports an entry whose id trims to nothing', () => {
+    const result = validateEntries([{ id: '   ', name: 'Mystery Guest' }, daisy]);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.issues).toContain('An entry is missing its id.');
+  });
+});

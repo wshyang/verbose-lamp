@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { CROP_PER_INTER_OCULAR, EYE_LINE, HEAD_OVER_FACE, HEAD_SHARE, cropFromDetection, largestFace } from './framing';
-import { forgetFaceLocator, locateFace } from './locateFace';
+import { canvasSourceOf, forgetFaceLocator, locateFace, warmUpFaceLocator } from './locateFace';
 import type { FaceDetection, TasksVisionModule } from './types';
 
 const SQUARE_FRAME = { width: 1000, height: 1000 };
@@ -45,6 +45,17 @@ describe('cropFromDetection', () => {
     expect(cropFromDetection({ keypoints: [] }, SQUARE_FRAME)).toBeNull();
     expect(cropFromDetection({}, SQUARE_FRAME)).toBeNull();
     expect(cropFromDetection(guest(0), SQUARE_FRAME)).toBeNull();
+    expect(cropFromDetection({ keypoints: [{ x: 0.5, y: 0.4 }] }, SQUARE_FRAME)).toBeNull();
+  });
+
+  it('frames from the eyes alone when the detector gives no box', () => {
+    const box = cropFromDetection({ keypoints: [{ x: 0.45, y: 0.4 }, { x: 0.55, y: 0.4 }] }, SQUARE_FRAME)!;
+    expect(box.size).toBeCloseTo(100 * CROP_PER_INTER_OCULAR, 6);
+  });
+
+  it('returns null when the eye centre is not finite', () => {
+    const astronomical = { keypoints: [{ x: 1e308, y: 0.3 }, { x: 1e308, y: 0.5 }] };
+    expect(cropFromDetection(astronomical, SQUARE_FRAME)).toBeNull();
   });
 });
 
@@ -53,6 +64,13 @@ describe('largestFace', () => {
     const faces = [guest(0.1, 40), guest(0.1, 120), guest(0.1, 80)];
     expect(largestFace(faces)).toBe(faces[1]);
     expect(largestFace([])).toBeNull();
+  });
+
+  it('treats a missing box as zero width', () => {
+    const noBox: FaceDetection = { keypoints: [{ x: 0.45, y: 0.4 }, { x: 0.55, y: 0.4 }] };
+    const boxed = guest(0.1, 50);
+    expect(largestFace([noBox, boxed])).toBe(boxed);
+    expect(largestFace([boxed, noBox])).toBe(boxed);
   });
 });
 
@@ -90,5 +108,39 @@ describe('locateFace', () => {
   it('returns null when no image source can be built', async () => {
     const load = async () => fakeTasksVision(() => ({ detections: [guest(0.08)] }));
     expect(await locateFace(photo, { load, toSource: () => null })).toBeNull();
+    expect(await locateFace(photo, { load, toSource: () => undefined })).toBeNull();
+  });
+
+  it('returns null when the detector answers without detections', async () => {
+    const silent = () => ({}) as unknown as { detections: FaceDetection[] };
+    const load = async () => fakeTasksVision(silent);
+    expect(await locateFace(photo, { load, toSource })).toBeNull();
+    const empty = async () => fakeTasksVision(() => ({ detections: [] }));
+    forgetFaceLocator();
+    expect(await locateFace(photo, { load: empty, toSource })).toBeNull();
+  });
+
+  it('warms up without poisoning later calls, even when the download fails', async () => {
+    const flush = () => new Promise((resolve) => setTimeout(resolve, 25)); // a cold import can outlast one tick
+    warmUpFaceLocator(() => Promise.reject(new Error('CDN blocked')));
+    await flush();
+    const working = async () => fakeTasksVision(() => ({ detections: [guest(0.08)] }));
+    expect(await locateFace(photo, { load: working, toSource })).not.toBeNull();
+
+    forgetFaceLocator();
+    warmUpFaceLocator();
+    await flush();
+    expect(await locateFace(photo, { load: working, toSource })).not.toBeNull();
+  });
+
+  it('returns null with the default CDN loader outside a browser', async () => {
+    await expect(locateFace(photo)).resolves.toBeNull();
+  });
+});
+
+describe('canvasSourceOf outside the browser', () => {
+  it('returns null when there is no document (this suite runs in node)', () => {
+    const image = { width: 2, height: 2, data: new Uint8ClampedArray(16) };
+    expect(canvasSourceOf(image)).toBeNull();
   });
 });

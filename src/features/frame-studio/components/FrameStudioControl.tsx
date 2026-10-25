@@ -6,6 +6,7 @@ import {
   FrameLayerSource,
   FrameSurface,
   IntricacyPreset,
+  ScreenBorderPattern,
 } from '@/features/art-deco-frame';
 import { GENE_GROUPS } from '../data/frameDesigns';
 import type { GeneKey } from '@/features/art-deco-frame';
@@ -36,6 +37,8 @@ interface FrameStudioControlProps {
   genome: Record<GeneKey, number>;
   borderEnabled: boolean;
   borderWeight: number;
+  borderPattern: ScreenBorderPattern;
+  isLatticeActive: boolean;
   onSurfaceChange: (surface: FrameSurface) => void;
   onPatternChange: (source: FrameSource) => void;
   onLayerToggle: (source: FrameLayerSource, enabled: boolean) => void;
@@ -47,6 +50,8 @@ interface FrameStudioControlProps {
   onGeneChange: (key: GeneKey, value: number) => void;
   onBorderEnabledChange: (enabled: boolean) => void;
   onBorderWeightChange: (weight: number) => void;
+  onBorderPatternChange: (pattern: ScreenBorderPattern) => void;
+  onRerollPattern: () => void;
   onReset: () => void;
   onDismiss: () => void;
 }
@@ -212,6 +217,18 @@ export const FrameStudioControl: React.FC<FrameStudioControlProps> = (props) => 
             />
           </div>
 
+          {props.isLatticeActive && (
+            <button
+              type="button"
+              onClick={props.onRerollPattern}
+              className={`w-full px-2 py-1.5 text-[9px] tracking-[0.12em] uppercase ${chip(false)}`}
+              title="Generate a new lattice arrangement from a new seed"
+              data-testid="frame-studio__reroll"
+            >
+              Reroll pattern
+            </button>
+          )}
+
           <div className="space-y-1">
             <div className="flex items-baseline justify-between">
               <span className="text-[9px] tracking-[0.2em] uppercase text-[#d4af37]/80">Detail</span>
@@ -288,6 +305,17 @@ export const FrameStudioControl: React.FC<FrameStudioControlProps> = (props) => 
               data-testid="frame-studio__border-enable"
             />
           </label>
+          <div className="space-y-1.5">
+            <div className="text-[9px] tracking-[0.2em] uppercase text-[#d4af37]/80">Border pattern</div>
+            <div className="grid grid-cols-2 gap-1" role="group" aria-label="Screen border pattern">
+              <button type="button" onClick={() => props.onBorderPatternChange('poster')} aria-pressed={props.borderPattern === 'poster'} className={`px-2 py-1.5 text-[9px] tracking-[0.12em] uppercase ${chip(props.borderPattern === 'poster')}`} data-testid="frame-studio__border-pattern-poster">
+                Poster
+              </button>
+              <button type="button" onClick={() => props.onBorderPatternChange('lattice')} aria-pressed={props.borderPattern === 'lattice'} className={`px-2 py-1.5 text-[9px] tracking-[0.12em] uppercase ${chip(props.borderPattern === 'lattice')}`} data-testid="frame-studio__border-pattern-lattice">
+                Lattice
+              </button>
+            </div>
+          </div>
           <div className={props.borderEnabled ? 'space-y-1' : 'space-y-1 opacity-40'}>
             <div className="flex items-baseline justify-between">
               <span className="text-[9px] tracking-[0.2em] uppercase text-[#d4af37]/80">Border weight</span>

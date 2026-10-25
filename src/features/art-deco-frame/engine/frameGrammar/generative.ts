@@ -1,5 +1,7 @@
+import { buildDecoLattice } from '@/features/deco-lattice';
 import { FrameArchetype } from '../../model/types';
 import { buildCoreFrameSpecs } from './archetypes';
+import { latticeToRails } from './latticeAdapter';
 import { FrameFormula, Point2, PolylineSpec, RailKind } from './types';
 
 /* -------------------------------------------------------------------------- */
@@ -240,11 +242,61 @@ function buildArcade(box: Box, level: number): PolylineSpec[] {
 }
 
 /* -------------------------------------------------------------------------- */
+/*  DECO LATTICE — the film's octilinear line bundles (ADDENDUM-021)           */
+/* -------------------------------------------------------------------------- */
+
+const LATTICE_DEFAULT_SEED = 1925;
+const LATTICE_CARD_DENSITY = 0.45;
+const LATTICE_WIDTH_FACTOR = 0.55;
+
+/**
+ * Full-frame lattice rails for a title card. Generated in normalised space
+ * (hh = 1) and scaled to the card box; frame mode keeps the typography
+ * aperture clear. Unlike the half-frame generators above, lattice specs are
+ * already D2-symmetric full frames, so they are not mirrored.
+ */
+export function buildLattice(box: Box, level: number, seed: number): PolylineSpec[] {
+  const ratio = box.hw / box.hh;
+  const geometry = buildDecoLattice({
+    mode: 'frame',
+    hw: ratio,
+    hh: 1,
+    seed,
+    density: LATTICE_CARD_DENSITY,
+    level,
+    aperture: { hw: ratio * 0.6, hh: 0.58 },
+  });
+  return latticeToRails(geometry, {
+    coordScale: box.hh,
+    widthScale: box.hh * LATTICE_WIDTH_FACTOR,
+    seed,
+  });
+}
+
+/* -------------------------------------------------------------------------- */
 /*  PUBLIC                                                                     */
 /* -------------------------------------------------------------------------- */
 
 /**
  * Generative core for a non-authored formula. Right half is built, then mirrored.
+ * For the monogram archetype the authored G/pinstripe letterforms are preserved.
+ */
+function withMonogramGlyph(
+  specs: PolylineSpec[],
+  archetype: FrameArchetype,
+  mainWidth: number,
+  includeMonogram: boolean | undefined
+): PolylineSpec[] {
+  if (archetype !== 'monogram_gate' || includeMonogram === false) return specs;
+  const glyph = buildCoreFrameSpecs('monogram_gate', mainWidth).filter(
+    (s) => s.kind === 'monogram' || s.kind === 'pinstripe'
+  );
+  return [...specs, ...glyph];
+}
+
+/**
+ * Generative core for a non-authored formula. Right half is built, then mirrored
+ * (the lattice source is the exception: it is already a full D2 frame).
  * For the monogram archetype the authored G/pinstripe letterforms are preserved.
  */
 export function buildGenerativeFrameSpecs(
@@ -256,6 +308,13 @@ export function buildGenerativeFrameSpecs(
   const box = frameBox(archetype, mainWidth);
   const level = clampGenesisLevel(formula.level);
 
+  if (formula.source === 'lattice') {
+    const rails = buildLattice(box, level, formula.seed ?? LATTICE_DEFAULT_SEED);
+    const pattern =
+      options.includePrimaryFrame === false ? rails.filter((r) => r.kind !== 'frame') : rails;
+    return withMonogramGlyph(pattern, archetype, mainWidth, options.includeMonogram);
+  }
+
   const rightHalf =
     formula.source === 'fractal'
       ? buildFractal(box, level)
@@ -264,11 +323,5 @@ export function buildGenerativeFrameSpecs(
         : buildArcade(box, level);
 
   const pattern = options.includePrimaryFrame === false ? rightHalf.slice(1) : rightHalf;
-  const specs = mirrorHalves(pattern);
-  if (archetype !== 'monogram_gate' || options.includeMonogram === false) return specs;
-
-  const glyph = buildCoreFrameSpecs('monogram_gate', mainWidth).filter(
-    (s) => s.kind === 'monogram' || s.kind === 'pinstripe'
-  );
-  return [...specs, ...glyph];
+  return withMonogramGlyph(mirrorHalves(pattern), archetype, mainWidth, options.includeMonogram);
 }

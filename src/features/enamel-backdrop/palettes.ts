@@ -99,7 +99,7 @@ export const DEFAULT_BACKDROPS: readonly BackdropPreset[] = Object.freeze([
 const JEWEL_FINISH = { bands: 4, gilt: 0.2, wireWidth: 0.9, leafDensity: 0.2, rampId: 'bright' } as const;
 
 interface JewelLook {
-  readonly palette: EnamelPalette;
+  readonly palette: EnamelPalette & { readonly accents: readonly string[] };
   readonly pattern: BackdropPattern;
   readonly inlay: InlayStyle;
   readonly guilloche: number;
@@ -107,7 +107,7 @@ interface JewelLook {
 
 function jewel(id: string, name: string, look: JewelLook): BackdropPreset {
   const { palette, ...rest } = look;
-  const spec: BackdropSpec = { ...JEWEL_FINISH, ...rest, colourOne: palette.colourOne, colourTwo: palette.colourTwo, accents: palette.accents ?? [] };
+  const spec: BackdropSpec = { ...JEWEL_FINISH, ...rest, colourOne: palette.colourOne, colourTwo: palette.colourTwo, accents: palette.accents };
   return Object.freeze({ id, name, spec: Object.freeze(spec) });
 }
 

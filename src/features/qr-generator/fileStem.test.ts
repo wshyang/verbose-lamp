@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { toSafeFileStem } from './export';
+import { toSafeFileStem } from './fileStem';
 
 describe('toSafeFileStem', () => {
   it('slugifies a caption with interpuncts and accents', () => {

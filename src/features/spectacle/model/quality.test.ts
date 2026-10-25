@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { qualitySettings, resolveQuality } from './quality';
+import { detectQualityEnv, qualitySettings, resolveQuality } from './quality';
 
 describe('resolveQuality', () => {
   it('auto picks low on coarse pointers or weak CPUs', () => {
@@ -19,5 +19,10 @@ describe('resolveQuality', () => {
     expect(lo.sparkCap).toBeLessThan(hi.sparkCap);
     expect(lo.trailSamples).toBeLessThan(hi.trailSamples);
     expect(lo.dprCap).toBeLessThanOrEqual(1.25);
+  });
+});
+describe('detectQualityEnv outside a browser', () => {
+  it('assumes a fine pointer and eight cores', () => {
+    expect(detectQualityEnv()).toEqual({ coarsePointer: false, cores: 8 });
   });
 });

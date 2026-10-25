@@ -27,3 +27,9 @@ export function randomIndex(n: number, fill: (buf: Uint32Array) => Uint32Array):
   const buf = fill(new Uint32Array(1));
   return buf[0] % n;
 }
+/**
+ * Plan spelling from ADDENDUM-022 §0.1: create a seeded PRNG. Implemented by
+ * mulberry32, which already existed for the spectacle/lattice engines, so
+ * the whole codebase draws from one deterministic generator.
+ */
+export const createPrng: (seed: number) => () => number = mulberry32;

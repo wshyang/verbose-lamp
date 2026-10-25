@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { QrGeneratorLauncher } from '@/features/qr-generator';
 import { AvatarStudioLauncher } from '@/features/avatar-studio';
+import { CelebrationLauncher } from '@/features/celebration-overlay';
 import { EventNightLauncher } from '@/features/event-night';
 import type { CameraMode } from '@/features/premiere';
 import { Button, IconButton } from '@/shared/ui';
@@ -41,7 +42,7 @@ export function PremiereHeader({
   return (
     <header className={cn(
       'absolute left-0 right-0 top-0 z-20 flex flex-wrap items-center justify-between gap-3 px-6 pt-6 transition-all duration-500 sm:px-9 sm:pt-8',
-      hudHidden ? 'pointer-events-none -translate-y-3 opacity-0' : 'translate-y-0 opacity-100'
+      hudHidden ? 'invisible pointer-events-none -translate-y-3 opacity-0' : 'visible translate-y-0 opacity-100'
     )}>
       <div className="flex items-center gap-3.5">
         <div className="flex h-9 w-9 rotate-45 items-center justify-center border border-[#f8e29b]/65 bg-[#09070d]/80 shadow-[0_0_20px_rgba(212,175,55,0.25)]">
@@ -65,6 +66,7 @@ export function PremiereHeader({
         </Button>
         <QrGeneratorLauncher />
         <AvatarStudioLauncher />
+        <CelebrationLauncher />
         <EventNightLauncher onOpen={onOpenEventNight} />
         <Button
           onClick={onToggleCameraMode}

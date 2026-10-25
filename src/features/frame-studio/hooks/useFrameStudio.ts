@@ -12,10 +12,14 @@ import {
   FrameStyle,
   FrameSurface,
   INTRICACY_PRESETS,
+  ScreenBorderPattern,
   ScreenBorderStyle,
 } from '@/features/art-deco-frame';
 import { SIGNATURE_GENOME, clampGenome, withGene, type GeneKey } from '@/features/art-deco-frame';
 import { DESIGN_GALLERY, describeDesign, designAt, findDesignEntry } from '../data/frameDesigns';
+import { nextPatternSeed } from '../model/patternSeed';
+
+export { nextPatternSeed } from '../model/patternSeed';
 
 export interface FrameStudioTarget {
   setSequenceFrameStyle: (style: FrameStyle) => void;
@@ -23,8 +27,16 @@ export interface FrameStudioTarget {
   setScreenBorderEnabled: (enabled: boolean) => void;
 }
 
+
 const detailPercent = (value: number) => Math.round(value * 100);
 const detailValue = (percent: number) => Math.min(1, Math.max(0, percent / 100));
+
+/**
+ * Below the `sm` breakpoint the open panel covers the timeline transport
+ * (found by the likeness gate, ADDENDUM-030), so small screens start with
+ * the studio tucked behind its reveal button. Sampled once at mount.
+ */
+const startsOpen = () => window.innerWidth >= 640;
 
 const defaultFrameFormula = (): FrameFormula => ({
   ...DEFAULT_FRAME_STYLE.formula,
@@ -33,7 +45,7 @@ const defaultFrameFormula = (): FrameFormula => ({
 });
 
 export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(startsOpen);
   const [surface, setSurfaceState] = useState<FrameSurface>('title-cards');
   const [formula, setFormula] = useState<FrameFormula>(defaultFrameFormula);
   const [intricacy, setIntricacy] = useState(DEFAULT_FRAME_STYLE.intricacy);
@@ -108,6 +120,11 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
     [commitSequence, formula, intricacy]
   );
 
+  const rerollPattern = useCallback(
+    () => commitSequence({ ...formula, seed: nextPatternSeed(formula.seed) }, intricacy),
+    [commitSequence, formula, intricacy]
+  );
+
   const setDetail = useCallback(
     (percent: number) => commitSequence(formula, detailValue(percent)),
     [commitSequence, formula]
@@ -115,6 +132,11 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
 
   const setBorderWeight = useCallback(
     (weight: number) => commitBorder({ ...border, weight: detailValue(weight) }),
+    [border, commitBorder]
+  );
+
+  const setBorderPattern = useCallback(
+    (pattern: ScreenBorderPattern) => commitBorder({ ...border, pattern }),
     [border, commitBorder]
   );
 
@@ -183,8 +205,14 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, []);
 
+  const isLatticeActive =
+    formula.source === 'lattice' ||
+    layerOptions.some((layer) => layer.source === 'lattice' && layer.enabled);
+
   return {
     isOpen,
+    isLatticeActive,
+    rerollPattern,
     selectPattern,
     selectDesign,
     setLevel,
@@ -212,6 +240,8 @@ export function useFrameStudio(getTarget: () => FrameStudioTarget | null) {
     setGene: setGeneForSurface,
     borderEnabled,
     setBorderEnabled,
+    borderPattern: border.pattern ?? 'poster',
+    setBorderPattern,
     borderWeight: detailPercent(border.weight),
     setBorderWeight,
     resetAll,

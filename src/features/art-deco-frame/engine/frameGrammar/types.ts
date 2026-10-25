@@ -18,7 +18,19 @@ export type RailKind =
   | 'column'
   | 'chevron'
   | 'ray'
-  | 'arch';
+  | 'arch'
+  // Deco Lattice kinds (ADDENDUM-021 §3.2): octagram, bundle fill, reed ticks.
+  | 'star'
+  | 'lattice'
+  | 'reed';
+
+export type FrameFinish = 'gold' | 'brass';
+
+/** Per-rail brass tone (ADDENDUM-021 §3.6): base 0 (light #ba9c72) .. 1 (dark #775320), gradient angle in radians. */
+export interface RailTone {
+  base: number;
+  angle: number;
+}
 
 export interface PolylineSpec {
   points: Point2[];
@@ -31,6 +43,8 @@ export interface PolylineSpec {
   kind?: RailKind;
   /** Derived importance 0 (essential) .. 3 (flourish). Computed by annotateRanks(). */
   rank?: number;
+  /** Brass gradient tone for the movie finish. Absent = untinted light brass. */
+  tone?: RailTone;
 }
 
 /** Intricacy scalar k in [0, 1]. 0.5 is the Film Baseline (identity). */
@@ -56,7 +70,7 @@ export const INTRICACY_PRESETS: readonly IntricacyPreset[] = [
 /*  FRAME GENESIS (ADDENDUM-004): the rule that draws the base rails           */
 /* -------------------------------------------------------------------------- */
 
-export type FrameSource = 'authored' | 'fractal' | 'rosette' | 'arcade';
+export type FrameSource = 'authored' | 'fractal' | 'rosette' | 'arcade' | 'lattice';
 export type FrameLayerSource = Exclude<FrameSource, 'authored'>;
 export type FrameSurface = 'title-cards' | 'screen-border';
 
@@ -71,6 +85,8 @@ export interface FrameFormula {
   source: FrameSource;
   /** Recursion depth / form exponent, 1..4. Ignored by `authored` (fixed shape). */
   level: number;
+  /** Seed for seeded sources (`lattice` walks). Default 1925 (ADDENDUM-021 §3.5). */
+  seed?: number;
   /** Proportion genes; the signature genome reproduces the delivered frame. */
   genome: BaseGenome;
   /** Optional decorative patterns composited over the foundation. */
@@ -112,6 +128,12 @@ export const FRAME_SOURCES: readonly FrameSourceInfo[] = [
     blurb: 'Recursive bays of stepped arches between piers, each level nested inward.',
     isGenerative: true,
   },
+  {
+    id: 'lattice',
+    label: 'Deco Lattice',
+    blurb: "The film's parallel-line bundles on a 45° lattice, generated from rules and a seed.",
+    isGenerative: true,
+  },
 ] as const;
 
 export const FRAME_LAYER_SOURCES: readonly (FrameSourceInfo & { id: FrameLayerSource })[] = Object.freeze(
@@ -124,6 +146,7 @@ export const DEFAULT_FRAME_LAYERS: readonly FramePatternLayer[] = [
   { source: 'fractal', enabled: false, level: 2 },
   { source: 'rosette', enabled: false, level: 2 },
   { source: 'arcade', enabled: false, level: 2 },
+  { source: 'lattice', enabled: false, level: 2 },
 ] as const;
 
 export const DEFAULT_FRAME_FORMULA: FrameFormula = {
@@ -143,15 +166,22 @@ export const DEFAULT_FRAME_STYLE: FrameStyle = {
   formula: DEFAULT_FRAME_FORMULA,
 };
 
+export type ScreenBorderPattern = 'poster' | 'lattice';
+
 export interface ScreenBorderStyle {
   /** 0..1 — how many nested rules and how dense the reeding */
   weight: number;
   /** proportion genes shared with the title frame */
   genome: BaseGenome;
+  /** Border family. Default 'poster' (the delivered geometry); 'lattice' is ADDENDUM-021. */
+  pattern?: ScreenBorderPattern;
+  /** Seed for the lattice border's walks. Default 1925. */
+  seed?: number;
 }
 
 export const DEFAULT_SCREEN_BORDER_STYLE: ScreenBorderStyle = {
   weight: 0.5,
   genome: { ...SIGNATURE_GENOME },
+  pattern: 'poster',
 };
 

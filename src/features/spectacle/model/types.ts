@@ -55,6 +55,14 @@ export interface OrbTransitionParams {
   onCovered?: () => void;
 }
 
+/**
+ * A sparkler transition: party sparklers fly the same flash-and-arc
+ * choreography the old "orb" name described (ADDENDUM-025). The orb spelling
+ * stays as a compatibility alias; new callers should use this name and the
+ * 'sparkler-transition' effect id.
+ */
+export type SparklerTransitionParams = OrbTransitionParams;
+
 export interface SunburstWipeParams {
   origin: NormPoint;
   rays?: number;
@@ -101,6 +109,8 @@ export interface FlashParams {
 
 export interface EffectParamsMap {
   fireworks: FireworksParams;
+  'sparkler-transition': SparklerTransitionParams;
+  /** Legacy alias of 'sparkler-transition' (ADDENDUM-025). */
   'orb-transition': OrbTransitionParams;
   'sunburst-wipe': SunburstWipeParams;
   confetti: ConfettiParams;

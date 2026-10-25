@@ -177,3 +177,10 @@ describe('spec edits', () => {
     expect(ENAMEL_PALETTES).toHaveLength(10);
   });
 });
+
+describe('fieldAt exhaustiveness', () => {
+  it('throws on a pattern kind that was never wired in', () => {
+    const bogus = { kind: 'plaid' } as unknown as BackdropPattern;
+    expect(() => fieldAt({ x: 0, y: 0 }, { size: 4, bands: 2 }, bogus)).toThrow('Unhandled backdrop pattern');
+  });
+});

@@ -7,8 +7,10 @@
  * Pure and deterministic. Adapted to our PolylineSpec/RailKind so it renders through
  * the same chamfered gold geometry and trim shader as the title cards.
  */
+import { apertureForLayout, buildDecoLattice, nineSliceLayout } from '@/features/deco-lattice';
 import { BaseGenome, clampGenome } from './genome';
-import { PolylineSpec, Point2, RailKind } from './types';
+import { latticeToRails } from './latticeAdapter';
+import { PolylineSpec, Point2, RailKind, ScreenBorderPattern } from './types';
 
 export interface EdgeBorderRequest {
   /** width / height of the viewport */
@@ -16,6 +18,10 @@ export interface EdgeBorderRequest {
   genome?: BaseGenome;
   /** 0..1 — how many nested rules and how dense the reeding */
   density: number;
+  /** Border family; 'poster' (default) is the delivered geometry. */
+  pattern?: ScreenBorderPattern;
+  /** Seed for the lattice border's walks. Default 1925. */
+  seed?: number;
 }
 
 export interface EdgeBorderGeometry {
@@ -33,7 +39,6 @@ const MAX_REED_PER_RUN = 26;
 const CORNER_FAN_REACH = 0.42;
 const REED_INSET = 0.095;
 const MIN_TICK_LENGTH = 0.008;
-const MIN_RAY_LENGTH = 0.004;
 const CORNER_FAN_ARCS = 3;
 
 function snap(value: number): number {
@@ -56,7 +61,7 @@ function reflectX(specs: PolylineSpec[]): PolylineSpec[] {
   return specs.map((spec) => ({
     ...spec,
     points: spec.points.map((point) => ({ x: snap(-point.x), y: point.y })),
-    partDir: -(spec.partDir ?? 1),
+    partDir: -(spec.partDir as number), // rail() always sets partDir
   }));
 }
 
@@ -117,11 +122,10 @@ function cornerFan(aspect: number, genome: BaseGenome, density: number): Polylin
   const rails: PolylineSpec[] = [];
 
   for (let index = 0; index < ribs; index += 1) {
-    const fraction = ribs === 1 ? 0 : index / (ribs - 1);
+    const fraction = index / (ribs - 1); // ribs is floored at 3 above
     const angle = baseAngle + fraction * span;
     const length = reach * (1 - fraction * 0.22);
     const end = { x: snap(origin.x + Math.cos(angle) * length), y: snap(origin.y + Math.sin(angle) * length) };
-    if (Math.hypot(end.x - origin.x, end.y - origin.y) < MIN_RAY_LENGTH) continue;
     rails.push(rail([origin, end], 0.009, 'ray', 0.16 + fraction * 0.05, -0.02, -1));
   }
 
@@ -139,7 +143,6 @@ function cornerFan(aspect: number, genome: BaseGenome, density: number): Polylin
       const level = genome.fractalDepth - twoAdicValuation(k);
       if (level === 0) continue;
       const length = reach * Math.pow(genome.fractalRatio, level);
-      if (length < MIN_RAY_LENGTH) continue;
       const angle = baseAngle + (span * k) / slots;
       rails.push(
         rail([origin, { x: snap(origin.x + Math.cos(angle) * length), y: snap(origin.y + Math.sin(angle) * length) }], 0.009 * Math.pow(0.72, level), 'ray', 0.2 + level * 0.02, -0.04, -1)
@@ -150,13 +153,9 @@ function cornerFan(aspect: number, genome: BaseGenome, density: number): Polylin
 }
 
 function twoAdicValuation(value: number): number {
-  let k = value;
-  let count = 0;
-  while (k % 2 === 0 && k > 0) {
-    k /= 2;
-    count += 1;
-  }
-  return count;
+  // value is a positive refinement slot; the position of its lowest set bit
+  // is exactly the number of times it can be halved.
+  return 31 - Math.clz32(value & -value);
 }
 
 function allCornerFans(aspect: number, genome: BaseGenome, density: number): PolylineSpec[] {
@@ -178,10 +177,9 @@ function reeding(aspect: number, genome: BaseGenome, density: number): PolylineS
   // into all four runs, so every edge is reeded identically.
   const buildRun = (toPoint: (t: number) => Point2, direction: Point2, lengthAt: (t: number) => number): PolylineSpec[] =>
     Array.from({ length: count }, (_, index) => {
-      const t = count === 1 ? 0 : index / (count - 1);
+      const t = index / (count - 1); // count is floored at MIN_REED_PER_RUN (3)
       const from = toPoint(t);
       const length = lengthAt(t);
-      if (length < MIN_TICK_LENGTH) return null;
       return rail(
         [from, { x: snap(from.x + direction.x * length), y: snap(from.y + direction.y * length) }],
         index % 2 === 0 ? 0.007 : 0.004,
@@ -190,7 +188,7 @@ function reeding(aspect: number, genome: BaseGenome, density: number): PolylineS
         -0.01,
         1
       );
-    }).filter((spec): spec is PolylineSpec => spec !== null);
+    });
 
   const vertical = buildRun(
     (t) => ({ x: runStart + (aspect - 2 * runStart) * t, y: 1 - REED_INSET }),
@@ -212,7 +210,7 @@ function reeding(aspect: number, genome: BaseGenome, density: number): PolylineS
     const subdivide = (run: PolylineSpec[], along: 'x' | 'y', span: number): PolylineSpec[] =>
       run.slice(0, Math.max(0, run.length - 1)).flatMap((spec) => {
         const [start] = spec.points;
-        const height = Math.abs(start.y - spec.points[1].y) * genome.fractalRatio;
+        const height = Math.hypot(start.x - spec.points[1].x, start.y - spec.points[1].y) * genome.fractalRatio;
         if (height < MIN_TICK_LENGTH) return [];
         const step = (span / Math.max(1, count - 1)) * 0.5;
         const point =
@@ -252,22 +250,52 @@ function innerHairline(aspect: number, density: number): PolylineSpec[] {
   ];
 }
 
+function extentsOf(specs: PolylineSpec[]): { extentX: number; extentY: number } {
+  return {
+    extentX: Math.max(...specs.flatMap((spec) => spec.points.map((point) => Math.abs(point.x)))),
+    extentY: Math.max(...specs.flatMap((spec) => spec.points.map((point) => Math.abs(point.y)))),
+  };
+}
+
+const LATTICE_BORDER_INSET = 0.97;
+const LATTICE_BORDER_WIDTH_FACTOR = 0.35;
+
+/**
+ * The lattice proscenium (ADDENDUM-021 §3.5): a nine-slice frame whose
+ * interior aperture stays clear, so the viewport still reads.
+ */
+function buildLatticeBorder(aspect: number, density: number, seed: number): PolylineSpec[] {
+  const layout = nineSliceLayout({ hw: aspect, hh: 1 });
+  const geometry = buildDecoLattice({
+    mode: 'frame',
+    hw: aspect * LATTICE_BORDER_INSET,
+    hh: LATTICE_BORDER_INSET,
+    seed,
+    density,
+    level: 1 + Math.round(density * 2),
+    aperture: apertureForLayout(layout, { hw: aspect, hh: 1 }),
+  });
+  return latticeToRails(geometry, { coordScale: 1, widthScale: LATTICE_BORDER_WIDTH_FACTOR, seed });
+}
+
 export function buildEdgeBorder(request: EdgeBorderRequest): EdgeBorderGeometry {
   const aspect = Math.min(3.2, Math.max(0.5, request.aspect));
   const genome = clampGenome(request.genome);
   const density = Math.min(1, Math.max(0, request.density));
-  const nestedCount = Math.min(MAX_NESTED_RULES, 1 + Math.round(density * 3));
 
+  if (request.pattern === 'lattice') {
+    const specs = buildLatticeBorder(aspect, density, request.seed ?? 1925);
+    return { specs, ...extentsOf(specs) };
+  }
+
+  const nestedCount = Math.min(MAX_NESTED_RULES, 1 + Math.round(density * 3));
   const specs = [
     ...nestedRules(aspect, nestedCount, genome),
     ...allCornerFans(aspect, genome, density),
     ...reeding(aspect, genome, density),
     ...innerHairline(aspect, density),
   ];
-
-  const extentX = Math.max(...specs.flatMap((spec) => spec.points.map((point) => Math.abs(point.x))));
-  const extentY = Math.max(...specs.flatMap((spec) => spec.points.map((point) => Math.abs(point.y))));
-  return { specs, extentX, extentY };
+  return { specs, ...extentsOf(specs) };
 }
 
 /** Camera-space scale that makes unit viewport coordinates fill the frustum exactly. */

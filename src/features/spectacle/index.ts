@@ -10,6 +10,8 @@ export type {
   EffectParamsMap,
   NormPoint,
   NormRect,
+  OrbTransitionParams,
   QualityTier,
+  SparklerTransitionParams,
   SpectacleStage,
 } from './model/types';

@@ -17,8 +17,24 @@ const ORB_CONFIGS: readonly OrbTransitionParams[] = [
   { origin: ORIGIN, pattern: 'corners', direction: 'inward' },
 ];
 
+/**
+ * Rounds floats to 6 decimal places before hashing. Math.sin/cos/sqrt can
+ * differ in the last bit across CPU architectures, which previously made
+ * these goldens pass on macOS and fail on Linux (ADDENDUM-025).
+ */
+function roundFloats(value: unknown): unknown {
+  if (typeof value === 'number') return Math.round(value * 1e6) / 1e6;
+  if (Array.isArray(value)) return value.map(roundFloats);
+  if (value !== null && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, entry]) => [key, roundFloats(entry)]),
+    );
+  }
+  return value;
+}
+
 function digest(value: unknown): { length: number; hash: string } {
-  const text = JSON.stringify(value);
+  const text = JSON.stringify(roundFloats(value));
   return { length: text.length, hash: hashText(text) };
 }
 

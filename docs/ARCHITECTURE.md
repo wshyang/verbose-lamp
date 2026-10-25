@@ -132,14 +132,20 @@ header or timeline into another product simply to reuse a button or modal.
 ## Adding A Feature
 
 1. Put product state, validation, and pure computations in the feature's
-   `model` or `hooks`; add adjacent tests for pure modules.
+   `model` or `hooks`; add adjacent tests for pure modules, and keep the
+   100 % pure-layer coverage gate (`npm run test:coverage`, ADDENDUM-029) green.
 2. Keep React components focused on markup, accessible state, and event wiring.
 3. Expose only supported components, hooks, and types through the feature barrel.
 4. Reuse shared controls when their interaction contract fits; add a new shared
    primitive only when it is useful to more than one feature.
 5. Record architectural or behavior decisions in the sequential addenda register.
 
-The three.js renderer is deliberately isolated from normal feature UI. A new app
-can reuse the QR generator, title customizer, research dialog, or frame studio
-without mounting `GatsbySceneManager`; a frame-based experience can reuse the
-Art Deco engine through its typed exports.
+The three.js renderer is deliberately isolated from normal feature UI. Since
+ADDENDUM-031 the premiere renders through React Three Fiber: a zustand store
+(`scene3d/premiereStore`) behind the same `PremiereSceneApi` port the hooks
+already drove, one small component per concern under `scene3d/` (clock,
+camera, title cards, atmosphere, post), GLSL under `scene3d/shaders/`, and the
+heavy geometry/texture builders kept imperative under `scene/`. A new app can
+reuse the QR generator, title customizer, research dialog, or frame studio
+without mounting the stage; a frame-based experience can reuse the Art Deco
+engine through its typed exports.

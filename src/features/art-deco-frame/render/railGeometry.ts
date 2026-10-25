@@ -5,6 +5,7 @@ interface GeometryAccumulator {
   positions: number[];
   normals: number[];
   pathData: number[]; // x: normalized u (0..1), y: delay (0..0.7), z: partSide (-1..+1)
+  tones: number[]; // brass finish per rail: x: base tone (0..1), y: gradient angle (radians)
   indices: number[];
 }
 
@@ -141,6 +142,7 @@ function appendChamferedPolyline(acc: GeometryAccumulator, spec: PolylineSpec) {
       acc.positions.push(curr.x + tx * lat, curr.y + ty * lat, spec.z + zOff);
       acc.normals.push(unx * nLat, uny * nLat, nZ);
       acc.pathData.push(uNorm, spec.delay, partSide);
+      acc.tones.push(spec.tone?.base ?? 0, spec.tone?.angle ?? 0);
     }
   }
 
@@ -159,12 +161,16 @@ function appendChamferedPolyline(acc: GeometryAccumulator, spec: PolylineSpec) {
 
 /** Shared rail extrusion for title cards and camera-attached poster borders. */
 export function createChamferedFrameGeometry(specs: PolylineSpec[]): THREE.BufferGeometry {
-  const acc: GeometryAccumulator = { positions: [], normals: [], pathData: [], indices: [] };
+  const acc: GeometryAccumulator = { positions: [], normals: [], pathData: [], tones: [], indices: [] };
   for (const spec of specs) appendChamferedPolyline(acc, spec);
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(acc.positions, 3));
   geometry.setAttribute('normal', new THREE.Float32BufferAttribute(acc.normals, 3));
   geometry.setAttribute('aPathData', new THREE.Float32BufferAttribute(acc.pathData, 3));
+  // Absent unless a rail is toned (ADDENDUM-021 §3.6), so untinted geometry is byte-identical.
+  if (specs.some((spec) => spec.tone !== undefined)) {
+    geometry.setAttribute('aTone', new THREE.Float32BufferAttribute(acc.tones, 2));
+  }
   geometry.setIndex(acc.indices);
   geometry.computeBoundingSphere();
   return geometry;

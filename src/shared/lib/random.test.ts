@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { hash01, mulberry32 } from './random';
+import { createPrng, hash01, mulberry32, randomIndex } from './random';
 
 describe('mulberry32', () => {
   it('is deterministic per seed', () => {
@@ -31,5 +31,48 @@ describe('hash01', () => {
       expect(v).toBeGreaterThanOrEqual(0);
       expect(v).toBeLessThan(1);
     }
+  });
+});
+describe('createPrng (ADDENDUM-022 §0.1)', () => {
+  it('produces the golden first values for the dust seed 1920', () => {
+    const random = createPrng(1920);
+    const first = Array.from({ length: 5 }, () => random());
+    expect(first).toHaveLength(5);
+    for (const value of first) {
+      expect(value).toBeGreaterThanOrEqual(0);
+      expect(value).toBeLessThan(1);
+    }
+    // Golden values pinned so the dust field can never silently reshuffle.
+    expect(first.map((v) => Number(v.toFixed(6)))).toEqual(GOLDEN_1920);
+  });
+
+  it('is mulberry32 under the hood', () => {
+    const a = createPrng(7);
+    const b = mulberry32(7);
+    for (let i = 0; i < 10; i += 1) expect(a()).toBe(b());
+  });
+});
+
+const GOLDEN_1920: readonly number[] = [0.932266, 0.617307, 0.579805, 0.077896, 0.762659];
+
+describe('randomIndex', () => {
+  const fillWith = (value: number) => (buf: Uint32Array) => {
+    buf[0] = value;
+    return buf;
+  };
+
+  it('reduces the drawn word into [0, n)', () => {
+    expect(randomIndex(4, fillWith(7))).toBe(3);
+    expect(randomIndex(10, fillWith(0))).toBe(0);
+    expect(randomIndex(6, fillWith(4294967295))).toBe(4294967295 % 6);
+  });
+
+  it('draws exactly one 32-bit word', () => {
+    const lengths: number[] = [];
+    randomIndex(3, (buf) => {
+      lengths.push(buf.length);
+      return buf;
+    });
+    expect(lengths).toEqual([1]);
   });
 });
