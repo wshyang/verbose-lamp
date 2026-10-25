@@ -72,6 +72,7 @@ export default defineConfig({
         'src/features/premiere/model/freeze.ts': FULL,
         'src/features/premiere/scene/choreography.ts': FULL,
         'src/features/premiere/scene/orbitFocus.ts': FULL,
+        'src/features/premiere/scene/styleClamp.ts': FULL,
       },
     },
   },
