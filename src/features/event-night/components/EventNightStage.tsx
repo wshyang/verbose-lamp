@@ -2,14 +2,14 @@ import { GildedNavBar } from '@/features/gilded-ui';
 import { LuckyDrawStage } from '@/features/lucky-draw';
 import { useSpectacle } from '@/features/spectacle';
 import {
+  KeepClearSpeaker,
+  OriginCrosshair,
+  PickOriginHint,
   SpectaclePreviewLauncher, SpectaclePreviewPanel, useSpectaclePreview,
 } from '@/features/spectacle-preview';
 import { useAmbientShow } from '../hooks/useAmbientShow';
 import { useEventNight } from '../hooks/useEventNight';
 import { EventNightHeader } from './EventNightHeader';
-import { KeepClearSpeaker } from './KeepClearSpeaker';
-import { OriginCrosshair } from './OriginCrosshair';
-import { PickOriginHint } from './PickOriginHint';
 import { StageBackdrop } from './StageBackdrop';
 import { TitleMedallion } from './TitleMedallion';
 
@@ -57,9 +57,13 @@ export function EventNightStage({ onExit }: EventNightStageProps) {
           <GildedNavBar items={preview.navItems} activeId={night.activeId} onSelect={night.selectNav} />
         </div>
       </div>
-      {preview.open && <OriginCrosshair origin={preview.origin} isPicking={preview.picking} />}
-      {preview.picking && <PickOriginHint />}
-      {preview.keepClearOn && <KeepClearSpeaker rect={preview.speaker} onMove={preview.moveSpeaker} />}
+      {preview.open && (
+        <OriginCrosshair origin={preview.origin} isPicking={preview.picking} testId="event-night__origin-crosshair" />
+      )}
+      {preview.picking && <PickOriginHint testId="event-night__pick-hint" />}
+      {preview.keepClearOn && (
+        <KeepClearSpeaker rect={preview.speaker} onMove={preview.moveSpeaker} testId="event-night__speaker" />
+      )}
       <SpectaclePreviewPanel preview={preview} onOpenDraw={night.openDraw} />
       {night.isDrawOpen && <LuckyDrawStage onClose={night.closeDraw} onLanded={night.handleLanded} />}
     </>

@@ -26,7 +26,7 @@ export function createExtrudedDecoTextMesh(opts: DecoTextOptions): DecoTextRig {
   let cursorX = 0;
   const placements: Array<{
     ch: string;
-    def: GlyphDef | null;
+    def: GlyphDef;
     x: number;
     glyphW: number;
     pinstriped: boolean;
@@ -85,7 +85,6 @@ export function createExtrudedDecoTextMesh(opts: DecoTextOptions): DecoTextRig {
   const offsetStartX = (canvasW - cursorX * scaleFit) * 0.5;
 
   for (const item of placements) {
-    if (!item.def) continue;
     sCtx.clearRect(0, 0, scratch.width, scratch.height);
     sCtx.save();
     sCtx.translate(strokeW * 0.85, padY);

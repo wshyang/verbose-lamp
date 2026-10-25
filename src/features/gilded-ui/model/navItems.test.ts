@@ -9,6 +9,16 @@ describe('navItems', () => {
     expect(items[2].label).toBe('Lucky Draw');
   });
 
+  it('falls back to a sparkle for a missing emoji and reports duplicate or empty ids', () => {
+    expect(parseNavLines(',Solo')[0]).toMatchObject({ emoji: '✦', label: 'Solo' });
+    const invalid = validateNavItems([
+      { id: '', emoji: '✦', label: 'One' },
+      { id: '', emoji: '✦', label: 'Two' },
+    ]);
+    expect(invalid.ok).toBe(false);
+    if (!invalid.ok) expect(invalid.issues[0]).toContain('Duplicate or empty id');
+  });
+
   it('validates count, labels and unique ids', () => {
     expect(validateNavItems(parseNavLines('🥂,Toast\n🎷,Program')).ok).toBe(true);
     expect(validateNavItems(parseNavLines('🥂,Toast')).ok).toBe(false);

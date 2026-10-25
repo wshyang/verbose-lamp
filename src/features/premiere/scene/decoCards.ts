@@ -1,10 +1,12 @@
 import * as THREE from 'three';
 import {
+  applyFinish,
   buildFrame,
   createChamferedFrameGeometry,
   createExtrudedDecoTextMesh,
   createGoldFrameMaterial,
   createGoldFrameUniforms,
+  finishForFormula,
   DEFAULT_FRAME_STYLE,
   type DecoTextRig,
   type FrameStyle,
@@ -171,7 +173,9 @@ export function createGatsbyCardRig(
   let frameGeo = buildFrameGeometry(chapter.archetype, mainTextWidth, frameStyle);
 
   const frameUniforms = createGoldFrameUniforms();
-  const goldMat = createGoldFrameMaterial(frameUniforms);
+  const goldMat = createGoldFrameMaterial(frameUniforms, {
+    finish: finishForFormula(frameStyle.formula),
+  });
 
   const frameMesh = new THREE.Mesh(frameGeo, goldMat);
   root.add(frameMesh);
@@ -189,6 +193,7 @@ export function createGatsbyCardRig(
         layers: next.formula.layers?.map((layer) => ({ ...layer })),
       },
     };
+    applyFinish(frameUniforms, finishForFormula(frameStyle.formula));
     const previous = frameGeo;
     frameGeo = buildFrameGeometry(chapter.archetype, mainTextWidth, frameStyle);
     frameMesh.geometry = frameGeo;

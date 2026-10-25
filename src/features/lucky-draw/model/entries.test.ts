@@ -18,6 +18,12 @@ describe('validateEntries', () => {
     expect(validateEntries([gatsby]).ok).toBe(false);
   });
 
+  it('reports an entry whose id trims to empty', () => {
+    const result = validateEntries([gatsby, { id: '   ', name: 'Mystery Guest' }]);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.issues).toContain('An entry is missing its id.');
+  });
+
   it('withoutWinners supports redraws', () => {
     const pool = withoutWinners([gatsby, daisy], ['gatz']);
     expect(pool.map((e) => e.id)).toEqual(['buchanan-d']);

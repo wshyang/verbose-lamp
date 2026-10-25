@@ -1,11 +1,11 @@
-import { useCallback, type Dispatch, type MutableRefObject, type SetStateAction } from 'react';
-import { CinemaAudioEngine } from '../audio/cinemaAudio';
-import { GatsbySceneManager } from '../scene/GatsbySceneManager';
+import { useCallback, type Dispatch, type RefObject, type SetStateAction } from 'react';
+import type { CinemaAudioEngine } from '../audio/cinemaAudio';
 import type { CameraMode } from '../model/types';
+import type { PremiereSceneApi } from '../scene/sceneApi';
 
 interface PremiereTransportOptions {
-  managerRef: MutableRefObject<GatsbySceneManager | null>;
-  audioRef: MutableRefObject<CinemaAudioEngine | null>;
+  sceneApi: PremiereSceneApi;
+  audioRef: RefObject<CinemaAudioEngine | null>;
   cameraMode: CameraMode;
   setCameraMode: Dispatch<SetStateAction<CameraMode>>;
   setCurrentTime: Dispatch<SetStateAction<number>>;
@@ -14,7 +14,7 @@ interface PremiereTransportOptions {
 }
 
 export function usePremiereTransport({
-  managerRef,
+  sceneApi,
   audioRef,
   cameraMode,
   setCameraMode,
@@ -23,34 +23,36 @@ export function usePremiereTransport({
   setIsPlaying,
 }: PremiereTransportOptions) {
   const togglePlayback = useCallback(() => {
-    const manager = managerRef.current;
-    if (!manager) return;
-    setIsPlaying(manager.togglePlaying());
-  }, [managerRef, setIsPlaying]);
+    setIsPlaying(sceneApi.togglePlaying());
+  }, [sceneApi, setIsPlaying]);
 
   const replay = useCallback(() => {
-    const manager = managerRef.current;
-    if (!manager) return;
     if (cameraMode === 'orbit') {
       setCameraMode('cinema');
-      manager.setCameraMode('cinema');
+      sceneApi.setCameraMode('cinema');
     }
-    manager.setTime(0);
-    manager.setPlaying(true);
+    sceneApi.setTime(0);
+    sceneApi.setPlaying(true);
     setCurrentTime(0);
     setIsPlaying(true);
-  }, [cameraMode, managerRef, setCameraMode, setCurrentTime, setIsPlaying]);
+  }, [cameraMode, sceneApi, setCameraMode, setCurrentTime, setIsPlaying]);
 
-  const scrub = useCallback((time: number) => {
-    setCurrentTime(time);
-    managerRef.current?.setTime(time);
-  }, [managerRef, setCurrentTime]);
+  const scrub = useCallback(
+    (time: number) => {
+      setCurrentTime(time);
+      sceneApi.setTime(time);
+    },
+    [sceneApi, setCurrentTime]
+  );
 
-  const selectAct = useCallback((index: number) => {
-    setActiveAct(index);
-    managerRef.current?.jumpToChapter(index);
-    audioRef.current?.triggerActShimmer(index);
-  }, [audioRef, managerRef, setActiveAct]);
+  const selectAct = useCallback(
+    (index: number) => {
+      setActiveAct(index);
+      sceneApi.jumpToChapter(index);
+      audioRef.current?.triggerActShimmer(index);
+    },
+    [audioRef, sceneApi, setActiveAct]
+  );
 
   return { togglePlayback, replay, scrub, selectAct };
 }

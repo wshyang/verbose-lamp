@@ -1,2 +1,6 @@
 .DS_Store
 .DS_Store
+/test-results/
+/playwright-report/
+/blob-report/
+/coverage/

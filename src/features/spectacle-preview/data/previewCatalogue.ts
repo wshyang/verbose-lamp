@@ -1,9 +1,12 @@
-export const ORB_DEMOS = [
-  { key: 'orb-sides-outward', label: '2 orbs · out', pattern: 'sides', direction: 'outward' },
-  { key: 'orb-sides-inward', label: '2 orbs · in', pattern: 'sides', direction: 'inward' },
-  { key: 'orb-corners-outward', label: '4 orbs · out', pattern: 'corners', direction: 'outward' },
-  { key: 'orb-corners-inward', label: '4 orbs · in', pattern: 'corners', direction: 'inward' },
+export const SPARKLER_DEMOS = [
+  { key: 'sparkler-sides-outward', label: '2 sparklers · out', pattern: 'sides', direction: 'outward' },
+  { key: 'sparkler-sides-inward', label: '2 sparklers · in', pattern: 'sides', direction: 'inward' },
+  { key: 'sparkler-corners-outward', label: '4 sparklers · out', pattern: 'corners', direction: 'outward' },
+  { key: 'sparkler-corners-inward', label: '4 sparklers · in', pattern: 'corners', direction: 'inward' },
 ] as const;
+
+/** @deprecated Sparklers replaced the orb name in user-facing copy. */
+export const ORB_DEMOS = SPARKLER_DEMOS;
 
 export const SUNBURST_DEMOS = [
   { key: 'sunburst-iris', label: 'Sunburst iris', variant: 'iris' },

@@ -4,7 +4,7 @@ import { countdownEffect } from '../effects/countdown/countdownEffect';
 import { fireworksEffect } from '../effects/fireworks/fireworksEffect';
 import { flashEffect } from '../effects/flash/flashEffect';
 import { nameRevealEffect } from '../effects/nameReveal/nameRevealEffect';
-import { orbsEffect } from '../effects/orbs/orbsEffect';
+import { orbsEffect, sparklersEffect } from '../effects/sparklers/sparklersEffect';
 import { searchlightsEffect } from '../effects/searchlights/searchlightsEffect';
 import { sunburstEffect } from '../effects/sunburst/sunburstEffect';
 import type { EffectParamsMap } from '../model/types';
@@ -15,6 +15,7 @@ export const effectRegistry: {
   [K in keyof EffectParamsMap]: EffectDefinition<EffectParamsMap[K]>;
 } = {
   fireworks: fireworksEffect,
+  'sparkler-transition': sparklersEffect,
   'orb-transition': orbsEffect,
   'sunburst-wipe': sunburstEffect,
   confetti: confettiEffect,

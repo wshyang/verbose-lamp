@@ -15,17 +15,30 @@ function cellKey(x: number, y: number): string {
   return `${Math.round(x * 1e4)},${Math.round(y * 1e4)}`;
 }
 
-function reserve(occupied: Set<string>, p: Pt, cell: number): void {
-  for (let dx = -1; dx <= 1; dx += 1) {
-    for (let dy = -1; dy <= 1; dy += 1) {
-      occupied.add(cellKey(p.x + dx * cell, p.y + dy * cell));
-    }
-  }
+/**
+ * Occupancy is the set of stepped cells; a candidate cell is free when its
+ * whole 3×3 neighbourhood is empty, which keeps walks one cell clear of each
+ * other. The walking head and the cell it just came from are exempt —
+ * without that exemption every one-cell step would land inside the head's own
+ * reserved neighbourhood and no walk could ever advance.
+ */
+interface Occupancy {
+  visited: ReadonlySet<string>;
+  exempt: ReadonlySet<string>;
 }
 
-function isFree(p: Pt, o: WalkOptions, occupied: Set<string>): boolean {
+const NO_EXEMPTIONS: ReadonlySet<string> = new Set();
+
+function isFree(p: Pt, o: WalkOptions, occupancy: Occupancy): boolean {
   const r = Math.hypot(p.x, p.y);
-  return inWedge(p) && r >= o.inner && r <= o.outer && !occupied.has(cellKey(p.x, p.y));
+  if (!inWedge(p) || r < o.inner || r > o.outer) return false;
+  for (let dx = -1; dx <= 1; dx += 1) {
+    for (let dy = -1; dy <= 1; dy += 1) {
+      const key = cellKey(p.x + dx * o.cell, p.y + dy * o.cell);
+      if (occupancy.visited.has(key) && !occupancy.exempt.has(key)) return false;
+    }
+  }
+  return true;
 }
 
 /** Weighted turn choice: straight 0.55, ±45° 0.3, ±90° 0.15. */
@@ -41,14 +54,15 @@ function nextDir(dir: number, rng: () => number): number {
  */
 export function traceWalks(o: WalkOptions): readonly (readonly Pt[])[] {
   const rng = mulberry32(o.seed);
-  const occupied = new Set<string>();
+  const visited = new Set<string>();
   const walks: Pt[][] = [];
   for (let w = 0; w < o.count; w += 1) {
     const startX = o.inner + o.cell * 2 + rng() * (o.outer - o.inner - o.cell * 4);
     let p: Pt = { x: Math.round(startX / o.cell) * o.cell, y: o.cell };
-    if (!isFree(p, o, occupied)) continue;
+    if (!isFree(p, o, { visited, exempt: NO_EXEMPTIONS })) continue;
     const pts: Pt[] = [p];
-    reserve(occupied, p, o.cell);
+    visited.add(cellKey(p.x, p.y));
+    let prev: Pt | null = null;
     let dir = 2; // into the wedge, along +y
     for (let turn = 0; turn < 6; turn += 1) {
       dir = nextDir(dir, rng);
@@ -56,9 +70,12 @@ export function traceWalks(o: WalkOptions): readonly (readonly Pt[])[] {
       let advanced = 0;
       for (let step = 0; step < run; step += 1) {
         const q = { x: p.x + OCTI_DIRS[dir][0] * o.cell, y: p.y + OCTI_DIRS[dir][1] * o.cell };
-        if (!isFree(q, o, occupied)) break;
+        const exempt = new Set([cellKey(p.x, p.y)]);
+        if (prev) exempt.add(cellKey(prev.x, prev.y));
+        if (!isFree(q, o, { visited, exempt })) break;
+        prev = p;
         p = q;
-        reserve(occupied, p, o.cell);
+        visited.add(cellKey(p.x, p.y));
         advanced += 1;
       }
       if (advanced === 0) break;

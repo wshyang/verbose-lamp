@@ -5,16 +5,21 @@ import { useSpeakerDrag } from '../hooks/useSpeakerDrag';
 interface KeepClearSpeakerProps {
   rect: NormRect;
   onMove: (dx: number, dy: number) => void;
+  testId?: string;
 }
 
 /** A draggable "keep clear" box: fireworks and searchlights avoid it. */
-export function KeepClearSpeaker({ rect, onMove }: KeepClearSpeakerProps) {
+export function KeepClearSpeaker({
+  rect,
+  onMove,
+  testId = 'spectacle-preview__speaker',
+}: KeepClearSpeakerProps) {
   const drag = useSpeakerDrag(onMove);
   return (
     <div
       role="img"
       aria-label="Keep-clear demo speaker box. Drag to move; fireworks avoid it."
-      data-testid="event-night__speaker"
+      data-testid={testId}
       className="absolute z-20 flex cursor-move touch-none flex-col items-center justify-center gap-1 border-2 border-dashed border-[#d9b264]/70 bg-[#171006]/40 text-[#d9b264]"
       style={{
         left: `${rect.x * 100}%`,

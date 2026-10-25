@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronDown, ChevronRight, RotateCcw, Sliders, X } from 'lucide-react';
+import { ChevronDown, ChevronRight, Dices, RotateCcw, Sliders, X } from 'lucide-react';
 import {
   FrameSource,
   FrameSourceInfo,
@@ -32,10 +32,13 @@ interface FrameStudioControlProps {
   detailPresets: readonly IntricacyPreset[];
   activePreset: IntricacyPreset | null;
   isDesignPattern: boolean;
+  isLatticePattern: boolean;
+  latticeSeed: number;
   proportionsOpen: boolean;
   genome: Record<GeneKey, number>;
   borderEnabled: boolean;
   borderWeight: number;
+  borderPattern: 'poster' | 'lattice';
   onSurfaceChange: (surface: FrameSurface) => void;
   onPatternChange: (source: FrameSource) => void;
   onLayerToggle: (source: FrameLayerSource, enabled: boolean) => void;
@@ -47,6 +50,8 @@ interface FrameStudioControlProps {
   onGeneChange: (key: GeneKey, value: number) => void;
   onBorderEnabledChange: (enabled: boolean) => void;
   onBorderWeightChange: (weight: number) => void;
+  onBorderPatternChange: (pattern: 'poster' | 'lattice') => void;
+  onRerollSeed: () => void;
   onReset: () => void;
   onDismiss: () => void;
 }
@@ -212,6 +217,18 @@ export const FrameStudioControl: React.FC<FrameStudioControlProps> = (props) => 
             />
           </div>
 
+          {props.isLatticePattern && (
+            <button
+              type="button"
+              onClick={props.onRerollSeed}
+              className={`flex w-full items-center justify-center gap-2 px-2 py-1.5 text-[9px] tracking-[0.12em] uppercase ${chip(false)}`}
+              data-testid="frame-studio__reroll"
+            >
+              <Dices className="h-3.5 w-3.5" aria-hidden />
+              <span>Reroll pattern · Seed {props.latticeSeed}</span>
+            </button>
+          )}
+
           <div className="space-y-1">
             <div className="flex items-baseline justify-between">
               <span className="text-[9px] tracking-[0.2em] uppercase text-[#d4af37]/80">Detail</span>
@@ -279,6 +296,14 @@ export const FrameStudioControl: React.FC<FrameStudioControlProps> = (props) => 
           <p className="text-[10px] font-editorial leading-snug text-[#d9c7a3]/80" data-testid="frame-studio__border-blurb">
             The printed border of the one-sheet, drawn around the edge of the picture. It stays fixed while the camera flies.
           </p>
+          <div className="grid grid-cols-2 gap-1" role="group" aria-label="Border pattern">
+            <button type="button" onClick={() => props.onBorderPatternChange('poster')} aria-pressed={props.borderPattern === 'poster'} className={`px-2 py-1.5 text-[9px] tracking-[0.12em] uppercase ${chip(props.borderPattern === 'poster')}`} data-testid="frame-studio__border-pattern">
+              Poster edge
+            </button>
+            <button type="button" onClick={() => props.onBorderPatternChange('lattice')} aria-pressed={props.borderPattern === 'lattice'} className={`px-2 py-1.5 text-[9px] tracking-[0.12em] uppercase ${chip(props.borderPattern === 'lattice')}`} data-testid="frame-studio__border-pattern">
+              Deco Lattice
+            </button>
+          </div>
           <label className="flex items-center justify-between gap-3 cursor-pointer" data-testid="frame-studio__border-row">
             <span className="text-[11px] tracking-[0.16em] uppercase text-[#e6d5b2]">Show border</span>
             <input

@@ -1,17 +1,12 @@
 import { useCallback, useRef, useState } from 'react';
 import { useFrameStudio } from '@/features/frame-studio';
-import type { CinemaAudioEngine } from '../audio/cinemaAudio';
 import { SEQUENCE_CHAPTERS, DEFAULT_HERO_TITLE } from '../data/sequence';
 import type { CameraMode, HeroTitleConfig } from '../model/types';
-import type { GatsbySceneManager } from '../scene/GatsbySceneManager';
 import { usePremiereRuntime } from './usePremiereRuntime';
 import { usePremiereSceneOptions } from './usePremiereSceneOptions';
 import { usePremiereTransport } from './usePremiereTransport';
 
 export function usePremiereController() {
-  const stageRef = useRef<HTMLDivElement | null>(null);
-  const managerRef = useRef<GatsbySceneManager | null>(null);
-  const audioRef = useRef<CinemaAudioEngine | null>(null);
   const lastUiSyncRef = useRef(0);
 
   const [currentTime, setCurrentTime] = useState(0);
@@ -31,12 +26,12 @@ export function usePremiereController() {
   }, []);
   const onChapterChange = useCallback((chapterIndex: number) => setActiveAct(chapterIndex), []);
 
-  usePremiereRuntime({ mountRef: stageRef, managerRef, audioRef, onTelemetry, onChapterChange });
-  const getSceneManager = useCallback(() => managerRef.current, []);
-  const frameStudio = useFrameStudio(getSceneManager);
+  const runtime = usePremiereRuntime({ onTelemetry, onChapterChange });
+  const getSceneApi = useCallback(() => runtime.sceneApi, [runtime.sceneApi]);
+  const frameStudio = useFrameStudio(getSceneApi);
   const transport = usePremiereTransport({
-    managerRef,
-    audioRef,
+    sceneApi: runtime.sceneApi,
+    audioRef: runtime.audioRef,
     cameraMode,
     setCameraMode,
     setCurrentTime,
@@ -44,8 +39,8 @@ export function usePremiereController() {
     setIsPlaying,
   });
   const sceneOptions = usePremiereSceneOptions({
-    managerRef,
-    audioRef,
+    sceneApi: runtime.sceneApi,
+    audioRef: runtime.audioRef,
     cameraMode,
     nitrateMode,
     setCameraMode,
@@ -58,7 +53,7 @@ export function usePremiereController() {
   const currentChapter = SEQUENCE_CHAPTERS[activeAct] ?? SEQUENCE_CHAPTERS[0];
 
   return {
-    stageRef,
+    sceneStore: runtime.store,
     currentTime,
     activeAct,
     isPlaying,

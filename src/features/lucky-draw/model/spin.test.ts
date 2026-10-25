@@ -31,6 +31,12 @@ describe('planSpin', () => {
     }
   });
 
+  it('holds the start position at and before time zero', () => {
+    const profile = planSpin({ startP: 12.5, winnerIndex: 3, n: 20 });
+    expect(profile.positionAt(0)).toBe(12.5);
+    expect(profile.positionAt(-250)).toBe(12.5);
+  });
+
   it('keeps cruise at or above the minimum and can skip the settle', () => {
     const profile = planSpin({ startP: 0, winnerIndex: 1, n: 2, minCruiseMs: 1200, settle: false });
     expect(profile.cruiseMs).toBeGreaterThanOrEqual(1199);

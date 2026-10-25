@@ -2,3 +2,6 @@ export { DEFAULT_HERO_TITLE, SEQUENCE_CHAPTERS, TOTAL_SEQUENCE_DURATION } from '
 export type { CameraMode, HeroTitleConfig, SequenceChapter } from './model/types';
 export { usePremiereController } from './hooks/usePremiereController';
 export { usePremiereShortcuts } from './hooks/usePremiereShortcuts';
+export { PremiereCanvas } from './scene3d/PremiereCanvas';
+export type { PremiereStore } from './scene3d/premiereStore';
+export type { PremiereSceneApi } from './scene/sceneApi';

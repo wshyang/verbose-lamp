@@ -28,10 +28,13 @@ export function FrameStudioDock({ studio, hudHidden }: FrameStudioDockProps) {
           detailPresets={studio.detailPresets}
           activePreset={studio.activePreset}
           isDesignPattern={studio.isDesignPattern}
+          isLatticePattern={studio.isLatticePattern}
+          latticeSeed={studio.latticeSeed}
           proportionsOpen={studio.proportionsOpen}
           genome={studio.genome}
           borderEnabled={studio.borderEnabled}
           borderWeight={studio.borderWeight}
+          borderPattern={studio.borderPattern}
           onSurfaceChange={studio.setSurface}
           onPatternChange={studio.selectPattern}
           onLayerToggle={studio.setLayerEnabled}
@@ -43,6 +46,8 @@ export function FrameStudioDock({ studio, hudHidden }: FrameStudioDockProps) {
           onGeneChange={studio.setGene}
           onBorderEnabledChange={studio.setBorderEnabled}
           onBorderWeightChange={studio.setBorderWeight}
+          onBorderPatternChange={studio.setBorderPattern}
+          onRerollSeed={studio.rerollSeed}
           onReset={studio.resetAll}
           onDismiss={studio.dismiss}
         />

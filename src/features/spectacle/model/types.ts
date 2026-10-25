@@ -47,13 +47,16 @@ export interface FireworksParams {
   wind?: number;
 }
 
-export interface OrbTransitionParams {
+export interface SparklerTransitionParams {
   origin: NormPoint;
   pattern: 'sides' | 'corners' | readonly NormPoint[];
   direction: 'outward' | 'inward';
   durationMs?: number;
   onCovered?: () => void;
 }
+
+/** @deprecated The transition is performed by party sparklers, not orbs. */
+export type OrbTransitionParams = SparklerTransitionParams;
 
 export interface SunburstWipeParams {
   origin: NormPoint;
@@ -101,6 +104,8 @@ export interface FlashParams {
 
 export interface EffectParamsMap {
   fireworks: FireworksParams;
+  'sparkler-transition': SparklerTransitionParams;
+  /** @deprecated Use `sparkler-transition`; retained so Event Night keeps working. */
   'orb-transition': OrbTransitionParams;
   'sunburst-wipe': SunburstWipeParams;
   confetti: ConfettiParams;

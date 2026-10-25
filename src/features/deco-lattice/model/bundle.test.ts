@@ -22,6 +22,12 @@ describe('offsetSide', () => {
     expect(Math.hypot(off[1].x - 1, off[1].y - 0)).toBeCloseTo(d * Math.SQRT2, 12);
   });
 
+  it('tolerates zero-length and reversal segments without non-finite offsets', () => {
+    const duplicate = offsetSide([{ x: 0, y: 0 }, { x: 0, y: 0 }], 0.02);
+    const reversal = offsetSide([{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 0 }], 0.02);
+    expect([...duplicate, ...reversal].every((p) => Number.isFinite(p.x) && Number.isFinite(p.y))).toBe(true);
+  });
+
   it('bundle emits the requested number of parallel strands', () => {
     const specs = bundle([{ x: 0, y: 0 }, { x: 1, y: 0 }], {
       strands: 3, spacing: 0.02, width: 0.006, layer: 2, rank: 2,

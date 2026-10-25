@@ -1,5 +1,6 @@
 import { FrameArchetype } from '../../model/types';
 import { buildCoreFrameSpecs } from './archetypes';
+import { buildLatticeRails } from './latticeSource';
 import { FrameFormula, Point2, PolylineSpec, RailKind } from './types';
 
 /* -------------------------------------------------------------------------- */
@@ -255,6 +256,21 @@ export function buildGenerativeFrameSpecs(
 ): PolylineSpec[] {
   const box = frameBox(archetype, mainWidth);
   const level = clampGenesisLevel(formula.level);
+
+  // The lattice generator already emits the full D2/D4-symmetric frame, so it
+  // is used whole (no right-half mirroring); its primary frame is the rank-0
+  // tutorial layer, which a composited overlay omits.
+  if (formula.source === 'lattice') {
+    const rails = buildLatticeRails({ box, level, seed: formula.seed });
+    const specs = options.includePrimaryFrame === false
+      ? rails.filter((railSpec) => railSpec.rank !== 0)
+      : rails;
+    if (archetype !== 'monogram_gate' || options.includeMonogram === false) return specs;
+    const glyph = buildCoreFrameSpecs('monogram_gate', mainWidth).filter(
+      (s) => s.kind === 'monogram' || s.kind === 'pinstripe'
+    );
+    return [...specs, ...glyph];
+  }
 
   const rightHalf =
     formula.source === 'fractal'

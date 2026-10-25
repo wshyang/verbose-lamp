@@ -21,10 +21,10 @@ interface GoldenCase {
 const CASES: readonly GoldenCase[] = [
   { name: 'fireworks', effect: 'fireworks', params: { seed: 1925, intensity: 0.6 } },
   { name: 'fireworks finale', effect: 'fireworks', params: { seed: 1925, finale: true, greenLight: true } },
-  { name: 'orbs sides outward', effect: 'orb-transition', params: { origin: ORIGIN, pattern: 'sides', direction: 'outward' } },
-  { name: 'orbs sides inward', effect: 'orb-transition', params: { origin: ORIGIN, pattern: 'sides', direction: 'inward' } },
-  { name: 'orbs corners outward', effect: 'orb-transition', params: { origin: ORIGIN, pattern: 'corners', direction: 'outward' } },
-  { name: 'orbs corners inward', effect: 'orb-transition', params: { origin: ORIGIN, pattern: 'corners', direction: 'inward' } },
+  { name: 'sparklers sides outward', effect: 'sparkler-transition', params: { origin: ORIGIN, pattern: 'sides', direction: 'outward' } },
+  { name: 'sparklers sides inward', effect: 'sparkler-transition', params: { origin: ORIGIN, pattern: 'sides', direction: 'inward' } },
+  { name: 'sparklers corners outward', effect: 'sparkler-transition', params: { origin: ORIGIN, pattern: 'corners', direction: 'outward' } },
+  { name: 'sparklers corners inward', effect: 'sparkler-transition', params: { origin: ORIGIN, pattern: 'corners', direction: 'inward' } },
   { name: 'sunburst iris', effect: 'sunburst-wipe', params: { origin: ORIGIN, variant: 'iris' } },
   { name: 'sunburst fan', effect: 'sunburst-wipe', params: { origin: { x: 0.5, y: 1 }, variant: 'fan' } },
   { name: 'confetti burst', effect: 'confetti', params: { mode: 'burst', origin: ORIGIN, seed: 1925 } },
@@ -76,4 +76,12 @@ describe('effect golden recordings', () => {
       expect(runEffect(testCase, false)).toEqual(runEffect(testCase, false));
     });
   }
+
+  it('deprecated orb-transition alias draws the same sparklers', () => {
+    const params = { origin: ORIGIN, pattern: 'sides', direction: 'outward' } as const;
+    const canonical = runEffect({ name: 'canonical', effect: 'sparkler-transition', params }, false);
+    const alias = runEffect({ name: 'alias', effect: 'orb-transition', params }, false);
+    expect(alias).toEqual(canonical);
+    expect(effectRegistry['orb-transition'].id).toBe('orb-transition');
+  });
 });

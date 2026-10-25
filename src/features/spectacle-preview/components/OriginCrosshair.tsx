@@ -1,16 +1,21 @@
 interface OriginCrosshairProps {
   origin: { x: number; y: number };
   isPicking: boolean;
+  testId?: string;
 }
 
 /** Marks where origin-driven effects will start; pulses while picking. */
-export function OriginCrosshair({ origin, isPicking }: OriginCrosshairProps) {
+export function OriginCrosshair({
+  origin,
+  isPicking,
+  testId = 'spectacle-preview__crosshair',
+}: OriginCrosshairProps) {
   const ringClass = isPicking ? 'animate-pulse border-[#fff3d0]' : 'border-[#d9b264]/80';
   return (
     <div
       className="pointer-events-none absolute z-20 -translate-x-1/2 -translate-y-1/2"
       style={{ left: `${origin.x * 100}%`, top: `${origin.y * 100}%` }}
-      data-testid="event-night__origin-crosshair"
+      data-testid={testId}
       aria-hidden="true"
     >
       <div className={`h-8 w-8 rounded-full border ${ringClass}`}>

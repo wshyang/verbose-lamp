@@ -1,16 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { mulberry32 } from '@/shared/lib/random';
-import type { FireworkShellType, OrbTransitionParams } from '../model/types';
+import type { FireworkShellType, SparklerTransitionParams } from '../model/types';
 import { hashText } from '../testing/recordingCanvas';
 import { shellSparks } from './fireworks/shells';
 import { planShow } from './fireworks/show';
-import { planOrbCrossfade, planOrbTransition } from './orbs/orbPlan';
+import { planSparklerCrossfade, planSparklerTransition } from './sparklers/sparklerPlan';
 
 const ORIGIN = { x: 0.5, y: 0.5 } as const;
 const SHELL_TYPES: readonly FireworkShellType[] = [
   'peony', 'chrysanthemum', 'willow', 'kamuro', 'palm', 'ring', 'crossette', 'strobe', 'double-break',
 ];
-const ORB_CONFIGS: readonly OrbTransitionParams[] = [
+const SPARKLER_CONFIGS: readonly SparklerTransitionParams[] = [
   { origin: ORIGIN, pattern: 'sides', direction: 'outward' },
   { origin: ORIGIN, pattern: 'sides', direction: 'inward' },
   { origin: ORIGIN, pattern: 'corners', direction: 'outward' },
@@ -18,7 +18,11 @@ const ORB_CONFIGS: readonly OrbTransitionParams[] = [
 ];
 
 function digest(value: unknown): { length: number; hash: string } {
-  const text = JSON.stringify(value);
+  // Trig differs by 1 ulp across JS engines; 10 dp keeps the golden stable
+  // without hiding any visually meaningful planning change.
+  const text = JSON.stringify(value, (_key, entry: unknown) => (
+    typeof entry === 'number' ? Math.round(entry * 1e10) / 1e10 : entry
+  ));
   return { length: text.length, hash: hashText(text) };
 }
 
@@ -35,10 +39,10 @@ describe('planning golden snapshots', () => {
     });
   }
 
-  for (const config of ORB_CONFIGS) {
-    it(`planOrbTransition ${config.pattern}/${config.direction} keeps its timeline`, () => {
-      expect(digest(planOrbTransition(config))).toMatchSnapshot();
-      expect(digest(planOrbCrossfade(config))).toMatchSnapshot();
+  for (const config of SPARKLER_CONFIGS) {
+    it(`planSparklerTransition ${config.pattern}/${config.direction} keeps its timeline`, () => {
+      expect(digest(planSparklerTransition(config))).toMatchSnapshot();
+      expect(digest(planSparklerCrossfade(config))).toMatchSnapshot();
     });
   }
 });

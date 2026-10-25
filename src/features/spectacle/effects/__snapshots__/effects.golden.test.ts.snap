@@ -152,78 +152,6 @@ exports[`effect golden recordings > name reveal draws identically (reduced motio
 }
 `;
 
-exports[`effect golden recordings > orbs corners inward draws identically (full motion) 1`] = `
-{
-  "announced": [],
-  "calls": 12277,
-  "hash": "26815c1c35b0a0331ee55fc0ade770c56ec6f909",
-  "status": "done",
-}
-`;
-
-exports[`effect golden recordings > orbs corners inward draws identically (reduced motion) 1`] = `
-{
-  "announced": [],
-  "calls": 42,
-  "hash": "bdb4b6de5c120feb90ce228200c59cfd6e1d0c5a",
-  "status": "done",
-}
-`;
-
-exports[`effect golden recordings > orbs corners outward draws identically (full motion) 1`] = `
-{
-  "announced": [],
-  "calls": 7374,
-  "hash": "36458a5101f1f171dc90f9f301eb0d45049478fb",
-  "status": "done",
-}
-`;
-
-exports[`effect golden recordings > orbs corners outward draws identically (reduced motion) 1`] = `
-{
-  "announced": [],
-  "calls": 42,
-  "hash": "bdb4b6de5c120feb90ce228200c59cfd6e1d0c5a",
-  "status": "done",
-}
-`;
-
-exports[`effect golden recordings > orbs sides inward draws identically (full motion) 1`] = `
-{
-  "announced": [],
-  "calls": 8955,
-  "hash": "1d9c0e66bd6d0a6882aa6bf82f04a604b85402d9",
-  "status": "done",
-}
-`;
-
-exports[`effect golden recordings > orbs sides inward draws identically (reduced motion) 1`] = `
-{
-  "announced": [],
-  "calls": 42,
-  "hash": "bdb4b6de5c120feb90ce228200c59cfd6e1d0c5a",
-  "status": "done",
-}
-`;
-
-exports[`effect golden recordings > orbs sides outward draws identically (full motion) 1`] = `
-{
-  "announced": [],
-  "calls": 3750,
-  "hash": "bd8e1de0548d8b003818e1e69173559588e4741f",
-  "status": "done",
-}
-`;
-
-exports[`effect golden recordings > orbs sides outward draws identically (reduced motion) 1`] = `
-{
-  "announced": [],
-  "calls": 42,
-  "hash": "bdb4b6de5c120feb90ce228200c59cfd6e1d0c5a",
-  "status": "done",
-}
-`;
-
 exports[`effect golden recordings > searchlights draws identically (full motion) 1`] = `
 {
   "announced": [],
@@ -239,6 +167,78 @@ exports[`effect golden recordings > searchlights draws identically (reduced moti
   "calls": 3660,
   "hash": "a6a8843664f534b243b9c9ca5e66c4fd3a25fe05",
   "status": "running",
+}
+`;
+
+exports[`effect golden recordings > sparklers corners inward draws identically (full motion) 1`] = `
+{
+  "announced": [],
+  "calls": 15883,
+  "hash": "18e8014a1069bdceea092191acbccd65cdf92f01",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > sparklers corners inward draws identically (reduced motion) 1`] = `
+{
+  "announced": [],
+  "calls": 42,
+  "hash": "bdb4b6de5c120feb90ce228200c59cfd6e1d0c5a",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > sparklers corners outward draws identically (full motion) 1`] = `
+{
+  "announced": [],
+  "calls": 11664,
+  "hash": "c50336262eb078b5d4a05d49bdc151eac3a195fb",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > sparklers corners outward draws identically (reduced motion) 1`] = `
+{
+  "announced": [],
+  "calls": 42,
+  "hash": "bdb4b6de5c120feb90ce228200c59cfd6e1d0c5a",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > sparklers sides inward draws identically (full motion) 1`] = `
+{
+  "announced": [],
+  "calls": 10389,
+  "hash": "637e1c6a230ada558c092d0e26b13a716b9ee606",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > sparklers sides inward draws identically (reduced motion) 1`] = `
+{
+  "announced": [],
+  "calls": 42,
+  "hash": "bdb4b6de5c120feb90ce228200c59cfd6e1d0c5a",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > sparklers sides outward draws identically (full motion) 1`] = `
+{
+  "announced": [],
+  "calls": 5866,
+  "hash": "a8a4615581e68a61728ed612936d237e19d053a8",
+  "status": "done",
+}
+`;
+
+exports[`effect golden recordings > sparklers sides outward draws identically (reduced motion) 1`] = `
+{
+  "announced": [],
+  "calls": 42,
+  "hash": "bdb4b6de5c120feb90ce228200c59cfd6e1d0c5a",
+  "status": "done",
 }
 `;
 

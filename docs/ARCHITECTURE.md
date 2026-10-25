@@ -14,7 +14,7 @@ src/
   App.tsx                       # Vite/React entry component (renders DemoHost)
   app/                          # Compose a complete host experience
     DemoHost.tsx                # Mounts the premiere or the Event Night demo
-    hooks/                      # useDemoScreen: screen state over the History API
+    hooks/                      # useDemoScreen (History API), usePremiereSpectacle
     model/                      # parseDemoScreen (pure, tested)
     components/                 # Stage, header, timeline, and HUD layout
   features/
@@ -29,10 +29,10 @@ src/
     gilded-portrait/            # Pure CPU image pipeline and optional portrait studio
     gilded-ui/                  # Gold plaques, glyphs and nav bar from emoji + label
     lucky-draw/                 # Fair draw rules, spin profile, canvas drum
-    premiere/                   # Sequence domain, audio, and WebGL runtime
+    premiere/                   # Sequence domain, audio, pure choreography, R3F scene
     qr-generator/               # Encode, render, export, and modal surface
     research/                   # Read-only dossier and content
-    spectacle/                  # Canvas-2D effects: fireworks, orbs, sunburst, confetti…
+    spectacle/                  # Canvas-2D effects: fireworks, sparklers, sunburst…
     spectacle-preview/          # Docked console that drives the spectacle effects
     title-customizer/           # Presets, normalization, and editor dialog
   shared/
@@ -52,8 +52,12 @@ supported import surface; internal files should remain private to that feature.
 - `src/App.tsx` is intentionally thin. `src/app/GatsbyPremiere.tsx` composes the
   screen and connects feature APIs; it does not implement playback or geometry.
 - `features/premiere` owns the five-act sequence, camera/audio controls, and the
-  scene lifecycle. React UI talks to the typed controller rather than reaching
-  into Three.js objects.
+  scene lifecycle. React UI talks to the renderer-neutral `PremiereSceneApi`
+  (`scene/sceneApi.ts`) rather than reaching into Three.js objects; the R3F
+  implementation (`scene3d/`) backs it with a vanilla Zustand store read
+  transiently in frame loops, and the camera/timing/style decisions are pure,
+  tested modules (`scene/choreography.ts`, `styleClamp.ts`, `orbitFocus.ts`,
+  `model/freeze.ts`).
 - `features/art-deco-frame` owns reusable frame grammar, genome data, beveled
   rail geometry, typography glyphs, and materials. It has no timeline or HUD.
 - `features/frame-studio` owns editor state and control presentation. Its hook
@@ -103,8 +107,14 @@ and the premiere starts over when it is shown again.
   entropy, the animation only plays the result out. It renders inside the shared
   `Dialog` and does not use the spectacle stage; the host chains confetti and the
   name reveal after it lands.
+- The transition formerly called "orbs" is the `sparkler-transition`
+  (`effects/sparklers/`): sparkler wands travel the tracks, shed crackle sparks,
+  and flash on inward collision. `orb-transition` survives as a deprecated typed
+  alias of the same implementation.
 - `features/event-night` is the only feature that composes `spectacle`,
-  `spectacle-preview`, `lucky-draw`, `gilded-ui` and `deco-lattice`. They do not
+  `spectacle-preview`, `lucky-draw`, `gilded-ui` and `deco-lattice`. The Gatsby
+  Premiere composes the same preview panel as a left-docked non-modal overlay
+  from `src/app` (`usePremiereSpectacle`), per ADDENDUM-020 §3.9. Features do not
   import each other except through barrels, and none import `app/`.
 
 ## Reusing The UI
@@ -141,5 +151,17 @@ header or timeline into another product simply to reuse a button or modal.
 
 The three.js renderer is deliberately isolated from normal feature UI. A new app
 can reuse the QR generator, title customizer, research dialog, or frame studio
-without mounting `GatsbySceneManager`; a frame-based experience can reuse the
+without mounting `PremiereCanvas`; a frame-based experience can reuse the
 Art Deco engine through its typed exports.
+
+## Testing
+
+`npm run test:coverage` enforces a literal 100% gate (lines, statements,
+functions, branches) over `src/**`, per ADDENDUM-025's recorded override of
+CLAUDE §2. Pure modules carry correctness; rendering is exercised through seams —
+the recording 2D canvas for spectacle effects, `@react-three/test-renderer` for
+the R3F scene graph, jsdom for DOM components. Golden snapshots pin geometry and
+draw-call digests, never pixels. `e2e/` holds the Playwright likeness scaffold
+(ADDENDUM-022): it drives the `?freezeAt=` hook at fixed times, but has no
+committed baselines yet — `npm run e2e:update` on a machine with a browser
+creates them, and a human reviews them before they gate anything.
