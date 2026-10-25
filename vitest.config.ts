@@ -69,6 +69,7 @@ export default defineConfig({
         ...GLOBAL_FLOORS,
         'src/test/digest.ts': FULL,
         'src/features/premiere/scene/shaders/glslDeclarations.ts': FULL,
+        'src/features/premiere/model/freeze.ts': FULL,
       },
     },
   },
