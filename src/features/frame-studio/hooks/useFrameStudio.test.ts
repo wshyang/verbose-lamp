@@ -3,6 +3,7 @@ import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { DEFAULT_SCREEN_BORDER_STYLE, SIGNATURE_GENOME } from '@/features/art-deco-frame';
 import { setupDomTests } from '@/test/dom';
+import { DESIGN_GALLERY, designAt } from '../data/frameDesigns';
 import { useFrameStudio, type FrameStudioTarget } from './useFrameStudio';
 
 setupDomTests();
@@ -47,6 +48,23 @@ describe('useFrameStudio', () => {
     act(() => result.current.setDetail(75));
     expect(result.current.detailPercent).toBe(75);
     expect(result.current.activePreset?.id).toBe('ornate');
+  });
+
+  it('adopts a gallery design wholesale, genome and all', () => {
+    const scene = target();
+    const { result } = studio(scene);
+
+    act(() => result.current.selectDesign(2));
+    const style = scene.setSequenceFrameStyle.mock.calls.at(-1)?.[0] as { formula: { genome: unknown } };
+
+    expect(result.current.activeDesignIndex).toBe(2);
+    expect(result.current.designLabel).toBe(designAt(2).label);
+    expect(style.formula.genome).toEqual(designAt(2).genome);
+
+    // The gallery wraps, so an out-of-range index still lands on a real design.
+    act(() => result.current.selectDesign(DESIGN_GALLERY.length));
+    expect(result.current.activeDesignIndex).toBe(0);
+    expect(result.current.designLabel).toBe(DESIGN_GALLERY[0].label);
   });
 
   it('rerolls the lattice seed into the six-digit range', () => {

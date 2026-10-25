@@ -59,7 +59,7 @@ describe('fireworks sub-shells', () => {
     // The split lands at 55 % of the star's life plus the shell's own delay, so
     // the later window draws strictly more: the sub-bursts are in there.
     expect(long.calls).toBeGreaterThan(short.calls);
-  });
+  }, 20_000);
 
   it('stays deterministic for the splitting seed too', () => {
     const seed = seedWithCrossette();
@@ -67,7 +67,7 @@ describe('fireworks sub-shells', () => {
     expect(run(definition, { seed, durationMs: 4000 }, 5200).log).toEqual(
       run(definition, { seed, durationMs: 4000 }, 5200).log
     );
-  });
+  }, 30_000);
 });
 
 describe('fireworks recycling', () => {

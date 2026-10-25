@@ -160,6 +160,30 @@ describe('PremiereSurfaces', () => {
     expect(state.shortcuts.at(-1)?.isDialogOpen).toBe(true);
   });
 
+  it('closes the research dialog again, releasing the shortcuts', async () => {
+    render(<PremiereSurfaces onOpenEventNight={vi.fn()} />);
+
+    await userEvent.click(screen.getByTestId('premiere-header__research'));
+    expect(state.shortcuts.at(-1)?.isDialogOpen).toBe(true);
+
+    // The research dialog has its own close button and does not listen for Escape.
+    await userEvent.click(screen.getByTestId('research-dialog__close'));
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(state.shortcuts.at(-1)?.isDialogOpen).toBe(false);
+  });
+
+  it('opens the title customizer from the header and closes it again', async () => {
+    render(<PremiereSurfaces onOpenEventNight={vi.fn()} />);
+
+    await userEvent.click(screen.getByTestId('premiere-header__customize'));
+    expect(screen.getByRole('dialog')).toBeTruthy();
+    expect(state.shortcuts.at(-1)?.isDialogOpen).toBe(true);
+
+    await userEvent.keyboard('{Escape}');
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(state.shortcuts.at(-1)?.isDialogOpen).toBe(false);
+  });
+
   it('hides the HUD from the floating toggle', async () => {
     render(<PremiereSurfaces onOpenEventNight={vi.fn()} />);
 
