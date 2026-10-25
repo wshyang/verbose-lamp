@@ -45,7 +45,10 @@ difference: those are shared code, and a change in any of them would move every 
 tens of steps, not fractions of one.
 
 The script writes each pair to `/tmp/renderer-parity/` plus a `report.json`, so the two
-frames with the largest numbers can be inspected rather than trusted.
+frames with the largest numbers can be inspected rather than trusted. Nothing is committed
+from that directory: the R3F half of any frame is already in
+`e2e/likeness.spec.ts-snapshots/`, and the script regenerates both halves in one command,
+which is more honest than a pair of PNGs that would age without anybody noticing.
 
 ## 3. Why this is a comparison and not a gate
 

@@ -130,6 +130,7 @@ Three test-only guards are worth knowing about:
   `e2e/likeness.spec.ts-snapshots/` (ADDENDUM-043).
 - `scripts/compare-renderers.mjs` — photographs both renderers at five frozen frames and
   reports the per-channel difference, so "the port is 1:1" is a number (ADDENDUM-045).
+  Captures go to `/tmp/renderer-parity/`; nothing from it is committed.
 
 ## Contributing conventions
 
