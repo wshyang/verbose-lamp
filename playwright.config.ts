@@ -7,6 +7,13 @@ import { defineConfig } from '@playwright/test';
  * Once `e2e/snapshots/` exists, `npm run e2e` fails on any visual drift in the
  * premiere. Re-baselining (`npm run e2e:update`) needs its own addendum.
  */
+/**
+ * Some hosts (CI images, sandboxes) already ship a Chromium build instead of
+ * downloading one. Point `PLAYWRIGHT_CHROMIUM_EXECUTABLE` at it and the config
+ * uses that binary; otherwise Playwright resolves its own download.
+ */
+const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE;
+
 export default defineConfig({
   testDir: 'e2e',
   fullyParallel: false,
@@ -20,12 +27,19 @@ export default defineConfig({
     reuseExistingServer: true,
     timeout: 120_000,
   },
+  // Software GL is slow: a cold premiere load takes ~15 s on SwiftShader, and
+  // a whole flow can need a minute once panels animate.
+  timeout: 120_000,
   expect: {
+    // Stable-screenshot capture under software GL needs several frames.
+    timeout: 60_000,
     toHaveScreenshot: { maxDiffPixelRatio: 0.01, threshold: 0.2, animations: 'disabled' },
   },
   use: {
     baseURL: 'http://localhost:4173',
     launchOptions: {
+      executablePath,
+      // Software GL: the premiere's three.js canvas must render without a GPU.
       args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
     },
   },

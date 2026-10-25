@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { gotoFrame } from './support/stage';
+import { gotoFrame, gotoFrozen } from './support/stage';
 
 /**
  * The likeness gate (ADDENDUM-022 §4). Every frame below is a frozen moment of
@@ -29,9 +29,8 @@ test.describe('premiere likeness', () => {
 
 test.describe('premiere likeness, nitrate forced', () => {
   test('act5-hero-nitrate', async ({ page }) => {
-    await gotoFrame(page, 30.5);
-    await page.getByTestId('premiere-header__nitrate').click();
-    await page.waitForTimeout(600);
+    // The toggle lives in the HUD, so it must be switched before the HUD hides.
+    await gotoFrozen(page, 30.5, { nitrate: true, hud: false });
     await expect(page).toHaveScreenshot('act5-hero-nitrate.png');
   });
 });

@@ -21,9 +21,27 @@ export async function gotoFrozen(page: Page, seconds: number, options: FrozenOpt
   const stage = page.getByTestId('cinematic-stage__canvas');
   await expect(stage).toHaveAttribute('data-frame-ready', 'true', { timeout: READY_TIMEOUT_MS });
   if (options.hud === false) await page.keyboard.press('h');
-  if (options.nitrate) await page.getByTestId('premiere-header__nitrate').click();
-  if (options.orbit) await page.getByTestId('premiere-header__orbit').click();
+  // These are toggles with a fixed target: forcing the click skips Playwright's
+  // stability wait, which software GL never satisfies while the film renders.
+  if (options.nitrate) {
+    await page.getByTestId('premiere-header__nitrate').click({ force: true, timeout: 60_000 });
+  }
+  if (options.orbit) {
+    await page.getByTestId('premiere-header__orbit').click({ force: true, timeout: 60_000 });
+  }
   await page.waitForTimeout(SETTLE_MS);
+}
+
+/**
+ * Closes the Frame Studio, which docks beside the film on wide screens but
+ * covers the header and transport on phones. Call it before driving the HUD.
+ */
+export async function dismissFrameStudio(page: Page): Promise<void> {
+  const dismiss = page.getByTestId('frame-studio__dismiss');
+  if ((await dismiss.count()) > 0 && (await dismiss.isVisible())) {
+    await dismiss.click();
+    await expect(page.getByTestId('frame-studio__panel')).toHaveCount(0);
+  }
 }
 
 /** Frozen premiere with the HUD hidden: the likeness baseline shot. */

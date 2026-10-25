@@ -68,6 +68,7 @@ const PresetRow: React.FC<{ qr: Generator }> = ({ qr }) => (
           type="button"
           onClick={() => qr.applyPreset(preset)}
           variant={qr.activePresetId === preset.id ? 'selected' : 'panel'}
+          aria-pressed={qr.activePresetId === preset.id}
           size="small"
           className={`${CHIP_BASE} ${qr.activePresetId === preset.id ? CHIP_ACTIVE : CHIP_IDLE}`}
           data-testid="qr-generator__preset"
@@ -89,6 +90,7 @@ const CorrectionRow: React.FC<{ qr: Generator }> = ({ qr }) => (
           type="button"
           onClick={() => qr.setErrorCorrection(option.level)}
           variant={qr.errorCorrection === option.level ? 'selected' : 'panel'}
+          aria-pressed={qr.errorCorrection === option.level}
           size="small"
           className={`${CHIP_BASE} ${qr.errorCorrection === option.level ? CHIP_ACTIVE : CHIP_IDLE}`}
           title={`Recovers up to ${option.recovery} damage`}
@@ -111,6 +113,7 @@ const ShapeRow: React.FC<{ qr: Generator }> = ({ qr }) => (
           type="button"
           onClick={() => qr.setShape(option.shape)}
           variant={qr.shape === option.shape ? 'selected' : 'panel'}
+          aria-pressed={qr.shape === option.shape}
           size="small"
           className={`${CHIP_BASE} ${qr.shape === option.shape ? CHIP_ACTIVE : CHIP_IDLE}`}
           data-testid="qr-generator__shape"

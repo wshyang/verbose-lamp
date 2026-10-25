@@ -24,7 +24,9 @@ Mocking `GatsbySceneManager` in the hooks would have coupled the tests to the cl
 - `likeness.spec.ts` records `e2e/snapshots/` at the four freeze points named in ADDENDUM-022 §4.1 (title hold, chapter card, name reveal, nitrate toggle).
 - `flows.spec.ts` walks the four user journeys (open the console, play an effect, change a surface, reroll a frame) as *behaviour*, without pixels.
 
-**The baselines are not committed.** They cannot be captured in this sandbox (no browser, no GPU). Until someone runs `npx playwright test --update-snapshots` on a real machine, the likeness gate protects nothing — it is infrastructure, not evidence. That must be said plainly rather than implied away.
+**The baselines were not committed in this addendum.** They could not be captured here at the time (no browser, no GPU). Until someone ran `npx playwright test --update-snapshots`, the likeness gate protected nothing — it was infrastructure, not evidence. That must be said plainly rather than implied away.
+
+> **Closed by ADDENDUM-029.** A Chromium build was obtained from npm (`@sparticuz/chromium`), the nine shots were captured on Linux + SwiftShader and committed as `*-linux.png`, and the suite now passes without `--update-snapshots`. The gate is evidence.
 
 ## 4. The test harness
 

@@ -131,6 +131,8 @@ HUD (`h`), nitrate, or orbit (`o`) as asked.
 act; scrubber input changes the time readout; `h` hides the HUD; each modal opens and closes through its testid, and
 Escape closes it; applying a custom title jumps to act V.
 
+> **Closed by ADDENDUM-029 (2026-10-25).** A browser was acquired inside the sandbox from npm, so the 0.6 checkpoint was completed there: `e2e/likeness.spec.ts` has committed Linux baselines and passes without `--update-snapshots`. The original instruction is kept below for a real-GPU machine.
+
 **0.6 USER CHECKPOINT — capture baselines.** The sandbox has no browser. The user runs
 `npx playwright install chromium && npm run e2e:update`, inspects `e2e/*-snapshots/`, and commits them. Baselines are
 OS-suffixed (`-darwin`) by Playwright. Comparisons are only valid on the same OS, browser and version.

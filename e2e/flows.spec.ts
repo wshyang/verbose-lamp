@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { gotoFrozen } from './support/stage';
+import { dismissFrameStudio, gotoFrozen } from './support/stage';
 
 /**
  * Interaction flows (ADDENDUM-022 §4). These assert behaviour, not pixels, so
@@ -8,14 +8,20 @@ import { gotoFrozen } from './support/stage';
  */
 test.describe('premiere flows', () => {
   test('transport: replay, scrub and chapter selection move the frame', async ({ page }) => {
+    // HUD stays up: the transport bar is part of it, and hiding the HUD also
+    // releases pointer events to the canvas underneath.
     await gotoFrozen(page, 12);
-    await page.keyboard.press('h');
+    await dismissFrameStudio(page);
 
+    // Chapters expose their selection as `aria-pressed` (a Button variant), not
+    // `aria-current`; the nav itself is labelled "Sequence chapters".
+    const chapters = page.getByTestId('timeline__chapter');
     await page.getByTestId('timeline__replay').click();
-    await expect(page.getByTestId('timeline__chapter').first()).toHaveAttribute('aria-current', 'true');
+    await expect(chapters.first()).toHaveAttribute('aria-pressed', 'true');
 
-    await page.getByTestId('timeline__chapter').nth(2).click();
-    await expect(page.getByTestId('timeline__chapter').nth(2)).toHaveAttribute('aria-current', 'true');
+    await chapters.nth(2).click();
+    await expect(chapters.nth(2)).toHaveAttribute('aria-pressed', 'true');
+    await expect(chapters.first()).toHaveAttribute('aria-pressed', 'false');
 
     const scrubber = page.getByTestId('timeline__scrubber');
     await scrubber.fill('30');
@@ -37,6 +43,7 @@ test.describe('premiere flows', () => {
 
   test('spectacle console opens, plays a sparkler and closes', async ({ page }) => {
     await gotoFrozen(page, 12);
+    await dismissFrameStudio(page);
     await page.getByTestId('spectacle-preview__launch').click();
     await expect(page.getByTestId('spectacle-preview__panel')).toBeVisible();
     await page.getByTestId('spectacle-preview__sparkler').first().click();
@@ -46,10 +53,14 @@ test.describe('premiere flows', () => {
   });
 
   test('event night opens and returns to the premiere', async ({ page }) => {
+    // Leaving event night remounts the premiere's whole three.js scene, which
+    // costs tens of seconds on a software GL stack.
+    test.slow();
     await gotoFrozen(page, 12);
+    await dismissFrameStudio(page);
     await page.getByTestId('event-night__launch').click();
     await expect(page.getByTestId('event-night__back')).toBeVisible();
-    await page.getByTestId('event-night__back').click();
-    await expect(page.getByTestId('cinematic-stage__canvas')).toBeVisible();
+    await page.getByTestId('event-night__back').click({ timeout: 60_000 });
+    await expect(page.getByTestId('cinematic-stage__canvas')).toBeVisible({ timeout: 120_000 });
   });
 });
