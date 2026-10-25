@@ -6,7 +6,7 @@ import { createExtrudedDecoTextMesh } from './decoTypography';
 import type { DecoTextOptions } from '../model/decoText';
 
 /**
- * The carved type rig, pinned before it was split (ADDENDUM-031). This is a pure
+ * The carved type rig, pinned before it was split (ADDENDUM-032). This is a pure
  * code-motion guard: every number below is a property of the *result*, so a
  * refactor that changes any of them is a behaviour change, not tidying.
  *

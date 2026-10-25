@@ -9,7 +9,7 @@ export type { DecoTextOptions, DecoTextRig } from '../model/decoText';
  * a 3D multi-slice gold-extruded + platinum-faced WebGL group.
  *
  * Split into layout → mask → heightfield → textures → materials → slices
- * (ADDENDUM-031). This was one 371-line function, which ADDENDUM-001 §4 listed as
+ * (ADDENDUM-032). This was one 371-line function, which ADDENDUM-001 §4 listed as
  * debt with the plan "split rasteriser / normal-synth / mesh on next touch". The
  * split is pure code motion: `decoTypography.test.ts` pins the produced rig with a
  * golden digest, so any numerical drift would fail before this file was changed.

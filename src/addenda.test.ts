@@ -8,8 +8,8 @@ import { describe, expect, it } from 'vitest';
  * CLAUDE.md §4 says every decision gets an addendum file and a row in
  * `docs/ADDENDA.md`, in the same change. Until now nothing checked it, which is
  * how a file can sit in `docs/addenda/` unregistered — and how two different
- * records can end up claiming the same number, which happened once this project
- * (a split record and a defect record both citing ADDENDUM-031).
+ * records can end up claiming the same number, which happened once in this project
+ * (the carve-type split was renumbered to 032 when the lattice defect claimed 031).
  *
  * These assertions are cheap and catch exactly that class of drift:
  * register ⟷ files both ways, contiguous numbering, a title that agrees with the

@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { DISCIPLINE_DEBT, REASON_TEXT, type DebtReason } from './test/disciplineBaseline';
 
 /**
- * The coding disciplines as a test (ADDENDUM-031).
+ * The coding disciplines as a test (ADDENDUM-032).
  *
  * CLAUDE.md §3 states hard limits — functions ≤ 50 lines, ≤ 3 parameters, nesting
  * ≤ 3, files ≤ 800 lines — and this project has always had comments saying so. A

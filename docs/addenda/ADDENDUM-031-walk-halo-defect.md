@@ -102,3 +102,11 @@ test. Two practices follow, and both are now in place:
 The lattice now draws roughly twice as much as before, and that has **never been seen
 in a browser**. The pending visual comparison (specs 123 → 243) is the user's, and it
 is the one check that can still say this fix is wrong.
+
+## 8. Erratum — mis-cited as the source of the ratchet
+
+Four source files (the debt table, the test that enforces it, and both halves of the
+carved-type rig) credited *this* addendum with the discipline ratchet and the 371-line
+split. Both belong to ADDENDUM-032. The numbers were corrected under
+[ADDENDUM-041](ADDENDUM-041-citation-subjects.md); the history of how the collision
+happened is in ADDENDUM-034 §1.

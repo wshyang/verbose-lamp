@@ -1,5 +1,5 @@
 /**
- * Recorded debt against the CLAUDE.md hard limits (ADDENDUM-031).
+ * Recorded debt against the CLAUDE.md hard limits (ADDENDUM-032).
  *
  * This is a ratchet, not an allowance: `src/discipline.test.ts` asserts that no
  * function in the tree exceeds the recorded size, that no *new* function appears
