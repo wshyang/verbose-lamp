@@ -13,144 +13,111 @@ interface GeometryAccumulator {
 const DEFAULT_TONE = 0.5;
 const DEG_TO_RAD = Math.PI / 180;
 
+const INV_SQRT2 = 0.70710678;
+const MITER_PARALLEL = 1e-3;
+const MITER_MAX_SCALE = 2.3;
+const MIN_SEGMENT = 1e-4;
+/** A rail whose mean x is within this of the centre line takes its side from the point, not the mean. */
+const CENTRE_BAND = 0.02;
+
+type ProfilePoint = readonly [lateral: number, z: number, normalLateral: number, normalZ: number];
+type Vec2 = { x: number; y: number };
+
 /**
- * Appends a 3D chamfered 24k gold bar along a 2D polyline at plane `z`.
- * Cross-section has a flat gleaming crest + two 45-degree angled bevel facets + side walls
- * with clean mitered corner joins so light catches every 45° and 90° Art Deco turn.
+ * The cross-section, 6 vertices across the front, bevels and sides, for crisp jewelry-grade facets:
+ * a flat gleaming crest, two 45-degree chamfers and the back corners.
  */
-function appendChamferedPolyline(acc: GeometryAccumulator, spec: PolylineSpec) {
-  const pts = spec.points;
-  if (pts.length < 2) return;
-
-  const isClosed = Boolean(spec.closed);
-  const count = pts.length;
-
-  // Compute cumulative arc length for normalized uProgress [0..1]
-  const cumLen: number[] = [0];
-  let totalLen = 0;
-  const segCount = isClosed ? count : count - 1;
-
-  for (let i = 0; i < segCount; i++) {
-    const a = pts[i];
-    const b = pts[(i + 1) % count];
-    const d = Math.hypot(b.x - a.x, b.y - a.y);
-    // Floored per segment, so a rail with two or more points always has a positive length.
-    totalLen += Math.max(1e-4, d);
-    cumLen.push(totalLen);
-  }
-
-  // Cross-section profile in (lateralOffset, zOffset, normalLateral, normalZ)
-  // 6 vertices across the front + bevels + sides for crisp jewelry-grade facets:
+function crossSection(spec: PolylineSpec): readonly ProfilePoint[] {
   const hw = spec.width * 0.5;
   const cw = spec.width * 0.26; // flat inner crest half-width
   const fz = spec.depth * 0.5;
   const bz = -spec.depth * 0.5;
-  const invSqrt2 = 0.70710678;
-
-  const profile: Array<[number, number, number, number]> = [
-    [-hw, bz, -1, 0],                   // 0: outer left back
-    [-hw, fz * 0.25, -invSqrt2, invSqrt2], // 1: left chamfer outer
-    [-cw, fz, -0.25, 0.968],            // 2: crest left edge
-    [cw, fz, 0.25, 0.968],              // 3: crest right edge
-    [hw, fz * 0.25, invSqrt2, invSqrt2],   // 4: right chamfer outer
-    [hw, bz, 1, 0],                     // 5: outer right back
+  return [
+    [-hw, bz, -1, 0],
+    [-hw, fz * 0.25, -INV_SQRT2, INV_SQRT2],
+    [-cw, fz, -0.25, 0.968],
+    [cw, fz, 0.25, 0.968],
+    [hw, fz * 0.25, INV_SQRT2, INV_SQRT2],
+    [hw, bz, 1, 0],
   ];
-  const profN = profile.length;
+}
 
-  const ringCount = isClosed ? count + 1 : count;
-  const baseVertex = acc.positions.length / 3;
-
-  // Determine parting direction for theatrical gate opening
-  let centerX = 0;
-  for (const p of pts) centerX += p.x;
-  centerX /= pts.length;
-
-  for (let r = 0; r < ringCount; r++) {
-    const idx = r % count;
-    const curr = pts[idx];
-
-    // Compute miter normal in XY plane
-    let tx = 0;
-    let ty = 0;
-
-    if (isClosed || (r > 0 && r < ringCount - 1)) {
-      const prev = pts[(idx - 1 + count) % count];
-      const next = pts[(idx + 1) % count];
-      let d1x = curr.x - prev.x;
-      let d1y = curr.y - prev.y;
-      const l1 = Math.hypot(d1x, d1y) || 1;
-      d1x /= l1;
-      d1y /= l1;
-
-      let d2x = next.x - curr.x;
-      let d2y = next.y - curr.y;
-      const l2 = Math.hypot(d2x, d2y) || 1;
-      d2x /= l2;
-      d2y /= l2;
-
-      const n1x = -d1y;
-      const n1y = d1x;
-      const n2x = -d2y;
-      const n2y = d2x;
-
-      let mx = n1x + n2x;
-      let my = n1y + n2y;
-      const ml = Math.hypot(mx, my);
-      if (ml < 1e-3) {
-        tx = n1x;
-        ty = n1y;
-      } else {
-        mx /= ml;
-        my /= ml;
-        const dot = Math.max(0.38, mx * n1x + my * n1y);
-        const miterScale = Math.min(2.3, 1.0 / dot);
-        tx = mx * miterScale;
-        ty = my * miterScale;
-      }
-    } else if (r === 0) {
-      const next = pts[1];
-      const dx = next.x - curr.x;
-      const dy = next.y - curr.y;
-      const l = Math.hypot(dx, dy) || 1;
-      tx = -dy / l;
-      ty = dx / l;
-    } else {
-      const prev = pts[count - 2];
-      const dx = curr.x - prev.x;
-      const dy = curr.y - prev.y;
-      const l = Math.hypot(dx, dy) || 1;
-      tx = -dy / l;
-      ty = dx / l;
-    }
-
-    const uNorm = cumLen[r] / totalLen;
-    const partSide =
-      spec.partDir !== undefined && spec.partDir !== 0
-        ? spec.partDir
-        : curr.x < -0.02
-          ? -1
-          : curr.x > 0.02
-            ? 1
-            : centerX < 0
-              ? -1
-              : 1;
-
-    // Normalize lateral direction for accurate normals
-    const nLen = Math.hypot(tx, ty) || 1;
-    const unx = tx / nLen;
-    const uny = ty / nLen;
-    const tone = spec.tone ?? DEFAULT_TONE;
-    const angleRad = (spec.brassAngle ?? 0) * DEG_TO_RAD;
-
-    for (let p = 0; p < profN; p++) {
-      const [lat, zOff, nLat, nZ] = profile[p];
-      acc.positions.push(curr.x + tx * lat, curr.y + ty * lat, spec.z + zOff);
-      acc.normals.push(unx * nLat, uny * nLat, nZ);
-      acc.pathData.push(uNorm, spec.delay, partSide);
-      acc.toneData.push(tone, angleRad);
-    }
+/** Cumulative arc length at each ring, floored per segment so a rail of two or more points has length. */
+function cumulativeLength(pts: readonly Vec2[], isClosed: boolean): number[] {
+  const cumLen = [0];
+  const segments = isClosed ? pts.length : pts.length - 1;
+  let total = 0;
+  for (let i = 0; i < segments; i++) {
+    const a = pts[i];
+    const b = pts[(i + 1) % pts.length];
+    total += Math.max(MIN_SEGMENT, Math.hypot(b.x - a.x, b.y - a.y));
+    cumLen.push(total);
   }
+  return cumLen;
+}
 
+const unit = (dx: number, dy: number): Vec2 => {
+  const length = Math.hypot(dx, dy) || 1;
+  return { x: dx / length, y: dy / length };
+};
+
+/** The left-hand normal of the segment `from` to `to`. */
+const normalOf = (from: Vec2, to: Vec2): Vec2 => {
+  const d = unit(to.x - from.x, to.y - from.y);
+  return { x: -d.y, y: d.x };
+};
+
+/** The mitred offset direction where two segments meet, scaled so both edges keep their width. */
+function miter(prev: Vec2, curr: Vec2, next: Vec2): Vec2 {
+  const n1 = normalOf(prev, curr);
+  const n2 = normalOf(curr, next);
+  const mx = n1.x + n2.x;
+  const my = n1.y + n2.y;
+  const ml = Math.hypot(mx, my);
+  if (ml < MITER_PARALLEL) return n1;
+  const ux = mx / ml;
+  const uy = my / ml;
+  // The original also clamped the dot product to 0.38 first. The cap binds at 1/2.3 = 0.435, so that
+  // clamp could never be the active limit; it is dropped and the output is unchanged.
+  const scale = Math.min(MITER_MAX_SCALE, 1.0 / (ux * n1.x + uy * n1.y));
+  return { x: ux * scale, y: uy * scale };
+}
+
+interface Ring {
+  pts: readonly Vec2[];
+  r: number;
+  ringCount: number;
+  isClosed: boolean;
+}
+
+/** The offset direction at ring `r`: mitred inside the run, perpendicular to the end segment at the ends. */
+function ringOffset({ pts, r, ringCount, isClosed }: Ring): Vec2 {
+  const count = pts.length;
+  const curr = pts[r % count];
+  if (isClosed || (r > 0 && r < ringCount - 1)) {
+    const idx = r % count;
+    return miter(pts[(idx - 1 + count) % count], curr, pts[(idx + 1) % count]);
+  }
+  return r === 0 ? normalOf(curr, pts[1]) : normalOf(pts[count - 2], curr);
+}
+
+/** Which half of the gate this ring opens with: the rail's own direction, else its side of the centre. */
+function partSideOf(spec: PolylineSpec, curr: Vec2, centreX: number): number {
+  if (spec.partDir !== undefined && spec.partDir !== 0) return spec.partDir;
+  if (curr.x < -CENTRE_BAND) return -1;
+  if (curr.x > CENTRE_BAND) return 1;
+  return centreX < 0 ? -1 : 1;
+}
+
+interface RingStack {
+  baseVertex: number;
+  ringCount: number;
+  /** Vertices in one ring: the cross-section's points. */
+  profN: number;
+}
+
+/** Triangles joining each ring of the cross-section to the next. */
+function connectRings(acc: GeometryAccumulator, { baseVertex, ringCount, profN }: RingStack): void {
   for (let r = 0; r < ringCount - 1; r++) {
     const rowA = baseVertex + r * profN;
     const rowB = baseVertex + (r + 1) * profN;
@@ -162,6 +129,42 @@ function appendChamferedPolyline(acc: GeometryAccumulator, spec: PolylineSpec) {
       acc.indices.push(a, d, c, a, c, b);
     }
   }
+}
+
+/**
+ * Appends a 3D chamfered 24k gold bar along a 2D polyline at plane `z`, with clean mitered corner
+ * joins so light catches every 45 and 90 degree Art Deco turn.
+ */
+function appendChamferedPolyline(acc: GeometryAccumulator, spec: PolylineSpec): void {
+  const pts = spec.points;
+  if (pts.length < 2) return;
+
+  const isClosed = Boolean(spec.closed);
+  const count = pts.length;
+  const cumLen = cumulativeLength(pts, isClosed);
+  const totalLen = cumLen[cumLen.length - 1];
+  const profile = crossSection(spec);
+  const ringCount = isClosed ? count + 1 : count;
+  const baseVertex = acc.positions.length / 3;
+  const centreX = pts.reduce((sum, p) => sum + p.x, 0) / count;
+  const tone = spec.tone ?? DEFAULT_TONE;
+  const angleRad = (spec.brassAngle ?? 0) * DEG_TO_RAD;
+
+  for (let r = 0; r < ringCount; r++) {
+    const curr = pts[r % count];
+    const offset = ringOffset({ pts, r, ringCount, isClosed });
+    const unitOffset = unit(offset.x, offset.y);
+    const uNorm = cumLen[r] / totalLen;
+    const partSide = partSideOf(spec, curr, centreX);
+
+    for (const [lat, zOff, nLat, nZ] of profile) {
+      acc.positions.push(curr.x + offset.x * lat, curr.y + offset.y * lat, spec.z + zOff);
+      acc.normals.push(unitOffset.x * nLat, unitOffset.y * nLat, nZ);
+      acc.pathData.push(uNorm, spec.delay, partSide);
+      acc.toneData.push(tone, angleRad);
+    }
+  }
+  connectRings(acc, { baseVertex, ringCount, profN: profile.length });
 }
 
 /** Shared rail extrusion for title cards and camera-attached poster borders. */
