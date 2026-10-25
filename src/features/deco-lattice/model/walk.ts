@@ -29,7 +29,7 @@ function isFree(p: Pt, o: WalkOptions, occupied: Set<string>): boolean {
 }
 
 /** Weighted turn choice: straight 0.55, ±45° 0.3, ±90° 0.15. */
-function nextDir(dir: number, rng: () => number): number {
+export function nextDir(dir: number, rng: () => number): number {
   const roll = rng();
   const turn = roll < 0.55 ? 0 : roll < 0.85 ? (rng() < 0.5 ? 1 : -1) : (rng() < 0.5 ? 2 : -2);
   return (dir + turn + 8) % 8;

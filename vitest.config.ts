@@ -80,6 +80,8 @@ export default defineConfig({
         'src/features/premiere/scene3d/usePointerAim.ts': FULL,
         'src/features/premiere/scene3d/applyRendererLook.ts': FULL,
         'src/features/premiere/scene3d/composer.ts': FULL,
+        'src/features/deco-lattice/model/clip.ts': FULL,
+        'src/features/deco-lattice/model/walk.ts': FULL,
       },
     },
   },

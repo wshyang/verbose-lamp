@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Pt } from './lattice';
-import { stepRun, traceWalks, type WalkOptions } from './walk';
+import { nextDir, stepRun, traceWalks, type WalkOptions } from './walk';
 
 /**
  * `stepRun` is the walker's step engine and `traceWalks` the seeded walk that uses
@@ -150,5 +150,27 @@ describe('traceWalks', () => {
   it('returns nothing when no start lands inside the annulus', () => {
     // `outer < inner` admits no legal start cell, so every attempt is skipped.
     expect(traceWalks({ seed: 3, cell: 0.05, inner: 0.9, outer: 0.3, count: 3, minRun: 2 })).toEqual([]);
+  });
+});
+
+describe('nextDir', () => {
+  const rolls = (...values: number[]) => {
+    const queue = [...values];
+    return () => queue.shift() ?? 0;
+  };
+
+  it.each([
+    ['straight below 0.55', [0.2], 0],
+    ['+45° on the low half of the 0.3 band', [0.6, 0.2], 1],
+    ['-45° on the high half of the 0.3 band', [0.6, 0.8], -1],
+    ['+90° on the low half of the 0.15 band', [0.9, 0.2], 2],
+    ['-90° on the high half of the 0.15 band', [0.9, 0.8], -2],
+  ] as const)('turns %s', (_label, values, turn) => {
+    expect(nextDir(2, rolls(...values))).toBe((2 + turn + 8) % 8);
+  });
+
+  it('wraps around the eight directions', () => {
+    expect(nextDir(7, rolls(0.6, 0.2))).toBe(0);
+    expect(nextDir(0, rolls(0.6, 0.8))).toBe(7);
   });
 });
