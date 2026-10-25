@@ -12,6 +12,7 @@ import { usePremiereSpectacle } from '../hooks/usePremiereSpectacle';
 import { CinematicStage } from './CinematicStage';
 import { FloatingHudToggle } from './FloatingHudToggle';
 import { FrameStudioDock } from './FrameStudioDock';
+import { forwardStageClick } from './forwardStageClick';
 import { OrbitHint } from './OrbitHint';
 import { PremiereHeader } from './PremiereHeader';
 import { PremiereSpectacleOverlay } from './PremiereSpectacleOverlay';
@@ -49,7 +50,7 @@ export function PremiereSurfaces({ onOpenEventNight }: PremiereSurfacesProps) {
   return (
     <main
       className="relative h-full w-full select-none overflow-hidden"
-      onClick={(event) => onStageClick(event.clientX, event.clientY)}
+      onClick={(event) => forwardStageClick(event, onStageClick)}
     >
       <CinematicStage
         mountRef={premiere.stageRef}

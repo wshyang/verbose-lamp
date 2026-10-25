@@ -150,6 +150,17 @@ describe('PremiereSurfaces', () => {
     expect(state.onStageClick).toHaveBeenCalledTimes(1);
   });
 
+  // The console is portalled to <body>, but React events still bubble through the React tree, so
+  // a click inside it reached the stage handler and ended origin picking at a point on the panel.
+  it('does not treat a click inside the console as a click on the stage', async () => {
+    state.panelOpen = true;
+    render(<PremiereSurfaces onOpenEventNight={vi.fn()} />);
+
+    await userEvent.click(screen.getByTestId('spectacle-preview__panel'));
+
+    expect(state.onStageClick).not.toHaveBeenCalled();
+  });
+
   it('closes the console from the launcher when it is already open', async () => {
     state.panelOpen = true;
     render(<PremiereSurfaces onOpenEventNight={vi.fn()} />);

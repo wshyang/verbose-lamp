@@ -1,6 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const PORT = 4173;
+// Not the dev server's usual 4173, and never reused: a long-lived dev server can serve modules
+// older than the working tree, and a gate that tests yesterday's code is worse than none.
+const PORT = Number(process.env.E2E_PORT ?? 4373);
 const BASE_URL = `http://localhost:${PORT}`;
 const SWIFTSHADER_ARGS = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'];
 
@@ -54,7 +56,7 @@ export default defineConfig({
   webServer: {
     command: `npm run dev -- --port ${PORT} --strictPort`,
     url: BASE_URL,
-    reuseExistingServer: true,
+    reuseExistingServer: false,
     timeout: 120_000,
   },
 });
