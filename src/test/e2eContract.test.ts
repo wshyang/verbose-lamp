@@ -75,3 +75,20 @@ describe('e2e specs against the source', () => {
     expect(source).toContain('frameReady');
   });
 });
+
+describe('the avatar model stubs against the source', () => {
+  const helper = () => readFileSync(join(E2E_DIR, 'support', 'avatarModels.ts'), 'utf8');
+  const routeOf = (name: string) => new RegExp(`${name} = '([^']+)'`).exec(helper())?.[1];
+
+  it.each([
+    ['TASKS_VISION_ROUTE', 'src/features/face-detection/locateFace.ts', 'TASKS_VISION_URL'],
+    ['TRANSFORMERS_ROUTE', 'src/features/background-removal/segmentSubject.ts', 'TRANSFORMERS_URL'],
+  ])('%s intercepts exactly the module URL the app imports', (route, sourceFile, constant) => {
+    const source = readFileSync(join(ROOT, sourceFile), 'utf8');
+    const appUrl = new RegExp(`${constant} =\\s*'([^']+)'`).exec(source)?.[1];
+
+    expect(appUrl).toBeTruthy();
+    expect(routeOf(route)).toBe(`${appUrl}*`);
+  });
+});
+
