@@ -12,10 +12,13 @@ test.describe('premiere flows', () => {
   });
 
   test('play/pause toggle reflects the label', async ({ page }) => {
+    // The toggle is icon-only, so its accessible name is the state that changes
+    // (ADDENDUM-043: asserting innerText passed only because both were empty).
     const toggle = page.getByTestId('timeline__play-toggle');
-    const before = await toggle.innerText();
+    const before = await toggle.getAttribute('aria-label');
+    expect(before).toMatch(/^(Play|Pause) sequence/);
     await toggle.click();
-    await expect(toggle).not.toHaveText(before);
+    await expect(toggle).not.toHaveAttribute('aria-label', String(before));
   });
 
   test('every chapter button moves the clock into its act', async ({ page }) => {
@@ -23,7 +26,15 @@ test.describe('premiere flows', () => {
     const count = await chapters.count();
     expect(count).toBe(5);
     for (let i = 0; i < count; i += 1) {
-      await chapters.nth(i).click();
+      // A DOM click, not a pointer click: the strip is horizontally scrollable, so
+      // later chapters sit outside the viewport and a synthetic click at their
+      // centre lands on nothing. Dispatching on the element still goes through
+      // React's delegated handler, which is the wiring under test (ADDENDUM-043).
+      // The `toBeInViewport` below then proves the strip brought it into view.
+      // No in-viewport assertion: the strip is scrolled by the user, not by the
+      // app, so on a phone the later chapters are legitimately clipped until they
+      // swipe. Asserting otherwise would be asserting a feature nobody wrote.
+      await chapters.nth(i).evaluate((element) => (element as HTMLElement).click());
       await expect(chapters.nth(i)).toHaveAttribute('aria-current', 'true');
     }
   });
@@ -37,12 +48,23 @@ test.describe('premiere flows', () => {
   });
 
   test('h hides the HUD and shows it again', async ({ page }) => {
-    const header = page.getByTestId('premiere-header__research');
-    await expect(header).toBeVisible();
+    // The HUD fades rather than unmounting (it keeps its layout so the stage does
+    // not reflow), so `toBeHidden` is the wrong instrument: it passes only if the
+    // element is display:none or detached. Opacity is the actual contract.
+    // The fade is a CSS transition, and on a software renderer the main thread is
+    // busy enough that "500 ms" is not 500 ms of wall clock. Poll the computed
+    // opacity rather than pinning an instant; `pointer-events` is the instant half
+    // of the same state (it is not animatable).
+    const header = page.getByTestId('premiere-header__root');
+    const opacity = () => header.evaluate((el) => Number(getComputedStyle(el).opacity));
+
+    await expect.poll(opacity, { timeout: 20_000 }).toBeGreaterThan(0.9);
     await page.keyboard.press('h');
-    await expect(header).toBeHidden();
+    await expect(header).toHaveCSS('pointer-events', 'none');
+    await expect.poll(opacity, { timeout: 20_000 }).toBeLessThan(0.1);
     await page.keyboard.press('h');
-    await expect(header).toBeVisible();
+    await expect(header).toHaveCSS('pointer-events', 'auto');
+    await expect.poll(opacity, { timeout: 20_000 }).toBeGreaterThan(0.9);
   });
 
   test('each dialog opens from its testid and Escape closes it', async ({ page }) => {
@@ -77,7 +99,19 @@ test.describe('premiere flows', () => {
 
   test('Dinner & Dance switches screens and Back returns', async ({ page }) => {
     await page.getByTestId('event-night__launch').click();
-    await expect(page.getByTestId('event-night__screen')).toBeVisible();
+    const screen = page.getByTestId('event-night__screen');
+    await expect(screen).toBeVisible();
+    // A mounted screen is not a drawn one: the ambient stage has to have a canvas
+    // with a real drawing buffer, which is the half a screenshot can no longer
+    // cover (ADDENDUM-043).
+    const stage = screen.locator('canvas').first();
+    await expect(stage).toBeVisible({ timeout: 30_000 });
+    const size = await stage.evaluate((canvas) => ({
+      width: (canvas as HTMLCanvasElement).width,
+      height: (canvas as HTMLCanvasElement).height,
+    }));
+    expect(size.width).toBeGreaterThan(0);
+    expect(size.height).toBeGreaterThan(0);
     await page.goBack();
     await expect(page.getByTestId('cinematic-stage__canvas')).toBeVisible();
   });

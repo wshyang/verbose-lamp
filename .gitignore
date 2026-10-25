@@ -18,5 +18,8 @@ blob-report/
 .vite/
 *.tsbuildinfo
 
-# Playwright browsers are downloaded per machine, never committed
+# Vitest's own cache
 .vitest-cache/
+
+# Playwright's browser download lives outside the repo (~/.cache/ms-playwright).
+# `scripts/sandbox-browser.mjs` extracts its Chromium to /tmp for the same reason.

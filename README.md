@@ -115,6 +115,7 @@ document deliberately does not pin it (ADDENDUM-040). Geometry is protected
 by golden snapshots on data, not pixels (`src/test/digest.ts` quantises before hashing so
 a snapshot from macOS still passes on Linux). The three.js scene graph is exercised headlessly
 through `@react-three/test-renderer` in `scene3d/` and through the pure planners it consumes.
+A real browser runs the Playwright suites and the screenshot gate — see the e2e line below.
 
 Three test-only guards are worth knowing about:
 
@@ -123,8 +124,10 @@ Three test-only guards are worth knowing about:
   `src/`, so the e2e suite cannot rot while it is not being run.
 - `src/app/testidCoverageStatic.test.ts` — every control in every component file carries a
   `data-testid`, with the three prop-forwarding primitives exempted by exact name.
-- `e2e/` — 42 Playwright tests in 2 files, written against `?freezeAt` and never executed in
-  this sandbox (no Chromium download, no browser); they still need baselines (ADDENDUM-001).
+- `e2e/` — 20 Playwright definitions × 2 viewport projects = 40 tests (16 interaction,
+  24 likeness plates), executed here against a Chromium shipped as an npm tarball:
+  `npm run e2e:sandbox`. The likeness baselines live in
+  `e2e/likeness.spec.ts-snapshots/` (ADDENDUM-043).
 
 ## Contributing conventions
 

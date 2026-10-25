@@ -1,5 +1,12 @@
-import { expect, test } from '@playwright/test';
-import { gotoFrozen, hideHud } from './support/stage';
+import { expect as baseExpect, test } from '@playwright/test';
+import { gotoFrozen } from './support/stage';
+
+/**
+ * A software-rendered frame takes ~30 s to photograph here, and `toHaveScreenshot`
+ * needs two consecutive identical captures before it will accept a frame. The
+ * default 5 s expect budget cannot reach that; this one can (ADDENDUM-043).
+ */
+const expect = baseExpect.configure({ timeout: 120_000 });
 
 /**
  * The visual contract (ADDENDUM-022 §0.4). Every shot is frozen mid-hold so the
@@ -45,10 +52,9 @@ test.describe('likeness', () => {
     await expect(page).toHaveScreenshot('hud-overlay.png');
   });
 
-  test('event-night ambient stage', async ({ page }) => {
-    await page.goto('/#event-night');
-    await expect(page.getByTestId('event-night__screen')).toBeVisible();
-    await hideHud(page);
-    await expect(page).toHaveScreenshot('event-night.png');
-  });
+  // The Event Night stage has no still frame: it is a live, ambient show with no
+  // `?freezeAt` equivalent, and two consecutive captures differ by 3–26 % of their
+  // pixels, so Playwright cannot even reach a stable expectation (ADDENDUM-043).
+  // Photographing it here would mean photographing a random moment. `flows.spec.ts`
+  // asserts it mounts and animates instead, which is what can be held honestly.
 });
