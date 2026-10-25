@@ -58,6 +58,10 @@ export function PremiereSurfaces({ onOpenEventNight }: PremiereSurfacesProps) {
         mountRef={premiere.stageRef}
         cameraMode={premiere.cameraMode}
         hudHidden={hudHidden}
+        renderer={premiere.renderer}
+        store={premiere.store}
+        onSceneTelemetry={premiere.sceneTelemetry}
+        onSceneChapterChange={premiere.sceneChapterChange}
       />
       <PremiereHeader
         cameraMode={premiere.cameraMode}

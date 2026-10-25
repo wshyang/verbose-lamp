@@ -16,13 +16,11 @@ import { createBallroomEnvironment, createDecoWallpaperTextures } from './enviro
 import { createGatsbyCardRig, type GatsbyCardRig } from './decoCards';
 import {
   DEFAULT_FRAME_STYLE,
-  DEFAULT_SCREEN_BORDER_PATTERN,
-  DEFAULT_SCREEN_BORDER_SEED,
   DEFAULT_SCREEN_BORDER_STYLE,
   FrameStyle,
   ScreenBorderStyle,
+  SIGNATURE_GENOME,
 } from '@/features/art-deco-frame';
-import { SIGNATURE_GENOME, clampGenome } from '@/features/art-deco-frame';
 import { createScreenBorderRig, type ScreenBorderRig } from '@/features/art-deco-frame';
 import {
   FORCED_NITRATE,
@@ -36,6 +34,14 @@ import {
   searchlightSway,
 } from './choreography';
 import { getCinemaCameraPose, resolveViewportFit, ViewportFit } from './responsiveLayout';
+import { orbitFocusPlan } from './orbitFocus';
+import {
+  chapterJumpTime,
+  clampChapterIndex,
+  clampFrameStyle,
+  clampScreenBorderStyle,
+  clampSequenceTime,
+} from './styleClamp';
 import type { PremiereSceneApi } from './sceneApi';
 import { createPrng, DUST_SEED } from '@/shared/lib/prng';
 
@@ -484,16 +490,14 @@ export class GatsbySceneManager implements PremiereSceneApi {
   }
 
   public jumpToChapter(index: number) {
-    const clamped = Math.max(0, Math.min(SEQUENCE_CHAPTERS.length - 1, index));
-    const ch = SEQUENCE_CHAPTERS[clamped];
-    this.currentTime = ch.startTime + 0.15;
+    this.currentTime = chapterJumpTime(clampChapterIndex(index));
     if (this.cameraMode === 'orbit') {
-      this.focusOrbitOnChapter(clamped);
+      this.focusOrbitOnChapter(clampChapterIndex(index));
     }
   }
 
   public setTime(t: number) {
-    this.currentTime = THREE.MathUtils.clamp(t, 0, TOTAL_SEQUENCE_DURATION - 0.001);
+    this.currentTime = clampSequenceTime(t);
   }
 
   public setPlaying(playing: boolean) {
@@ -517,15 +521,15 @@ export class GatsbySceneManager implements PremiereSceneApi {
   }
 
   private focusOrbitOnChapter(idx: number) {
-    const ch = SEQUENCE_CHAPTERS[idx];
-    // Advance into the hold portion of the card if currently at the very start so user sees full frame
-    const local = (this.currentTime - ch.startTime) / (ch.endTime - ch.startTime);
-    if (local < 0.42 || local > 0.85) {
-      this.currentTime = ch.startTime + (ch.endTime - ch.startTime) * 0.56;
+    // The window and the stand-off live in orbitFocus.ts (ADDENDUM-022 §6 step 2.3),
+    // so the R3F camera frames a card exactly as this one does.
+    const plan = orbitFocusPlan(this.currentTime, SEQUENCE_CHAPTERS[idx]);
+    if (plan.time !== null) {
+      this.currentTime = plan.time;
       this.isPlaying = false;
     }
-    this.controls.target.set(0, 0, ch.zPosition);
-    this.camera.position.set(2.4, 0.9, ch.zPosition + 9.2);
+    this.controls.target.set(...plan.target);
+    this.camera.position.set(...plan.position);
     this.controls.update();
   }
 
@@ -540,31 +544,12 @@ export class GatsbySceneManager implements PremiereSceneApi {
   }
 
   public setSequenceFrameStyle(style: FrameStyle) {
-    this.frameStyle = {
-      intricacy: THREE.MathUtils.clamp(style.intricacy, 0, 1),
-      formula: {
-        source: style.formula.source,
-        level: THREE.MathUtils.clamp(Math.round(style.formula.level), 1, 4),
-        genome: clampGenome(style.formula.genome),
-        layers: style.formula.layers?.map((layer) => ({
-          source: layer.source,
-          enabled: layer.enabled,
-          level: THREE.MathUtils.clamp(Math.round(layer.level), 1, 4),
-        })) ?? [],
-      },
-    };
+    this.frameStyle = clampFrameStyle(style);
     this.scheduleFrameRebuild();
   }
 
   public setScreenBorderStyle(style: ScreenBorderStyle) {
-    // `pattern`/`seed` select the Deco Lattice proscenium (ADDENDUM-021 §3.5);
-    // dropping them here would pin the rig to the printed poster edge.
-    this.screenBorderStyle = {
-      weight: THREE.MathUtils.clamp(style.weight, 0, 1),
-      genome: clampGenome(style.genome),
-      pattern: style.pattern ?? DEFAULT_SCREEN_BORDER_PATTERN,
-      seed: style.seed ?? DEFAULT_SCREEN_BORDER_SEED,
-    };
+    this.screenBorderStyle = clampScreenBorderStyle(style);
     this.screenBorderRig.setStyle(this.screenBorderStyle);
   }
 

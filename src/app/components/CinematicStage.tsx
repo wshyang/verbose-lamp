@@ -1,14 +1,38 @@
 import type { RefObject } from 'react';
 import type { CameraMode } from '@/features/premiere';
+import type { PlaybackTelemetry } from '@/features/premiere/scene/GatsbySceneManager';
+import type { PremiereRenderer } from '@/features/premiere/scene/rendererMode';
+import type { PremiereStore } from '@/features/premiere/scene3d/premiereStore';
+import { PremiereCanvas } from '@/features/premiere/scene3d/PremiereCanvas';
 import { cn } from '@/shared/lib/cn';
 
 interface CinematicStageProps {
   mountRef: RefObject<HTMLDivElement | null>;
   cameraMode: CameraMode;
   hudHidden: boolean;
+  /** `'r3f'` mounts the React Three Fiber port inside the same container. */
+  renderer?: PremiereRenderer;
+  /** Present only for the port; the manager path builds its own scene. */
+  store?: PremiereStore | null;
+  onSceneTelemetry?: (telemetry: PlaybackTelemetry) => void;
+  onSceneChapterChange?: (chapterIndex: number) => void;
 }
 
-export function CinematicStage({ mountRef, cameraMode, hudHidden }: CinematicStageProps) {
+/**
+ * The stage. The mount div is the contract: it carries the test id, the orbit cursor,
+ * `aria-label`, and the `data-frame-ready` flag the screenshot gate waits on. Both
+ * renderers live inside it — the manager appends its canvas imperatively, the port
+ * renders one — so the gate cannot tell them apart.
+ */
+export function CinematicStage({
+  mountRef,
+  cameraMode,
+  hudHidden,
+  renderer = 'manager',
+  store = null,
+  onSceneTelemetry,
+  onSceneChapterChange,
+}: CinematicStageProps) {
   return (
     <>
       <div
@@ -19,7 +43,17 @@ export function CinematicStage({ mountRef, cameraMode, hudHidden }: CinematicSta
           cameraMode === 'orbit' && 'cursor-grab active:cursor-grabbing'
         )}
         aria-label="Interactive WebGL title sequence"
-      />
+      >
+        {renderer === 'r3f' && store ? (
+          <PremiereCanvas
+            store={store}
+            containerRef={mountRef}
+            className="absolute inset-0 h-full w-full"
+            onTelemetry={onSceneTelemetry}
+            onChapterChange={onSceneChapterChange}
+          />
+        ) : null}
+      </div>
       <div
         className={cn(
           'pointer-events-none absolute inset-3 border border-[#d4af37]/20 transition-opacity duration-500 sm:inset-5',

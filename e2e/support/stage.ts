@@ -12,12 +12,25 @@ const READY_TIMEOUT_MS = 20_000;
 const SETTLE_MS = 600;
 
 /**
+ * Which renderer to shoot (ADDENDUM-022 §6 step 2.5). Unset means the app's default,
+ * `GatsbySceneManager`. `PREMIERE_RENDERER=r3f` puts the whole likeness gate on the
+ * React Three Fiber port, so the port can be judged against the *unchanged* baselines
+ * rather than against a fresh set of its own.
+ */
+const RENDERER = process.env.PREMIERE_RENDERER?.trim();
+
+const stageUrl = (seconds: number): string => {
+  const base = `/?freezeAt=${seconds}`;
+  return RENDERER ? `${base}&renderer=${encodeURIComponent(RENDERER)}` : base;
+};
+
+/**
  * Opens the premiere pinned to one frame and waits for three composited
  * frames. `?freezeAt=` stops playback and pointer aim (ADDENDUM-027 §3), so
  * the capture is reproducible.
  */
 export async function gotoFrozen(page: Page, seconds: number, options: FrozenOptions = {}): Promise<void> {
-  await page.goto(`/?freezeAt=${seconds}`);
+  await page.goto(stageUrl(seconds));
   const stage = page.getByTestId('cinematic-stage__canvas');
   await expect(stage).toHaveAttribute('data-frame-ready', 'true', { timeout: READY_TIMEOUT_MS });
   if (options.hud === false) await page.keyboard.press('h');
