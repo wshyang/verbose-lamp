@@ -37,7 +37,7 @@ import {
 } from './choreography';
 import { orbitFocusPlan } from './orbitFocus';
 import type { PlaybackTelemetry, SceneCallbacks } from './sceneApi';
-import { advanceClock } from './playback';
+import { advanceClock, advanceElapsed, isFrameReady } from './playback';
 import {
   chapterJumpTarget,
   clampFrameStyle,
@@ -63,6 +63,11 @@ const CinemaNitrateShader = {
 };
 
 export type { PlaybackTelemetry } from './sceneApi';
+
+export interface GatsbySceneManagerOptions extends SceneCallbacks {
+  /** Pins the playhead and the shader clock to this time; the pointer is ignored. */
+  freezeAt?: number;
+}
 
 export class GatsbySceneManager {
   private container: HTMLElement;
@@ -108,6 +113,10 @@ export class GatsbySceneManager {
   private pointerTarget = new THREE.Vector2(0, 0);
   private pointerSmooth = new THREE.Vector2(0, 0);
 
+  /** `?freezeAt=`: the playhead and the shader clock never move on their own. */
+  private readonly freezeAt: number | null;
+  private framesDrawn = 0;
+
   private rafId: number | null = null;
   private clock = new THREE.Clock();
   private lastChapterIdx = -1;
@@ -115,11 +124,14 @@ export class GatsbySceneManager {
   private onTelemetry?: (telemetry: PlaybackTelemetry) => void;
   private onChapterChange?: (chapterIdx: number) => void;
 
-  constructor(
-    container: HTMLElement,
-    callbacks?: SceneCallbacks,
-  ) {
+  constructor(container: HTMLElement, options?: GatsbySceneManagerOptions) {
+    const callbacks = options;
     this.container = container;
+    this.freezeAt = options?.freezeAt === undefined ? null : clampSequenceTime(options.freezeAt);
+    if (this.freezeAt !== null) {
+      this.currentTime = this.freezeAt;
+      this.isPlaying = false;
+    }
     this.hasCoarsePointer =
       window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
     this.onTelemetry = callbacks?.onTelemetry;
@@ -444,6 +456,7 @@ export class GatsbySceneManager {
   };
 
   private handlePointerMove = (e: PointerEvent) => {
+    if (this.freezeAt !== null) return;
     const nx = (e.clientX / Math.max(1, window.innerWidth)) * 2 - 1;
     const ny = -((e.clientY / Math.max(1, window.innerHeight)) * 2 - 1);
     this.pointerTarget.set(nx, ny);
@@ -453,10 +466,10 @@ export class GatsbySceneManager {
     this.rafId = requestAnimationFrame(this.animate);
 
     const dt = this.clock.getDelta();
-    const elapsed = this.clock.elapsedTime;
+    const elapsed = advanceElapsed(this.clock.elapsedTime, 0, this.freezeAt);
 
     this.currentTime = advanceClock(
-      { time: this.currentTime, isPlaying: this.isPlaying, isFrozen: false },
+      { time: this.currentTime, isPlaying: this.isPlaying, isFrozen: this.freezeAt !== null },
       dt,
     );
 
@@ -488,6 +501,9 @@ export class GatsbySceneManager {
       activeChapterIndex: activeIdx,
       isPlaying: this.isPlaying,
     });
+
+    this.framesDrawn += 1;
+    if (isFrameReady(this.framesDrawn)) this.container.dataset.frameReady = 'true';
   };
 
   /** Draw-on, text wipe, gate parting and fade of every card (see `cardPhase`). */

@@ -132,6 +132,26 @@ describe('usePremiereRuntime with the default renderer', () => {
   });
 });
 
+describe('usePremiereRuntime freezing the default renderer', () => {
+  it('passes ?freezeAt= to the manager, so both renderers freeze the same way', () => {
+    run('?freezeAt=12.5');
+
+    expect((doubles.managers[0].options as { freezeAt?: number }).freezeAt).toBe(12.5);
+  });
+
+  it('passes no freeze for a plain visit', () => {
+    run();
+
+    expect((doubles.managers[0].options as { freezeAt?: number }).freezeAt).toBeUndefined();
+  });
+
+  it('passes no freeze for a malformed value', () => {
+    run('?freezeAt=abc');
+
+    expect((doubles.managers[0].options as { freezeAt?: number }).freezeAt).toBeUndefined();
+  });
+});
+
 describe('usePremiereRuntime with the R3F port', () => {
   it('opts in with ?renderer=r3f: no manager is built, the store backs the scene API', () => {
     const { managerRef, result } = run('?renderer=r3f');

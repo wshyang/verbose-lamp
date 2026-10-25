@@ -88,6 +88,7 @@ export function usePremiereRuntime({
     }
 
     const manager = new GatsbySceneManager(container, {
+      freezeAt: parseFreezeAt(window.location.search) ?? undefined,
       onTelemetry: handleTelemetry,
       onChapterChange: handleChapterChange,
     });

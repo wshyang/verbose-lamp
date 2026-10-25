@@ -486,3 +486,96 @@ describe('GatsbySceneManager lifecycle', () => {
     expect(container.querySelector('canvas')).toBeNull();
   });
 });
+
+// ---- Freeze (T3.0). The port honours ?freezeAt=; for a manager-versus-port parity check
+// ---- the manager must be frozen the same way. The 12 frame traces above are the guard
+// ---- that the default (unfrozen) path did not move.
+describe('GatsbySceneManager frozen frame', () => {
+  it('starts paused at the frozen time', () => {
+    const onTelemetry = vi.fn();
+    build({ onTelemetry, freezeAt: 12.5 });
+    step();
+
+    const last = onTelemetry.mock.calls.at(-1)![0];
+    expect(last.currentTime).toBe(12.5);
+    expect(last.isPlaying).toBe(false);
+  });
+
+  it('never advances, however many frames are drawn', () => {
+    const onTelemetry = vi.fn();
+    build({ onTelemetry, freezeAt: 12.5 });
+    for (let i = 0; i < 20; i += 1) step();
+
+    expect(onTelemetry.mock.calls.at(-1)![0].currentTime).toBe(12.5);
+  });
+
+  it('keeps a frozen playhead frozen even when a seek or play is requested', () => {
+    const onTelemetry = vi.fn();
+    const { manager } = build({ onTelemetry, freezeAt: 12.5 });
+
+    manager.setPlaying(true);
+    step();
+    manager.setTime(20);
+    step();
+
+    // A seek is honoured (the host is in charge of where a frozen frame is), but nothing
+    // moves the playhead on its own.
+    expect(onTelemetry.mock.calls.at(-1)![0].currentTime).toBe(20);
+    step();
+    expect(onTelemetry.mock.calls.at(-1)![0].currentTime).toBe(20);
+  });
+
+  it('pins the shader clock to the frozen moment, so grain and sway stop with the picture', () => {
+    build({ freezeAt: 6 });
+    for (let i = 0; i < 5; i += 1) step();
+
+    expect(gl.shaderPasses[0].uTime.value).toBe(6);
+  });
+
+  it('ignores the pointer, so a stray mouse move cannot change a screenshot', () => {
+    const { manager } = build({ freezeAt: 9 });
+    step();
+    const before = inside(manager).camera.position.toArray();
+
+    window.dispatchEvent(new PointerEvent('pointermove', { clientX: 1, clientY: 1 }));
+    for (let i = 0; i < 10; i += 1) step();
+
+    expect(inside(manager).camera.position.toArray()).toEqual(before);
+  });
+
+  it('flags the container once three frames are drawn, and not before', () => {
+    const { container } = build({ freezeAt: 12.5 });
+    expect(container.dataset.frameReady).toBeUndefined();
+
+    step();
+    expect(container.dataset.frameReady).toBeUndefined();
+    step();
+    expect(container.dataset.frameReady).toBe('true');
+  });
+
+  it('flags the container on an ordinary live visit too', () => {
+    const { container } = build();
+
+    step();
+    step();
+
+    expect(container.dataset.frameReady).toBe('true');
+  });
+
+  it('flags the container exactly once', () => {
+    const { container } = build({ freezeAt: 4 });
+    for (let i = 0; i < 6; i += 1) step();
+    container.removeAttribute('data-frame-ready');
+    for (let i = 0; i < 6; i += 1) step();
+
+    expect(container.dataset.frameReady).toBeUndefined();
+  });
+
+  it('takes the frozen time clamped into the sequence', () => {
+    const onTelemetry = vi.fn();
+    build({ onTelemetry, freezeAt: 999 });
+    step();
+
+    expect(onTelemetry.mock.calls.at(-1)![0].currentTime).toBeCloseTo(37.999, 9);
+  });
+});
