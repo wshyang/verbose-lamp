@@ -352,3 +352,67 @@ describe('subscriptions', () => {
     expect(listener).toHaveBeenCalledTimes(1);
   });
 });
+
+// ---- Assertions merged from the other PRs' store suites (ADDENDUM-029) that the tests
+// ---- above do not already make. Each block names where it came from.
+
+describe('orbit request counting (PR #5)', () => {
+  it('moves the nonce on orbit entry and on a jump made while orbiting, and on nothing else', () => {
+    const store = createPremiereStore();
+
+    store.getState().jumpToChapter(1);
+    expect(store.getState().orbitFocus).toBeNull();
+
+    store.getState().setCameraMode('orbit');
+    expect(store.getState().orbitFocus?.nonce).toBe(1);
+
+    store.getState().jumpToChapter(3);
+    expect(store.getState().orbitFocus?.nonce).toBe(2);
+
+    store.getState().setCameraMode('cinema');
+    expect(store.getState().orbitFocus?.nonce).toBe(2);
+  });
+});
+
+describe('style clamping without mutation (PR #2)', () => {
+  it('leaves the caller’s style object untouched and clamps its layers', () => {
+    const store = createPremiereStore();
+    const input = {
+      ...DEFAULT_FRAME_STYLE,
+      intricacy: 4,
+      formula: {
+        ...DEFAULT_FRAME_STYLE.formula,
+        layers: [{ source: 'rosette' as const, enabled: true, level: 0 }],
+      },
+    };
+
+    store.getState().setSequenceFrameStyle(input);
+
+    expect(store.getState().frameStyle.formula.layers?.[0].level).toBe(1);
+    expect(input.intricacy).toBe(4);
+    expect(input.formula.layers[0].level).toBe(0);
+  });
+});
+
+describe('screen border fields the clamp does not own (PRs #2, #6)', () => {
+  // The lattice pattern and seed land with the lattice work; the guarantee that a border
+  // update cannot drop them is structural and holds today.
+  it('keeps extra border fields such as the lattice pattern and seed', () => {
+    const store = createPremiereStore();
+
+    store.getState().setScreenBorderStyle({
+      ...DEFAULT_SCREEN_BORDER_STYLE,
+      weight: 4,
+      pattern: 'lattice',
+      seed: 8,
+    } as typeof DEFAULT_SCREEN_BORDER_STYLE);
+
+    const border = store.getState().borderStyle as typeof DEFAULT_SCREEN_BORDER_STYLE & {
+      pattern?: string;
+      seed?: number;
+    };
+    expect(border.weight).toBe(1);
+    expect(border.pattern).toBe('lattice');
+    expect(border.seed).toBe(8);
+  });
+});
