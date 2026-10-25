@@ -8,7 +8,17 @@ import {
   cardRole,
   cinemaCameraZ,
   clamp,
+  FORCED_NITRATE,
+  GREEN_LIGHT_ACT1_Z,
+  GREEN_LIGHT_HANDOVER_T,
+  greenLight,
   lerp,
+  lightRig,
+  nitrateStrength,
+  OPENING_NITRATE_GAIN,
+  openingNitrate,
+  rigAnchors,
+  searchlightSway,
   smoothstep,
 } from './choreography';
 
@@ -213,5 +223,127 @@ describe('cinemaCameraZ', () => {
       expect(z).toBeLessThanOrEqual(previous + 1e-9);
       previous = z;
     }
+  });
+});
+
+// Expected values below come from the shipped manager's inline arithmetic
+// (GatsbySceneManager.animate), evaluated with THREE.MathUtils.smoothstep.
+describe('greenLight', () => {
+  const heroZ = SEQUENCE_CHAPTERS[SEQUENCE_CHAPTERS.length - 1].zPosition;
+
+  it.each([
+    ['before Act I fades', 0, 1, -7.5],
+    ['at the start of the fade', 4.8, 1, -7.5],
+    ['half way through the Act I fade', 6.2, 0.4999999999999999, -7.5],
+    ['when Act I has fully faded', 7.6, 0, -7.5],
+    ['in the dark middle of the film', 9, 0, -7.5],
+    ['just before the hand-over', 29.99, 0, -7.5],
+    ['exactly at the hand-over time (still Act I’s position)', 30, 0, -7.5],
+    ['just after the hand-over, behind the finale card', 30.01, 0, -115.5],
+    ['just before the finale bookend begins', 34.8, 0, -115.5],
+    ['part-way into the bookend', 36.4, 0.3941690962099122, -115.5],
+    ['at the bookend’s full level', 37.6, 0.65, -115.5],
+  ])('%s', (_label, t, intensity, z) => {
+    const light = greenLight(t, heroZ);
+
+    expect(light.intensity).toBeCloseTo(intensity, 12);
+    expect(light.z).toBeCloseTo(z, 12);
+  });
+
+  it('exposes the named hand-over constants', () => {
+    expect(GREEN_LIGHT_ACT1_Z).toBe(-7.5);
+    expect(GREEN_LIGHT_HANDOVER_T).toBe(30);
+  });
+});
+
+describe('nitrate', () => {
+  it.each([
+    ['at the very start', 0, 1],
+    ['when the fade begins', 0.35, 1],
+    ['half way through the fade', 1.45, 0.4999999999999999],
+    ['when the fade ends', 2.55, 0],
+    ['after the opening', 3, 0],
+  ])('the opening projection %s', (_label, t, expected) => {
+    expect(openingNitrate(t)).toBeCloseTo(expected, 12);
+  });
+
+  it.each([
+    ['full opening at t=0', 0, false, 0.82],
+    ['still full when the fade begins', 0.35, false, 0.82],
+    ['mid-fade', 1.45, false, 0.40999999999999986],
+    ['gone after the opening', 2.55, false, 0],
+    ['forced on at t=0', 0, true, 0.92],
+    ['forced on late in the film', 30, true, 0.92],
+  ])('the shader strength is %s', (_label, t, forced, expected) => {
+    expect(nitrateStrength(t, forced)).toBeCloseTo(expected, 12);
+  });
+
+  it('keeps the gain and forced level as named constants', () => {
+    expect(OPENING_NITRATE_GAIN).toBe(0.82);
+    expect(FORCED_NITRATE).toBe(0.92);
+  });
+});
+
+describe('searchlightSway', () => {
+  it.each([
+    [0, -0.36, 0.5],
+    [2, -0.2635509976845228, 0.47059891240963114],
+    [10, -0.44566010473198064, 0.22175283221275888],
+    [123.4, -0.3278255984618117, 0.22098519536578362],
+  ])('at %d s', (elapsed, left, right) => {
+    const sway = searchlightSway(elapsed);
+
+    expect(sway.left).toBeCloseTo(left, 12);
+    expect(sway.right).toBeCloseTo(right, 12);
+  });
+});
+
+describe('lightRig', () => {
+  it('places the three lights relative to the focus plane at t=0', () => {
+    expect(lightRig(0, 10)).toEqual({
+      key: [0, 4, 13.2],
+      rim: [-6, -2.2, 11.5],
+      cool: [0, 4.5, 8],
+    });
+  });
+
+  it('orbits the key and rim lights while the cool light only follows Z', () => {
+    const rig = lightRig(1.7, -20);
+
+    expect(rig.key[0]).toBeCloseTo(5.261136732725422, 12);
+    expect(rig.key[1]).toBeCloseTo(3.523976404238975, 12);
+    expect(rig.key[2]).toBeCloseTo(-16.8, 12);
+    expect(rig.rim[0]).toBeCloseTo(-2.9645843020726934, 12);
+    expect(rig.rim[1]).toBeCloseTo(-0.9931013828320465, 12);
+    expect(rig.rim[2]).toBeCloseTo(-18.5, 12);
+    expect(rig.cool).toEqual([0, 4.5, -22]);
+  });
+
+  it('tracks a late finale focus', () => {
+    const rig = lightRig(42.5, -95.5);
+
+    expect(rig.key[0]).toBeCloseTo(2.437147304466261, 12);
+    expect(rig.rim[1]).toBeCloseTo(-3.673864950761181, 12);
+    expect(rig.cool[2]).toBeCloseTo(-97.5, 12);
+  });
+});
+
+describe('rigAnchors', () => {
+  it('hangs the wallpaper and lights off the camera in cinema mode', () => {
+    expect(rigAnchors({ cameraMode: 'cinema', cameraZ: 4, chapterZ: -20 })).toEqual({
+      backdropZ: -8,
+      lightZ: -2.5,
+    });
+  });
+
+  it('hangs them off the active card in orbit mode, ignoring the camera', () => {
+    expect(rigAnchors({ cameraMode: 'orbit', cameraZ: 4, chapterZ: -20 })).toEqual({
+      backdropZ: -23.5,
+      lightZ: -16.5,
+    });
+    expect(rigAnchors({ cameraMode: 'orbit', cameraZ: -999, chapterZ: -20 })).toEqual({
+      backdropZ: -23.5,
+      lightZ: -16.5,
+    });
   });
 });

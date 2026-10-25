@@ -1,3 +1,5 @@
+import type { CameraMode } from '../model/types';
+
 /**
  * The premiere's timing and staging maths, lifted out of the imperative scene manager's
  * `animate()` (ADDENDUM-022 §4.0.7). Nothing here imports `three`: the arithmetic is the
@@ -140,4 +142,99 @@ function finaleCameraZ(chapterZ: number, chapterLocal: number, pullback: number)
   const from = chapterZ + HERO_START_DISTANCE + pullback;
   const to = chapterZ + HERO_HOLD_DISTANCE + pullback;
   return lerp(from, to, settle) - chapterLocal * HERO_DRIFT_PER_CHAPTER;
+}
+
+/** The level the manual 1920s toggle forces. */
+export const FORCED_NITRATE = 0.92;
+
+/** How much of the opening's nitrate look actually reaches the shader. */
+export const OPENING_NITRATE_GAIN = 0.82;
+
+const NITRATE_FADE_START = 0.35;
+const NITRATE_FADE_END = 2.55;
+
+/** The 1920s silver-nitrate opening: full strength, gone by 2.55 s. */
+export function openingNitrate(t: number): number {
+  return 1 - smoothstep(t, NITRATE_FADE_START, NITRATE_FADE_END);
+}
+
+/** Nitrate mix for the shader: the manual toggle forces the look, otherwise the opener fades out. */
+export function nitrateStrength(t: number, forced: boolean): number {
+  return forced ? FORCED_NITRATE : openingNitrate(t) * OPENING_NITRATE_GAIN;
+}
+
+export interface GreenLight {
+  /** 0..1; the mesh hides itself below 0.01. */
+  readonly intensity: number;
+  readonly z: number;
+}
+
+/** Act I's green light sits here, behind the signet gate. */
+export const GREEN_LIGHT_ACT1_Z = -7.5;
+/** After this time the light moves to the finale card (strictly after, not at). */
+export const GREEN_LIGHT_HANDOVER_T = 30;
+/** …and sits this far behind the finale card. */
+const GREEN_LIGHT_BEHIND_HERO = 7.5;
+const ACT1_FADE_START = 4.8;
+const ACT1_FADE_END = 7.6;
+const BOOKEND_START = 34.8;
+const BOOKEND_END = 37.6;
+const BOOKEND_LEVEL = 0.65;
+
+/** Prominent behind the Act I gate, then a subtle bookend behind the finale. */
+export function greenLight(t: number, heroZ: number): GreenLight {
+  const act1 = 1 - smoothstep(t, ACT1_FADE_START, ACT1_FADE_END);
+  const bookend = smoothstep(t, BOOKEND_START, BOOKEND_END) * BOOKEND_LEVEL;
+  return {
+    intensity: Math.max(act1, bookend),
+    z: t > GREEN_LIGHT_HANDOVER_T ? heroZ - GREEN_LIGHT_BEHIND_HERO : GREEN_LIGHT_ACT1_Z,
+  };
+}
+
+export interface SearchlightSway {
+  readonly left: number;
+  readonly right: number;
+}
+
+/** Slow counter-phase sway of the two premiere searchlights (radians). */
+export function searchlightSway(elapsed: number): SearchlightSway {
+  return {
+    left: -0.36 + Math.sin(elapsed * 0.38) * 0.14,
+    right: 0.36 + Math.cos(elapsed * 0.33) * 0.14,
+  };
+}
+
+export type Vec3 = readonly [number, number, number];
+
+export interface LightRig {
+  readonly key: Vec3;
+  readonly rim: Vec3;
+  readonly cool: Vec3;
+}
+
+/** The three moving point lights, orbiting the focus plane so the bevelled gold gleams. */
+export function lightRig(elapsed: number, focusZ: number): LightRig {
+  return {
+    key: [Math.sin(elapsed * 0.75) * 5.5, 2.6 + Math.cos(elapsed * 0.5) * 1.4, focusZ + 3.2],
+    rim: [Math.cos(elapsed * 0.62) * -6.0, -2.2 + Math.sin(elapsed * 0.55) * 1.5, focusZ + 1.5],
+    cool: [0, 4.5, focusZ - 2.0],
+  };
+}
+
+export interface RigAnchorsRequest {
+  readonly cameraMode: CameraMode;
+  readonly cameraZ: number;
+  readonly chapterZ: number;
+}
+
+export interface RigAnchors {
+  readonly backdropZ: number;
+  readonly lightZ: number;
+}
+
+/** Where the wallpaper and the lighting rig hang: with the camera, or with the card in orbit. */
+export function rigAnchors({ cameraMode, cameraZ, chapterZ }: RigAnchorsRequest): RigAnchors {
+  return cameraMode === 'cinema'
+    ? { backdropZ: cameraZ - 12.0, lightZ: cameraZ - 6.5 }
+    : { backdropZ: chapterZ - 3.5, lightZ: chapterZ + 3.5 };
 }
