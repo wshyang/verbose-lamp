@@ -143,6 +143,12 @@ describe('normalizeFrameStyle', () => {
     expect((normalized.formula as typeof future).tilt).toBe(0.3);
   });
 
+  it('keeps a style-level field it has never heard of, not only a formula one', () => {
+    const future = { ...frameStyle(), tint: 'warm' };
+
+    expect((normalizeFrameStyle(future) as typeof future).tint).toBe('warm');
+  });
+
   it('copies the layers rather than aliasing them', () => {
     const layers = [{ source: 'fractal' as const, enabled: true, level: 2 }];
     const normalized = normalizeFrameStyle(frameStyle({ layers }));

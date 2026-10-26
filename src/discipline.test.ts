@@ -173,7 +173,7 @@ describe('CLAUDE.md hard limits', () => {
   it('records the debt no faster than it is paid', () => {
     // The ceiling: raise it only with an addendum that says why. It is the count recorded when this
     // test was added to the integrated tree (ADDENDUM-034); lower it each time a row is paid off.
-    expect(DISCIPLINE_DEBT.length).toBeLessThanOrEqual(48);
+    expect(DISCIPLINE_DEBT.length).toBeLessThanOrEqual(47);
     const byReason = DISCIPLINE_DEBT.reduce<Record<string, number>>((acc, entry) => {
       acc[entry.reason] = (acc[entry.reason] ?? 0) + 1;
       return acc;

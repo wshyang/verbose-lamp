@@ -55,6 +55,7 @@ function normalizeLayer(layer: FramePatternLayer): FramePatternLayer {
 export function normalizeFrameStyle(style: FrameStyle): FrameStyle {
   const { formula } = style;
   return {
+    ...style,
     intricacy: clampIntricacy(style.intricacy),
     formula: {
       ...formula,

@@ -56,13 +56,15 @@ describe('GoldUiSection', () => {
     expect(issues.textContent).toContain('Too many items');
   });
 
-  it('marks the item you pick in the sample bar', async () => {
+  it('marks the item you pick as the current one in the sample bar', async () => {
     render(<GoldUiSection gold={gold()} />);
 
     const buttons = screen.getAllByTestId('gilded-nav-bar__item');
     await userEvent.click(buttons[1]);
 
-    expect(screen.getAllByTestId('gilded-nav-bar__item')).toHaveLength(buttons.length);
+    const items = screen.getAllByTestId('gilded-nav-bar__item');
+    expect(items[1].getAttribute('aria-current')).toBe('page');
+    expect(items[0].getAttribute('aria-current')).toBeNull();
   });
 });
 

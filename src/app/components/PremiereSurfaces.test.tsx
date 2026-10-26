@@ -12,7 +12,21 @@ const state = vi.hoisted(() => ({
   closeDraw: vi.fn(),
   handleLanded: vi.fn(),
   onStageClick: vi.fn(() => false),
+  getSceneApi: () => null,
+  studioTargets: [] as Array<() => unknown>,
 }));
+
+// A spy on the studio's argument: the host's one line that joins the Frame Studio to the scene.
+vi.mock('@/features/frame-studio', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/frame-studio')>();
+  return {
+    ...actual,
+    useFrameStudio: (getTarget: () => unknown) => {
+      state.studioTargets.push(getTarget);
+      return actual.useFrameStudio(getTarget as Parameters<typeof actual.useFrameStudio>[0]);
+    },
+  };
+});
 
 vi.mock('@/features/spectacle', () => ({
   SpectacleProvider: ({ children }: { children: React.ReactNode }) => (
@@ -35,7 +49,7 @@ vi.mock('@/features/premiere', async (importOriginal) => {
       soundOn: false,
       heroConfig: actual.DEFAULT_HERO_TITLE,
       currentChapter: actual.SEQUENCE_CHAPTERS[1] ?? actual.SEQUENCE_CHAPTERS[0],
-      getSceneApi: () => null,
+      getSceneApi: state.getSceneApi,
       togglePlayback: vi.fn(),
       replay: vi.fn(),
       scrub: vi.fn(),
@@ -90,6 +104,7 @@ const { GatsbyPremiere } = await import('../GatsbyPremiere');
 
 beforeEach(() => {
   state.shortcuts.length = 0;
+  state.studioTargets.length = 0;
   state.panelOpen = false;
   state.drawOpen = false;
   state.setOpen.mockClear();
@@ -105,6 +120,15 @@ describe('PremiereSurfaces', () => {
     expect(screen.getByTestId('premiere-header__research')).toBeTruthy();
     expect(screen.getByTestId('frame-studio__dock')).toBeTruthy();
     expect(screen.getByTestId('timeline__play-toggle')).toBeTruthy();
+  });
+
+  // Without this the studio's panel renders and takes input, yet never reaches the scene: nothing
+  // else notices if the host stops handing it the controller's scene getter.
+  it('binds the Frame Studio to the controller’s scene getter', () => {
+    render(<PremiereSurfaces onOpenEventNight={vi.fn()} />);
+
+    expect(state.studioTargets.length).toBeGreaterThan(0);
+    for (const target of state.studioTargets) expect(target).toBe(state.getSceneApi);
   });
 
   it('wraps the premiere in one spectacle stage', () => {

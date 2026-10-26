@@ -13,6 +13,7 @@ const night = vi.hoisted(() => ({ current: null as Record<string, unknown> | nul
 const controls = vi.hoisted(() => ({
   lattice: { latticeSeed: 1925, latticeDensity: 3, latticeLevel: 2 },
   gold: { navItems: [{ id: 'dinner', label: 'Dinner & Dance' }] },
+  received: { gold: null as unknown, lattice: null as unknown },
 }));
 const ambient = vi.hoisted(() => ({ start: null as (() => void) | null, ready: false }));
 vi.mock('@/features/spectacle', async (importOriginal) => ({
@@ -37,8 +38,14 @@ vi.mock('../hooks/useEventNight', () => ({ useEventNight: () => night.current })
 vi.mock('../hooks/useLatticeControls', () => ({ useLatticeControls: () => controls.lattice }));
 vi.mock('../hooks/useGoldUiLines', () => ({ useGoldUiLines: () => controls.gold }));
 vi.mock('./EventNightConsoleSections', () => ({
-  GoldUiSection: () => <div data-testid="gold-section" />,
-  LatticeSection: () => <div data-testid="lattice-section" />,
+  GoldUiSection: ({ gold }: { gold: unknown }) => {
+    controls.received.gold = gold;
+    return <div data-testid="gold-section" />;
+  },
+  LatticeSection: ({ lattice }: { lattice: unknown }) => {
+    controls.received.lattice = lattice;
+    return <div data-testid="lattice-section" />;
+  },
 }));
 vi.mock('../hooks/useAmbientShow', () => ({
   useAmbientShow: ({ isReady, start }: { isReady: boolean; start: () => void }) => {
@@ -87,6 +94,18 @@ const mount = (previewOverrides: Record<string, unknown> = {}, nightOverrides: R
   return { preview: preview_p6.current, night: night.current as unknown as ReturnType<typeof buildNight>, onExit, view };
 };
 describe('EventNightStage', () => {
+  // The two sections reach the console only through the panel's children slot; delete either and
+  // nothing else would fail, because the panel double still renders whatever it is given.
+  it('mounts the gold-nav and lattice sections inside the console, fed by the stage’s own controls', () => {
+    mount();
+
+    const panel = screen.getByTestId('panel');
+    expect(panel.contains(screen.getByTestId('gold-section'))).toBe(true);
+    expect(panel.contains(screen.getByTestId('lattice-section'))).toBe(true);
+    expect(controls.received.gold).toBe(controls.gold);
+    expect(controls.received.lattice).toBe(controls.lattice);
+  });
+
   it('composes the backdrop, medallion, nav and header', () => {
     mount();
 

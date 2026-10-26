@@ -91,6 +91,38 @@ function targetFeature(resolved: string): { feature: string; rest: string } | nu
   return match ? { feature: match[1], rest: match[2] ?? '' } : null;
 }
 
+const HEAVY_PACKAGE = /^(react|react-dom|three|@react-three\/.*|zustand.*)$/;
+
+/** The file a relative specifier points at, trying the usual extensions and an index file. */
+function resolveRelative(from: string, specifier: string): string | null {
+  const base = resolve(join(from, '..'), specifier);
+  const candidates = [`${base}.ts`, `${base}.tsx`, join(base, 'index.ts'), join(base, 'index.tsx')];
+  return candidates.find((candidate) => {
+    try {
+      return statSync(candidate).isFile();
+    } catch {
+      return false;
+    }
+  }) ?? null;
+}
+
+/** Every file reachable from `entry` through relative, value (non-type-only) imports, entry included. */
+function reachableFiles(entry: string): string[] {
+  const seen = new Set<string>();
+  const queue = [entry];
+  while (queue.length > 0) {
+    const file = queue.pop() as string;
+    if (seen.has(file)) continue;
+    seen.add(file);
+    for (const ref of importsOf(file)) {
+      if (ref.isTypeOnly || !ref.specifier.startsWith('.')) continue;
+      const next = resolveRelative(file, ref.specifier);
+      if (next) queue.push(next);
+    }
+  }
+  return [...seen];
+}
+
 const files = sourceFiles(SRC);
 const everyImport = files.flatMap((file) => importsOf(file).map((ref) => ({ ...ref, abs: file })));
 const isException = (file: string, specifier: string) =>
@@ -143,7 +175,7 @@ describe('feature boundaries', () => {
     expect(offences).toEqual([]);
   });
 
-  it('keeps every pure model entry free of React, Three.js and the DOM', () => {
+  it('keeps every pure model entry free of React, Three.js and the DOM, however deep', () => {
     const entries = readdirSync(FEATURES_DIR)
       .map((name) => join(FEATURES_DIR, name, 'model', 'index.ts'))
       .filter((path) => {
@@ -155,11 +187,12 @@ describe('feature boundaries', () => {
       });
     expect(entries.length).toBeGreaterThanOrEqual(2);
 
-    const heavy = /^(react|react-dom|three|@react-three\/.*|zustand.*)$/;
     const offences = entries.flatMap((entry) =>
-      importsOf(entry)
-        .filter((ref) => !ref.isTypeOnly && heavy.test(ref.specifier))
-        .map((ref) => `${ref.file} imports ${ref.specifier}`),
+      reachableFiles(entry).flatMap((file) =>
+        importsOf(file)
+          .filter((ref) => !ref.isTypeOnly && HEAVY_PACKAGE.test(ref.specifier))
+          .map((ref) => `${ref.file} imports ${ref.specifier} (reachable from ${relative(ROOT, entry)})`),
+      ),
     );
 
     expect(offences).toEqual([]);

@@ -23,7 +23,7 @@ The 2026-10-26 modularity review (`docs/modularity-review/2026-10-26/modularity-
 
 ## [x] Phase 0 — Baseline and tracking
 - [x] 0.1 Tree clean apart from `docs/modularity-review/`. Staying on `integrate/best-of-pr2-6`.
-- [x] 0.2 Baseline (2026-10-26): tsc clean; 585 test files, 4320 tests pass; coverage 100 % statements (5430), branches (1891), functions (1277), lines; `DISCIPLINE_DEBT` = 50 rows.
+- [x] 0.2 Baseline (2026-10-26): tsc clean; 585 test files, 4320 tests pass; coverage 100 % statements (5430), branches (1891), functions (1277), lines; `DISCIPLINE_DEBT` = 49 rows.
 - [x] 0.3 Checklist copied here.
 - [x] 0.4 Review docs committed (0b8609ad).
 
@@ -86,7 +86,7 @@ Goal: `premiere` no longer imports `frame-studio`, and there is one port type, n
 - [x] 3.7 Addendum 039 + register row. Gate. The Frame Studio must still drive the scene: the `getTarget` getter is lazy, so timing is unchanged.
 
 ## [x] Phase 4 — Finding 4 (Significant): console cohesion, one celebration recipe, one seed
-> **Status:** all of Phase 4 done (4A, 4B: ADDENDUM-040; 4C: ADDENDUM-042). 4C changes what the premiere console shows: it no longer carries GOLD UI KIT or DECO LATTICE. Reverse in ADDENDUM-042 §2 if that was wrong. `EventNightStage` and `stubPreview` came off the discipline debt (50 → 48).
+> **Status:** all of Phase 4 done (4A, 4B: ADDENDUM-040; 4C: ADDENDUM-042). 4C changes what the premiere console shows: it no longer carries GOLD UI KIT or DECO LATTICE. Reverse in ADDENDUM-042 §2 if that was wrong. `EventNightStage` and `stubPreview` came off the discipline debt (49 → 47 rows).
 
 **4A. One default seed**
 - [x] 4A.1 Add `DEFAULT_SEED = 1925` (with the existing "year of the novel" note from `enamel-backdrop/goldLeaf.ts`) to `shared/lib/random.ts`, with a test.
@@ -165,7 +165,7 @@ Goal: the "barrel is the only door" rule becomes a test. Run after Phases 1–4 
 - [ ] 6.5 Addendum 042 + register row. Gate, plus a local browser check of the timeline scrub, camera toggle, nitrate toggle and title edit.
 
 ## Phase 7 — Close-out
-- [ ] 7.1 Run the code-reviewer over the full diff and fix CRITICAL and HIGH findings. (Not run: left for you to request.)
+- [x] 7.1 Code review run over the full diff (`f00796db..HEAD`): no CRITICAL or HIGH findings, four MEDIUM and three LOW. Fixed: `normalizeFrameStyle` now spreads the style as well as the formula; the model-entry purity check walks imports transitively (it could not fail before: a `three` import planted one hop away passed, and now fails); tests added for the Frame Studio binding in `PremiereSurfaces` and for Event Night mounting both sections, each seen to fail when the line it guards is broken; the nav-pick test asserts `aria-current`; the debt cap is 47, matching the 47 rows. Not changed: `Section`/`SliderRow` exported from `spectacle-preview` (a known trade-off, ADDENDUM-042). My earlier "50 → 48" debt counts included the interface line; the real figures are 49 → 47.
 - [x] 7.2 Greps re-run: no formula-level clamp outside `styleRules` (the Deco Lattice's own layer count is noted in ADDENDUM-037); `1925` only in `DEFAULT_SEED`, the two hash/offset literals and two comments; 0 deep imports in source; 0 `frame-studio` references in `premiere`; 0 sibling imports in the four image features; `managerRef` still 31 (Phase 6 not done).
 - [x] 7.3 Checklist ticked. Deferred and open: Phase 6 (single source of truth for premiere state; needs a browser), the `FrameStudioVocabulary` grouping export, and the Deco Lattice's own 1-4 layer count.
 - [x] 7.4 Browser caveat: type-checks, tests pass, builds; visual verification pending until `npm run e2e` is run on darwin.
